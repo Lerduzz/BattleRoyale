@@ -1,0 +1,40 @@
+[worldserver]
+
+####################################################
+# Announce module when player login 
+# Default: 1 (Enabled)
+#          0 (Disabled)
+EventParkour.Announce = 1
+
+####################################################
+# Announce event status 
+# Default: 1 (Enabled)
+#          0 (Disabled)
+EventParkour.Announce.Queue   = 1
+EventParkour.Announce.Start   = 1
+EventParkour.Announce.Join    = 1
+EventParkour.Announce.Logout  = 0
+
+####################################################
+# Minimun players needed to start
+# Default: 30 (Must be >= 1)
+EventParkour.MinPlayersToStart = 30
+
+####################################################
+# Max players
+# Default: 50 (Must be >= 1)
+EventParkour.MaxPlayers = 50
+
+####################################################
+# Start event delay
+# Default: 60000 (Must be >= 60000 and <= 300000)
+EventParkour.EventStartDelay = 60000
+
+####################################################
+# Visual phases (Use carefully)
+# Default: Normal = 1
+#          Event  = 2
+#          Delay  = 4
+EventParkour.Phase.Normal = 1
+EventParkour.Phase.Event  = 2
+EventParkour.Phase.Delay  = 4

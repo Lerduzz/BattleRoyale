@@ -1,0 +1,391 @@
+#include "EventParkourMgr.h"
+#include "Config.h"
+#include "Chat.h"
+#include "Player.h"
+
+EventParkourMgr::EventParkourMgr()
+{
+    hasTeleported = false;
+    hasEventStarted = false;
+    hasEventClose = false;
+    hasEventEnded = true;
+    nextReward = 1;
+	inTimeToEvent = false;
+	hasAnnouncedEvent = false;
+}
+
+EventParkourMgr::~EventParkourMgr()
+{
+	ep_Players.clear();
+    ep_PlayersData.clear();
+}
+
+// Not Fly!
+void EventParkourMgr::HandleDismountFly(Player *player)
+{
+    if (!inTimeToEvent || hasEventClose)
+        return;
+    if (ep_Players.find(player->GetGUID().GetCounter()) == ep_Players.end())
+        return;
+    if (!player->HasAura(31700))
+        return;
+    player->Dismount();
+    player->RemoveAurasByType(SPELL_AURA_MOUNTED);
+    player->RemoveAurasDueToSpell(31700);
+}
+
+void EventParkourMgr::HandlePlayerJoin(Player *player)
+{
+    if (!inTimeToEvent)
+    {
+        ChatHandler(player->GetSession()).PSendSysMessage("|cff4CFF00EventParkour::|r En este momento el evento no se esta efectuando, regresa el sabado entre las 8:00pm y las 10:00pm.");
+        return;
+    }
+    if (ep_Players.find(player->GetGUID().GetCounter()) != ep_Players.end())
+    {
+        ChatHandler(player->GetSession()).PSendSysMessage("|cff4CFF00EventParkour::|r Ya estas en cola para el evento.");
+        return;
+    }
+    if (hasEventEnded)
+    {
+        ChatHandler(player->GetSession()).PSendSysMessage("|cff4CFF00EventParkour::|r El evento ha finalizado.");
+        return;
+    }
+    if (hasEventClose)
+    {
+        ChatHandler(player->GetSession()).PSendSysMessage("|cff4CFF00EventParkour::|r El evento ya esta cerrado.");
+        return;
+    }
+    uint32 count;
+    uint32 maxp = sConfigMgr->GetOption<int32>("EventParkour.MaxPlayers", 50);
+    count = ep_Players.size();
+    if (count >= maxp)
+    {
+        ChatHandler(player->GetSession()).PSendSysMessage("|cff4CFF00EventParkour::|r El evento esta lleno, intenta mas tarde.");
+        return;
+    }
+
+	ep_Players[player->GetGUID().GetCounter()] = player;
+    ep_PlayersData[player->GetGUID().GetCounter()].SetPosition(player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetOrientation());
+
+    count = ep_Players.size();
+    uint32 minp = sConfigMgr->GetOption<int32>("EventParkour.MinPlayersToStart", 30);
+    if(count >= minp && !hasTeleported)
+    {
+        if (sConfigMgr->GetOption<bool>("EventParkour.Announce.Start", true))
+        {
+            std::ostringstream msg;
+            msg << "|cff4CFF00EventParkour::|r " << player->GetName().c_str() << " ha completado la cola, teletransportando a los jugadores al evento. Los demas jugadores seran teletransportado a penas se unan a la cola.";
+            sWorld->SendServerMessage(SERVER_MSG_STRING, msg.str().c_str());
+        }
+        TeleportToEvent(0);
+    }
+    else if (!hasTeleported)
+    {
+        if (sConfigMgr->GetOption<bool>("EventParkour.Announce.Queue", true))
+        {
+            std::ostringstream msg;
+            msg << "|cff4CFF00EventParkour::|r " << player->GetName().c_str() << " se ha unido a la cola, falta " << (minp - count) << " mas para comenzar.";
+            sWorld->SendServerMessage(SERVER_MSG_STRING, msg.str().c_str());
+        }
+    }
+    else
+    {
+        if (sConfigMgr->GetOption<bool>("EventParkour.Announce.Join", true))
+        {
+            std::ostringstream msg;
+            msg << "|cff4CFF00EventParkour::|r " << player->GetName().c_str() << " se ha unido al evento.";
+            sWorld->SendServerMessage(SERVER_MSG_STRING, msg.str().c_str());
+        }
+        TeleportToEvent(player->GetGUID().GetCounter());
+    }
+}
+
+void EventParkourMgr::HandlePlayerLogout(Player *player)
+{
+    if (ep_Players.find(player->GetGUID().GetCounter()) == ep_Players.end()) return;
+    uint32 guid = player->GetGUID().GetCounter();
+    ExitFromPhaseEvent(guid);
+    ep_Players.erase(guid);
+    ep_PlayersData.erase(guid);
+    if (sConfigMgr->GetOption<bool>("EventParkour.Announce.Logout", false))
+    {
+        std::ostringstream msg;
+        msg << "|cff4CFF00EventParkour::|r " << player->GetName().c_str() << " se ha desconectado y ha dejado el evento.";
+        sWorld->SendServerMessage(SERVER_MSG_STRING, msg.str().c_str());
+    }
+}
+
+void EventParkourMgr::HandleGiveReward(Player *player)
+{
+    if (ep_Players.find(player->GetGUID().GetCounter()) == ep_Players.end() || !inTimeToEvent) return;
+
+    uint32 money;
+    std::string place;
+    if (nextReward == 1)
+    {
+        money = 50000000;
+        place = "PRIMER";
+    }
+    else if (nextReward == 2)
+    {
+        money = 30000000;
+        place = "SEGUNDO";
+    }
+    else if (nextReward == 3)
+    {
+        money = 10000000;
+        place = "TERCER";
+
+        hasEventClose = true;
+    }
+    else return;
+
+    std::ostringstream msg;
+    msg << "|cff4CFF00EventParkour::|r Felicitaciones " << player->GetName().c_str() << " has quedado en el |cff4CFF00" << place << " LUGAR|r.";
+    sWorld->SendServerMessage(SERVER_MSG_STRING, msg.str().c_str());
+
+    std::string subject = "Parkour de la Muerte";
+    std::string text    = "Felicitaciones, has ganado en el evento, aqui tienes tu recompensa!";
+
+    // Enviado por Atencion al cliente
+    MailSender sender(MAIL_NORMAL, 0, MAIL_STATIONERY_GM);
+
+    // Llenar el correo
+    MailDraft draft(subject, text);
+
+    CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
+
+    // Agrega el objeto al correo si es el primer lugar (TODO: Y no tiene ya el objeto).
+    if (nextReward == 1)
+    {
+        Item* item = Item::CreateItem(21176, 1, 0);
+        item->SaveToDB(trans);
+        draft.AddItem(item);
+    }
+
+    // Agrega la recompensa monetaria al correo.
+    draft.AddMoney(money);
+
+    // Envia el correo.
+    draft.SendMailTo(trans, MailReceiver(player, player->GetGUID().GetCounter()), sender);
+    CharacterDatabase.CommitTransaction(trans);
+
+    // Si ya ganaron los 3 lugares termina el evento.
+    nextReward++;
+    if (nextReward == 4)
+    {
+        std::ostringstream msg2;
+        msg2 << "|cff4CFF00EventParkour::|r El evento ha finalizado.";
+        sWorld->SendServerMessage(SERVER_MSG_STRING, msg2.str().c_str());
+        ExitFromEvent(0);
+		hasEventEnded = true;
+    }
+    else
+    {
+        ExitFromEvent(player->GetGUID().GetCounter());
+    }
+}
+
+void EventParkourMgr::StartEvent(uint32 guid)
+{
+	if (!guid)
+	{
+		for (ParkourPlayerList::iterator it = ep_Players.begin(); it != ep_Players.end(); ++it)
+        {
+            EnterToPhaseEvent((*it).first);
+            ep_PlayersData[(*it).first].SetLast((*it).second->GetPositionZ());
+        }
+        hasEventStarted = true;
+        hackCheckDelay = 5000;
+	}
+	else
+    {
+        EnterToPhaseEvent(guid);
+        ep_PlayersData[guid].SetLast(ep_Players[guid]->GetPositionZ());
+    }
+}
+
+void EventParkourMgr::TeleportToEvent(uint32 guid)
+{
+	if (!guid)
+	{
+        startDelay = sConfigMgr->GetOption<int32>("EventParkour.EventStartDelay", 60000);
+		secondsDelay = startDelay / 1000;
+        for (ParkourPlayerList::iterator it = ep_Players.begin(); it != ep_Players.end(); ++it)
+		{
+			(*it).second->TeleportTo(0, -13246.281f, 193.465f, 31.019f, 1.130f);
+            EnterToPhaseDelay((*it).first);
+            (*it).second->SaveToDB(false, false);
+		}
+        hasTeleported = true;
+	}
+	else
+	{
+        ep_Players[guid]->TeleportTo(0, -13246.281f, 193.465f, 31.019f, 1.130f);
+        if (hasEventStarted) EnterToPhaseEvent(guid);
+        else EnterToPhaseDelay(guid);
+        ep_Players[guid]->SaveToDB(false, false);
+	}
+}
+
+void EventParkourMgr::ExitFromEvent(uint32 guid)
+{
+	if (!guid)
+	{
+		for (ParkourPlayerList::iterator it = ep_Players.begin(); it != ep_Players.end(); ++it)
+		{
+            if (!(*it).second->IsAlive()) ResurrectPlayer((*it).second);
+            ExitFromPhaseEvent((*it).first);
+            (*it).second->TeleportTo(571, 5804.149902f, 624.770996f, 647.767029f, 1.533971f);
+            (*it).second->SaveToDB(false, false);
+            ep_Players.erase((*it).first);
+		    ep_PlayersData.erase((*it).first);
+		}
+	}
+	else
+	{
+        if (!ep_Players[guid]->IsAlive()) ResurrectPlayer(ep_Players[guid]);
+        ExitFromPhaseEvent(guid);
+        ep_Players[guid]->TeleportTo(571, 5804.149902f, 624.770996f, 647.767029f, 1.533971f);
+        ep_Players[guid]->SaveToDB(false, false);
+        ep_Players.erase(guid);
+	    ep_PlayersData.erase(guid);
+	}
+}
+
+void EventParkourMgr::HandleReleaseGhost(Player *player, uint32 oldArea, uint32 newArea)
+{
+    if (ep_Players.find(player->GetGUID().GetCounter()) == ep_Players.end()) return;
+	if ((oldArea == 1741 || oldArea == 2177) && newArea == 1741 && !player->IsAlive())
+    {
+        player->TeleportTo(0, -13246.281f, 193.465f, 31.019f, 1.130f);
+        ResurrectPlayer(player);
+    }
+    else if ((oldArea == 1741 || oldArea == 2177) && newArea != 1741 && newArea != 2177)
+    {
+        if (!player->IsAlive()) ResurrectPlayer(player);
+        ExitFromPhaseEvent(player->GetGUID().GetCounter());
+        ep_Players.erase(player->GetGUID().GetCounter());
+        ep_PlayersData.erase(player->GetGUID().GetCounter());
+        ChatHandler(player->GetSession()).PSendSysMessage("|cff4CFF00EventParkour::|r Has abandonado la zona del evento.");
+    }
+}
+
+void EventParkourMgr::HandleOnWoldUpdate(uint32 diff)
+{
+    time_t t = time(NULL);
+    tm *now = localtime(&t);
+
+	if (now->tm_wday == 6 /*Saturday*/ && now->tm_hour >= 20/*8:00pm*/ && now->tm_hour <= 21/*9:00pm*/)
+	{
+		if (!hasAnnouncedEvent && hasEventEnded)
+		{
+			std::ostringstream msg2;
+			msg2 << "|cff4CFF00EventParkour::|r El Evento Parkour de la Muerte va a comenzar en la Arena Gurubachi en Vega de Tuercespina.";
+			sWorld->SendServerMessage(SERVER_MSG_STRING, msg2.str().c_str());
+			hasAnnouncedEvent = true;
+			inTimeToEvent = true;
+            hasEventEnded = false;
+		}
+	}
+	else
+	{
+		if (!hasEventEnded)
+		{
+			std::ostringstream msg2;
+			msg2 << "|cff4CFF00EventParkour::|r El evento ha finalizado.";
+			sWorld->SendServerMessage(SERVER_MSG_STRING, msg2.str().c_str());
+			ExitFromEvent(0);
+			hasEventEnded = true;
+		}
+        if (hasAnnouncedEvent)
+        {
+            hasTeleported = false;
+            hasEventStarted = false;
+            hasEventClose = false;
+            nextReward = 1;
+            inTimeToEvent = false;
+            hasAnnouncedEvent = false;
+        }
+	}
+
+
+	if (hasEventStarted)
+    {
+        if (hackCheckDelay <= diff)
+        {
+            CheckForHacks(0);
+            hackCheckDelay = 5000;
+        }
+        else hackCheckDelay -= diff;
+    }
+    if (!hasTeleported || hasEventStarted) return;
+    if (secondsDelay * 1000 > startDelay)
+    {
+        SendNotification(0, secondsDelay);
+        if (secondsDelay > 5) secondsDelay -= 5;
+        else if (secondsDelay > 0) secondsDelay--;
+    }
+    if (startDelay <= diff) StartEvent(0);
+    else startDelay -= diff;
+}
+
+// -- Private functions -- //
+void EventParkourMgr::EnterToPhaseDelay(uint32 guid)
+{
+	ep_Players[guid]->SetPhaseMask(4, false);
+    ep_Players[guid]->UpdateObjectVisibility();
+}
+
+void EventParkourMgr::EnterToPhaseEvent(uint32 guid)
+{
+	ep_Players[guid]->SetPhaseMask(2, false);
+    ep_Players[guid]->UpdateObjectVisibility();
+}
+
+void EventParkourMgr::ExitFromPhaseEvent(uint32 guid)
+{
+	ep_Players[guid]->SetPhaseMask(1, false);
+    ep_Players[guid]->UpdateObjectVisibility();
+}
+
+void EventParkourMgr::ResurrectPlayer(Player *player)
+{
+	player->ResurrectPlayer(1.0f);
+    player->SpawnCorpseBones();
+    player->SaveToDB(false, false);
+}
+
+void EventParkourMgr::CheckForHacks(uint32 guid)
+{
+    if (!guid)
+        for (ParkourPlayerData::iterator it = ep_PlayersData.begin(); it != ep_PlayersData.end(); ++it)
+		{
+            if ((*it).second.IsHackingZ(ep_Players[(*it).first]->GetPositionZ()))
+            {
+                ep_Players[(*it).first]->TeleportTo(0, -13246.281f, 193.465f, 31.019f, 1.130f);
+                ep_Players[(*it).first]->SaveToDB(false, false);
+                (*it).second.SetLast(ep_Players[(*it).first]->GetPositionZ());
+                ChatHandler(ep_Players[(*it).first]->GetSession()).PSendSysMessage("|cff4CFF00EventParkour::|r Has sido transportado al inicio por movimiento sospechoso (posible hack).");
+            }
+        }
+    else
+    {
+        if (ep_PlayersData[guid].IsHackingZ(ep_Players[guid]->GetPositionZ()))
+        {
+            ep_Players[guid]->TeleportTo(0, -13246.281f, 193.465f, 31.019f, 1.130f);
+            ep_Players[guid]->SaveToDB(false, false);
+            ep_PlayersData[guid].SetLast(ep_Players[guid]->GetPositionZ());
+            ChatHandler(ep_Players[guid]->GetSession()).PSendSysMessage("|cff4CFF00EventParkour::|r Has sido transportado al inicio por movimiento sospechoso (posible hack).");
+        }
+    }
+}
+
+void EventParkourMgr::SendNotification(uint32 guid, uint32 delay)
+{
+    if (!guid)
+        for (ParkourPlayerList::iterator it = ep_Players.begin(); it != ep_Players.end(); ++it)
+			(*it).second->GetSession()->SendNotification("|cff00ff00FALTA(N) |cffDA70D6%u|cff00ff00 SEGUNDO(S) PARA COMENZAR!", delay);
+    else ep_Players[guid]->GetSession()->SendNotification("|cff00ff00FALTA(N) |cffDA70D6%u|cff00ff00 SEGUNDO(S) PARA COMENZAR!", delay);
+}
