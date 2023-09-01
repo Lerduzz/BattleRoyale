@@ -37,6 +37,7 @@ public:
     void StartEvent(uint32 guid);
     void TeleportToEvent(uint32 guid);
     void ExitFromEvent(uint32 guid);
+    bool ForceFFAPvPFlag(Player* player);
     
 private:
     void EnterToPhaseDelay(uint32 guid);
