@@ -43,17 +43,13 @@ public:
     ModBattleRoyalePlayer() : PlayerScript("ModBattleRoyalePlayer") { }
 
     void OnLogin(Player* player) override {
-        if (!player)
-            return;
-
         if (sConfigMgr->GetOption<bool>("BattleRoyale.Enabled", true)) {
             if (sConfigMgr->GetOption<bool>("BattleRoyale.Announce", true)) {
                 ChatHandler(player->GetSession()).SendSysMessage("El modulo |cff4CFF00BattleRoyale|r ha sido activado.");
             }
-            player->SetByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
         }
     }
-
+    
     void OnLogout(Player* player) override {
         sBattleRoyaleMgr->HandlePlayerLogout(player);
     }
@@ -62,6 +58,10 @@ public:
 	{
 		sBattleRoyaleMgr->HandleReleaseGhost(player, oldArea, newArea);
 	}
+
+    bool BRForcePlayerFFAPvPFlag(Player* player) override {
+        return true;
+    }
 };
 
 class npc_battleroyale : public CreatureScript
