@@ -1,40 +1,37 @@
 [worldserver]
 
 ####################################################
+# Module control
+# Default: 1 (Enabled)
+#          0 (Disabled)
+BattleRoyale.Enabled = 1
+
+####################################################
 # Announce module when player login 
 # Default: 1 (Enabled)
 #          0 (Disabled)
-EventParkour.Announce = 1
-
-####################################################
-# Announce event status 
-# Default: 1 (Enabled)
-#          0 (Disabled)
-EventParkour.Announce.Queue   = 1
-EventParkour.Announce.Start   = 1
-EventParkour.Announce.Join    = 1
-EventParkour.Announce.Logout  = 0
+BattleRoyale.Announce = 1
 
 ####################################################
 # Minimun players needed to start
-# Default: 30 (Must be >= 1)
-EventParkour.MinPlayersToStart = 30
+# Default: 25 (Must be >= 10)
+BattleRoyale.MinPlayers = 25
 
 ####################################################
 # Max players
-# Default: 50 (Must be >= 1)
-EventParkour.MaxPlayers = 50
+# Default: 50 (Must be >= 10)
+BattleRoyale.MaxPlayers = 50
 
 ####################################################
 # Start event delay
 # Default: 60000 (Must be >= 60000 and <= 300000)
-EventParkour.EventStartDelay = 60000
+# BattleRoyale.EventStartDelay = 60000
 
 ####################################################
 # Visual phases (Use carefully)
 # Default: Normal = 1
 #          Event  = 2
 #          Delay  = 4
-EventParkour.Phase.Normal = 1
-EventParkour.Phase.Event  = 2
-EventParkour.Phase.Delay  = 4
+# BattleRoyale.Phase.Normal = 1
+# BattleRoyale.Phase.Event  = 2
+# BattleRoyale.Phase.Delay  = 4
