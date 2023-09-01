@@ -4,27 +4,27 @@
 #include "Common.h"
 #include "SharedDefines.h"
 #include "ScriptMgr.h"
-#include "EventParkourData.h"
+#include "BattleRoyaleData.h"
 #include "Chat.h"
 #include "Player.h"
 
-class EventParkourData;
+class BattleRoyaleData;
 
 // GUIDLow es la llave, Lista de personajes en el evento.
 typedef std::map<uint32, Player*> ParkourPlayerList;
 
 // GUIDLow es la llave, Datos de los personajes en el evento.
-typedef std::map<uint32, EventParkourData> ParkourPlayerData;
+typedef std::map<uint32, BattleRoyaleData> ParkourPlayerData;
 
-class EventParkourMgr
+class BattleRoyaleMgr
 {
-    EventParkourMgr();
-    ~EventParkourMgr();
+    BattleRoyaleMgr();
+    ~BattleRoyaleMgr();
 
 public:
-    static EventParkourMgr *instance()
+    static BattleRoyaleMgr *instance()
     {
-        static EventParkourMgr *instance = new EventParkourMgr();
+        static BattleRoyaleMgr *instance = new BattleRoyaleMgr();
         return instance;
     }
     
@@ -64,6 +64,6 @@ private:
     
 };
 
-#define sEventParkourMgr EventParkourMgr::instance()
+#define sBattleRoyaleMgr BattleRoyaleMgr::instance()
 
 #endif

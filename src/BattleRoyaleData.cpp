@@ -1,6 +1,6 @@
-#include "EventParkourData.h"
+#include "BattleRoyaleData.h"
 
-EventParkourData::EventParkourData()
+BattleRoyaleData::BattleRoyaleData()
 {
     last_z = 0.0f;
     start_x = 0.0f;
@@ -9,11 +9,11 @@ EventParkourData::EventParkourData()
     start_o = 0.0f;
 }
 
-EventParkourData::~EventParkourData()
+BattleRoyaleData::~BattleRoyaleData()
 {
 }
 
-void EventParkourData::SetPosition(float x, float y, float z, float o)
+void BattleRoyaleData::SetPosition(float x, float y, float z, float o)
 {
     start_x = x;
     start_y = y;
@@ -21,37 +21,37 @@ void EventParkourData::SetPosition(float x, float y, float z, float o)
     start_o = o;
 }
 
-void EventParkourData::SetLast(float last)
+void BattleRoyaleData::SetLast(float last)
 {
     last_z = last;
 }
 
-float EventParkourData::GetLast()
+float BattleRoyaleData::GetLast()
 {
     return last_z;
 }
 
-float EventParkourData::GetX()
+float BattleRoyaleData::GetX()
 {
     return start_x;
 }
 
-float EventParkourData::GetY()
+float BattleRoyaleData::GetY()
 {
     return start_y;
 }
 
-float EventParkourData::GetZ()
+float BattleRoyaleData::GetZ()
 {
     return start_z;
 }
 
-float EventParkourData::GetO()
+float BattleRoyaleData::GetO()
 {
     return start_o;
 }
 
-bool EventParkourData::IsHackingZ(float z)
+bool BattleRoyaleData::IsHackingZ(float z)
 {
     if (last_z > z)
     {

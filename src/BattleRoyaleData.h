@@ -1,13 +1,13 @@
 #ifndef SC_EPDATA_H
 #define SC_EPDATA_H
 
-#include "EventParkourMgr.h"
+#include "BattleRoyaleMgr.h"
 
-class EventParkourData
+class BattleRoyaleData
 {
 public:
-    EventParkourData();
-    ~EventParkourData();
+    BattleRoyaleData();
+    ~BattleRoyaleData();
 
     void SetPosition(float x, float y, float z, float o);
     void SetLast(float last);

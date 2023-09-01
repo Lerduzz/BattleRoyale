@@ -1,1 +1,1 @@
-void AddModEventParkourScripts();
+void AddModBattleRoyaleScripts();

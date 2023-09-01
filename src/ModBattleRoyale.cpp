@@ -2,7 +2,7 @@
  *  Event: Parkour of Death
  */
 
-#include "EventParkourMgr.h"
+#include "BattleRoyaleMgr.h"
 #include "ScriptMgr.h"
 #include "Player.h"
 #include "Config.h"
@@ -26,44 +26,50 @@
 #include "SpellAuraEffects.h"
 
 // Not Fly!
-class DismountParkourScript : public MovementHandlerScript
-{
-    public:
-        DismountParkourScript() : MovementHandlerScript("DismountParkourScript") { }
+// class DismountParkourScript : public MovementHandlerScript
+// {
+//     public:
+//         DismountParkourScript() : MovementHandlerScript("DismountParkourScript") { }
+// 
+//         void OnPlayerMove(Player* player, MovementInfo /*movementInfo*/, uint32 /*opcode*/) override
+//         {
+//             sBattleRoyaleMgr->HandleDismountFly(player);
+//         }
+// };
 
-        void OnPlayerMove(Player* player, MovementInfo /*movementInfo*/, uint32 /*opcode*/) override
-        {
-            sEventParkourMgr->HandleDismountFly(player);
-        }
-};
-
-class ModEventParkourPlayer : public PlayerScript{
+class ModBattleRoyalePlayer : public PlayerScript{
 public:
 
-    ModEventParkourPlayer() : PlayerScript("ModEventParkourPlayer") { }
+    ModBattleRoyalePlayer() : PlayerScript("ModBattleRoyalePlayer") { }
 
     void OnLogin(Player* player) override {
-        if (sConfigMgr->GetOption<bool>("EventParkour.Announce", true)) {
-            ChatHandler(player->GetSession()).SendSysMessage("El modulo |cff4CFF00EventParkour|r ha sido activado.");
+        if (!player)
+            return;
+
+        if (sConfigMgr->GetOption<bool>("BattleRoyale.Enabled", true)) {
+            if (sConfigMgr->GetOption<bool>("BattleRoyale.Announce", true)) {
+                ChatHandler(player->GetSession()).SendSysMessage("El modulo |cff4CFF00BattleRoyale|r ha sido activado.");
+            }
+            player->SetByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
         }
     }
 
     void OnLogout(Player* player) override {
-        sEventParkourMgr->HandlePlayerLogout(player);
+        sBattleRoyaleMgr->HandlePlayerLogout(player);
     }
 
     void OnUpdateArea(Player *player, uint32 oldArea, uint32 newArea) override
 	{
-		sEventParkourMgr->HandleReleaseGhost(player, oldArea, newArea);
+		sBattleRoyaleMgr->HandleReleaseGhost(player, oldArea, newArea);
 	}
 };
 
-class npc_eventparkour : public CreatureScript
+class npc_battleroyale : public CreatureScript
 {
 
 public:
 
-    npc_eventparkour() : CreatureScript("npc_eventparkour") { }
+    npc_battleroyale() : CreatureScript("npc_battleroyale") { }
 
     bool OnGossipHello(Player* player, Creature* creature)
     {
@@ -80,7 +86,7 @@ public:
         switch (action)
         {
         case 1:
-            sEventParkourMgr->HandlePlayerJoin(player);
+            sBattleRoyaleMgr->HandlePlayerJoin(player);
             break;
         case 2:
             break;
@@ -90,12 +96,12 @@ public:
     }
 };
 
-class npc_eventparkour_tele : public CreatureScript
+class npc_battleroyale_tele : public CreatureScript
 {
 
 public:
 
-    npc_eventparkour_tele() : CreatureScript("npc_eventparkour_tele") { }
+    npc_battleroyale_tele() : CreatureScript("npc_battleroyale_tele") { }
 
     bool OnGossipHello(Player* player, Creature* creature)
     {
@@ -146,12 +152,12 @@ public:
     }
 };
 
-class npc_eventparkour_winner : public CreatureScript
+class npc_battleroyale_winner : public CreatureScript
 {
 
 public:
 
-    npc_eventparkour_winner() : CreatureScript("npc_eventparkour_winner") { }
+    npc_battleroyale_winner() : CreatureScript("npc_battleroyale_winner") { }
 
     bool OnGossipHello(Player* player, Creature* creature)
     {
@@ -168,7 +174,7 @@ public:
         switch (action)
         {
         case 1:
-            sEventParkourMgr->HandleGiveReward(player);
+            sBattleRoyaleMgr->HandleGiveReward(player);
             break;
         case 2:
             break;
@@ -178,24 +184,24 @@ public:
     }
 };
 
-class EventParkourWorldScript : public WorldScript
+class BattleRoyaleWorldScript : public WorldScript
 {
 public:
-	EventParkourWorldScript()
-		: WorldScript("EventParkourWorldScript")
+	BattleRoyaleWorldScript()
+		: WorldScript("BattleRoyaleWorldScript")
 	{
 	}
 	void OnUpdate(uint32 diff) override
 	{
-		sEventParkourMgr->HandleOnWoldUpdate(diff);
+		sBattleRoyaleMgr->HandleOnWoldUpdate(diff);
 	}
 };
 
-void AddModEventParkourScripts() {
-    new DismountParkourScript();
-    new ModEventParkourPlayer();
-    new EventParkourWorldScript();
-    new npc_eventparkour();
-    new npc_eventparkour_tele();
-    new npc_eventparkour_winner();
+void AddModBattleRoyaleScripts() {
+    // new DismountParkourScript();
+    new ModBattleRoyalePlayer();
+    new BattleRoyaleWorldScript();
+    new npc_battleroyale();
+    new npc_battleroyale_tele();
+    new npc_battleroyale_winner();
 }

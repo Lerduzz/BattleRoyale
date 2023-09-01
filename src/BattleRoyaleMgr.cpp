@@ -1,9 +1,9 @@
-#include "EventParkourMgr.h"
+#include "BattleRoyaleMgr.h"
 #include "Config.h"
 #include "Chat.h"
 #include "Player.h"
 
-EventParkourMgr::EventParkourMgr()
+BattleRoyaleMgr::BattleRoyaleMgr()
 {
     hasTeleported = false;
     hasEventStarted = false;
@@ -14,14 +14,14 @@ EventParkourMgr::EventParkourMgr()
 	hasAnnouncedEvent = false;
 }
 
-EventParkourMgr::~EventParkourMgr()
+BattleRoyaleMgr::~BattleRoyaleMgr()
 {
 	ep_Players.clear();
     ep_PlayersData.clear();
 }
 
 // Not Fly!
-void EventParkourMgr::HandleDismountFly(Player *player)
+void BattleRoyaleMgr::HandleDismountFly(Player *player)
 {
     if (!inTimeToEvent || hasEventClose)
         return;
@@ -34,34 +34,34 @@ void EventParkourMgr::HandleDismountFly(Player *player)
     player->RemoveAurasDueToSpell(31700);
 }
 
-void EventParkourMgr::HandlePlayerJoin(Player *player)
+void BattleRoyaleMgr::HandlePlayerJoin(Player *player)
 {
     if (!inTimeToEvent)
     {
-        ChatHandler(player->GetSession()).PSendSysMessage("|cff4CFF00EventParkour::|r En este momento el evento no se esta efectuando, regresa el sabado entre las 8:00pm y las 10:00pm.");
+        ChatHandler(player->GetSession()).PSendSysMessage("|cff4CFF00BattleRoyale::|r En este momento el evento no se esta efectuando, regresa el sabado entre las 8:00pm y las 10:00pm.");
         return;
     }
     if (ep_Players.find(player->GetGUID().GetCounter()) != ep_Players.end())
     {
-        ChatHandler(player->GetSession()).PSendSysMessage("|cff4CFF00EventParkour::|r Ya estas en cola para el evento.");
+        ChatHandler(player->GetSession()).PSendSysMessage("|cff4CFF00BattleRoyale::|r Ya estas en cola para el evento.");
         return;
     }
     if (hasEventEnded)
     {
-        ChatHandler(player->GetSession()).PSendSysMessage("|cff4CFF00EventParkour::|r El evento ha finalizado.");
+        ChatHandler(player->GetSession()).PSendSysMessage("|cff4CFF00BattleRoyale::|r El evento ha finalizado.");
         return;
     }
     if (hasEventClose)
     {
-        ChatHandler(player->GetSession()).PSendSysMessage("|cff4CFF00EventParkour::|r El evento ya esta cerrado.");
+        ChatHandler(player->GetSession()).PSendSysMessage("|cff4CFF00BattleRoyale::|r El evento ya esta cerrado.");
         return;
     }
     uint32 count;
-    uint32 maxp = sConfigMgr->GetOption<int32>("EventParkour.MaxPlayers", 50);
+    uint32 maxp = sConfigMgr->GetOption<int32>("BattleRoyale.MaxPlayers", 50);
     count = ep_Players.size();
     if (count >= maxp)
     {
-        ChatHandler(player->GetSession()).PSendSysMessage("|cff4CFF00EventParkour::|r El evento esta lleno, intenta mas tarde.");
+        ChatHandler(player->GetSession()).PSendSysMessage("|cff4CFF00BattleRoyale::|r El evento esta lleno, intenta mas tarde.");
         return;
     }
 
@@ -69,54 +69,54 @@ void EventParkourMgr::HandlePlayerJoin(Player *player)
     ep_PlayersData[player->GetGUID().GetCounter()].SetPosition(player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetOrientation());
 
     count = ep_Players.size();
-    uint32 minp = sConfigMgr->GetOption<int32>("EventParkour.MinPlayersToStart", 30);
+    uint32 minp = sConfigMgr->GetOption<int32>("BattleRoyale.MinPlayersToStart", 30);
     if(count >= minp && !hasTeleported)
     {
-        if (sConfigMgr->GetOption<bool>("EventParkour.Announce.Start", true))
+        if (sConfigMgr->GetOption<bool>("BattleRoyale.Announce.Start", true))
         {
             std::ostringstream msg;
-            msg << "|cff4CFF00EventParkour::|r " << player->GetName().c_str() << " ha completado la cola, teletransportando a los jugadores al evento. Los demas jugadores seran teletransportado a penas se unan a la cola.";
+            msg << "|cff4CFF00BattleRoyale::|r " << player->GetName().c_str() << " ha completado la cola, teletransportando a los jugadores al evento. Los demas jugadores seran teletransportado a penas se unan a la cola.";
             sWorld->SendServerMessage(SERVER_MSG_STRING, msg.str().c_str());
         }
         TeleportToEvent(0);
     }
     else if (!hasTeleported)
     {
-        if (sConfigMgr->GetOption<bool>("EventParkour.Announce.Queue", true))
+        if (sConfigMgr->GetOption<bool>("BattleRoyale.Announce.Queue", true))
         {
             std::ostringstream msg;
-            msg << "|cff4CFF00EventParkour::|r " << player->GetName().c_str() << " se ha unido a la cola, falta " << (minp - count) << " mas para comenzar.";
+            msg << "|cff4CFF00BattleRoyale::|r " << player->GetName().c_str() << " se ha unido a la cola, falta " << (minp - count) << " mas para comenzar.";
             sWorld->SendServerMessage(SERVER_MSG_STRING, msg.str().c_str());
         }
     }
     else
     {
-        if (sConfigMgr->GetOption<bool>("EventParkour.Announce.Join", true))
+        if (sConfigMgr->GetOption<bool>("BattleRoyale.Announce.Join", true))
         {
             std::ostringstream msg;
-            msg << "|cff4CFF00EventParkour::|r " << player->GetName().c_str() << " se ha unido al evento.";
+            msg << "|cff4CFF00BattleRoyale::|r " << player->GetName().c_str() << " se ha unido al evento.";
             sWorld->SendServerMessage(SERVER_MSG_STRING, msg.str().c_str());
         }
         TeleportToEvent(player->GetGUID().GetCounter());
     }
 }
 
-void EventParkourMgr::HandlePlayerLogout(Player *player)
+void BattleRoyaleMgr::HandlePlayerLogout(Player *player)
 {
     if (ep_Players.find(player->GetGUID().GetCounter()) == ep_Players.end()) return;
     uint32 guid = player->GetGUID().GetCounter();
     ExitFromPhaseEvent(guid);
     ep_Players.erase(guid);
     ep_PlayersData.erase(guid);
-    if (sConfigMgr->GetOption<bool>("EventParkour.Announce.Logout", false))
+    if (sConfigMgr->GetOption<bool>("BattleRoyale.Announce.Logout", false))
     {
         std::ostringstream msg;
-        msg << "|cff4CFF00EventParkour::|r " << player->GetName().c_str() << " se ha desconectado y ha dejado el evento.";
+        msg << "|cff4CFF00BattleRoyale::|r " << player->GetName().c_str() << " se ha desconectado y ha dejado el evento.";
         sWorld->SendServerMessage(SERVER_MSG_STRING, msg.str().c_str());
     }
 }
 
-void EventParkourMgr::HandleGiveReward(Player *player)
+void BattleRoyaleMgr::HandleGiveReward(Player *player)
 {
     if (ep_Players.find(player->GetGUID().GetCounter()) == ep_Players.end() || !inTimeToEvent) return;
 
@@ -142,7 +142,7 @@ void EventParkourMgr::HandleGiveReward(Player *player)
     else return;
 
     std::ostringstream msg;
-    msg << "|cff4CFF00EventParkour::|r Felicitaciones " << player->GetName().c_str() << " has quedado en el |cff4CFF00" << place << " LUGAR|r.";
+    msg << "|cff4CFF00BattleRoyale::|r Felicitaciones " << player->GetName().c_str() << " has quedado en el |cff4CFF00" << place << " LUGAR|r.";
     sWorld->SendServerMessage(SERVER_MSG_STRING, msg.str().c_str());
 
     std::string subject = "Parkour de la Muerte";
@@ -176,7 +176,7 @@ void EventParkourMgr::HandleGiveReward(Player *player)
     if (nextReward == 4)
     {
         std::ostringstream msg2;
-        msg2 << "|cff4CFF00EventParkour::|r El evento ha finalizado.";
+        msg2 << "|cff4CFF00BattleRoyale::|r El evento ha finalizado.";
         sWorld->SendServerMessage(SERVER_MSG_STRING, msg2.str().c_str());
         ExitFromEvent(0);
 		hasEventEnded = true;
@@ -187,7 +187,7 @@ void EventParkourMgr::HandleGiveReward(Player *player)
     }
 }
 
-void EventParkourMgr::StartEvent(uint32 guid)
+void BattleRoyaleMgr::StartEvent(uint32 guid)
 {
 	if (!guid)
 	{
@@ -206,11 +206,11 @@ void EventParkourMgr::StartEvent(uint32 guid)
     }
 }
 
-void EventParkourMgr::TeleportToEvent(uint32 guid)
+void BattleRoyaleMgr::TeleportToEvent(uint32 guid)
 {
 	if (!guid)
 	{
-        startDelay = sConfigMgr->GetOption<int32>("EventParkour.EventStartDelay", 60000);
+        startDelay = sConfigMgr->GetOption<int32>("BattleRoyale.EventStartDelay", 60000);
 		secondsDelay = startDelay / 1000;
         for (ParkourPlayerList::iterator it = ep_Players.begin(); it != ep_Players.end(); ++it)
 		{
@@ -229,7 +229,7 @@ void EventParkourMgr::TeleportToEvent(uint32 guid)
 	}
 }
 
-void EventParkourMgr::ExitFromEvent(uint32 guid)
+void BattleRoyaleMgr::ExitFromEvent(uint32 guid)
 {
 	if (!guid)
 	{
@@ -254,7 +254,7 @@ void EventParkourMgr::ExitFromEvent(uint32 guid)
 	}
 }
 
-void EventParkourMgr::HandleReleaseGhost(Player *player, uint32 oldArea, uint32 newArea)
+void BattleRoyaleMgr::HandleReleaseGhost(Player *player, uint32 oldArea, uint32 newArea)
 {
     if (ep_Players.find(player->GetGUID().GetCounter()) == ep_Players.end()) return;
 	if ((oldArea == 1741 || oldArea == 2177) && newArea == 1741 && !player->IsAlive())
@@ -268,11 +268,11 @@ void EventParkourMgr::HandleReleaseGhost(Player *player, uint32 oldArea, uint32 
         ExitFromPhaseEvent(player->GetGUID().GetCounter());
         ep_Players.erase(player->GetGUID().GetCounter());
         ep_PlayersData.erase(player->GetGUID().GetCounter());
-        ChatHandler(player->GetSession()).PSendSysMessage("|cff4CFF00EventParkour::|r Has abandonado la zona del evento.");
+        ChatHandler(player->GetSession()).PSendSysMessage("|cff4CFF00BattleRoyale::|r Has abandonado la zona del evento.");
     }
 }
 
-void EventParkourMgr::HandleOnWoldUpdate(uint32 diff)
+void BattleRoyaleMgr::HandleOnWoldUpdate(uint32 diff)
 {
     time_t t = time(NULL);
     tm *now = localtime(&t);
@@ -282,7 +282,7 @@ void EventParkourMgr::HandleOnWoldUpdate(uint32 diff)
 		if (!hasAnnouncedEvent && hasEventEnded)
 		{
 			std::ostringstream msg2;
-			msg2 << "|cff4CFF00EventParkour::|r El Evento Parkour de la Muerte va a comenzar en la Arena Gurubachi en Vega de Tuercespina.";
+			msg2 << "|cff4CFF00BattleRoyale::|r El Evento Parkour de la Muerte va a comenzar en la Arena Gurubachi en Vega de Tuercespina.";
 			sWorld->SendServerMessage(SERVER_MSG_STRING, msg2.str().c_str());
 			hasAnnouncedEvent = true;
 			inTimeToEvent = true;
@@ -294,7 +294,7 @@ void EventParkourMgr::HandleOnWoldUpdate(uint32 diff)
 		if (!hasEventEnded)
 		{
 			std::ostringstream msg2;
-			msg2 << "|cff4CFF00EventParkour::|r El evento ha finalizado.";
+			msg2 << "|cff4CFF00BattleRoyale::|r El evento ha finalizado.";
 			sWorld->SendServerMessage(SERVER_MSG_STRING, msg2.str().c_str());
 			ExitFromEvent(0);
 			hasEventEnded = true;
@@ -332,32 +332,32 @@ void EventParkourMgr::HandleOnWoldUpdate(uint32 diff)
 }
 
 // -- Private functions -- //
-void EventParkourMgr::EnterToPhaseDelay(uint32 guid)
+void BattleRoyaleMgr::EnterToPhaseDelay(uint32 guid)
 {
 	ep_Players[guid]->SetPhaseMask(4, false);
     ep_Players[guid]->UpdateObjectVisibility();
 }
 
-void EventParkourMgr::EnterToPhaseEvent(uint32 guid)
+void BattleRoyaleMgr::EnterToPhaseEvent(uint32 guid)
 {
 	ep_Players[guid]->SetPhaseMask(2, false);
     ep_Players[guid]->UpdateObjectVisibility();
 }
 
-void EventParkourMgr::ExitFromPhaseEvent(uint32 guid)
+void BattleRoyaleMgr::ExitFromPhaseEvent(uint32 guid)
 {
 	ep_Players[guid]->SetPhaseMask(1, false);
     ep_Players[guid]->UpdateObjectVisibility();
 }
 
-void EventParkourMgr::ResurrectPlayer(Player *player)
+void BattleRoyaleMgr::ResurrectPlayer(Player *player)
 {
 	player->ResurrectPlayer(1.0f);
     player->SpawnCorpseBones();
     player->SaveToDB(false, false);
 }
 
-void EventParkourMgr::CheckForHacks(uint32 guid)
+void BattleRoyaleMgr::CheckForHacks(uint32 guid)
 {
     if (!guid)
         for (ParkourPlayerData::iterator it = ep_PlayersData.begin(); it != ep_PlayersData.end(); ++it)
@@ -367,7 +367,7 @@ void EventParkourMgr::CheckForHacks(uint32 guid)
                 ep_Players[(*it).first]->TeleportTo(0, -13246.281f, 193.465f, 31.019f, 1.130f);
                 ep_Players[(*it).first]->SaveToDB(false, false);
                 (*it).second.SetLast(ep_Players[(*it).first]->GetPositionZ());
-                ChatHandler(ep_Players[(*it).first]->GetSession()).PSendSysMessage("|cff4CFF00EventParkour::|r Has sido transportado al inicio por movimiento sospechoso (posible hack).");
+                ChatHandler(ep_Players[(*it).first]->GetSession()).PSendSysMessage("|cff4CFF00BattleRoyale::|r Has sido transportado al inicio por movimiento sospechoso (posible hack).");
             }
         }
     else
@@ -377,12 +377,12 @@ void EventParkourMgr::CheckForHacks(uint32 guid)
             ep_Players[guid]->TeleportTo(0, -13246.281f, 193.465f, 31.019f, 1.130f);
             ep_Players[guid]->SaveToDB(false, false);
             ep_PlayersData[guid].SetLast(ep_Players[guid]->GetPositionZ());
-            ChatHandler(ep_Players[guid]->GetSession()).PSendSysMessage("|cff4CFF00EventParkour::|r Has sido transportado al inicio por movimiento sospechoso (posible hack).");
+            ChatHandler(ep_Players[guid]->GetSession()).PSendSysMessage("|cff4CFF00BattleRoyale::|r Has sido transportado al inicio por movimiento sospechoso (posible hack).");
         }
     }
 }
 
-void EventParkourMgr::SendNotification(uint32 guid, uint32 delay)
+void BattleRoyaleMgr::SendNotification(uint32 guid, uint32 delay)
 {
     if (!guid)
         for (ParkourPlayerList::iterator it = ep_Players.begin(); it != ep_Players.end(); ++it)
