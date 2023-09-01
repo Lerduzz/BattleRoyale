@@ -62,6 +62,10 @@ private:
     uint32 secondsDelay;
     
     uint32 hackCheckDelay;
+
+    GameObject* secureZone;
+    int secureZoneIndex;
+    int secureZoneDelay;
     
 };
 
