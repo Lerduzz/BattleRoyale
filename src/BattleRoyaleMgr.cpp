@@ -3,6 +3,13 @@
 #include "Chat.h"
 #include "Player.h"
 
+const Position BRZonesCenter[1] =
+{
+    { 5520.340820f, -3700.600342f, 1594.888916f }      // 1: ZONA CERCA DE CLARO LUNA
+};
+
+const float BRSecureZoneZPlus[10] = { 140.0f, 130.0f, 120.0f, 110.0f, 100.0f, 90.0f, 75.0f, 60.0f, 45.0f, 25.0f };
+
 BattleRoyaleMgr::BattleRoyaleMgr()
 {
     hasTeleported = false;
@@ -206,6 +213,7 @@ void BattleRoyaleMgr::StartEvent(uint32 guid)
     //     ep_PlayersData[guid].SetLast(ep_Players[guid]->GetPositionZ());
     // }
     EnterToPhaseEvent(guid);
+    ep_Players[guid]->TeleportTo(1, BRZonesCenter[0].GetPositionX(), BRZonesCenter[0].GetPositionY(), BRZonesCenter[0].GetPositionZ(), 0.0f);
     ep_Players[guid]->SetByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
     hasEventStarted = true;
     secureZoneIndex = 0;
@@ -338,25 +346,23 @@ void BattleRoyaleMgr::HandleOnWoldUpdate(uint32 diff)
     // else startDelay -= diff;
     if (hasEventStarted) {
         if (secureZoneDelay <= 0) {
+            if (secureZone) {
+                secureZone->DespawnOrUnsummon();
+                secureZone->Delete();
+                secureZone = nullptr;
+            }
             if (secureZoneIndex < 10) {
                 for (ParkourPlayerList::iterator it = ep_Players.begin(); it != ep_Players.end(); ++it)
                 {
-                    secureZone = (*it).second->SummonGameObject(500000 + secureZoneIndex, 5520.340820f, -3700.600342f, 1594.888916f, 0, 0, 0, 0, 0, 120);
+                    secureZone = (*it).second->SummonGameObject(500000 + secureZoneIndex, BRZonesCenter[0].GetPositionX(), BRZonesCenter[0].GetPositionY(), BRZonesCenter[0].GetPositionZ() + BRSecureZoneZPlus[secureZoneIndex], 0, 0, 0, 0, 0, 120);
                     secureZone->SetPhaseMask(2, true);
                     break;
                 }
             }
             secureZoneIndex++;
-            secureZoneDelay = 60000;
+            secureZoneDelay = 7000;
             secureZoneAnnounced = false;
         } else {
-            if (secureZoneDelay <= 2500) {
-                if (secureZone) {
-                    secureZone->DespawnOrUnsummon();
-                    secureZone->Delete();
-                    secureZone = nullptr;
-                }
-            }
             if (secureZoneDelay <= 5000 && !secureZoneAnnounced) {
                 SendNotification(0, 5);
                 secureZoneAnnounced = true;
