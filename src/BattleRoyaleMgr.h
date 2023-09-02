@@ -1,5 +1,5 @@
-#ifndef SC_EPMGR_H
-#define SC_EPMGR_H
+#ifndef SC_BR_MGR_H
+#define SC_BR_MGR_H
 
 #include "Common.h"
 #include "SharedDefines.h"
@@ -54,26 +54,16 @@ private:
     BattleRoyalePlayerList ep_Players;
     BattleRoyalePlayerData ep_PlayersData;
     
-    bool hasTeleported;
-    bool hasEventStarted;
-    bool hasEventClose;
-	bool inTimeToEvent;
-	bool hasAnnouncedEvent;
-	bool hasEventEnded;
-    
-    uint32 nextReward;
-    uint32 startDelay;
-    uint32 secondsDelay;
-    
-    uint32 hackCheckDelay;
-
-    // NEW!
     GameObject* secureZone;
     int secureZoneIndex;
     int secureZoneDelay;
     bool secureZoneAnnounced;
     
     int rotationMapIndex;
+    int eventCurrentStatus;
+
+    int eventMinPlayers;
+    int eventMaxPlayers;
 };
 
 #define sBattleRoyaleMgr BattleRoyaleMgr::instance()

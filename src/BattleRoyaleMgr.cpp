@@ -13,14 +13,14 @@ const Position BRZonesCenter[BRMapCount] =
     { 5520.340820f, -3700.600342f, 1594.888916f }      // 1: Kalimdor: Hyjal
 };
 
-const std:string BRZonesNames[BRMapCount] =
+const std::string BRZonesNames[BRMapCount] =
 {
     "Kalimdor: Hyjal"
 };
 
 const float BRSecureZoneZPlus[10] = { 140.0f, 130.0f, 120.0f, 110.0f, 100.0f, 90.0f, 75.0f, 60.0f, 45.0f, 25.0f };
 
-enum BREventStatus
+enum BREventStatus : int
 {
     ST_NO_PLAYERS                           = 0,
     ST_SUMMON_PLAYERS                       = 1,
@@ -31,16 +31,10 @@ enum BREventStatus
 // -- FUNCIONES -- //
 BattleRoyaleMgr::BattleRoyaleMgr()
 {
-    hasTeleported = false;
-    hasEventStarted = false;
-    hasEventClose = false;
-    hasEventEnded = true;
-    nextReward = 1;
-	inTimeToEvent = false;
-	hasAnnouncedEvent = false;
-
-    // NEW!
     rotationMapIndex = 0;
+    eventCurrentStatus = ST_NO_PLAYERS;
+    eventMinPlayers = sConfigMgr->GetOption<int32>("BattleRoyale.MinPlayers", 25);
+    eventMaxPlayers = sConfigMgr->GetOption<int32>("BattleRoyale.MaxPlayers", 50);
 }
 
 BattleRoyaleMgr::~BattleRoyaleMgr()
@@ -77,76 +71,38 @@ void BattleRoyaleMgr::HandlePlayerJoin(Player *player)
         ChatHandler(player->GetSession()).PSendSysMessage("|cff4CFF00BattleRoyale::|r Ya estas dentro del evento.");
         return;
     }
-    // if (hasEventEnded)
-    // {
-    //     ChatHandler(player->GetSession()).PSendSysMessage("|cff4CFF00BattleRoyale::|r El evento ha finalizado.");
-    //     return;
-    // }
-    // if (hasEventClose)
-    // {
-    //     ChatHandler(player->GetSession()).PSendSysMessage("|cff4CFF00BattleRoyale::|r El evento ya esta cerrado.");
-    //     return;
-    // }
-    // uint32 count;
-    // uint32 maxp = sConfigMgr->GetOption<int32>("BattleRoyale.MaxPlayers", 50);
-    // count = ep_Players.size();
-    // if (count >= maxp)
-    // {
-    //     ChatHandler(player->GetSession()).PSendSysMessage("|cff4CFF00BattleRoyale::|r El evento esta lleno, intenta mas tarde.");
-    //     return;
-    // }
-
-	// ep_Players[guid] = player;
-    // ep_PlayersData[guid].SetPosition(player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetOrientation());
-
-    // count = ep_Players.size();
-    // uint32 minp = sConfigMgr->GetOption<int32>("BattleRoyale.MinPlayersToStart", 25);
-    // if(count >= minp && !hasTeleported)
-    // {
-    //     if (sConfigMgr->GetOption<bool>("BattleRoyale.Announce.Start", true))
-    //     {
-    //         std::ostringstream msg;
-    //         msg << "|cff4CFF00BattleRoyale::|r " << player->GetName().c_str() << " ha completado la cola, teletransportando a los jugadores al evento. Los demas jugadores seran teletransportado a penas se unan a la cola.";
-    //         sWorld->SendServerMessage(SERVER_MSG_STRING, msg.str().c_str());
-    //     }
-    //     TeleportToEvent(0);
-    // }
-    // else if (!hasTeleported)
-    // {
-    //     if (sConfigMgr->GetOption<bool>("BattleRoyale.Announce.Queue", true))
-    //     {
-    //         std::ostringstream msg;
-    //         msg << "|cff4CFF00BattleRoyale::|r " << player->GetName().c_str() << " se ha unido a la cola, falta " << (minp - count) << " mas para comenzar.";
-    //         sWorld->SendServerMessage(SERVER_MSG_STRING, msg.str().c_str());
-    //     }
-    // }
-    // else
-    // {
-    //     if (sConfigMgr->GetOption<bool>("BattleRoyale.Announce.Join", true))
-    //     {
-    //         std::ostringstream msg;
-    //         msg << "|cff4CFF00BattleRoyale::|r " << player->GetName().c_str() << " se ha unido al evento.";
-    //         sWorld->SendServerMessage(SERVER_MSG_STRING, msg.str().c_str());
-    //     }
-    //     TeleportToEvent(player->GetGUID().GetCounter());
-    // }
     ep_PlayersQueue[guid] = player;
-    StartEvent(guid);
+    ChatHandler(player->GetSession()).PSendSysMessage("|cff4CFF00BattleRoyale::|r Te has unido a la cola del evento. Jugadores en cola: %u.", ep_PlayersQueue.size());
+    switch (eventCurrentStatus)
+    {
+        case ST_NO_PLAYERS:
+        {
+            if (ep_PlayersQueue.size() >= eventMinPlayers) {
+                TeleportToEvent(0);
+            }
+            break;
+        }
+        case ST_SUMMON_PLAYERS:
+        {
+            if (ep_Players.size() < eventMaxPlayers) {
+                TeleportToEvent(guid);
+            }
+            break;
+        }
+    }
 }
 
 void BattleRoyaleMgr::HandlePlayerLogout(Player *player)
 {
-    if (ep_Players.find(player->GetGUID().GetCounter()) == ep_Players.end()) return;
     uint32 guid = player->GetGUID().GetCounter();
-    ExitFromPhaseEvent(guid);
-    ep_Players.erase(guid);
-    ep_PlayersData.erase(guid);
-    // if (sConfigMgr->GetOption<bool>("BattleRoyale.Announce.Logout", false))
-    // {
-    //     std::ostringstream msg;
-    //     msg << "|cff4CFF00BattleRoyale::|r " << player->GetName().c_str() << " se ha desconectado y ha dejado el evento.";
-    //     sWorld->SendServerMessage(SERVER_MSG_STRING, msg.str().c_str());
-    // }
+    if (ep_PlayersQueue.find(guid) != ep_PlayersQueue.end()) {
+        ep_PlayersQueue.erase(guid);
+    };
+    if (ep_Players.find(guid) != ep_Players.end()) {
+        ExitFromPhaseEvent(guid);
+        ep_Players.erase(guid);
+        ep_PlayersData.erase(guid);
+    }
 }
 
 void BattleRoyaleMgr::HandleGiveReward(Player *player)
@@ -239,7 +195,7 @@ void BattleRoyaleMgr::StartEvent(uint32 guid)
     EnterToPhaseEvent(guid);
     ep_Players[guid]->TeleportTo(1, BRZonesCenter[0].GetPositionX(), BRZonesCenter[0].GetPositionY(), BRZonesCenter[0].GetPositionZ(), 0.0f);
     ep_Players[guid]->SetByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
-    hasEventStarted = true;
+    eventCurrentStatus = ST_IN_PROGRESS;
     secureZoneIndex = 0;
     secureZoneDelay = 0;
     secureZoneAnnounced = false;
@@ -248,25 +204,31 @@ void BattleRoyaleMgr::StartEvent(uint32 guid)
 
 void BattleRoyaleMgr::TeleportToEvent(uint32 guid)
 {
-	// if (!guid)
-	// {
-    //     startDelay = sConfigMgr->GetOption<int32>("BattleRoyale.EventStartDelay", 60000);
-	// 	secondsDelay = startDelay / 1000;
-    //     for (BattleRoyalePlayerList::iterator it = ep_Players.begin(); it != ep_Players.end(); ++it)
-	// 	{
-	// 		(*it).second->TeleportTo(0, -13246.281f, 193.465f, 31.019f, 1.130f);
-    //         EnterToPhaseDelay((*it).first);
-    //         (*it).second->SaveToDB(false, false);
-	// 	}
-    //     hasTeleported = true;
-	// }
-	// else
-	// {
-    //     ep_Players[guid]->TeleportTo(0, -13246.281f, 193.465f, 31.019f, 1.130f);
-    //     if (hasEventStarted) EnterToPhaseEvent(guid);
-    //     else EnterToPhaseDelay(guid);
-    //     ep_Players[guid]->SaveToDB(false, false);
-	// }
+	if (!guid)
+	{
+        if (eventCurrentStatus != ST_NO_PLAYERS) return;        
+        for (BattleRoyalePlayerQueue::iterator it = ep_PlayersQueue.begin(); it != ep_PlayersQueue.end(); ++it)
+		{
+            ep_Players[(*it).first] = (*it).second;
+            ep_PlayersQueue.erase((*it).first);
+            ep_PlayersData[(*it).first].SetPosition((*it).second->GetPositionX(), (*it).second->GetPositionY(), (*it).second->GetPositionZ(), (*it).second->GetOrientation());
+			(*it).second->TeleportTo(0, -13246.281f, 193.465f, 31.019f, 1.130f); // TODO: Variable de posicion inicial.
+            EnterToPhaseDelay((*it).first);
+            (*it).second->SaveToDB(false, false);
+		}
+	}
+	else
+	{
+        if (eventCurrentStatus != ST_SUMMON_PLAYERS) return;
+        
+        ep_Players[guid]->TeleportTo(0, -13246.281f, 193.465f, 31.019f, 1.130f);
+        if (hasEventStarted) EnterToPhaseEvent(guid);
+        else EnterToPhaseDelay(guid);
+        ep_Players[guid]->SaveToDB(false, false);
+	}
+
+    // ep_Players[guid] = player;
+    // ep_PlayersData[guid].SetPosition(player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetOrientation());
 }
 
 void BattleRoyaleMgr::ExitFromEvent(uint32 guid)
@@ -368,7 +330,7 @@ void BattleRoyaleMgr::HandleOnWoldUpdate(uint32 diff)
     // }
     // if (startDelay <= diff) StartEvent(0);
     // else startDelay -= diff;
-    if (hasEventStarted) {
+    if (eventCurrentStatus == ST_IN_PROGRESS) {
         if (secureZoneDelay <= 0) {
             if (secureZone) {
                 secureZone->DespawnOrUnsummon();
