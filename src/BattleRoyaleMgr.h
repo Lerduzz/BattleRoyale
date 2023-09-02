@@ -54,6 +54,7 @@ private:
     BattleRoyalePlayerData ep_PlayersData;
     
     GameObject* secureZone;
+    GameObject* secureZoneHalf;
     GameObject* secureZoneCenter;
     int secureZoneIndex;
     int secureZoneDelay;
