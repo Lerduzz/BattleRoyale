@@ -183,6 +183,7 @@ void BattleRoyaleMgr::StartEvent(uint32 guid)
     secureZoneDelay = 0;
     secureZoneAnnounced = false;
     secureZone = nullptr;
+    secureZoneCenter = nullptr;
 }
 
 void BattleRoyaleMgr::TeleportToEvent(uint32 guid)
@@ -354,7 +355,15 @@ void BattleRoyaleMgr::HandleOnWoldUpdate(uint32 diff)
                 if (secureZoneIndex < 10) {
                     for (BattleRoyalePlayerList::iterator it = ep_Players.begin(); it != ep_Players.end(); ++it)
                     {
-                        secureZone = (*it).second->SummonGameObject(500000 + secureZoneIndex, BRZonesCenter[0].GetPositionX(), BRZonesCenter[0].GetPositionY(), BRZonesCenter[0].GetPositionZ() + BRSecureZoneZPlus[secureZoneIndex], 0, 0, 0, 0, 0, 120);
+                        if (secureZoneIndex == 0) {
+                            if (secureZoneCenter) {
+                                secureZoneCenter->DespawnOrUnsummon();
+                                secureZoneCenter->Delete();
+                                secureZoneCenter = nullptr;
+                            }
+                            secureZoneCenter = (*it).second->SummonGameObject(190589, BRZonesCenter[0].GetPositionX(), BRZonesCenter[0].GetPositionY(), BRZonesCenter[0].GetPositionZ(), 0, 0, 0, 0, 0, 15 * 60);
+                        }
+                        secureZone = (*it).second->SummonGameObject(500000 + secureZoneIndex, BRZonesCenter[0].GetPositionX(), BRZonesCenter[0].GetPositionY(), BRZonesCenter[0].GetPositionZ() + BRSecureZoneZPlus[secureZoneIndex], 0, 0, 0, 0, 0, 2 * 60);
                         secureZone->SetPhaseMask(2, true);
                         break;
                     }
@@ -425,11 +434,11 @@ void BattleRoyaleMgr::OutOfZoneDamage()
 {
     for (BattleRoyalePlayerList::iterator it = ep_Players.begin(); it != ep_Players.end(); ++it)
     {
-        float distance = (*it).second->GetExactDist(secureZone);
+        float distance = (*it).second->GetExactDist(secureZoneCenter);
         ChatHandler((*it).second->GetSession()).PSendSysMessage("|cff4CFF00BattleRoyale::|r Distancia del centro de la zona segura: %f.", distance);
         if (distance > BRSecureZoneDists[secureZoneIndex]) {
             ep_PlayersData[(*it).first].SetDTick(ep_PlayersData[(*it).first].GetDTick() + 1);
-            uint32 damage = (*it).second->GetMaxHealth() * ep_PlayersData[(*it).first].GetDTick() / 100 + 25 * ep_PlayersData[(*it).first].GetDTick();
+            uint32 damage = 2 * (*it).second->GetMaxHealth() * sqrt(ep_PlayersData[(*it).first].GetDTick()) / 100;
             (*it).second->GetSession()->SendNotification("|cffff0000¡Has recibido |cffDA70D6%u|cffff0000 de daño, adéntrate en la zona segura!", damage);
             Unit::DealDamage(nullptr, (*it).second, damage, nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false, true);
         } else {
