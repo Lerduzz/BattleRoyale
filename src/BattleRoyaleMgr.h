@@ -46,6 +46,7 @@ private:
     void ExitFromPhaseEvent(uint32 guid);
     void ResurrectPlayer(Player *player);
     void SendNotification(uint32 guid, uint32 delay);
+    void SendNotificationStart(uint32 guid, uint32 delay);
     
     BattleRoyalePlayerList ep_PlayersQueue;
     BattleRoyalePlayerList ep_Players;
@@ -61,6 +62,10 @@ private:
 
     int eventMinPlayers;
     int eventMaxPlayers;
+
+    // TESTs
+    int secondsTicksHelper;
+    int summonRemainingTime;
 };
 
 #define sBattleRoyaleMgr BattleRoyaleMgr::instance()

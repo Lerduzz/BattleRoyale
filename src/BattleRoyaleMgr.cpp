@@ -35,6 +35,8 @@ BattleRoyaleMgr::BattleRoyaleMgr()
     eventCurrentStatus = ST_NO_PLAYERS;
     eventMinPlayers = sConfigMgr->GetOption<int32>("BattleRoyale.MinPlayers", 25);
     eventMaxPlayers = sConfigMgr->GetOption<int32>("BattleRoyale.MaxPlayers", 50);
+
+    secondsTicksHelper = 1000;
 }
 
 BattleRoyaleMgr::~BattleRoyaleMgr()
@@ -187,6 +189,7 @@ void BattleRoyaleMgr::TeleportToEvent(uint32 guid)
 	if (!guid)
 	{
         if (eventCurrentStatus != ST_NO_PLAYERS) return;
+        summonRemainingTime = 60;
         eventCurrentStatus = ST_SUMMON_PLAYERS;
         for (BattleRoyalePlayerQueue::iterator it = ep_PlayersQueue.begin(); it != ep_PlayersQueue.end(); ++it)
 		{
@@ -199,8 +202,7 @@ void BattleRoyaleMgr::TeleportToEvent(uint32 guid)
             ep_Players[guid]->SaveToDB(false, false);
 		}
         for (BattleRoyalePlayerList::iterator it = ep_Players.begin(); it != ep_Players.end(); ++it) ep_PlayersQueue.erase((*it).first);
-        StartEvent(0); // TODO: Esto no va aqui.
-	}
+    }
 	else
 	{
         if (eventCurrentStatus != ST_SUMMON_PLAYERS) return;
@@ -312,34 +314,58 @@ void BattleRoyaleMgr::HandleOnWoldUpdate(uint32 diff)
     // }
     // if (startDelay <= diff) StartEvent(0);
     // else startDelay -= diff;
-    if (eventCurrentStatus == ST_IN_PROGRESS) {
-        if (secureZoneDelay <= 0) {
-            if (secureZone) {
-                secureZone->DespawnOrUnsummon();
-                secureZone->Delete();
-                secureZone = nullptr;
+    switch(eventCurrentStatus)
+    {
+        case ST_SUMMON_PLAYERS:
+        {
+            if (secondsTicksHelper <= 0) {
+                secondsTicksHelper = 1000;
+                if (summonRemainingTime <= 0) {
+                    StartEvent(0);
+                } else {
+                    int srt = summonRemainingTime;
+                    if (srt == 5 || srt == 10 || srt == 15 || srt == 20 || srt == 25 || srt == 30 || srt == 35 || srt == 40 || srt == 45 || srt == 50 || srt == 55 || srt == 60) {
+                        SendNotificationStart(0, srt);
+                    }
+                    summonRemainingTime--;
+                }
+            } else {
+                secondsTicksHelper -= diff;
             }
-            if (secureZoneIndex < 10) {
-                for (BattleRoyalePlayerList::iterator it = ep_Players.begin(); it != ep_Players.end(); ++it)
-                {
-                    secureZone = (*it).second->SummonGameObject(500000 + secureZoneIndex, BRZonesCenter[0].GetPositionX(), BRZonesCenter[0].GetPositionY(), BRZonesCenter[0].GetPositionZ() + BRSecureZoneZPlus[secureZoneIndex], 0, 0, 0, 0, 0, 120);
-                    secureZone->SetPhaseMask(2, true);
-                    break;
+            break;
+        }
+        case ST_IN_PROGRESS:
+        {
+            if (secureZoneDelay <= 0) {
+                if (secureZone) {
+                    secureZone->DespawnOrUnsummon();
+                    secureZone->Delete();
+                    secureZone = nullptr;
+                }
+                if (secureZoneIndex < 10) {
+                    for (BattleRoyalePlayerList::iterator it = ep_Players.begin(); it != ep_Players.end(); ++it)
+                    {
+                        secureZone = (*it).second->SummonGameObject(500000 + secureZoneIndex, BRZonesCenter[0].GetPositionX(), BRZonesCenter[0].GetPositionY(), BRZonesCenter[0].GetPositionZ() + BRSecureZoneZPlus[secureZoneIndex], 0, 0, 0, 0, 0, 120);
+                        secureZone->SetPhaseMask(2, true);
+                        break;
+                    }
+                }
+                secureZoneIndex++;
+                secureZoneDelay = 60000;
+                secureZoneAnnounced = false;
+            } else {
+                if (secureZoneDelay <= 5000 && !secureZoneAnnounced) {
+                    SendNotification(0, 5);
+                    secureZoneAnnounced = true;
+                }
+                if (secureZoneIndex <= 10) {
+                    secureZoneDelay -= diff;
+                } else {
+                    ExitFromEvent(0); // TODO: Esto no va aqui.
+                    eventCurrentStatus = ST_NO_PLAYERS;  // TODO: Esto no va aqui.
                 }
             }
-            secureZoneIndex++;
-            secureZoneDelay = 60000;
-            secureZoneAnnounced = false;
-        } else {
-            if (secureZoneDelay <= 5000 && !secureZoneAnnounced) {
-                SendNotification(0, 5);
-                secureZoneAnnounced = true;
-            }
-            if (secureZoneIndex <= 10) {
-                secureZoneDelay -= diff;
-            } else {
-                ExitFromEvent(0); // TODO: Esto no va aqui.
-            }
+            break;
         }
     }
 }
@@ -376,4 +402,12 @@ void BattleRoyaleMgr::SendNotification(uint32 guid, uint32 delay)
         for (BattleRoyalePlayerList::iterator it = ep_Players.begin(); it != ep_Players.end(); ++it)
 			(*it).second->GetSession()->SendNotification("|cff00ff00¡La zona segura se reducirá en |cffDA70D6%u|cff00ff00 segundos!", delay);
     else ep_Players[guid]->GetSession()->SendNotification("|cff00ff00¡La zona segura se reducirá en |cffDA70D6%u|cff00ff00 segundos!", delay);
+}
+
+void BattleRoyaleMgr::SendNotificationStart(uint32 guid, uint32 delay)
+{
+    if (!guid)
+        for (BattleRoyalePlayerList::iterator it = ep_Players.begin(); it != ep_Players.end(); ++it)
+			(*it).second->GetSession()->SendNotification("|cff00ff00¡La batalla iniciará en |cffDA70D6%u|cff00ff00 segundos!", delay);
+    else ep_Players[guid]->GetSession()->SendNotification("|cff00ff00¡La batalla iniciará en |cffDA70D6%u|cff00ff00 segundos!", delay);
 }
