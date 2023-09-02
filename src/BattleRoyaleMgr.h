@@ -10,6 +10,9 @@
 
 class BattleRoyaleData;
 
+// GUIDLow es la llave, Lista de personajes en cola para el evento.
+typedef std::map<uint32, Player*> BattleRoyalePlayerQueue;
+
 // GUIDLow es la llave, Lista de personajes en el evento.
 typedef std::map<uint32, Player*> BattleRoyalePlayerList;
 
@@ -47,6 +50,7 @@ private:
     void CheckForHacks(uint32 guid);
     void SendNotification(uint32 guid, uint32 delay);
     
+    BattleRoyalePlayerList ep_PlayersQueue;
     BattleRoyalePlayerList ep_Players;
     BattleRoyalePlayerData ep_PlayersData;
     

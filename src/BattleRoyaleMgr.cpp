@@ -37,6 +37,7 @@ BattleRoyaleMgr::BattleRoyaleMgr()
 
 BattleRoyaleMgr::~BattleRoyaleMgr()
 {
+    ep_PlayersQueue.clear();
 	ep_Players.clear();
     ep_PlayersData.clear();
 }
