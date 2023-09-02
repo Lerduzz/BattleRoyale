@@ -47,6 +47,7 @@ private:
     void ResurrectPlayer(Player *player);
     void SendNotification(uint32 guid, uint32 delay);
     void SendNotificationStart(uint32 guid, uint32 delay);
+    void OutOfZoneDamage();
     
     BattleRoyalePlayerList ep_PlayersQueue;
     BattleRoyalePlayerList ep_Players;

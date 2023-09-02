@@ -19,6 +19,7 @@ const std::string BRZonesNames[BRMapCount] =
 };
 
 const float BRSecureZoneZPlus[10] = { 140.0f, 130.0f, 120.0f, 110.0f, 100.0f, 90.0f, 75.0f, 60.0f, 45.0f, 25.0f };
+const float BRSecureZoneDists[10] = { 263.17f, 243.79f, 218.36f, 194.25f, 169.19f, 144.24f, 116.79f, 89.64f, 63.59f, 31.85 };
 
 enum BREventStatus : int
 {
@@ -336,6 +337,14 @@ void BattleRoyaleMgr::HandleOnWoldUpdate(uint32 diff)
         }
         case ST_IN_PROGRESS:
         {
+            // TEST DAMAGE OUT OF ZONE
+            if (secondsTicksHelper <= 0) {
+                secondsTicksHelper = 1000;
+                OutOfZoneDamage();
+            } else {
+                secondsTicksHelper -= diff;
+            }
+
             if (secureZoneDelay <= 0) {
                 if (secureZone) {
                     secureZone->DespawnOrUnsummon();
@@ -410,4 +419,14 @@ void BattleRoyaleMgr::SendNotificationStart(uint32 guid, uint32 delay)
         for (BattleRoyalePlayerList::iterator it = ep_Players.begin(); it != ep_Players.end(); ++it)
 			(*it).second->GetSession()->SendNotification("|cff00ff00¡La batalla iniciará en |cffDA70D6%u|cff00ff00 segundos!", delay);
     else ep_Players[guid]->GetSession()->SendNotification("|cff00ff00¡La batalla iniciará en |cffDA70D6%u|cff00ff00 segundos!", delay);
+}
+
+void BattleRoyaleMgr::OutOfZoneDamage()
+{
+    for (BattleRoyalePlayerList::iterator it = ep_Players.begin(); it != ep_Players.end(); ++it)
+    {
+        if ((*it).second->GetExactDist(secureZone) > BRSecureZoneDists[secureZoneIndex]) {
+            Unit::DealDamage(nullptr, (*it).second, 100, nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false, true); 
+        }
+    }
 }
