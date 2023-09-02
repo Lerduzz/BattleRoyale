@@ -72,7 +72,7 @@ void BattleRoyaleMgr::HandlePlayerJoin(Player *player)
         return;
     }
     ep_PlayersQueue[guid] = player;
-    ChatHandler(player->GetSession()).PSendSysMessage("|cff4CFF00BattleRoyale::|r Te has unido a la cola del evento. Jugadores en cola: %u.", ep_PlayersQueue.size());
+    ChatHandler(player->GetSession()).PSendSysMessage("|cff4CFF00BattleRoyale::|r Te has unido a la cola del evento. Jugadores en cola: %u/%u.", ep_PlayersQueue.size(), eventMinPlayers);
     switch (eventCurrentStatus)
     {
         case ST_NO_PLAYERS:
@@ -211,24 +211,24 @@ void BattleRoyaleMgr::TeleportToEvent(uint32 guid)
 		{
             ep_Players[(*it).first] = (*it).second;
             ep_PlayersQueue.erase((*it).first);
-            ep_PlayersData[(*it).first].SetPosition((*it).second->GetPositionX(), (*it).second->GetPositionY(), (*it).second->GetPositionZ(), (*it).second->GetOrientation());
-			(*it).second->TeleportTo(0, -13246.281f, 193.465f, 31.019f, 1.130f); // TODO: Variable de posicion inicial.
-            EnterToPhaseDelay((*it).first);
+            ep_PlayersData[(*it).first].SetPosition((*it).second->GetMapId(), (*it).second->GetPositionX(), (*it).second->GetPositionY(), (*it).second->GetPositionZ(), (*it).second->GetOrientation());
+
+			(*it).second->TeleportTo(BRMapID[0], BRZonesCenter[0].GetPositionX(), BRZonesCenter[0].GetPositionY(), BRZonesCenter[0].GetPositionZ(), 0.0f); // TODO: Variable de posicion inicial.
+            EnterToPhaseEvent(guid);
             (*it).second->SaveToDB(false, false);
 		}
 	}
 	else
 	{
         if (eventCurrentStatus != ST_SUMMON_PLAYERS) return;
-        
-        ep_Players[guid]->TeleportTo(0, -13246.281f, 193.465f, 31.019f, 1.130f);
-        if (hasEventStarted) EnterToPhaseEvent(guid);
-        else EnterToPhaseDelay(guid);
+        ep_Players[guid] = ep_PlayersQueue[guid];
+        ep_PlayersQueue.erase(guid);
+        ep_PlayersData[guid].SetPosition(ep_Players[guid]->GetMapId(), ep_Players[guid]->GetPositionX(), ep_Players[guid]->GetPositionY(), ep_Players[guid]->GetPositionZ(), ep_Players[guid]->GetOrientation());
+
+        ep_Players[guid]->TeleportTo(BRMapID[0], BRZonesCenter[0].GetPositionX(), BRZonesCenter[0].GetPositionY(), BRZonesCenter[0].GetPositionZ(), 0.0f); // TODO: Variable de posicion inicial.
+        EnterToPhaseEvent(guid);
         ep_Players[guid]->SaveToDB(false, false);
 	}
-
-    // ep_Players[guid] = player;
-    // ep_PlayersData[guid].SetPosition(player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetOrientation());
 }
 
 void BattleRoyaleMgr::ExitFromEvent(uint32 guid)
@@ -367,12 +367,6 @@ bool BattleRoyaleMgr::ForceFFAPvPFlag(Player* player)
 }
 
 // -- Private functions -- //
-void BattleRoyaleMgr::EnterToPhaseDelay(uint32 guid)
-{
-	ep_Players[guid]->SetPhaseMask(4, false);
-    ep_Players[guid]->UpdateObjectVisibility();
-}
-
 void BattleRoyaleMgr::EnterToPhaseEvent(uint32 guid)
 {
 	ep_Players[guid]->SetPhaseMask(2, false);
@@ -390,31 +384,6 @@ void BattleRoyaleMgr::ResurrectPlayer(Player *player)
 	player->ResurrectPlayer(1.0f);
     player->SpawnCorpseBones();
     player->SaveToDB(false, false);
-}
-
-void BattleRoyaleMgr::CheckForHacks(uint32 guid)
-{
-    if (!guid)
-        for (BattleRoyalePlayerData::iterator it = ep_PlayersData.begin(); it != ep_PlayersData.end(); ++it)
-		{
-            if ((*it).second.IsHackingZ(ep_Players[(*it).first]->GetPositionZ()))
-            {
-                ep_Players[(*it).first]->TeleportTo(0, -13246.281f, 193.465f, 31.019f, 1.130f);
-                ep_Players[(*it).first]->SaveToDB(false, false);
-                (*it).second.SetLast(ep_Players[(*it).first]->GetPositionZ());
-                ChatHandler(ep_Players[(*it).first]->GetSession()).PSendSysMessage("|cff4CFF00BattleRoyale::|r Has sido transportado al inicio por movimiento sospechoso (posible hack).");
-            }
-        }
-    else
-    {
-        if (ep_PlayersData[guid].IsHackingZ(ep_Players[guid]->GetPositionZ()))
-        {
-            ep_Players[guid]->TeleportTo(0, -13246.281f, 193.465f, 31.019f, 1.130f);
-            ep_Players[guid]->SaveToDB(false, false);
-            ep_PlayersData[guid].SetLast(ep_Players[guid]->GetPositionZ());
-            ChatHandler(ep_Players[guid]->GetSession()).PSendSysMessage("|cff4CFF00BattleRoyale::|r Has sido transportado al inicio por movimiento sospechoso (posible hack).");
-        }
-    }
 }
 
 void BattleRoyaleMgr::SendNotification(uint32 guid, uint32 delay)

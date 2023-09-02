@@ -43,11 +43,9 @@ public:
     bool ForceFFAPvPFlag(Player* player);
     
 private:
-    void EnterToPhaseDelay(uint32 guid);
     void EnterToPhaseEvent(uint32 guid);
     void ExitFromPhaseEvent(uint32 guid);
     void ResurrectPlayer(Player *player);
-    void CheckForHacks(uint32 guid);
     void SendNotification(uint32 guid, uint32 delay);
     
     BattleRoyalePlayerList ep_PlayersQueue;
