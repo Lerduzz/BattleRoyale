@@ -410,7 +410,7 @@ void BattleRoyaleMgr::HandleOnWoldUpdate(uint32 diff)
 
 bool BattleRoyaleMgr::ForceFFAPvPFlag(Player* player)
 {
-    if (ep_Players.find(player->GetGUID().GetCounter()) == ep_Players.end()) return false;
+    if (eventCurrentStatus != ST_IN_PROGRESS || ep_Players.find(player->GetGUID().GetCounter()) == ep_Players.end()) return false;
     return true;
 }
 
