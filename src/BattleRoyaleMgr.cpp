@@ -10,7 +10,7 @@ const int BRMapID[BRMapCount] = { 1 };
 
 const Position BRZonesCenter[BRMapCount] =
 {
-    { 5520.340820f, -3700.600342f, 1594.888916f }      // 1: Kalimdor: Hyjal
+    { 5411.041504f, -2701.873779f, 1451.660522f }      // 1: Kalimdor: Hyjal
 };
 
 const std::string BRZonesNames[BRMapCount] =
@@ -205,7 +205,6 @@ void BattleRoyaleMgr::StartEvent(uint32 guid)
     secureZoneDelay = 0;
     secureZoneAnnounced = false;
     secureZone = nullptr;
-    secureZoneHalf = nullptr;
     secureZoneCenter = nullptr;
 }
 
@@ -373,11 +372,6 @@ void BattleRoyaleMgr::HandleOnWoldUpdate(uint32 diff)
                     secureZone->Delete();
                     secureZone = nullptr;
                 }
-                if (secureZoneHalf) {
-                    secureZoneHalf->DespawnOrUnsummon();
-                    secureZoneHalf->Delete();
-                    secureZoneHalf = nullptr;
-                }
                 if (secureZoneIndex < 10) {
                     for (BattleRoyalePlayerList::iterator it = ep_Players.begin(); it != ep_Players.end(); ++it)
                     {
@@ -390,9 +384,7 @@ void BattleRoyaleMgr::HandleOnWoldUpdate(uint32 diff)
                             secureZoneCenter = (*it).second->SummonGameObject(500010, BRZonesCenter[0].GetPositionX(), BRZonesCenter[0].GetPositionY(), BRZonesCenter[0].GetPositionZ(), 0, 0, 0, 0, 0, 15 * 60);
                         }
                         secureZone = (*it).second->SummonGameObject(500000 + secureZoneIndex, BRZonesCenter[0].GetPositionX(), BRZonesCenter[0].GetPositionY(), BRZonesCenter[0].GetPositionZ() + BRSecureZoneZPlus[secureZoneIndex], 0, 0, 0, 0, 0, 2 * 60);
-                        secureZoneHalf = (*it).second->SummonGameObject(500000 + secureZoneIndex, BRZonesCenter[0].GetPositionX(), BRZonesCenter[0].GetPositionY(), BRZonesCenter[0].GetPositionZ() + BRSecureZoneZPlus[secureZoneIndex], 0, 0, 0, 0, 180.0f, 2 * 60);
                         secureZone->SetPhaseMask(2, true);
-                        secureZoneHalf->SetPhaseMask(2, true);
                         break;
                     }
                 }
