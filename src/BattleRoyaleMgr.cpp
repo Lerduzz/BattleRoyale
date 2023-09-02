@@ -20,6 +20,14 @@ const std:string BRZonesNames[BRMapCount] =
 
 const float BRSecureZoneZPlus[10] = { 140.0f, 130.0f, 120.0f, 110.0f, 100.0f, 90.0f, 75.0f, 60.0f, 45.0f, 25.0f };
 
+enum BREventStatus
+{
+    ST_NO_PLAYERS                           = 0,
+    ST_SUMMON_PLAYERS                       = 1,
+    ST_IN_PROGRESS                          = 2,
+    ST_ENDING                               = 3,
+};
+
 // -- FUNCIONES -- //
 BattleRoyaleMgr::BattleRoyaleMgr()
 {
@@ -59,14 +67,14 @@ void BattleRoyaleMgr::HandleDismountFly(Player *player)
 void BattleRoyaleMgr::HandlePlayerJoin(Player *player)
 {
     uint32 guid = player->GetGUID().GetCounter();
-    // if (!inTimeToEvent)
-    // {
-    //     ChatHandler(player->GetSession()).PSendSysMessage("|cff4CFF00BattleRoyale::|r En este momento el evento no se esta efectuando, regresa el sabado entre las 8:00pm y las 10:00pm.");
-    //     return;
-    // }
-    if (ep_Players.find(guid) != ep_Players.end())
+    if (ep_PlayersQueue.find(guid) != ep_PlayersQueue.end())
     {
         ChatHandler(player->GetSession()).PSendSysMessage("|cff4CFF00BattleRoyale::|r Ya estas en cola para el evento.");
+        return;
+    }
+    if (ep_Players.find(guid) != ep_Players.end())
+    {
+        ChatHandler(player->GetSession()).PSendSysMessage("|cff4CFF00BattleRoyale::|r Ya estas dentro del evento.");
         return;
     }
     // if (hasEventEnded)
@@ -88,8 +96,8 @@ void BattleRoyaleMgr::HandlePlayerJoin(Player *player)
     //     return;
     // }
 
-	ep_Players[guid] = player;
-    ep_PlayersData[guid].SetPosition(player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetOrientation());
+	// ep_Players[guid] = player;
+    // ep_PlayersData[guid].SetPosition(player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetOrientation());
 
     // count = ep_Players.size();
     // uint32 minp = sConfigMgr->GetOption<int32>("BattleRoyale.MinPlayersToStart", 25);
@@ -122,6 +130,7 @@ void BattleRoyaleMgr::HandlePlayerJoin(Player *player)
     //     }
     //     TeleportToEvent(player->GetGUID().GetCounter());
     // }
+    ep_PlayersQueue[guid] = player;
     StartEvent(guid);
 }
 
