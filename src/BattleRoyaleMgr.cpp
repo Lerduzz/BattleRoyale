@@ -3,13 +3,24 @@
 #include "Chat.h"
 #include "Player.h"
 
-const Position BRZonesCenter[1] =
+// -- CONSTANTES -- //
+const int BRMapCount = 1;
+
+const int BRMapID[BRMapCount] = { 1 };
+
+const Position BRZonesCenter[BRMapCount] =
 {
-    { 5520.340820f, -3700.600342f, 1594.888916f }      // 1: ZONA CERCA DE CLARO LUNA
+    { 5520.340820f, -3700.600342f, 1594.888916f }      // 1: Kalimdor: Hyjal
+};
+
+const std:string BRZonesNames[BRMapCount] =
+{
+    "Kalimdor: Hyjal"
 };
 
 const float BRSecureZoneZPlus[10] = { 140.0f, 130.0f, 120.0f, 110.0f, 100.0f, 90.0f, 75.0f, 60.0f, 45.0f, 25.0f };
 
+// -- FUNCIONES -- //
 BattleRoyaleMgr::BattleRoyaleMgr()
 {
     hasTeleported = false;
@@ -19,6 +30,9 @@ BattleRoyaleMgr::BattleRoyaleMgr()
     nextReward = 1;
 	inTimeToEvent = false;
 	hasAnnouncedEvent = false;
+
+    // NEW!
+    rotationMapIndex = 0;
 }
 
 BattleRoyaleMgr::~BattleRoyaleMgr()

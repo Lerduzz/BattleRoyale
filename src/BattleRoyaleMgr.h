@@ -63,11 +63,13 @@ private:
     
     uint32 hackCheckDelay;
 
+    // NEW!
     GameObject* secureZone;
     int secureZoneIndex;
     int secureZoneDelay;
     bool secureZoneAnnounced;
     
+    int rotationMapIndex;
 };
 
 #define sBattleRoyaleMgr BattleRoyaleMgr::instance()
