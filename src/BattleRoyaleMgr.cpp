@@ -338,22 +338,25 @@ void BattleRoyaleMgr::HandleOnWoldUpdate(uint32 diff)
     // else startDelay -= diff;
     if (hasEventStarted) {
         if (secureZoneDelay <= 0) {
-            if (secureZone) {
-                secureZone->DespawnOrUnsummon();
-                secureZone->Delete();
-            }
             if (secureZoneIndex < 10) {
                 for (ParkourPlayerList::iterator it = ep_Players.begin(); it != ep_Players.end(); ++it)
                 {
-                    secureZone = (*it).second->SummonGameObject(500000 + secureZoneIndex, 10322.849609f, 830.343994f, 1326.370972f, 0, 0, 0, 0, 0, 120);
+                    secureZone = (*it).second->SummonGameObject(500000 + secureZoneIndex, 5520.340820f, -3700.600342f, 1594.888916f, 0, 0, 0, 0, 0, 120);
                     secureZone->SetPhaseMask(2, true);
                     break;
                 }
             }
             secureZoneIndex++;
-            secureZoneDelay = 10000; // TODO: debe ser 60000 (1 minuto).
+            secureZoneDelay = 60000;
             secureZoneAnnounced = false;
         } else {
+            if (secureZoneDelay <= 2500) {
+                if (secureZone) {
+                    secureZone->DespawnOrUnsummon();
+                    secureZone->Delete();
+                    secureZone = nullptr;
+                }
+            }
             if (secureZoneDelay <= 5000 && !secureZoneAnnounced) {
                 SendNotification(0, 5);
                 secureZoneAnnounced = true;
