@@ -2,7 +2,7 @@
 
 BattleRoyaleData::BattleRoyaleData()
 {
-    last_z = 0.0f;
+    start_map = 0;
     start_x = 0.0f;
     start_y = 0.0f;
     start_z = 0.0f;
@@ -13,22 +13,18 @@ BattleRoyaleData::~BattleRoyaleData()
 {
 }
 
-void BattleRoyaleData::SetPosition(float x, float y, float z, float o)
+void BattleRoyaleData::SetPosition(int m, float x, float y, float z, float o)
 {
+    start_map = m;
     start_x = x;
     start_y = y;
     start_z = z;
     start_o = o;
 }
 
-void BattleRoyaleData::SetLast(float last)
+int BattleRoyaleData::GetMap()
 {
-    last_z = last;
-}
-
-float BattleRoyaleData::GetLast()
-{
-    return last_z;
+    return start_map;
 }
 
 float BattleRoyaleData::GetX()
@@ -49,16 +45,4 @@ float BattleRoyaleData::GetZ()
 float BattleRoyaleData::GetO()
 {
     return start_o;
-}
-
-bool BattleRoyaleData::IsHackingZ(float z)
-{
-    if (last_z > z)
-    {
-        last_z = z;
-        return false;
-    }
-    if (z - last_z > 50.0f) return true;
-    last_z = z;
-    return false;
 }
