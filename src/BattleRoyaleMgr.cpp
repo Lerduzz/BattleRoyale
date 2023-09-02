@@ -215,27 +215,27 @@ void BattleRoyaleMgr::TeleportToEvent(uint32 guid)
 
 void BattleRoyaleMgr::ExitFromEvent(uint32 guid)
 {
-	// if (!guid)
-	// {
-	// 	for (BattleRoyalePlayerList::iterator it = ep_Players.begin(); it != ep_Players.end(); ++it)
-	// 	{
-    //         if (!(*it).second->IsAlive()) ResurrectPlayer((*it).second);
-    //         ExitFromPhaseEvent((*it).first);
-    //         (*it).second->TeleportTo(571, 5804.149902f, 624.770996f, 647.767029f, 1.533971f);
-    //         (*it).second->SaveToDB(false, false);
-    //         ep_Players.erase((*it).first);
-	// 	    ep_PlayersData.erase((*it).first);
-	// 	}
-	// }
-	// else
-	// {
-    //     if (!ep_Players[guid]->IsAlive()) ResurrectPlayer(ep_Players[guid]);
-    //     ExitFromPhaseEvent(guid);
-    //     ep_Players[guid]->TeleportTo(571, 5804.149902f, 624.770996f, 647.767029f, 1.533971f);
-    //     ep_Players[guid]->SaveToDB(false, false);
-    //     ep_Players.erase(guid);
-	//     ep_PlayersData.erase(guid);
-	// }
+	if (!guid)
+	{
+		for (BattleRoyalePlayerList::iterator it = ep_Players.begin(); it != ep_Players.end(); ++it)
+		{
+            if (!(*it).second->IsAlive()) ResurrectPlayer((*it).second);
+            ExitFromPhaseEvent((*it).first);
+            (*it).second->TeleportTo(ep_PlayersData[(*it).first].GetMap(), ep_PlayersData[(*it).first].GetX(), ep_PlayersData[(*it).first].GetY(), ep_PlayersData[(*it).first].GetZ(), ep_PlayersData[(*it).first].GetO());
+            (*it).second->SaveToDB(false, false);
+            ep_Players.erase((*it).first);
+		    ep_PlayersData.erase((*it).first);
+		}
+	}
+	else
+	{
+        if (!ep_Players[guid]->IsAlive()) ResurrectPlayer(ep_Players[guid]);
+        ExitFromPhaseEvent(guid);
+        ep_Players[guid]->TeleportTo(ep_PlayersData[guid].GetMap(), ep_PlayersData[guid].GetX(), ep_PlayersData[guid].GetY(), ep_PlayersData[guid].GetZ(), ep_PlayersData[guid].GetO());
+        ep_Players[guid]->SaveToDB(false, false);
+        ep_Players.erase(guid);
+	    ep_PlayersData.erase(guid);
+	}
 }
 
 void BattleRoyaleMgr::HandleReleaseGhost(Player *player, uint32 oldArea, uint32 newArea)
@@ -337,6 +337,8 @@ void BattleRoyaleMgr::HandleOnWoldUpdate(uint32 diff)
             }
             if (secureZoneIndex <= 10) {
                 secureZoneDelay -= diff;
+            } else {
+                ExitFromEvent(0); // TODO: Esto no va aqui.
             }
         }
     }
