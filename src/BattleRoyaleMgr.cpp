@@ -210,6 +210,8 @@ void BattleRoyaleMgr::StartEvent(uint32 guid)
     hasEventStarted = true;
     secureZoneIndex = 0;
     secureZoneDelay = 0;
+    secureZoneAnnounced = false;
+    secureZone = nullptr;
 }
 
 void BattleRoyaleMgr::TeleportToEvent(uint32 guid)
@@ -349,8 +351,13 @@ void BattleRoyaleMgr::HandleOnWoldUpdate(uint32 diff)
                 }
             }
             secureZoneIndex++;
-            secureZoneDelay = 60000;
+            secureZoneDelay = 10000; // TODO: debe ser 60000 (1 minuto).
+            secureZoneAnnounced = false;
         } else {
+            if (secureZoneDelay <= 5000 && !secureZoneAnnounced) {
+                SendNotification(0, 5);
+                secureZoneAnnounced = true;
+            }
             if (secureZoneIndex <= 10) {
                 secureZoneDelay -= diff;
             }
@@ -417,8 +424,12 @@ void BattleRoyaleMgr::CheckForHacks(uint32 guid)
 
 void BattleRoyaleMgr::SendNotification(uint32 guid, uint32 delay)
 {
+    // if (!guid)
+    //     for (ParkourPlayerList::iterator it = ep_Players.begin(); it != ep_Players.end(); ++it)
+	// 		(*it).second->GetSession()->SendNotification("|cff00ff00FALTA(N) |cffDA70D6%u|cff00ff00 SEGUNDO(S) PARA COMENZAR!", delay);
+    // else ep_Players[guid]->GetSession()->SendNotification("|cff00ff00FALTA(N) |cffDA70D6%u|cff00ff00 SEGUNDO(S) PARA COMENZAR!", delay);
     if (!guid)
         for (ParkourPlayerList::iterator it = ep_Players.begin(); it != ep_Players.end(); ++it)
-			(*it).second->GetSession()->SendNotification("|cff00ff00FALTA(N) |cffDA70D6%u|cff00ff00 SEGUNDO(S) PARA COMENZAR!", delay);
-    else ep_Players[guid]->GetSession()->SendNotification("|cff00ff00FALTA(N) |cffDA70D6%u|cff00ff00 SEGUNDO(S) PARA COMENZAR!", delay);
+			(*it).second->GetSession()->SendNotification("|cff00ff00¡La zona segura se reducirá en |cffDA70D6%u|cff00ff00 segundos!", delay);
+    else ep_Players[guid]->GetSession()->SendNotification("|cff00ff00¡La zona segura se reducirá en |cffDA70D6%u|cff00ff00 segundos!", delay);
 }

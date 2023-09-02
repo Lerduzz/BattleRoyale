@@ -66,6 +66,7 @@ private:
     GameObject* secureZone;
     int secureZoneIndex;
     int secureZoneDelay;
+    bool secureZoneAnnounced;
     
 };
 
