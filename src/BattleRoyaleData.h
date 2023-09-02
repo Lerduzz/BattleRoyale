@@ -15,13 +15,16 @@ public:
     float GetY();
     float GetZ();
     float GetO();
+    int GetDTick();
+    void SetDTick(int dt);
 
 private:
     int start_map;
     float start_x;
     float start_y;
     float start_z;
-    float start_o;    
+    float start_o;
+    int damage_tick;
 };
 
 #endif

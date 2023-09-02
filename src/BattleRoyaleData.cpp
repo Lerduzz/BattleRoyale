@@ -7,6 +7,7 @@ BattleRoyaleData::BattleRoyaleData()
     start_y = 0.0f;
     start_z = 0.0f;
     start_o = 0.0f;
+    damage_tick = 0;
 }
 
 BattleRoyaleData::~BattleRoyaleData()
@@ -45,4 +46,14 @@ float BattleRoyaleData::GetZ()
 float BattleRoyaleData::GetO()
 {
     return start_o;
+}
+
+int BattleRoyaleData::GetDTick()
+{
+    return damage_tick;
+}
+
+void BattleRoyaleData::SetDTick(int dt)
+{
+    damage_tick = dt;
 }

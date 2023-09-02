@@ -425,8 +425,15 @@ void BattleRoyaleMgr::OutOfZoneDamage()
 {
     for (BattleRoyalePlayerList::iterator it = ep_Players.begin(); it != ep_Players.end(); ++it)
     {
-        if ((*it).second->GetExactDist(secureZone) > BRSecureZoneDists[secureZoneIndex]) {
-            Unit::DealDamage(nullptr, (*it).second, 100, nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false, true); 
+        float distance = (*it).second->GetExactDist(secureZone);
+        ChatHandler((*it).second->GetSession()).PSendSysMessage("|cff4CFF00BattleRoyale::|r Distancia del centro de la zona segura: %f.", distance);
+        if (distance > BRSecureZoneDists[secureZoneIndex]) {
+            ep_PlayersData[(*it).first].SetDTick(ep_PlayersData[(*it).first].GetDTick() + 1);
+            uint32 damage = (*it).second->GetMaxHealth() * ep_PlayersData[(*it).first].GetDTick() / 100 + 25 * ep_PlayersData[(*it).first].GetDTick();
+            (*it).second->GetSession()->SendNotification("|cffff0000¡Has recibido |cffDA70D6%u|cffff0000 de daño, adéntrate en la zona segura!", damage);
+            Unit::DealDamage(nullptr, (*it).second, damage, nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false, true);
+        } else {
+            ep_PlayersData[(*it).first].SetDTick(0);
         }
     }
 }
