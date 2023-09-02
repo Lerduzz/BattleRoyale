@@ -44,20 +44,6 @@ BattleRoyaleMgr::~BattleRoyaleMgr()
     ep_PlayersData.clear();
 }
 
-// Not Fly!
-void BattleRoyaleMgr::HandleDismountFly(Player *player)
-{
-    // if (!inTimeToEvent || hasEventClose)
-    //     return;
-    // if (ep_Players.find(player->GetGUID().GetCounter()) == ep_Players.end())
-    //     return;
-    // if (!player->HasAura(31700))
-    //     return;
-    // player->Dismount();
-    // player->RemoveAurasByType(SPELL_AURA_MOUNTED);
-    // player->RemoveAurasDueToSpell(31700);
-}
-
 void BattleRoyaleMgr::HandlePlayerJoin(Player *player)
 {
     uint32 guid = player->GetGUID().GetCounter();
@@ -177,24 +163,18 @@ void BattleRoyaleMgr::HandleGiveReward(Player *player)
 
 void BattleRoyaleMgr::StartEvent(uint32 guid)
 {
-	// if (!guid)
-	// {
-	// 	for (BattleRoyalePlayerList::iterator it = ep_Players.begin(); it != ep_Players.end(); ++it)
-    //     {
-    //         EnterToPhaseEvent((*it).first);
-    //         ep_PlayersData[(*it).first].SetLast((*it).second->GetPositionZ());
-    //     }
-    // hasEventStarted = true;
-    // hackCheckDelay = 5000;
-	// }
-	// else
-    // {
-    //     EnterToPhaseEvent(guid);
-    //     ep_PlayersData[guid].SetLast(ep_Players[guid]->GetPositionZ());
-    // }
-    EnterToPhaseEvent(guid);
-    ep_Players[guid]->TeleportTo(1, BRZonesCenter[0].GetPositionX(), BRZonesCenter[0].GetPositionY(), BRZonesCenter[0].GetPositionZ(), 0.0f);
-    ep_Players[guid]->SetByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
+	if (!guid)
+	{
+	 	for (BattleRoyalePlayerList::iterator it = ep_Players.begin(); it != ep_Players.end(); ++it)
+        {
+            (*it).second->SetByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
+            // TODO: Iniciar sobrevuelo de la zona.
+        }
+	}
+	else
+    {
+        ep_Players[guid]->SetByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
+    }    
     eventCurrentStatus = ST_IN_PROGRESS;
     secureZoneIndex = 0;
     secureZoneDelay = 0;
@@ -206,17 +186,19 @@ void BattleRoyaleMgr::TeleportToEvent(uint32 guid)
 {
 	if (!guid)
 	{
-        if (eventCurrentStatus != ST_NO_PLAYERS) return;        
+        if (eventCurrentStatus != ST_NO_PLAYERS) return;
+        eventCurrentStatus = ST_SUMMON_PLAYERS;
         for (BattleRoyalePlayerQueue::iterator it = ep_PlayersQueue.begin(); it != ep_PlayersQueue.end(); ++it)
 		{
             ep_Players[(*it).first] = (*it).second;
             ep_PlayersQueue.erase((*it).first);
-            ep_PlayersData[(*it).first].SetPosition((*it).second->GetMapId(), (*it).second->GetPositionX(), (*it).second->GetPositionY(), (*it).second->GetPositionZ(), (*it).second->GetOrientation());
+            ep_PlayersData[(*it).first].SetPosition(ep_Players[(*it).first]->GetMapId(), ep_Players[(*it).first]->GetPositionX(), ep_Players[(*it).first]->GetPositionY(), ep_Players[(*it).first]->GetPositionZ(), ep_Players[(*it).first]->GetOrientation());
 
-			(*it).second->TeleportTo(BRMapID[0], BRZonesCenter[0].GetPositionX(), BRZonesCenter[0].GetPositionY(), BRZonesCenter[0].GetPositionZ(), 0.0f); // TODO: Variable de posicion inicial.
-            EnterToPhaseEvent(guid);
-            (*it).second->SaveToDB(false, false);
+			ep_Players[(*it).first]->TeleportTo(BRMapID[0], BRZonesCenter[0].GetPositionX(), BRZonesCenter[0].GetPositionY(), BRZonesCenter[0].GetPositionZ(), 0.0f); // TODO: Variable de posicion inicial.
+            EnterToPhaseEvent((*it).first);
+            ep_Players[(*it).first]->SaveToDB(false, false);
 		}
+        StartEvent(0); // TODO: Esto no va aqui.
 	}
 	else
 	{
@@ -388,10 +370,6 @@ void BattleRoyaleMgr::ResurrectPlayer(Player *player)
 
 void BattleRoyaleMgr::SendNotification(uint32 guid, uint32 delay)
 {
-    // if (!guid)
-    //     for (BattleRoyalePlayerList::iterator it = ep_Players.begin(); it != ep_Players.end(); ++it)
-	// 		(*it).second->GetSession()->SendNotification("|cff00ff00FALTA(N) |cffDA70D6%u|cff00ff00 SEGUNDO(S) PARA COMENZAR!", delay);
-    // else ep_Players[guid]->GetSession()->SendNotification("|cff00ff00FALTA(N) |cffDA70D6%u|cff00ff00 SEGUNDO(S) PARA COMENZAR!", delay);
     if (!guid)
         for (BattleRoyalePlayerList::iterator it = ep_Players.begin(); it != ep_Players.end(); ++it)
 			(*it).second->GetSession()->SendNotification("|cff00ff00¡La zona segura se reducirá en |cffDA70D6%u|cff00ff00 segundos!", delay);

@@ -31,7 +31,6 @@ public:
         return instance;
     }
     
-    void HandleDismountFly(Player *player);
     void HandlePlayerJoin(Player *player);
     void HandlePlayerLogout(Player *player);
     void HandleGiveReward(Player *player);
