@@ -190,26 +190,26 @@ void BattleRoyaleMgr::TeleportToEvent(uint32 guid)
         eventCurrentStatus = ST_SUMMON_PLAYERS;
         for (BattleRoyalePlayerQueue::iterator it = ep_PlayersQueue.begin(); it != ep_PlayersQueue.end(); ++it)
 		{
-            ep_Players[(*it).first] = (*it).second;
-            ep_PlayersQueue.erase((*it).first);
-            ep_PlayersData[(*it).first].SetPosition(ep_Players[(*it).first]->GetMapId(), ep_Players[(*it).first]->GetPositionX(), ep_Players[(*it).first]->GetPositionY(), ep_Players[(*it).first]->GetPositionZ(), ep_Players[(*it).first]->GetOrientation());
+            uint32 guid = (*it).first;
+            ep_Players[guid] = (*it).second;
+            ep_PlayersData[guid].SetPosition(ep_Players[guid]->GetMapId(), ep_Players[guid]->GetPositionX(), ep_Players[guid]->GetPositionY(), ep_Players[guid]->GetPositionZ(), ep_Players[guid]->GetOrientation());
 
-			ep_Players[(*it).first]->TeleportTo(BRMapID[0], BRZonesCenter[0].GetPositionX(), BRZonesCenter[0].GetPositionY(), BRZonesCenter[0].GetPositionZ(), 0.0f); // TODO: Variable de posicion inicial.
-            EnterToPhaseEvent((*it).first);
-            ep_Players[(*it).first]->SaveToDB(false, false);
+			ep_Players[guid]->TeleportTo(BRMapID[0], BRZonesCenter[0].GetPositionX(), BRZonesCenter[0].GetPositionY(), BRZonesCenter[0].GetPositionZ(), 0.0f); // TODO: Variable de posicion inicial.
+            EnterToPhaseEvent(guid);
+            ep_Players[guid]->SaveToDB(false, false);
 		}
+        for (BattleRoyalePlayerList::iterator it = ep_Players.begin(); it != ep_Players.end(); ++it) ep_PlayersQueue.erase((*it).first);
         StartEvent(0); // TODO: Esto no va aqui.
 	}
 	else
 	{
         if (eventCurrentStatus != ST_SUMMON_PLAYERS) return;
         ep_Players[guid] = ep_PlayersQueue[guid];
-        ep_PlayersQueue.erase(guid);
         ep_PlayersData[guid].SetPosition(ep_Players[guid]->GetMapId(), ep_Players[guid]->GetPositionX(), ep_Players[guid]->GetPositionY(), ep_Players[guid]->GetPositionZ(), ep_Players[guid]->GetOrientation());
-
         ep_Players[guid]->TeleportTo(BRMapID[0], BRZonesCenter[0].GetPositionX(), BRZonesCenter[0].GetPositionY(), BRZonesCenter[0].GetPositionZ(), 0.0f); // TODO: Variable de posicion inicial.
         EnterToPhaseEvent(guid);
         ep_Players[guid]->SaveToDB(false, false);
+        ep_PlayersQueue.erase(guid);
 	}
 }
 
@@ -328,7 +328,7 @@ void BattleRoyaleMgr::HandleOnWoldUpdate(uint32 diff)
                 }
             }
             secureZoneIndex++;
-            secureZoneDelay = 7000;
+            secureZoneDelay = 60000;
             secureZoneAnnounced = false;
         } else {
             if (secureZoneDelay <= 5000 && !secureZoneAnnounced) {
