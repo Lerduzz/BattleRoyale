@@ -18,8 +18,30 @@ const std::string BRZonesNames[BRMapCount] =
     "Kalimdor: Hyjal"
 };
 
-const float BRSecureZoneZPlus[10] = { 140.0f, 130.0f, 120.0f, 110.0f, 100.0f, 90.0f, 75.0f, 60.0f, 45.0f, 25.0f };
-const float BRSecureZoneDists[10] = { 263.17f, 243.79f, 218.36f, 194.25f, 169.19f, 144.24f, 116.79f, 89.64f, 63.59f, 31.85 };
+const float BRSecureZoneZPlus[10] = { 
+    297.0f,
+    264.0f,
+    231.0f,
+    198.0f,
+    165.0f,
+    132.0f,
+    99.0f,
+    66.0f,
+    33.0f,
+    16.5f
+};
+const float BRSecureZoneDists[10] = {
+    297.0f,
+    264.0f,
+    231.0f,
+    198.0f,
+    165.0f,
+    132.0f,
+    99.0f,
+    66.0f,
+    33.0f,
+    16.5f
+};
 
 enum BREventStatus : int
 {
@@ -338,14 +360,12 @@ void BattleRoyaleMgr::HandleOnWoldUpdate(uint32 diff)
         }
         case ST_IN_PROGRESS:
         {
-            // TEST DAMAGE OUT OF ZONE
             if (secondsTicksHelper <= 0) {
                 secondsTicksHelper = 1000;
                 OutOfZoneDamage();
             } else {
                 secondsTicksHelper -= diff;
             }
-
             if (secureZoneDelay <= 0) {
                 if (secureZone) {
                     secureZone->DespawnOrUnsummon();
@@ -435,8 +455,8 @@ void BattleRoyaleMgr::OutOfZoneDamage()
     for (BattleRoyalePlayerList::iterator it = ep_Players.begin(); it != ep_Players.end(); ++it)
     {
         float distance = (*it).second->GetExactDist(secureZoneCenter);
-        ChatHandler((*it).second->GetSession()).PSendSysMessage("|cff4CFF00BattleRoyale::|r Distancia del centro de la zona segura: %f.", distance);
-        if (distance > BRSecureZoneDists[secureZoneIndex]) {
+        ChatHandler((*it).second->GetSession()).PSendSysMessage("|cff4CFF00BattleRoyale::|r Distancia del centro de la zona segura: %f.", distance); // temp
+        if (secureZoneIndex > 0 && distance > BRSecureZoneDists[secureZoneIndex - 1]) {
             ep_PlayersData[(*it).first].SetDTick(ep_PlayersData[(*it).first].GetDTick() + 1);
             uint32 damage = 2 * (*it).second->GetMaxHealth() * sqrt(ep_PlayersData[(*it).first].GetDTick()) / 100;
             (*it).second->GetSession()->SendNotification("|cffff0000¡Has recibido |cffDA70D6%u|cffff0000 de daño, adéntrate en la zona segura!", damage);
