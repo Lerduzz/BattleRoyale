@@ -213,7 +213,7 @@ void BattleRoyaleMgr::StartEvent(uint32 guid)
 {
 	// if (!guid)
 	// {
-	// 	for (ParkourPlayerList::iterator it = ep_Players.begin(); it != ep_Players.end(); ++it)
+	// 	for (BattleRoyalePlayerList::iterator it = ep_Players.begin(); it != ep_Players.end(); ++it)
     //     {
     //         EnterToPhaseEvent((*it).first);
     //         ep_PlayersData[(*it).first].SetLast((*it).second->GetPositionZ());
@@ -242,7 +242,7 @@ void BattleRoyaleMgr::TeleportToEvent(uint32 guid)
 	// {
     //     startDelay = sConfigMgr->GetOption<int32>("BattleRoyale.EventStartDelay", 60000);
 	// 	secondsDelay = startDelay / 1000;
-    //     for (ParkourPlayerList::iterator it = ep_Players.begin(); it != ep_Players.end(); ++it)
+    //     for (BattleRoyalePlayerList::iterator it = ep_Players.begin(); it != ep_Players.end(); ++it)
 	// 	{
 	// 		(*it).second->TeleportTo(0, -13246.281f, 193.465f, 31.019f, 1.130f);
     //         EnterToPhaseDelay((*it).first);
@@ -263,7 +263,7 @@ void BattleRoyaleMgr::ExitFromEvent(uint32 guid)
 {
 	// if (!guid)
 	// {
-	// 	for (ParkourPlayerList::iterator it = ep_Players.begin(); it != ep_Players.end(); ++it)
+	// 	for (BattleRoyalePlayerList::iterator it = ep_Players.begin(); it != ep_Players.end(); ++it)
 	// 	{
     //         if (!(*it).second->IsAlive()) ResurrectPlayer((*it).second);
     //         ExitFromPhaseEvent((*it).first);
@@ -366,7 +366,7 @@ void BattleRoyaleMgr::HandleOnWoldUpdate(uint32 diff)
                 secureZone = nullptr;
             }
             if (secureZoneIndex < 10) {
-                for (ParkourPlayerList::iterator it = ep_Players.begin(); it != ep_Players.end(); ++it)
+                for (BattleRoyalePlayerList::iterator it = ep_Players.begin(); it != ep_Players.end(); ++it)
                 {
                     secureZone = (*it).second->SummonGameObject(500000 + secureZoneIndex, BRZonesCenter[0].GetPositionX(), BRZonesCenter[0].GetPositionY(), BRZonesCenter[0].GetPositionZ() + BRSecureZoneZPlus[secureZoneIndex], 0, 0, 0, 0, 0, 120);
                     secureZone->SetPhaseMask(2, true);
@@ -423,7 +423,7 @@ void BattleRoyaleMgr::ResurrectPlayer(Player *player)
 void BattleRoyaleMgr::CheckForHacks(uint32 guid)
 {
     if (!guid)
-        for (ParkourPlayerData::iterator it = ep_PlayersData.begin(); it != ep_PlayersData.end(); ++it)
+        for (BattleRoyalePlayerData::iterator it = ep_PlayersData.begin(); it != ep_PlayersData.end(); ++it)
 		{
             if ((*it).second.IsHackingZ(ep_Players[(*it).first]->GetPositionZ()))
             {
@@ -448,11 +448,11 @@ void BattleRoyaleMgr::CheckForHacks(uint32 guid)
 void BattleRoyaleMgr::SendNotification(uint32 guid, uint32 delay)
 {
     // if (!guid)
-    //     for (ParkourPlayerList::iterator it = ep_Players.begin(); it != ep_Players.end(); ++it)
+    //     for (BattleRoyalePlayerList::iterator it = ep_Players.begin(); it != ep_Players.end(); ++it)
 	// 		(*it).second->GetSession()->SendNotification("|cff00ff00FALTA(N) |cffDA70D6%u|cff00ff00 SEGUNDO(S) PARA COMENZAR!", delay);
     // else ep_Players[guid]->GetSession()->SendNotification("|cff00ff00FALTA(N) |cffDA70D6%u|cff00ff00 SEGUNDO(S) PARA COMENZAR!", delay);
     if (!guid)
-        for (ParkourPlayerList::iterator it = ep_Players.begin(); it != ep_Players.end(); ++it)
+        for (BattleRoyalePlayerList::iterator it = ep_Players.begin(); it != ep_Players.end(); ++it)
 			(*it).second->GetSession()->SendNotification("|cff00ff00¡La zona segura se reducirá en |cffDA70D6%u|cff00ff00 segundos!", delay);
     else ep_Players[guid]->GetSession()->SendNotification("|cff00ff00¡La zona segura se reducirá en |cffDA70D6%u|cff00ff00 segundos!", delay);
 }

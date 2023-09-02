@@ -11,10 +11,10 @@
 class BattleRoyaleData;
 
 // GUIDLow es la llave, Lista de personajes en el evento.
-typedef std::map<uint32, Player*> ParkourPlayerList;
+typedef std::map<uint32, Player*> BattleRoyalePlayerList;
 
 // GUIDLow es la llave, Datos de los personajes en el evento.
-typedef std::map<uint32, BattleRoyaleData> ParkourPlayerData;
+typedef std::map<uint32, BattleRoyaleData> BattleRoyalePlayerData;
 
 class BattleRoyaleMgr
 {
@@ -47,8 +47,8 @@ private:
     void CheckForHacks(uint32 guid);
     void SendNotification(uint32 guid, uint32 delay);
     
-    ParkourPlayerList ep_Players;
-    ParkourPlayerData ep_PlayersData;
+    BattleRoyalePlayerList ep_Players;
+    BattleRoyalePlayerData ep_PlayersData;
     
     bool hasTeleported;
     bool hasEventStarted;
