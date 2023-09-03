@@ -6,7 +6,7 @@
 // -- CONSTANTES -- //
 const int BRMapCount = 1;
 
-const int BRMapID[BRMapCount] = { 1, 1 };
+const int BRMapID[BRMapCount] = { 1};
 
 const Position BRZonesCenter[BRMapCount] =
 {
@@ -62,7 +62,8 @@ BattleRoyaleMgr::BattleRoyaleMgr()
 {
     eventMinPlayers = sConfigMgr->GetOption<int32>("BattleRoyale.MinPlayers", 25);
     eventMaxPlayers = sConfigMgr->GetOption<int32>("BattleRoyale.MaxPlayers", 50);
-    go_CommandPoint = nullptr;
+    go_SecureZone = nullptr;
+    go_CenterOfBattle = nullptr;
     go_TransportShip = nullptr;
     ResetFullEvent();
 }
@@ -199,13 +200,18 @@ void BattleRoyaleMgr::StartEvent(uint32 guid)
 	 	for (BattleRoyalePlayerList::iterator it = ep_Players.begin(); it != ep_Players.end(); ++it)
         {
             (*it).second->SetByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
-            // TODO: Iniciar sobrevuelo de la zona.
         }
 	}
 	else
     {
         ep_Players[guid]->SetByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
-    }    
+    } 
+
+    // TEST de Mover Nave
+    uint32_t const autoCloseTime = go_TransportShip->GetGOInfo()->GetAutoCloseTime() ? 10000u : 0u;
+    go_TransportShip->SetLootState(GO_READY);
+    go_TransportShip->UseDoorOrButton(autoCloseTime, false, nullptr);
+
     eventCurrentStatus = ST_IN_PROGRESS;
     secureZoneIndex = 0;
     secureZoneDelay = 0;
@@ -250,7 +256,7 @@ void BattleRoyaleMgr::TeleportToEvent(uint32 guid)
         {
             ep_Players[guid] = ep_PlayersQueue[guid];
             ep_PlayersData[guid].SetPosition(ep_Players[guid]->GetMapId(), ep_Players[guid]->GetPositionX(), ep_Players[guid]->GetPositionY(), ep_Players[guid]->GetPositionZ(), ep_Players[guid]->GetOrientation());
-            ep_Players[guid]->TeleportTo(BRMapID[rotationMapIndex], BRZonesShipStart[rotationMapIndex].GetPositionX(), BRZonesShipStart[rotationMapIndex].GetPositionY(), BRZonesShipStart[rotationMapIndex].GetPositionZ(), 0.0f);
+            ep_Players[guid]->TeleportTo(BRMapID[rotationMapIndex], BRZonesShipStart[rotationMapIndex][0], BRZonesShipStart[rotationMapIndex][1], BRZonesShipStart[rotationMapIndex][2], 0.0f);
             EnterToPhaseEvent(guid);
             ep_Players[guid]->SaveToDB(false, false);
             ep_PlayersQueue.erase(guid);
@@ -327,11 +333,8 @@ void BattleRoyaleMgr::HandleOnWoldUpdate(uint32 diff)
                             ResetFullEvent();
                             return;
                         }
-                        
-
-
-                        // ep_Players[guid]->TeleportTo(BRMapID[rotationMapIndex], BRZonesShipStart[rotationMapIndex].GetPositionX(), BRZonesShipStart[rotationMapIndex].GetPositionY(), BRZonesShipStart[rotationMapIndex].GetPositionZ(), 0.0f);
-
+                        SpawnTransportShip();
+                        TeleportPlayersToShip();
                     }
                     summonRemainingTime--;
                 }
@@ -349,18 +352,7 @@ void BattleRoyaleMgr::HandleOnWoldUpdate(uint32 diff)
                 secondsTicksHelper -= diff;
             }
             if (secureZoneDelay <= 0) {
-                if (go_SecureZone) {
-                    go_SecureZone->DespawnOrUnsummon();
-                    go_SecureZone->Delete();
-                    go_SecureZone = nullptr;
-                }
-                if (secureZoneIndex < 10) {
-                    // *** ---
-                    go_SecureZone = go_CenterOfBattle->SummonGameObject(500000 + secureZoneIndex, BRZonesCenter[rotationMapIndex].GetPositionX(), BRZonesCenter[rotationMapIndex].GetPositionY(), BRZonesCenter[rotationMapIndex].GetPositionZ() + BRSecureZoneZPlus[secureZoneIndex], 0, 0, 0, 0, 0, 2 * 60);
-                    go_SecureZone->SetPhaseMask(2, true);
-                    go_SecureZone->GetMap()->SetVisibilityRange(500.0f);
-                    go_SecureZone->SetVisibilityDistanceOverride(VisibilityDistanceType::Infinite);
-                }
+                SpawnSecureZone();
                 secureZoneIndex++;
                 secureZoneDelay = 60000;
                 secureZoneAnnounced = false;
@@ -467,7 +459,31 @@ void BattleRoyaleMgr::SpawnTransportShip()
     float o = BRZonesShipStart[rotationMapIndex][3];
     float rot2 = std::sin(o / 2);
     float rot3 = cos(o / 2);
-    go_TransportShip = player->SummonGameObject(194675, x, y, z, o, 0, 0, rot2, rot3, 2 * 60);
+    go_TransportShip = go_CenterOfBattle->SummonGameObject(194675, x, y, z, o, 0, 0, rot2, rot3, 2 * 60);
+}
+
+void BattleRoyaleMgr::SpawnSecureZone()
+{
+    if (go_SecureZone) {
+        go_SecureZone->DespawnOrUnsummon();
+        go_SecureZone->Delete();
+        go_SecureZone = nullptr;
+    }
+    if (secureZoneIndex < 10) {
+        go_SecureZone = go_CenterOfBattle->SummonGameObject(500000 + secureZoneIndex, BRZonesCenter[rotationMapIndex].GetPositionX(), BRZonesCenter[rotationMapIndex].GetPositionY(), BRZonesCenter[rotationMapIndex].GetPositionZ() + BRSecureZoneZPlus[secureZoneIndex], 0, 0, 0, 0, 0, 2 * 60);
+        go_SecureZone->SetPhaseMask(2, true);
+        go_SecureZone->GetMap()->SetVisibilityRange(500.0f);
+        go_SecureZone->SetVisibilityDistanceOverride(VisibilityDistanceType::Infinite);
+    }
+}
+
+void BattleRoyaleMgr::TeleportPlayersToShip()
+{
+    if (ep_Players.size() == 0) return;
+    for (BattleRoyalePlayerList::iterator it = ep_Players.begin(); it != ep_Players.end(); ++it)
+    {
+        (*it).second->TeleportTo(BRMapID[rotationMapIndex], BRZonesShipStart[rotationMapIndex][0], BRZonesShipStart[rotationMapIndex][1], BRZonesShipStart[rotationMapIndex][2], 0.0f);
+    }
 }
 
 void BattleRoyaleMgr::OutOfZoneDamage()
@@ -486,7 +502,7 @@ void BattleRoyaleMgr::OutOfZoneDamage()
     }
 }
 
-void BattlefieldMgr::ResetFullEvent()
+void BattleRoyaleMgr::ResetFullEvent()
 {
     ep_PlayersQueue.clear();
 	ep_Players.clear();
@@ -510,38 +526,3 @@ void BattlefieldMgr::ResetFullEvent()
         go_TransportShip = nullptr;
     }
 }
-
-
-
-/*void BattleRoyaleMgr::CrearNave(Player* player)
-{
-    // Test dist.
-    invoker = player;
-    CreateReferencePoint(player);
-
-    // Limpiar anterior.
-    if (go_TransportShip) {
-        go_TransportShip->DespawnOrUnsummon();
-        go_TransportShip->Delete();
-        go_TransportShip = nullptr;
-    }
-
-    // Posicion y angulo.
-    float x = player->GetPositionX();
-    float y = player->GetPositionY();
-    float z = player->GetPositionZ();
-    float ang = player->GetOrientation() - M_PI / 2.0f;
-    float rot2 = std::sin(ang / 2);
-    float rot3 = cos(ang / 2);
-
-    // Invocar.
-    go_TransportShip = player->SummonGameObject(194675, x, y, z, ang, 0, 0, rot2, rot3, 2 * 60);
-
-    // Montarse.
-    player->TeleportTo(go_TransportShip->GetMapId(), go_TransportShip->GetPositionX(), go_TransportShip->GetPositionY(), go_TransportShip->GetPositionZ() + 1.0f, go_TransportShip->GetOrientation());
-    
-    // Activar.
-    uint32_t const autoCloseTime = go_TransportShip->GetGOInfo()->GetAutoCloseTime() ? 10000u : 0u;
-    go_TransportShip->SetLootState(GO_READY);
-    go_TransportShip->UseDoorOrButton(autoCloseTime, false, player);
-}*/

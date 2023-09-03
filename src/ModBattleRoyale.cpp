@@ -278,27 +278,27 @@ public:
 
     static bool HandleBattleYoyaleCommand(ChatHandler *handler)
     {
-        handler->SendSysMessage("|cff4CFF00BRCommands::|r point: set point, distance: calculate distance.");
+        // handler->SendSysMessage("|cff4CFF00BRCommands::|r point: set point, distance: calculate distance.");
         return true;
     }
 
     static bool HandleBRPointCommand(ChatHandler *handler)
     {
-        sBattleRoyaleMgr->CreateReferencePoint(handler->GetSession()->GetPlayer());
-        handler->SendSysMessage("|cff4CFF00BRCommands::|r Punto de medicion establecido.");
+        // sBattleRoyaleMgr->CreateReferencePoint(handler->GetSession()->GetPlayer());
+        // handler->SendSysMessage("|cff4CFF00BRCommands::|r Punto de medicion establecido.");
         return true;
     }
 
     static bool HandleBRDistanceCommand(ChatHandler *handler)
     {
-        handler->PSendSysMessage("|cff4CFF00BRCommands::|r La distancia es: %f.", sBattleRoyaleMgr->GetDistanceFromPoint(handler->GetSession()->GetPlayer()));
+        // handler->PSendSysMessage("|cff4CFF00BRCommands::|r La distancia es: %f.", sBattleRoyaleMgr->GetDistanceFromPoint(handler->GetSession()->GetPlayer()));
         return true;
     }
 
     static bool HandleBRTestCommand(ChatHandler *handler)
     {
-        sBattleRoyaleMgr->CrearNave(handler->GetSession()->GetPlayer());
-        handler->SendSysMessage("|cff4CFF00BRCommands::|r Probando la nave.");
+        // sBattleRoyaleMgr->CrearNave(handler->GetSession()->GetPlayer());
+        // handler->SendSysMessage("|cff4CFF00BRCommands::|r Probando la nave.");
         return true;
     }
 };

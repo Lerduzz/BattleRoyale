@@ -51,6 +51,8 @@ private:
     void SendNotificationStart(uint32 guid, uint32 delay);
     bool SpawnTheCenterOfBattle();
     void SpawnTransportShip();
+    void SpawnSecureZone();
+    void TeleportPlayersToShip();
     void OutOfZoneDamage();
     void ResetFullEvent();
     
