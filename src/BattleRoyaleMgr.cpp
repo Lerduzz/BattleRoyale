@@ -469,7 +469,6 @@ void BattleRoyaleMgr::OutOfZoneDamage()
     for (BattleRoyalePlayerList::iterator it = ep_Players.begin(); it != ep_Players.end(); ++it)
     {
         float distance = (*it).second->GetExactDist(secureZoneCenter);
-        ChatHandler((*it).second->GetSession()).PSendSysMessage("|cff4CFF00BattleRoyale::|r Distancia del centro de la zona segura: %f.", distance); // temp
         if (secureZoneIndex > 0 && distance > BRSecureZoneDists[secureZoneIndex - 1]) {
             ep_PlayersData[(*it).first].SetDTick(ep_PlayersData[(*it).first].GetDTick() + 1);
             uint32 damage = (*it).second->GetMaxHealth() * (2 * sqrt(ep_PlayersData[(*it).first].GetDTick()) + secureZoneIndex) / 100;
