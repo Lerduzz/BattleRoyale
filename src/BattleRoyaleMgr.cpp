@@ -252,6 +252,9 @@ void BattleRoyaleMgr::ExitFromEvent(uint32 guid)
             ep_Players.erase((*it).first);
 		    ep_PlayersData.erase((*it).first);
 		}
+
+        // TODO: Esto no debe ir aqui.
+        secureZoneCenter->GetMap()->SetVisibilityRange(World::GetMaxVisibleDistanceOnContinents());
 	}
 	else
 	{
@@ -375,7 +378,6 @@ void BattleRoyaleMgr::HandleOnWoldUpdate(uint32 diff)
                 if (secureZoneIndex < 10) {
                     for (BattleRoyalePlayerList::iterator it = ep_Players.begin(); it != ep_Players.end(); ++it)
                     {
-                        (*it).second->GetMap()->SetVisibilityRange(350.0f);
                         if (secureZoneIndex == 0) {
                             if (secureZoneCenter) {
                                 secureZoneCenter->DespawnOrUnsummon();
@@ -384,10 +386,12 @@ void BattleRoyaleMgr::HandleOnWoldUpdate(uint32 diff)
                             }
                             secureZoneCenter = (*it).second->SummonGameObject(500010, BRZonesCenter[0].GetPositionX(), BRZonesCenter[0].GetPositionY(), BRZonesCenter[0].GetPositionZ(), 0, 0, 0, 0, 0, 15 * 60);
                         }
-                        secureZone = (*it).second->SummonGameObject(500000 + secureZoneIndex, BRZonesCenter[0].GetPositionX(), BRZonesCenter[0].GetPositionY(), BRZonesCenter[0].GetPositionZ() + BRSecureZoneZPlus[secureZoneIndex], 0, 0, 0, 0, 0, 2 * 60);
-                        secureZone->SetPhaseMask(2, true);
                         break;
                     }
+                    secureZone = secureZoneCenter->SummonGameObject(500000 + secureZoneIndex, BRZonesCenter[0].GetPositionX(), BRZonesCenter[0].GetPositionY(), BRZonesCenter[0].GetPositionZ() + BRSecureZoneZPlus[secureZoneIndex], 0, 0, 0, 0, 0, 2 * 60);
+                    secureZone->SetPhaseMask(2, true);
+                    secureZone->GetMap()->SetVisibilityRange(500.0f);
+                    secureZone->SetVisibilityDistanceOverride(VisibilityDistanceType::Infinite);
                 }
                 secureZoneIndex++;
                 secureZoneDelay = 60000;

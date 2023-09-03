@@ -14,4 +14,4 @@ INSERT INTO `gameobject_template` (`entry`, `displayId`, `name`, `size`, `type`,
 INSERT INTO `gameobject_template` (`entry`, `displayId`, `name`, `size`, `type`, `Data3`) VALUES (@Entry+8, @DisplayID, @Name, 0.5,  5, 1);
 INSERT INTO `gameobject_template` (`entry`, `displayId`, `name`, `size`, `type`, `Data3`) VALUES (@Entry+9, @DisplayID, @Name, 0.25, 5, 1);
 
-INSERT INTO `gameobject_template` (`entry`, `displayId`, `name`, `size`, `type`, `Data3`) VALUES (@Entry+10, 0, "Centro Invisible BR", 1.0, 5, 1);
+INSERT INTO `gameobject_template` (`entry`, `displayId`, `name`, `size`, `type`) VALUES (@Entry+10, 0, "Centro Invisible BR", 1.0, 5);
