@@ -15,7 +15,7 @@ const Position BRZonesCenter[BRMapCount] =
 
 const float BRZonesShipStart[BRMapCount][4] =
 {
-    { 3267.581055f, -2164.183105f, 1759.483765f, 0.0f - M_PI / 2.0f }
+    { 3067.581055f, -2164.183105f, 1609.483765f, 0.0f - M_PI / 2.0f }
 };
 
 const std::string BRZonesNames[BRMapCount] =
