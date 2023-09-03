@@ -42,10 +42,6 @@ public:
     bool ForceFFAPvPFlag(Player* player);
     bool RestrictPlayerFunctions(Player* player);
 
-    // TEMP
-    void CreateReferencePoint(Player* player);
-    float GetDistanceFromPoint(Player* player);
-    void CrearNave(Player* player);
     
 private:
     void EnterToPhaseEvent(uint32 guid);
@@ -53,14 +49,18 @@ private:
     void ResurrectPlayer(Player *player);
     void SendNotification(uint32 guid, uint32 delay);
     void SendNotificationStart(uint32 guid, uint32 delay);
+    bool SpawnTheCenterOfBattle();
     void OutOfZoneDamage();
+    void ResetFullEvent();
     
     BattleRoyalePlayerList ep_PlayersQueue;
     BattleRoyalePlayerList ep_Players;
     BattleRoyalePlayerData ep_PlayersData;
     
-    GameObject* secureZone;
-    GameObject* secureZoneCenter;
+    GameObject* go_SecureZone;
+    GameObject* go_CenterOfBattle;    
+    GameObject* go_TransportShip;
+
     int secureZoneIndex;
     int secureZoneDelay;
     bool secureZoneAnnounced;
@@ -71,15 +71,8 @@ private:
     int eventMinPlayers;
     int eventMaxPlayers;
 
-    // TESTs
     int secondsTicksHelper;
-    int summonRemainingTime;
-
-    // TEMP
-    GameObject* go_CommandPoint;
-    GameObject* go_Nave;
-    Player* invoker;
-    
+    int summonRemainingTime;    
 };
 
 #define sBattleRoyaleMgr BattleRoyaleMgr::instance()
