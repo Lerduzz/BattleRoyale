@@ -4,20 +4,23 @@
 #include "Player.h"
 
 // -- CONSTANTES -- //
-const int TEMP_CURRENT_MAP_INDEX = 1;
-const int BRMapCount = 2;
+const int TEMP_CURRENT_MAP_INDEX = 0;
+const int BRMapCount = 1;
 
 const int BRMapID[BRMapCount] = { 1, 1 };
 
 const Position BRZonesCenter[BRMapCount] =
 {
-    { 5411.041504f, -2701.873779f, 1451.660522f },      // 1: Kalimdor: Hyjal
     { 5261.581055f, -2164.183105f, 1259.483765f }       // 1: Kalimdor: Hyjal
+};
+
+const float BRZonesShipStart[BRMapCount][4] =
+{
+    { 3267.581055f, -2164.183105f, 1759.483765f, 0.0f - M_PI / 2.0f }
 };
 
 const std::string BRZonesNames[BRMapCount] =
 {
-    "Kalimdor: Hyjal",
     "Kalimdor: Hyjal"
 };
 
