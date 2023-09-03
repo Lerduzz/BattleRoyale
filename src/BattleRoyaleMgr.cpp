@@ -53,8 +53,9 @@ enum BREventStatus : int
 {
     ST_NO_PLAYERS                           = 0,
     ST_SUMMON_PLAYERS                       = 1,
-    ST_IN_PROGRESS                          = 2,
-    ST_ENDING                               = 3,
+    ST_SHIP_WAITING                         = 2,
+    ST_SHIP_IN_WAY                          = 3,
+    ST_IN_PROGRESS                          = 4
 };
 
 // -- FUNCIONES -- //
@@ -228,6 +229,8 @@ void BattleRoyaleMgr::TeleportToEvent(uint32 guid)
 		{
             uint32 guid = (*it).first;
             ep_Players[guid] = (*it).second;
+
+            // TODO: Si esta en intancia o transporte entonces almacenar coordenadas de hogar.
             ep_PlayersData[guid].SetPosition(ep_Players[guid]->GetMapId(), ep_Players[guid]->GetPositionX(), ep_Players[guid]->GetPositionY(), ep_Players[guid]->GetPositionZ(), ep_Players[guid]->GetOrientation());
 
 			ep_Players[guid]->TeleportTo(BRMapID[TEMP_CURRENT_MAP_INDEX], BRZonesCenter[TEMP_CURRENT_MAP_INDEX].GetPositionX(), BRZonesCenter[TEMP_CURRENT_MAP_INDEX].GetPositionY(), BRZonesCenter[TEMP_CURRENT_MAP_INDEX].GetPositionZ(), 0.0f);
