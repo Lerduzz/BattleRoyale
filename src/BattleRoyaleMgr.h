@@ -50,6 +50,7 @@ private:
     void SendNotification(uint32 guid, uint32 delay);
     void SendNotificationStart(uint32 guid, uint32 delay);
     bool SpawnTheCenterOfBattle();
+    void SpawnTransportShip();
     void OutOfZoneDamage();
     void ResetFullEvent();
     

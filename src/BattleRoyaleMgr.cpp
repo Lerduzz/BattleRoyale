@@ -327,18 +327,9 @@ void BattleRoyaleMgr::HandleOnWoldUpdate(uint32 diff)
                             ResetFullEvent();
                             return;
                         }
-                        if (go_TransportShip) {
-                            go_TransportShip->DespawnOrUnsummon();
-                            go_TransportShip->Delete();
-                            go_TransportShip = nullptr;
-                        }
-                        float x = BRZonesShipStart[rotationMapIndex][0];
-                        float y = BRZonesShipStart[rotationMapIndex][1];
-                        float z = BRZonesShipStart[rotationMapIndex][2];
-                        float o = BRZonesShipStart[rotationMapIndex][3];
-                        float rot2 = std::sin(o / 2);
-                        float rot3 = cos(o / 2);
-                        go_TransportShip = player->SummonGameObject(194675, x, y, z, ang, 0, 0, rot2, rot3, 2 * 60);
+                        
+
+
                         // ep_Players[guid]->TeleportTo(BRMapID[rotationMapIndex], BRZonesShipStart[rotationMapIndex].GetPositionX(), BRZonesShipStart[rotationMapIndex].GetPositionY(), BRZonesShipStart[rotationMapIndex].GetPositionZ(), 0.0f);
 
                     }
@@ -461,6 +452,22 @@ bool BattleRoyaleMgr::SpawnTheCenterOfBattle()
         }
     }
     return success;
+}
+
+void BattleRoyaleMgr::SpawnTransportShip()
+{
+    if (go_TransportShip) {
+        go_TransportShip->DespawnOrUnsummon();
+        go_TransportShip->Delete();
+        go_TransportShip = nullptr;
+    }
+    float x = BRZonesShipStart[rotationMapIndex][0];
+    float y = BRZonesShipStart[rotationMapIndex][1];
+    float z = BRZonesShipStart[rotationMapIndex][2];
+    float o = BRZonesShipStart[rotationMapIndex][3];
+    float rot2 = std::sin(o / 2);
+    float rot3 = cos(o / 2);
+    go_TransportShip = player->SummonGameObject(194675, x, y, z, o, 0, 0, rot2, rot3, 2 * 60);
 }
 
 void BattleRoyaleMgr::OutOfZoneDamage()
