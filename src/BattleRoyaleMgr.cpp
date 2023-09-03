@@ -348,6 +348,7 @@ void BattleRoyaleMgr::HandleOnWoldUpdate(uint32 diff)
             if (secondsTicksHelper <= 0) {
                 secondsTicksHelper = 1000;
                 if (summonRemainingTime <= 0) {
+                    SendNotificationStart(0, 0);
                     StartEvent(0);
                 } else {
                     int srt = summonRemainingTime;
@@ -449,10 +450,15 @@ void BattleRoyaleMgr::SendNotification(uint32 guid, uint32 delay)
 
 void BattleRoyaleMgr::SendNotificationStart(uint32 guid, uint32 delay)
 {
-    if (!guid)
-        for (BattleRoyalePlayerList::iterator it = ep_Players.begin(); it != ep_Players.end(); ++it)
-			(*it).second->GetSession()->SendNotification("|cff00ff00¡La batalla iniciará en |cffDA70D6%u|cff00ff00 segundos!", delay);
-    else ep_Players[guid]->GetSession()->SendNotification("|cff00ff00¡La batalla iniciará en |cffDA70D6%u|cff00ff00 segundos!", delay);
+    if (!guid){
+        for (BattleRoyalePlayerList::iterator it = ep_Players.begin(); it != ep_Players.end(); ++it) {
+            if (delay == 0){
+                (*it).second->GetSession()->SendNotification("|cff00ff00¡Que comience la batalla de |cffDA70D6%s|cff00ff00!", BRZonesNames[0]);
+            } else {
+                (*it).second->GetSession()->SendNotification("|cff00ff00¡La batalla iniciará en |cffDA70D6%u|cff00ff00 segundos!", delay);
+            }
+        }
+    } else ep_Players[guid]->GetSession()->SendNotification("|cff00ff00¡La batalla iniciará en |cffDA70D6%u|cff00ff00 segundos!", delay);
 }
 
 void BattleRoyaleMgr::OutOfZoneDamage()
