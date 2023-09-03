@@ -464,6 +464,7 @@ void BattleRoyaleMgr::SpawnTransportShip()
 
 void BattleRoyaleMgr::SpawnSecureZone()
 {
+    return; // TODO
     if (go_SecureZone) {
         go_SecureZone->DespawnOrUnsummon();
         go_SecureZone->Delete();
@@ -482,12 +483,13 @@ void BattleRoyaleMgr::TeleportPlayersToShip()
     if (ep_Players.size() == 0) return;
     for (BattleRoyalePlayerList::iterator it = ep_Players.begin(); it != ep_Players.end(); ++it)
     {
-        (*it).second->TeleportTo(BRMapID[rotationMapIndex], BRZonesShipStart[rotationMapIndex][0], BRZonesShipStart[rotationMapIndex][1], BRZonesShipStart[rotationMapIndex][2], 0.0f);
+        (*it).second->TeleportTo(BRMapID[rotationMapIndex], BRZonesShipStart[rotationMapIndex][0], BRZonesShipStart[rotationMapIndex][1], BRZonesShipStart[rotationMapIndex][2] + 2.5f, 0.0f);
     }
 }
 
 void BattleRoyaleMgr::OutOfZoneDamage()
 {
+    return; // TODO
     for (BattleRoyalePlayerList::iterator it = ep_Players.begin(); it != ep_Players.end(); ++it)
     {
         float distance = (*it).second->GetExactDist(go_CenterOfBattle);
