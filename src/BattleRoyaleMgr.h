@@ -40,6 +40,7 @@ public:
     void TeleportToEvent(uint32 guid);
     void ExitFromEvent(uint32 guid);
     bool ForceFFAPvPFlag(Player* player);
+    bool RestrictPlayerFunctions(Player* player);
     
 private:
     void EnterToPhaseEvent(uint32 guid);

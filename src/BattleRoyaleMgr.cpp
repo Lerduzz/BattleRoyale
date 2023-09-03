@@ -423,6 +423,12 @@ bool BattleRoyaleMgr::ForceFFAPvPFlag(Player* player)
     return true;
 }
 
+bool BattleRoyaleMgr::RestrictPlayerFunctions(Player* player)
+{
+    if (eventCurrentStatus > ST_NO_PLAYERS && ep_Players.find(player->GetGUID().GetCounter()) != ep_Players.end()) return true;
+    return false;
+}
+
 // -- Private functions -- //
 void BattleRoyaleMgr::EnterToPhaseEvent(uint32 guid)
 {
