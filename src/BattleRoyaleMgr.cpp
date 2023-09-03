@@ -4,17 +4,20 @@
 #include "Player.h"
 
 // -- CONSTANTES -- //
-const int BRMapCount = 1;
+const int TEMP_CURRENT_MAP_INDEX = 1;
+const int BRMapCount = 2;
 
-const int BRMapID[BRMapCount] = { 1 };
+const int BRMapID[BRMapCount] = { 1, 1 };
 
 const Position BRZonesCenter[BRMapCount] =
 {
-    { 5411.041504f, -2701.873779f, 1451.660522f }      // 1: Kalimdor: Hyjal
+    { 5411.041504f, -2701.873779f, 1451.660522f },      // 1: Kalimdor: Hyjal
+    { 5261.581055f, -2164.183105f, 1259.483765f }       // 1: Kalimdor: Hyjal
 };
 
 const std::string BRZonesNames[BRMapCount] =
 {
+    "Kalimdor: Hyjal",
     "Kalimdor: Hyjal"
 };
 
@@ -221,7 +224,7 @@ void BattleRoyaleMgr::TeleportToEvent(uint32 guid)
             ep_Players[guid] = (*it).second;
             ep_PlayersData[guid].SetPosition(ep_Players[guid]->GetMapId(), ep_Players[guid]->GetPositionX(), ep_Players[guid]->GetPositionY(), ep_Players[guid]->GetPositionZ(), ep_Players[guid]->GetOrientation());
 
-			ep_Players[guid]->TeleportTo(BRMapID[0], BRZonesCenter[0].GetPositionX(), BRZonesCenter[0].GetPositionY(), BRZonesCenter[0].GetPositionZ(), 0.0f); // TODO: Variable de posicion inicial.
+			ep_Players[guid]->TeleportTo(BRMapID[TEMP_CURRENT_MAP_INDEX], BRZonesCenter[TEMP_CURRENT_MAP_INDEX].GetPositionX(), BRZonesCenter[TEMP_CURRENT_MAP_INDEX].GetPositionY(), BRZonesCenter[TEMP_CURRENT_MAP_INDEX].GetPositionZ(), 0.0f);
             EnterToPhaseEvent(guid);
             ep_Players[guid]->SaveToDB(false, false);
 		}
@@ -232,7 +235,7 @@ void BattleRoyaleMgr::TeleportToEvent(uint32 guid)
         if (eventCurrentStatus != ST_SUMMON_PLAYERS) return;
         ep_Players[guid] = ep_PlayersQueue[guid];
         ep_PlayersData[guid].SetPosition(ep_Players[guid]->GetMapId(), ep_Players[guid]->GetPositionX(), ep_Players[guid]->GetPositionY(), ep_Players[guid]->GetPositionZ(), ep_Players[guid]->GetOrientation());
-        ep_Players[guid]->TeleportTo(BRMapID[0], BRZonesCenter[0].GetPositionX(), BRZonesCenter[0].GetPositionY(), BRZonesCenter[0].GetPositionZ(), 0.0f); // TODO: Variable de posicion inicial.
+        ep_Players[guid]->TeleportTo(BRMapID[TEMP_CURRENT_MAP_INDEX], BRZonesCenter[TEMP_CURRENT_MAP_INDEX].GetPositionX(), BRZonesCenter[TEMP_CURRENT_MAP_INDEX].GetPositionY(), BRZonesCenter[TEMP_CURRENT_MAP_INDEX].GetPositionZ(), 0.0f);
         EnterToPhaseEvent(guid);
         ep_Players[guid]->SaveToDB(false, false);
         ep_PlayersQueue.erase(guid);
@@ -385,11 +388,11 @@ void BattleRoyaleMgr::HandleOnWoldUpdate(uint32 diff)
                                 secureZoneCenter->Delete();
                                 secureZoneCenter = nullptr;
                             }
-                            secureZoneCenter = (*it).second->SummonGameObject(500010, BRZonesCenter[0].GetPositionX(), BRZonesCenter[0].GetPositionY(), BRZonesCenter[0].GetPositionZ(), 0, 0, 0, 0, 0, 15 * 60);
+                            secureZoneCenter = (*it).second->SummonGameObject(500010, BRZonesCenter[TEMP_CURRENT_MAP_INDEX].GetPositionX(), BRZonesCenter[TEMP_CURRENT_MAP_INDEX].GetPositionY(), BRZonesCenter[TEMP_CURRENT_MAP_INDEX].GetPositionZ(), 0, 0, 0, 0, 0, 15 * 60);
                         }
                         break;
                     }
-                    secureZone = secureZoneCenter->SummonGameObject(500000 + secureZoneIndex, BRZonesCenter[0].GetPositionX(), BRZonesCenter[0].GetPositionY(), BRZonesCenter[0].GetPositionZ() + BRSecureZoneZPlus[secureZoneIndex], 0, 0, 0, 0, 0, 2 * 60);
+                    secureZone = secureZoneCenter->SummonGameObject(500000 + secureZoneIndex, BRZonesCenter[TEMP_CURRENT_MAP_INDEX].GetPositionX(), BRZonesCenter[TEMP_CURRENT_MAP_INDEX].GetPositionY(), BRZonesCenter[TEMP_CURRENT_MAP_INDEX].GetPositionZ() + BRSecureZoneZPlus[secureZoneIndex], 0, 0, 0, 0, 0, 2 * 60);
                     secureZone->SetPhaseMask(2, true);
                     secureZone->GetMap()->SetVisibilityRange(500.0f);
                     secureZone->SetVisibilityDistanceOverride(VisibilityDistanceType::Infinite);
@@ -453,7 +456,7 @@ void BattleRoyaleMgr::SendNotificationStart(uint32 guid, uint32 delay)
     if (!guid){
         for (BattleRoyalePlayerList::iterator it = ep_Players.begin(); it != ep_Players.end(); ++it) {
             if (delay == 0){
-                (*it).second->GetSession()->SendNotification("|cff00ff00¡Que comience la batalla de |cffDA70D6%s|cff00ff00!", BRZonesNames[0]);
+                (*it).second->GetSession()->SendNotification("|cff00ff00¡Que comience la batalla de |cffDA70D6%s|cff00ff00!", BRZonesNames[TEMP_CURRENT_MAP_INDEX]);
             } else {
                 (*it).second->GetSession()->SendNotification("|cff00ff00¡La batalla iniciará en |cffDA70D6%u|cff00ff00 segundos!", delay);
             }
