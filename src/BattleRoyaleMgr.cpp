@@ -63,6 +63,9 @@ BattleRoyaleMgr::BattleRoyaleMgr()
     eventMaxPlayers = sConfigMgr->GetOption<int32>("BattleRoyale.MaxPlayers", 50);
 
     secondsTicksHelper = 1000;
+
+    go_CommandPoint = nullptr;
+    go_Nave = nullptr;
 }
 
 BattleRoyaleMgr::~BattleRoyaleMgr()
@@ -415,6 +418,17 @@ void BattleRoyaleMgr::HandleOnWoldUpdate(uint32 diff)
             break;
         }
     }
+
+    // TEMP
+    if (go_Nave) {
+        if (secondsTicksHelper <= 0) {
+            secondsTicksHelper = 1000;
+            float distance = go_Nave->GetExactDist(go_CommandPoint);
+            ChatHandler(invoker->GetSession()).PSendSysMessage("|cff4CFF00BattleRoyale::|r Distancia del punto de partida: %f.", distance); // temp
+        } else {
+            secondsTicksHelper -= diff;
+        }
+    }
 }
 
 bool BattleRoyaleMgr::ForceFFAPvPFlag(Player* player)
@@ -484,4 +498,53 @@ void BattleRoyaleMgr::OutOfZoneDamage()
             ep_PlayersData[(*it).first].SetDTick(0);
         }
     }
+}
+
+// TEMP
+void BattleRoyaleMgr::CreateReferencePoint(Player* player)
+{
+    if (go_CommandPoint) {
+        go_CommandPoint->DespawnOrUnsummon();
+        go_CommandPoint->Delete();
+        go_CommandPoint = nullptr;
+    }
+    go_CommandPoint = player->SummonGameObject(500010, player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), 0, 0, 0, 0, 0, 2 * 60);
+}
+
+float BattleRoyaleMgr::GetDistanceFromPoint(Player* player)
+{
+    return player->GetExactDist(go_CommandPoint);
+}
+
+void BattleRoyaleMgr::CrearNave(Player* player)
+{
+    // Test dist.
+    invoker = player;
+    CreateReferencePoint(player);
+
+    // Limpiar anterior.
+    if (go_Nave) {
+        go_Nave->DespawnOrUnsummon();
+        go_Nave->Delete();
+        go_Nave = nullptr;
+    }
+
+    // Posicion y angulo.
+    float x = player->GetPositionX();
+    float y = player->GetPositionY();
+    float z = player->GetPositionZ();
+    float ang = player->GetOrientation() - M_PI / 2.0f;
+    float rot2 = std::sin(ang / 2);
+    float rot3 = cos(ang / 2);
+
+    // Invocar.
+    go_Nave = player->SummonGameObject(194675, x, y, z, ang, 0, 0, rot2, rot3, 2 * 60);
+
+    // Montarse.
+    player->TeleportTo(go_Nave->GetMapId(), go_Nave->GetPositionX(), go_Nave->GetPositionY(), go_Nave->GetPositionZ() + 1.0f, go_Nave->GetOrientation());
+    
+    // Activar.
+    uint32_t const autoCloseTime = go_Nave->GetGOInfo()->GetAutoCloseTime() ? 10000u : 0u;
+    go_Nave->SetLootState(GO_READY);
+    go_Nave->UseDoorOrButton(autoCloseTime, false, player);
 }

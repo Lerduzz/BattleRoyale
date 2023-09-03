@@ -41,6 +41,11 @@ public:
     void ExitFromEvent(uint32 guid);
     bool ForceFFAPvPFlag(Player* player);
     bool RestrictPlayerFunctions(Player* player);
+
+    // TEMP
+    void CreateReferencePoint(Player* player);
+    float GetDistanceFromPoint(Player* player);
+    void CrearNave(Player* player);
     
 private:
     void EnterToPhaseEvent(uint32 guid);
@@ -69,6 +74,12 @@ private:
     // TESTs
     int secondsTicksHelper;
     int summonRemainingTime;
+
+    // TEMP
+    GameObject* go_CommandPoint;
+    GameObject* go_Nave;
+    Player* invoker;
+    
 };
 
 #define sBattleRoyaleMgr BattleRoyaleMgr::instance()
