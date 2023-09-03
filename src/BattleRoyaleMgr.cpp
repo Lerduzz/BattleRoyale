@@ -375,6 +375,7 @@ void BattleRoyaleMgr::HandleOnWoldUpdate(uint32 diff)
                 if (secureZoneIndex < 10) {
                     for (BattleRoyalePlayerList::iterator it = ep_Players.begin(); it != ep_Players.end(); ++it)
                     {
+                        (*it).second->GetMap()->SetVisibilityRange(350.0f);
                         if (secureZoneIndex == 0) {
                             if (secureZoneCenter) {
                                 secureZoneCenter->DespawnOrUnsummon();
