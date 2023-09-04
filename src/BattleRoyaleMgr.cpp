@@ -645,6 +645,11 @@ void BattleRoyaleMgr::TeleportPlayerBeforeShip(uint32 guid)
     }
 }
 
+/**
+ * @brief Teletransporta a un personaje a la nave.
+ * 
+ * @param guid 
+ */
 void BattleRoyaleMgr::TeleportPlayerToShip(uint32 guid)
 {
     if (ep_Players.find(guid) != ep_Players.end())
@@ -670,23 +675,33 @@ void BattleRoyaleMgr::TeleportPlayersToShip()
     }
 }
 
+/**
+ * @brief Causa daño a todos los que esten fuera de la zona segura.
+ * 
+ */
 void BattleRoyaleMgr::OutOfZoneDamage()
 {
-    return; // TODO
-    for (BattleRoyalePlayerList::iterator it = ep_Players.begin(); it != ep_Players.end(); ++it)
+    if (ep_Players.size())
     {
-        float distance = (*it).second->GetExactDist(go_CenterOfBattle);
-        if (secureZoneIndex > 0 && distance > BRSecureZoneDists[secureZoneIndex - 1]) {
-            ep_PlayersData[(*it).first].SetDTick(ep_PlayersData[(*it).first].GetDTick() + 1);
-            uint32 damage = (*it).second->GetMaxHealth() * (2 * sqrt(ep_PlayersData[(*it).first].GetDTick()) + secureZoneIndex) / 100;
-            (*it).second->GetSession()->SendNotification("|cffff0000¡Has recibido |cffDA70D6%u|cffff0000 de daño, adéntrate en la zona segura!", damage);
-            Unit::DealDamage(nullptr, (*it).second, damage, nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false, true);
-        } else {
-            ep_PlayersData[(*it).first].SetDTick(0);
+        for (BattleRoyalePlayerList::iterator it = ep_Players.begin(); it != ep_Players.end(); ++it)
+        {
+            float distance = (*it).second->GetExactDist(go_CenterOfBattle);
+            if (secureZoneIndex > 0 && distance > BRSecureZoneDists[secureZoneIndex - 1]) {
+                ep_PlayersData[(*it).first].SetDTick(ep_PlayersData[(*it).first].GetDTick() + 1);
+                uint32 damage = (*it).second->GetMaxHealth() * (2 * sqrt(ep_PlayersData[(*it).first].GetDTick()) + secureZoneIndex) / 100;
+                (*it).second->GetSession()->SendNotification("|cffff0000¡Has recibido |cffDA70D6%u|cffff0000 de daño, adéntrate en la zona segura!", damage);
+                Unit::DealDamage(nullptr, (*it).second, damage, nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false, true);
+            } else {
+                ep_PlayersData[(*it).first].SetDTick(0);
+            }
         }
-    }
+    }        
 }
 
+/**
+ * @brief Reinicia el valor de todas las variables del evento (El boton de pánico).
+ * 
+ */
 void BattleRoyaleMgr::ResetFullEvent()
 {
     ep_PlayersQueue.clear();
