@@ -21,7 +21,7 @@ const std::string BRZonesNames[BRMapCount] =
 
 const float BRZonesShipStart[BRMapCount][4] =
 {
-    { 3067.581055f, -2164.183105f, 1609.483765f, 0.0f - M_PI / 2.0f }
+    { 3067.581055f, -2164.183105f, 1559.483765f, 0.0f - M_PI / 2.0f }
 };
 
 const float ShipOffsets[BROffsetsCount][2] = 
@@ -374,6 +374,7 @@ void BattleRoyaleMgr::HandleOnWoldUpdate(uint32 diff)
     {
         case ST_SUMMON_PLAYERS:
         case ST_SHIP_WAITING:
+        case ST_SHIP_IN_WAY:
         {
             if (secondsTicksHelper <= 0) {
                 secondsTicksHelper = 1000;
