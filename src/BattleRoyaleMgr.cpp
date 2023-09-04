@@ -442,7 +442,6 @@ void BattleRoyaleMgr::HandleOnWoldUpdate(uint32 diff)
             if (secureZoneDelay <= 0) {
                 SpawnSecureZone();
                 NotifySecureZoneReduced();
-                secureZoneIndex++;
                 secureZoneDelay = 60000;
                 secureZoneAnnounced = false;
             } else {
@@ -606,6 +605,7 @@ bool BattleRoyaleMgr::SpawnSecureZone()
             go_SecureZone->SetPhaseMask(2, true);
             go_SecureZone->SetVisibilityDistanceOverride(VisibilityDistanceType::Infinite);
         }
+        secureZoneIndex++;
         return true;
     }
     return false;
