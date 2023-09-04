@@ -6,11 +6,16 @@
 // -- CONSTANTES -- //
 const int BRMapCount = 1;
 
-const int BRMapID[BRMapCount] = { 1};
+const int BRMapID[BRMapCount] = { 1 };
 
 const Position BRZonesCenter[BRMapCount] =
 {
     { 5261.581055f, -2164.183105f, 1259.483765f }       // 1: Kalimdor: Hyjal
+};
+
+const std::string BRZonesNames[BRMapCount] =
+{
+    "Kalimdor: Hyjal"
 };
 
 const float BRZonesShipStart[BRMapCount][4] =
@@ -18,10 +23,58 @@ const float BRZonesShipStart[BRMapCount][4] =
     { 3067.581055f, -2164.183105f, 1609.483765f, 0.0f - M_PI / 2.0f }
 };
 
-const std::string BRZonesNames[BRMapCount] =
+const float ShipOffsets[25][2] = 
 {
-    "Kalimdor: Hyjal"
-};
+    { 0.0f, 0.0f },
+    { 0.0f, 0.5f },
+    { 0.0f, 1.0f },
+    { 0.0f, 1.5f },
+    { 0.0f, -0.5f },
+    { 0.0f, -1.0f },
+    { 0.0f, -1.5f },
+    { 0.5f, 0.0f },
+    { 0.5f, 0.5f },
+    { 0.5f, 1.0f },
+    { 0.5f, 1.5f },
+    { 0.5f, -0.5f },
+    { 0.5f, -1.0f },
+    { 0.5f, -1.5f },
+    { 1.0f, 0.0f },
+    { 1.0f, 0.5f },
+    { 1.0f, 1.0f },
+    { 1.0f, 1.5f },
+    { 1.0f, -0.5f },
+    { 1.0f, -1.0f },
+    { 1.0f, -1.5f },
+    { 1.5f, 0.0f },
+    { 1.5f, 0.5f },
+    { 1.5f, 1.0f },
+    { 1.5f, 1.5f },
+    { 1.5f, -0.5f },
+    { 1.5f, -1.0f },
+    { 1.5f, -1.5f },
+    { -0.5f, 0.0f },
+    { -0.5f, 0.5f },
+    { -0.5f, 1.0f },
+    { -0.5f, 1.5f },
+    { -0.5f, -0.5f },
+    { -0.5f, -1.0f },
+    { -0.5f, -1.5f },
+    { -1.0f, 0.0f },
+    { -1.0f, 0.5f },
+    { -1.0f, 1.0f },
+    { -1.0f, 1.5f },
+    { -1.0f, -0.5f },
+    { -1.0f, -1.0f },
+    { -1.0f, -1.5f },
+    { -1.5f, 0.0f },
+    { -1.5f, 0.5f },
+    { -1.5f, 1.0f },
+    { -1.5f, 1.5f },
+    { -1.5f, -0.5f },
+    { -1.5f, -1.0f },
+    { -1.5f, -1.5f }
+}
 
 const float BRSecureZoneZPlus[10] = { 
     297.0f,
@@ -464,7 +517,7 @@ void BattleRoyaleMgr::SpawnTransportShip()
 
 void BattleRoyaleMgr::SpawnSecureZone()
 {
-    return; // TODO
+    // return; // TODO
     if (go_SecureZone) {
         go_SecureZone->DespawnOrUnsummon();
         go_SecureZone->Delete();
