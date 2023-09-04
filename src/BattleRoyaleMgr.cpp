@@ -280,6 +280,11 @@ void BattleRoyaleMgr::StartEvent(uint32 guid)
     go_CenterOfBattle = nullptr;
 }
 
+/**
+ * @brief Teletransporta todos los personajes al aire sobre el spawn de la nave. / De manera individual elije si mandar a un personaje a la nave o encima en el aire.
+ * 
+ * @param guid 
+ */
 void BattleRoyaleMgr::TeleportToEvent(uint32 guid)
 {
 	if (!guid)
@@ -384,13 +389,11 @@ void BattleRoyaleMgr::HandleOnWoldUpdate(uint32 diff)
                     if (srt == 5 || srt == 10 || srt == 15 || srt == 20 || srt == 25 || srt == 30 || srt == 35 || srt == 40 || srt == 45 || srt == 50 || srt == 55 || srt == 60) {
                         SendNotificationStart(0, srt);
                     }
-                    if (eventCurrentStatus == ST_SUMMON_PLAYERS && summonRemainingTime <= 50) {
-                        eventCurrentStatus = ST_SHIP_WAITING;
-                        if (!SpawnTheCenterOfBattle()) {
+                    if (eventCurrentStatus == ST_SUMMON_PLAYERS && summonRemainingTime <= 55) {
+                        if (!SpawnTransportShip()) {
                             ResetFullEvent();
                             return;
                         }
-                        SpawnTransportShip();
                         TeleportPlayersToShip();
                     }
                     summonRemainingTime--;
@@ -488,9 +491,48 @@ void BattleRoyaleMgr::SendNotificationStart(uint32 guid, uint32 delay)
     } else ep_Players[guid]->GetSession()->SendNotification("|cff00ff00¡La batalla iniciará en |cffDA70D6%u|cff00ff00 segundos!", delay);
 }
 
+/**
+ * @brief Hace que el primer jugador de la lista invoque la nave.
+ * 
+ * @return true 
+ * @return false 
+ */
+bool BattleRoyaleMgr::SpawnTransportShip()
+{
+    bool success = false;
+    if (ep_Players.size())
+    {
+        for (BattleRoyalePlayerList::iterator it = ep_Players.begin(); it != ep_Players.end(); ++it)
+        {
+            if ((*it).second)
+            {
+                if (go_TransportShip) {
+                    go_TransportShip->DespawnOrUnsummon();
+                    go_TransportShip->Delete();
+                    go_TransportShip = nullptr;
+                }
+                eventCurrentStatus = ST_SHIP_WAITING;
+                float x = BRZonesShipStart[rotationMapIndex][0];
+                float y = BRZonesShipStart[rotationMapIndex][1];
+                float z = BRZonesShipStart[rotationMapIndex][2];
+                float o = BRZonesShipStart[rotationMapIndex][3];
+                float rot2 = std::sin(o / 2);
+                float rot3 = cos(o / 2);
+                go_TransportShip = (*it).second->SummonGameObject(194675, x, y, z, o, 0, 0, rot2, rot3, 2 * 60);
+                success = true;
+                break;
+            }
+        }
+    }
+    return success;
+}
+
 bool BattleRoyaleMgr::SpawnTheCenterOfBattle()
 {
-    if (ep_Players.size() == 0) return false;
+    if (ep_Players.size())
+    {
+
+    }
     bool success = false;
     for (BattleRoyalePlayerList::iterator it = ep_Players.begin(); it != ep_Players.end(); ++it)
     {
@@ -506,22 +548,6 @@ bool BattleRoyaleMgr::SpawnTheCenterOfBattle()
         }
     }
     return success;
-}
-
-void BattleRoyaleMgr::SpawnTransportShip()
-{
-    if (go_TransportShip) {
-        go_TransportShip->DespawnOrUnsummon();
-        go_TransportShip->Delete();
-        go_TransportShip = nullptr;
-    }
-    float x = BRZonesShipStart[rotationMapIndex][0];
-    float y = BRZonesShipStart[rotationMapIndex][1];
-    float z = BRZonesShipStart[rotationMapIndex][2];
-    float o = BRZonesShipStart[rotationMapIndex][3];
-    float rot2 = std::sin(o / 2);
-    float rot3 = cos(o / 2);
-    go_TransportShip = go_CenterOfBattle->SummonGameObject(194675, x, y, z, o, 0, 0, rot2, rot3, 2 * 60);
 }
 
 void BattleRoyaleMgr::SpawnSecureZone()

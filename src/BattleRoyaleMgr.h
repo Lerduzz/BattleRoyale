@@ -49,9 +49,9 @@ private:
     void ResurrectPlayer(Player *player);
     void SendNotification(uint32 guid, uint32 delay);
     void SendNotificationStart(uint32 guid, uint32 delay);
+    bool SpawnTransportShip();
     bool SpawnTheCenterOfBattle();
-    void SpawnTransportShip();
-    void SpawnSecureZone();
+    bool SpawnSecureZone();
     void StorePlayerStartPosition(uint32 guid);
     void TeleportPlayerBeforeShip(uint32 guid);
     void TeleportPlayerToShip(uint32 guid);
