@@ -105,17 +105,24 @@ const float BRSecureZoneDists[10] = {
 
 enum BREventStatus
 {
-    ST_NO_PLAYERS                           = 0, // No hay suficientes jugadores.
-    ST_SUMMON_PLAYERS                       = 1, // Se ha comenzado a teletransportar jugadores a la zona central.
-    ST_SHIP_WAITING                         = 2, // Ahora se estan moviendo a los jugadores a la nave en espera.
-    ST_SHIP_IN_WAY                          = 3, // La nave esta en camino a su destino.
-    ST_SHIP_OVER_ZONE                       = 4, // La nave se encuentra sobrevolando la zona segura.
-    ST_IN_PROGRESS                          = 5, // La batalla ha iniciado.
+    ST_NO_PLAYERS                           = 0,      // No hay suficientes jugadores.
+    ST_SUMMON_PLAYERS                       = 1,      // Se ha comenzado a teletransportar jugadores a la zona central.
+    ST_SHIP_WAITING                         = 2,      // Ahora se estan moviendo a los jugadores a la nave en espera.
+    ST_SHIP_IN_WAY                          = 3,      // La nave esta en camino a su destino.
+    ST_SHIP_OVER_ZONE                       = 4,      // La nave se encuentra sobrevolando la zona segura.
+    ST_IN_PROGRESS                          = 5,      // La batalla ha iniciado.
 };
 
 enum BRSpells
 {
-    SPELL_PARACHUTE_DALARAN                 = 45472, // Paracaidas que te ponen en Dalaran.
+    SPELL_PARACHUTE_DALARAN                 = 45472,  // Paracaidas que te ponen en Dalaran.
+};
+
+enum BRGameObjects
+{
+    GOBJ_SHIP                               = 194675, // El tren de Ulduar.
+    GOBJ_MAP_CENTER                         = 500010, // CUSTOM: Centro del mapa (Para calculod de distancia de zona segura).
+    GOBJ_SECURE_ZONE_BASE                   = 500000, // CUSTOM[0-9]: Cúpula de ulduar para identificar visualmente los límites de la zona segura.
 };
 
 // -- FUNCIONES -- //
@@ -532,7 +539,7 @@ bool BattleRoyaleMgr::SpawnTransportShip()
                 float o = BRZonesShipStart[rotationMapIndex][3];
                 float rot2 = std::sin(o / 2);
                 float rot3 = cos(o / 2);
-                go_TransportShip = (*it).second->SummonGameObject(194675, x, y, z, o, 0, 0, rot2, rot3, 2 * 60);
+                go_TransportShip = (*it).second->SummonGameObject(GOBJ_SHIP, x, y, z, o, 0, 0, rot2, rot3, 2 * 60);
                 success = true;
                 break;
             }
@@ -556,7 +563,7 @@ bool BattleRoyaleMgr::SpawnTheCenterOfBattle()
             go_CenterOfBattle->Delete();
             go_CenterOfBattle = nullptr;
         }
-        go_CenterOfBattle = go_TransportShip->SummonGameObject(500010, BRZonesCenter[rotationMapIndex].GetPositionX(), BRZonesCenter[rotationMapIndex].GetPositionY(), BRZonesCenter[rotationMapIndex].GetPositionZ(), 0, 0, 0, 0, 0, 15 * 60);
+        go_CenterOfBattle = go_TransportShip->SummonGameObject(GOBJ_MAP_CENTER, BRZonesCenter[rotationMapIndex].GetPositionX(), BRZonesCenter[rotationMapIndex].GetPositionY(), BRZonesCenter[rotationMapIndex].GetPositionZ(), 0, 0, 0, 0, 0, 15 * 60);
         go_CenterOfBattle->GetMap()->SetVisibilityRange(500.0f);
         return true;
     }
@@ -579,7 +586,7 @@ bool BattleRoyaleMgr::SpawnSecureZone()
             go_SecureZone = nullptr;
         }
         if (secureZoneIndex < 10) {
-            go_SecureZone = go_CenterOfBattle->SummonGameObject(500000 + secureZoneIndex, BRZonesCenter[rotationMapIndex].GetPositionX(), BRZonesCenter[rotationMapIndex].GetPositionY(), BRZonesCenter[rotationMapIndex].GetPositionZ() + BRSecureZoneZPlus[secureZoneIndex], 0, 0, 0, 0, 0, 2 * 60);
+            go_SecureZone = go_CenterOfBattle->SummonGameObject(GOBJ_SECURE_ZONE_BASE + secureZoneIndex, BRZonesCenter[rotationMapIndex].GetPositionX(), BRZonesCenter[rotationMapIndex].GetPositionY(), BRZonesCenter[rotationMapIndex].GetPositionZ() + BRSecureZoneZPlus[secureZoneIndex], 0, 0, 0, 0, 0, 2 * 60);
             go_SecureZone->SetPhaseMask(2, true);
             go_SecureZone->SetVisibilityDistanceOverride(VisibilityDistanceType::Infinite);
         }
