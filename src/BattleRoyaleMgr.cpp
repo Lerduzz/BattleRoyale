@@ -109,7 +109,8 @@ enum BREventStatus
     ST_SUMMON_PLAYERS                       = 1, // Se ha comenzado a teletransportar jugadores a la zona central.
     ST_SHIP_WAITING                         = 2, // Ahora se estan moviendo a los jugadores a la nave en espera.
     ST_SHIP_IN_WAY                          = 3, // La nave esta en camino a su destino.
-    ST_IN_PROGRESS                          = 4, // La batalla ha iniciado.
+    ST_SHIP_OVER_ZONE                       = 4, // La nave se encuentra sobrevolando la zona segura.
+    ST_IN_PROGRESS                          = 5, // La batalla ha iniciado.
 };
 
 enum BRSpells
@@ -370,6 +371,7 @@ void BattleRoyaleMgr::HandleOnWoldUpdate(uint32 diff)
         case ST_SUMMON_PLAYERS:
         case ST_SHIP_WAITING:
         case ST_SHIP_IN_WAY:
+        case ST_SHIP_OVER_ZONE:
         {
             if (secondsTicksHelper <= 0) {
                 secondsTicksHelper = 1000;
@@ -397,8 +399,9 @@ void BattleRoyaleMgr::HandleOnWoldUpdate(uint32 diff)
                         go_TransportShip->SetLootState(GO_READY);
                         go_TransportShip->UseDoorOrButton(autoCloseTime, false, nullptr);
                     }
-                    if (eventCurrentStatus == ST_SHIP_IN_WAY && summonRemainingTime <= 10)
+                    if (eventCurrentStatus == ST_SHIP_IN_WAY && summonRemainingTime <= 15)
                     {
+                        eventCurrentStatus = ST_SHIP_OVER_ZONE;
                         secureZoneIndex = 0;
                         secureZoneDelay = 0;
                         secureZoneAnnounced = false;
