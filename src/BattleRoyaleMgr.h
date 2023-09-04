@@ -75,7 +75,9 @@ private:
     int eventMaxPlayers;
 
     int secondsTicksHelper;
-    int summonRemainingTime;    
+    int summonRemainingTime;
+
+    int summonOffsetIndex;    
 };
 
 #define sBattleRoyaleMgr BattleRoyaleMgr::instance()
