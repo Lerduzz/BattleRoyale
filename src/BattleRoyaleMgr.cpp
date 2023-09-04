@@ -385,29 +385,21 @@ void BattleRoyaleMgr::HandleOnWoldUpdate(uint32 diff)
                     if (srt == 5 || srt == 10 || srt == 15 || srt == 20 || srt == 25 || srt == 30 || srt == 35 || srt == 40 || srt == 45 || srt == 50 || srt == 55 || srt == 60) {
                         SendNotificationStart(0, srt);
                     }
-                    if (summonRemainingTime <= 55)
+                    if (eventCurrentStatus == ST_SUMMON_PLAYERS && summonRemainingTime <= 55)
                     {
-                        if (eventCurrentStatus == ST_SUMMON_PLAYERS)
-                        {
-                            if (!SpawnTransportShip()) {
-                                ResetFullEvent();
-                                return;
-                            }
-                            TeleportPlayersToShip();
+                        eventCurrentStatus = ST_SHIP_WAITING;
+                        if (!SpawnTransportShip()) {
+                            ResetFullEvent();
+                            return;
                         }
+                        TeleportPlayersToShip();
                     }
-                    else if (summonRemainingTime <= 30)
+                    if (eventCurrentStatus == ST_SHIP_WAITING && summonRemainingTime <= 30 && go_TransportShip)
                     {
-                        if (eventCurrentStatus == ST_SHIP_WAITING)
-                        {
-                            if (go_TransportShip)
-                            {
-                                eventCurrentStatus = ST_SHIP_IN_WAY;
-                                uint32_t const autoCloseTime = go_TransportShip->GetGOInfo()->GetAutoCloseTime() ? 10000u : 0u;
-                                go_TransportShip->SetLootState(GO_READY);
-                                go_TransportShip->UseDoorOrButton(autoCloseTime, false, nullptr);
-                            }                                
-                        }
+                        eventCurrentStatus = ST_SHIP_IN_WAY;
+                        uint32_t const autoCloseTime = go_TransportShip->GetGOInfo()->GetAutoCloseTime() ? 10000u : 0u;
+                        go_TransportShip->SetLootState(GO_READY);
+                        go_TransportShip->UseDoorOrButton(autoCloseTime, false, nullptr);
                     }
                     summonRemainingTime--;
                 }
@@ -519,7 +511,6 @@ bool BattleRoyaleMgr::SpawnTransportShip()
                     go_TransportShip->Delete();
                     go_TransportShip = nullptr;
                 }
-                eventCurrentStatus = ST_SHIP_WAITING;
                 float x = BRZonesShipStart[rotationMapIndex][0];
                 float y = BRZonesShipStart[rotationMapIndex][1];
                 float z = BRZonesShipStart[rotationMapIndex][2];
@@ -558,9 +549,9 @@ bool BattleRoyaleMgr::SpawnTheCenterOfBattle()
     return success;
 }
 
-void BattleRoyaleMgr::SpawnSecureZone()
+bool BattleRoyaleMgr::SpawnSecureZone()
 {
-    return; // TODO
+    return false; // TODO
     if (go_SecureZone) {
         go_SecureZone->DespawnOrUnsummon();
         go_SecureZone->Delete();
