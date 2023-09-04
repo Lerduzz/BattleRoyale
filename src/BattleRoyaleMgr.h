@@ -47,8 +47,9 @@ private:
     void EnterToPhaseEvent(uint32 guid);
     void ExitFromPhaseEvent(uint32 guid);
     void ResurrectPlayer(Player *player);
-    void SendNotification(uint32 guid, uint32 delay);
-    void SendNotificationStart(uint32 guid, uint32 delay);
+    void NotifySecureZoneReduceWarn(uint32 delay);
+    void NotifySecureZoneReduced();
+    void NotifyTimeRemainingToStart(uint32 delay);
     bool SpawnTransportShip();
     bool SpawnTheCenterOfBattle();
     bool SpawnSecureZone();

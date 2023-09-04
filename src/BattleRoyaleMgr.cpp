@@ -273,7 +273,7 @@ void BattleRoyaleMgr::StartEvent(uint32 guid)
 	else
     {
         ep_Players[guid]->SetByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
-    } 
+    }
 
     // TEST de Mover Nave
     eventCurrentStatus = ST_IN_PROGRESS;
@@ -383,12 +383,13 @@ void BattleRoyaleMgr::HandleOnWoldUpdate(uint32 diff)
             if (secondsTicksHelper <= 0) {
                 secondsTicksHelper = 1000;
                 if (summonRemainingTime <= 0) {
-                    SendNotificationStart(0, 0);
+                    NotifyTimeRemainingToStart(0);
+                    secureZoneDelay = 60000;
                     StartEvent(0);
                 } else {
                     int srt = summonRemainingTime;
                     if (srt == 5 || srt == 10 || srt == 15 || srt == 20 || srt == 25 || srt == 30 || srt == 35 || srt == 40 || srt == 45 || srt == 50 || srt == 55 || srt == 60) {
-                        SendNotificationStart(0, srt);
+                        NotifyTimeRemainingToStart(srt);
                     }
                     if (eventCurrentStatus == ST_SUMMON_PLAYERS && summonRemainingTime <= 55)
                     {
@@ -440,12 +441,13 @@ void BattleRoyaleMgr::HandleOnWoldUpdate(uint32 diff)
             }
             if (secureZoneDelay <= 0) {
                 SpawnSecureZone();
+                NotifySecureZoneReduced();
                 secureZoneIndex++;
                 secureZoneDelay = 60000;
                 secureZoneAnnounced = false;
             } else {
                 if (secureZoneDelay <= 5000 && !secureZoneAnnounced) {
-                    SendNotification(0, 5);
+                    NotifySecureZoneReduceWarn(5);
                     secureZoneAnnounced = true;
                 }
                 if (secureZoneIndex <= 10) {
@@ -492,17 +494,31 @@ void BattleRoyaleMgr::ResurrectPlayer(Player *player)
     player->SaveToDB(false, false);
 }
 
-void BattleRoyaleMgr::SendNotification(uint32 guid, uint32 delay)
+void BattleRoyaleMgr::NotifySecureZoneReduceWarn(uint32 delay)
 {
-    if (!guid)
+    if (ep_Players.size())
+    {
         for (BattleRoyalePlayerList::iterator it = ep_Players.begin(); it != ep_Players.end(); ++it)
-			(*it).second->GetSession()->SendNotification("|cff00ff00¡La zona segura se reducirá en |cffDA70D6%u|cff00ff00 segundos!", delay);
-    else ep_Players[guid]->GetSession()->SendNotification("|cff00ff00¡La zona segura se reducirá en |cffDA70D6%u|cff00ff00 segundos!", delay);
+        {
+            (*it).second->GetSession()->SendNotification("|cff00ff00¡La zona segura se reducirá en |cffDA70D6%u|cff00ff00 segundos!", delay);
+        }
+    }
 }
 
-void BattleRoyaleMgr::SendNotificationStart(uint32 guid, uint32 delay)
+void BattleRoyaleMgr::NotifySecureZoneReduced()
 {
-    if (!guid){
+    if (ep_Players.size())
+    {
+        for (BattleRoyalePlayerList::iterator it = ep_Players.begin(); it != ep_Players.end(); ++it)
+        {
+            (*it).second->GetSession()->SendNotification("|cffff0000¡ALERTA: La zona segura se ha actualizado!");
+        }
+    }
+}
+
+void BattleRoyaleMgr::NotifyTimeRemainingToStart(uint32 delay)
+{
+    if (ep_Players.size()){
         for (BattleRoyalePlayerList::iterator it = ep_Players.begin(); it != ep_Players.end(); ++it) {
             if (delay == 0){
                 (*it).second->GetSession()->SendNotification("|cff00ff00¡Que comience la batalla de |cffDA70D6%s|cff00ff00!", BRZonesNames[rotationMapIndex]);
@@ -510,7 +526,7 @@ void BattleRoyaleMgr::SendNotificationStart(uint32 guid, uint32 delay)
                 (*it).second->GetSession()->SendNotification("|cff00ff00¡La batalla iniciará en |cffDA70D6%u|cff00ff00 segundos!", delay);
             }
         }
-    } else ep_Players[guid]->GetSession()->SendNotification("|cff00ff00¡La batalla iniciará en |cffDA70D6%u|cff00ff00 segundos!", delay);
+    }
 }
 
 /**
