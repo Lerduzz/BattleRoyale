@@ -292,19 +292,13 @@ void BattleRoyaleMgr::TeleportToEvent(uint32 guid)
             uint32 guid = (*it).first;
             ep_Players[guid] = (*it).second;
 
-            // ep_Players[guid]->AddAura(SPELL_PARACHUTE_DALARAN, ep_Players[guid]);
-
             // Guardar posicion donde se enviara el personaje al salir del evento.
             if (ep_Players[guid]->GetMap()->Instanceable())
                 ep_PlayersData[guid].SetPosition(player->m_homebindMapId, player->m_homebindX, player->m_homebindY, player->m_homebindZ, ep_Players[guid]->GetOrientation());
             else
                 ep_PlayersData[guid].SetPosition(ep_Players[guid]->GetMapId(), ep_Players[guid]->GetPositionX(), ep_Players[guid]->GetPositionY(), ep_Players[guid]->GetPositionZ(), ep_Players[guid]->GetOrientation());
 
-            float ox = ShipOffsets[summonOffsetIndex][0] * 3;
-            float oy = ShipOffsets[summonOffsetIndex][1] * 3;
-            summonOffsetIndex++;
-            if (summonOffsetIndex >= BROffsetsCount) summonOffsetIndex = 0;
-			ep_Players[guid]->TeleportTo(BRMapID[rotationMapIndex], BRZonesCenter[rotationMapIndex].GetPositionX() + ox, BRZonesCenter[rotationMapIndex].GetPositionY() + oy, BRZonesCenter[rotationMapIndex].GetPositionZ(), 0.0f);
+            TeleportPlayerBeforeShip(guid);
             
             EnterToPhaseEvent(guid);
             ep_Players[guid]->SaveToDB(false, false);
@@ -565,6 +559,28 @@ void BattleRoyaleMgr::SpawnSecureZone()
     }
 }
 
+/**
+ * @brief Teletransporta a un personaje unas yardas encima de donde aparecera la nave y le pone paracaidas.
+ * 
+ * @param guid 
+ */
+void BattleRoyaleMgr::TeleportPlayerBeforeShip(uint32 guid)
+{
+    if (ep_Players.find(guid) != ep_Players.end())
+    {
+        float ox = ShipOffsets[summonOffsetIndex][0] * 3;
+        float oy = ShipOffsets[summonOffsetIndex][1] * 3;
+        summonOffsetIndex++;
+        if (summonOffsetIndex >= BROffsetsCount) summonOffsetIndex = 0;
+        ep_Players[guid]->TeleportTo(BRMapID[rotationMapIndex], BRZonesShipStart[rotationMapIndex][0] + ox, BRZonesShipStart[rotationMapIndex][1] + oy, BRZonesShipStart[rotationMapIndex][2] + 15.0f, 0.0f);
+        ep_Players[guid]->AddAura(SPELL_PARACHUTE_DALARAN, ep_Players[guid]);
+    }
+}
+
+/**
+ * @brief Teletransporta a todos los personajes del evento hacia el interior de la nave.
+ * 
+ */
 void BattleRoyaleMgr::TeleportPlayersToShip()
 {
     if (ep_Players.size() == 0) return;

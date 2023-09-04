@@ -52,6 +52,7 @@ private:
     bool SpawnTheCenterOfBattle();
     void SpawnTransportShip();
     void SpawnSecureZone();
+    void TeleportPlayerBeforeShip(uint32 guid);
     void TeleportPlayersToShip();
     void OutOfZoneDamage();
     void ResetFullEvent();
