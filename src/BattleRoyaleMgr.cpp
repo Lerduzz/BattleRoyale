@@ -103,13 +103,18 @@ const float BRSecureZoneDists[10] = {
     16.5f
 };
 
-enum BREventStatus : int
+enum BREventStatus
 {
     ST_NO_PLAYERS                           = 0, // No hay suficientes jugadores.
     ST_SUMMON_PLAYERS                       = 1, // Se ha comenzado a teletransportar jugadores a la zona central.
     ST_SHIP_WAITING                         = 2, // Ahora se estan moviendo a los jugadores a la nave en espera.
     ST_SHIP_IN_WAY                          = 3, // La nave esta en camino a su destino.
     ST_IN_PROGRESS                          = 4, // La batalla ha iniciado.
+};
+
+enum BRSpells
+{
+    SPELL_PARACHUTE_DALARAN                 = 45472, // Paracaidas que te ponen en Dalaran.
 };
 
 // -- FUNCIONES -- //
@@ -287,8 +292,13 @@ void BattleRoyaleMgr::TeleportToEvent(uint32 guid)
             uint32 guid = (*it).first;
             ep_Players[guid] = (*it).second;
 
-            // TODO: Si esta en intancia o transporte entonces almacenar coordenadas de hogar.
-            ep_PlayersData[guid].SetPosition(ep_Players[guid]->GetMapId(), ep_Players[guid]->GetPositionX(), ep_Players[guid]->GetPositionY(), ep_Players[guid]->GetPositionZ(), ep_Players[guid]->GetOrientation());
+            // ep_Players[guid]->AddAura(SPELL_PARACHUTE_DALARAN, ep_Players[guid]);
+
+            // Guardar posicion donde se enviara el personaje al salir del evento.
+            if (ep_Players[guid]->GetMap()->Instanceable())
+                ep_PlayersData[guid].SetPosition(player->m_homebindMapId, player->m_homebindX, player->m_homebindY, player->m_homebindZ, ep_Players[guid]->GetOrientation());
+            else
+                ep_PlayersData[guid].SetPosition(ep_Players[guid]->GetMapId(), ep_Players[guid]->GetPositionX(), ep_Players[guid]->GetPositionY(), ep_Players[guid]->GetPositionZ(), ep_Players[guid]->GetOrientation());
 
             float ox = ShipOffsets[summonOffsetIndex][0] * 3;
             float oy = ShipOffsets[summonOffsetIndex][1] * 3;
@@ -419,6 +429,11 @@ void BattleRoyaleMgr::HandleOnWoldUpdate(uint32 diff)
         {
             if (secondsTicksHelper <= 0) {
                 secondsTicksHelper = 1000;
+                // TODO:
+                // Temporalmente mostrar distancia.
+                for (BattleRoyalePlayerList::iterator it = ep_Players.begin(); it != ep_Players.end(); ++it)
+			        ChatHandler((*it).second->GetSession()).PSendSysMessage("|cff00ff00Distancia: |cffDA70D6%f|cff00ff00!", (*it).second->GetExactDist(go_CenterOfBattle));
+                // ---
                 OutOfZoneDamage();
             } else {
                 secondsTicksHelper -= diff;
