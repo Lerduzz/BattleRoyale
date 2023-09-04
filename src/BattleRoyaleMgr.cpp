@@ -291,15 +291,8 @@ void BattleRoyaleMgr::TeleportToEvent(uint32 guid)
 		{
             uint32 guid = (*it).first;
             ep_Players[guid] = (*it).second;
-
-            // Guardar posicion donde se enviara el personaje al salir del evento.
-            if (ep_Players[guid]->GetMap()->Instanceable())
-                ep_PlayersData[guid].SetPosition(player->m_homebindMapId, player->m_homebindX, player->m_homebindY, player->m_homebindZ, ep_Players[guid]->GetOrientation());
-            else
-                ep_PlayersData[guid].SetPosition(ep_Players[guid]->GetMapId(), ep_Players[guid]->GetPositionX(), ep_Players[guid]->GetPositionY(), ep_Players[guid]->GetPositionZ(), ep_Players[guid]->GetOrientation());
-
-            TeleportPlayerBeforeShip(guid);
-            
+            StorePlayerStartPosition(guid);
+            TeleportPlayerBeforeShip(guid);            
             EnterToPhaseEvent(guid);
             ep_Players[guid]->SaveToDB(false, false);
 		}
@@ -310,14 +303,8 @@ void BattleRoyaleMgr::TeleportToEvent(uint32 guid)
         if (eventCurrentStatus == ST_SUMMON_PLAYERS)
         {
             ep_Players[guid] = ep_PlayersQueue[guid];
-            ep_PlayersData[guid].SetPosition(ep_Players[guid]->GetMapId(), ep_Players[guid]->GetPositionX(), ep_Players[guid]->GetPositionY(), ep_Players[guid]->GetPositionZ(), ep_Players[guid]->GetOrientation());
-            
-            float ox = ShipOffsets[summonOffsetIndex][0] * 3;
-            float oy = ShipOffsets[summonOffsetIndex][1] * 3;
-            summonOffsetIndex++;
-            if (summonOffsetIndex >= BROffsetsCount) summonOffsetIndex = 0;
-            ep_Players[guid]->TeleportTo(BRMapID[rotationMapIndex], BRZonesCenter[rotationMapIndex].GetPositionX() + ox, BRZonesCenter[rotationMapIndex].GetPositionY() + oy, BRZonesCenter[rotationMapIndex].GetPositionZ(), 0.0f);
-            
+            StorePlayerStartPosition(guid);
+            TeleportPlayerBeforeShip(guid);            
             EnterToPhaseEvent(guid);
             ep_Players[guid]->SaveToDB(false, false);
             ep_PlayersQueue.erase(guid);
@@ -325,14 +312,8 @@ void BattleRoyaleMgr::TeleportToEvent(uint32 guid)
         else if (eventCurrentStatus == ST_SHIP_WAITING)
         {
             ep_Players[guid] = ep_PlayersQueue[guid];
-            ep_PlayersData[guid].SetPosition(ep_Players[guid]->GetMapId(), ep_Players[guid]->GetPositionX(), ep_Players[guid]->GetPositionY(), ep_Players[guid]->GetPositionZ(), ep_Players[guid]->GetOrientation());
-            
-            float ox = ShipOffsets[summonOffsetIndex][0] * 3;
-            float oy = ShipOffsets[summonOffsetIndex][1] * 3;
-            summonOffsetIndex++;
-            if (summonOffsetIndex >= BROffsetsCount) summonOffsetIndex = 0;
-            ep_Players[guid]->TeleportTo(BRMapID[rotationMapIndex], BRZonesShipStart[rotationMapIndex][0] + ox, BRZonesShipStart[rotationMapIndex][1] + oy, BRZonesShipStart[rotationMapIndex][2], 0.0f);
-            
+            StorePlayerStartPosition(guid);
+            TeleportPlayerToShip(guid);
             EnterToPhaseEvent(guid);
             ep_Players[guid]->SaveToDB(false, false);
             ep_PlayersQueue.erase(guid);
@@ -560,6 +541,22 @@ void BattleRoyaleMgr::SpawnSecureZone()
 }
 
 /**
+ * @brief Almacena la posicion a la que se debe enviar al personaje tras salir del evento.
+ * 
+ * @param guid 
+ */
+void BattleRoyaleMgr::StorePlayerStartPosition(uint32 guid)
+{
+    if (ep_Players.find(guid) != ep_Players.end())
+    {
+        if (ep_Players[guid]->GetMap()->Instanceable())
+            ep_PlayersData[guid].SetPosition(ep_Players[guid]->m_homebindMapId, ep_Players[guid]->m_homebindX, ep_Players[guid]->m_homebindY, ep_Players[guid]->m_homebindZ, ep_Players[guid]->GetOrientation());
+        else
+            ep_PlayersData[guid].SetPosition(ep_Players[guid]->GetMapId(), ep_Players[guid]->GetPositionX(), ep_Players[guid]->GetPositionY(), ep_Players[guid]->GetPositionZ(), ep_Players[guid]->GetOrientation());
+    }
+}
+
+/**
  * @brief Teletransporta a un personaje unas yardas encima de donde aparecera la nave y le pone paracaidas.
  * 
  * @param guid 
@@ -577,6 +574,18 @@ void BattleRoyaleMgr::TeleportPlayerBeforeShip(uint32 guid)
     }
 }
 
+void BattleRoyaleMgr::TeleportPlayerToShip(uint32 guid)
+{
+    if (ep_Players.find(guid) != ep_Players.end())
+    {
+        float ox = ShipOffsets[summonOffsetIndex][0] * 3;
+        float oy = ShipOffsets[summonOffsetIndex][1] * 3;
+        summonOffsetIndex++;
+        if (summonOffsetIndex >= BROffsetsCount) summonOffsetIndex = 0;
+        ep_Players[guid]->TeleportTo(BRMapID[rotationMapIndex], BRZonesShipStart[rotationMapIndex][0] + ox, BRZonesShipStart[rotationMapIndex][1] + oy, BRZonesShipStart[rotationMapIndex][2] + 1.5f, 0.0f);
+    }
+}
+
 /**
  * @brief Teletransporta a todos los personajes del evento hacia el interior de la nave.
  * 
@@ -586,11 +595,7 @@ void BattleRoyaleMgr::TeleportPlayersToShip()
     if (ep_Players.size() == 0) return;
     for (BattleRoyalePlayerList::iterator it = ep_Players.begin(); it != ep_Players.end(); ++it)
     {
-        float ox = ShipOffsets[summonOffsetIndex][0] * 3;
-        float oy = ShipOffsets[summonOffsetIndex][1] * 3;
-        summonOffsetIndex++;
-        if (summonOffsetIndex >= BROffsetsCount) summonOffsetIndex = 0;
-        (*it).second->TeleportTo(BRMapID[rotationMapIndex], BRZonesShipStart[rotationMapIndex][0] + ox, BRZonesShipStart[rotationMapIndex][1] + oy, BRZonesShipStart[rotationMapIndex][2] + 2.5f, 0.0f);
+        TeleportPlayerToShip((*it).first);
     }
 }
 
