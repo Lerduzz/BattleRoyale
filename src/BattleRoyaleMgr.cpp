@@ -402,6 +402,17 @@ void BattleRoyaleMgr::HandleOnWoldUpdate(uint32 diff)
                         go_TransportShip->SetLootState(GO_READY);
                         go_TransportShip->UseDoorOrButton(autoCloseTime, false, nullptr);
                     }
+                    if (eventCurrentStatus == ST_SHIP_IN_WAY && summonRemainingTime <= 10)
+                    {
+                        if (!SpawnTheCenterOfBattle()) {
+                            ResetFullEvent();
+                            return;
+                        }
+                        if (!SpawnSecureZone()) {
+                            ResetFullEvent();
+                            return;
+                        }
+                    }
                     summonRemainingTime--;
                 }
             } else {
@@ -527,43 +538,50 @@ bool BattleRoyaleMgr::SpawnTransportShip()
     return success;
 }
 
+/**
+ * @brief Hace que la propia nave invoque el centro de la batalla.
+ * 
+ * @return true 
+ * @return false 
+ */
 bool BattleRoyaleMgr::SpawnTheCenterOfBattle()
 {
-    if (ep_Players.size())
+    if (go_TransportShip)
     {
-
-    }
-    bool success = false;
-    for (BattleRoyalePlayerList::iterator it = ep_Players.begin(); it != ep_Players.end(); ++it)
-    {
-        if ((*it).second) {
-            if (go_CenterOfBattle) {
-                go_CenterOfBattle->DespawnOrUnsummon();
-                go_CenterOfBattle->Delete();
-                go_CenterOfBattle = nullptr;
-            }
-            go_CenterOfBattle = (*it).second->SummonGameObject(500010, BRZonesCenter[rotationMapIndex].GetPositionX(), BRZonesCenter[rotationMapIndex].GetPositionY(), BRZonesCenter[rotationMapIndex].GetPositionZ(), 0, 0, 0, 0, 0, 15 * 60);
-            success = true;
-            break;
+        if (go_CenterOfBattle) {
+            go_CenterOfBattle->DespawnOrUnsummon();
+            go_CenterOfBattle->Delete();
+            go_CenterOfBattle = nullptr;
         }
+        go_CenterOfBattle = go_TransportShip->SummonGameObject(500010, BRZonesCenter[rotationMapIndex].GetPositionX(), BRZonesCenter[rotationMapIndex].GetPositionY(), BRZonesCenter[rotationMapIndex].GetPositionZ(), 0, 0, 0, 0, 0, 15 * 60);
+        go_CenterOfBattle->GetMap()->SetVisibilityRange(500.0f);
+        return true;
     }
-    return success;
+    return false;
 }
 
+/**
+ * @brief Hace que el centro de la batalla invoque a la zona segura.
+ * 
+ * @return true 
+ * @return false 
+ */
 bool BattleRoyaleMgr::SpawnSecureZone()
 {
-    return false; // TODO
-    if (go_SecureZone) {
-        go_SecureZone->DespawnOrUnsummon();
-        go_SecureZone->Delete();
-        go_SecureZone = nullptr;
+    if (go_CenterOfBattle)
+    {
+        if (go_SecureZone) {
+            go_SecureZone->DespawnOrUnsummon();
+            go_SecureZone->Delete();
+            go_SecureZone = nullptr;
+        }
+        if (secureZoneIndex < 10) {
+            go_SecureZone = go_CenterOfBattle->SummonGameObject(500000 + secureZoneIndex, BRZonesCenter[rotationMapIndex].GetPositionX(), BRZonesCenter[rotationMapIndex].GetPositionY(), BRZonesCenter[rotationMapIndex].GetPositionZ() + BRSecureZoneZPlus[secureZoneIndex], 0, 0, 0, 0, 0, 2 * 60);
+            go_SecureZone->SetPhaseMask(2, true);
+            go_SecureZone->SetVisibilityDistanceOverride(VisibilityDistanceType::Infinite);
+        }
     }
-    if (secureZoneIndex < 10) {
-        go_SecureZone = go_CenterOfBattle->SummonGameObject(500000 + secureZoneIndex, BRZonesCenter[rotationMapIndex].GetPositionX(), BRZonesCenter[rotationMapIndex].GetPositionY(), BRZonesCenter[rotationMapIndex].GetPositionZ() + BRSecureZoneZPlus[secureZoneIndex], 0, 0, 0, 0, 0, 2 * 60);
-        go_SecureZone->SetPhaseMask(2, true);
-        go_SecureZone->GetMap()->SetVisibilityRange(500.0f);
-        go_SecureZone->SetVisibilityDistanceOverride(VisibilityDistanceType::Infinite);
-    }
+    return false;
 }
 
 /**
