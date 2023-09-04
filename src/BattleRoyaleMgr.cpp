@@ -269,11 +269,6 @@ void BattleRoyaleMgr::StartEvent(uint32 guid)
 
     // TEST de Mover Nave
     eventCurrentStatus = ST_IN_PROGRESS;
-    secureZoneIndex = 0;
-    secureZoneDelay = 0;
-    secureZoneAnnounced = false;
-    go_SecureZone = nullptr;
-    go_CenterOfBattle = nullptr;
 }
 
 /**
@@ -404,6 +399,11 @@ void BattleRoyaleMgr::HandleOnWoldUpdate(uint32 diff)
                     }
                     if (eventCurrentStatus == ST_SHIP_IN_WAY && summonRemainingTime <= 10)
                     {
+                        secureZoneIndex = 0;
+                        secureZoneDelay = 0;
+                        secureZoneAnnounced = false;
+                        go_CenterOfBattle = nullptr;
+                        go_SecureZone = nullptr;
                         if (!SpawnTheCenterOfBattle()) {
                             ResetFullEvent();
                             return;
@@ -580,6 +580,7 @@ bool BattleRoyaleMgr::SpawnSecureZone()
             go_SecureZone->SetPhaseMask(2, true);
             go_SecureZone->SetVisibilityDistanceOverride(VisibilityDistanceType::Infinite);
         }
+        return true;
     }
     return false;
 }
