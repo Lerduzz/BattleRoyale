@@ -116,7 +116,7 @@ public:
     
     void HandlePlayerJoin(Player *player);
     void HandlePlayerLogout(Player *player);
-    void HandleReleaseGhost(Player *player);
+    bool HandleReleaseGhost(Player *player);
     void HandleOnWoldUpdate(uint32 diff);
     void TeleportToEvent(uint32 guid);
     bool ForceFFAPvPFlag(Player* player);

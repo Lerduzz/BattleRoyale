@@ -144,27 +144,31 @@ void BattleRoyaleMgr::TeleportToEvent(uint32 guid)
 }
 
 /**
- * @brief Saca al personaje del evento al liberar el espiritu.
+ * @brief Decide si se debe retornar al jugador o dejar que valla al cementerio.
  * 
  * @param player 
+ * @return true: Retornado!
+ * @return false: Dejar por defecto!
  */
-void BattleRoyaleMgr::HandleReleaseGhost(Player *player)
+bool BattleRoyaleMgr::HandleReleaseGhost(Player *player)
 {
-    if (!ep_Players.size()) return;
+    if (!ep_Players.size()) return false;
     uint32 guid = player->GetGUID().GetCounter();
-    if (ep_Players.find(guid) == ep_Players.end()) return;
+    if (ep_Players.find(guid) == ep_Players.end()) return false;
     if (!player->IsAlive()) ResurrectPlayer(player);
     ExitFromPhaseEvent(guid);
     player->TeleportTo(ep_PlayersData[guid].GetMap(), ep_PlayersData[guid].GetX(), ep_PlayersData[guid].GetY(), ep_PlayersData[guid].GetZ(), ep_PlayersData[guid].GetO());
     player->SaveToDB(false, false);
     ep_Players.erase(guid);
 	ep_PlayersData.erase(guid);
-
+    
     // TEMP: Finalizar evento al no quedar nadie en el.
     if (!ep_Players.size())
     {
         eventCurrentStatus = STATUS_NO_ENOUGH_PLAYERS;
     }
+
+    return true;
 }
 
 void BattleRoyaleMgr::HandleOnWoldUpdate(uint32 diff)

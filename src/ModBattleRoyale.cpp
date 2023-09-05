@@ -1,7 +1,3 @@
-/**
- *  Event: Parkour of Death
- */
-
 #include "BattleRoyaleMgr.h"
 #include "ScriptMgr.h"
 #include "Player.h"
@@ -57,11 +53,11 @@ public:
         }
     }
 
-    void OnPlayerReleasedGhost(Player *player) override
+    bool CanRepopAtGraveyard(Player *player) override
 	{
         if (sConfigMgr->GetOption<bool>("BattleRoyale.Enabled", true))
         {
-            sBattleRoyaleMgr->HandleReleaseGhost(player);
+            return !sBattleRoyaleMgr->HandleReleaseGhost(player);
         }
 	}
 
