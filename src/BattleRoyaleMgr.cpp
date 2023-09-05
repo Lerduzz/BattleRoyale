@@ -496,6 +496,7 @@ void BattleRoyaleMgr::TeleportPlayerBeforeShip(uint32 guid)
         summonOffsetIndex++;
         if (summonOffsetIndex >= BROffsetsCount) summonOffsetIndex = 0;
         Dismount(ep_Players[guid]);
+        ep_Players[guid]->SetPvP(false);
         ep_Players[guid]->TeleportTo(BRMapID[rotationMapIndex], BRZonesShipStart[rotationMapIndex][0] + ox, BRZonesShipStart[rotationMapIndex][1] + oy, BRZonesShipStart[rotationMapIndex][2] + 15.0f, 0.0f);
         ep_Players[guid]->AddAura(SPELL_PARACHUTE_DALARAN, ep_Players[guid]);
     }
@@ -515,6 +516,7 @@ void BattleRoyaleMgr::TeleportPlayerToShip(uint32 guid)
         summonOffsetIndex++;
         if (summonOffsetIndex >= BROffsetsCount) summonOffsetIndex = 0;
         Dismount(ep_Players[guid]);
+        ep_Players[guid]->SetPvP(false);
         ep_Players[guid]->TeleportTo(BRMapID[rotationMapIndex], BRZonesShipStart[rotationMapIndex][0] + ox, BRZonesShipStart[rotationMapIndex][1] + oy, BRZonesShipStart[rotationMapIndex][2] + 1.5f, 0.0f);
     }
 }
