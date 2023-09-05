@@ -55,6 +55,7 @@ public:
         {
             return !sBattleRoyaleMgr->HandleReleaseGhost(player);
         }
+        return true;
 	}
 
     bool BRForcePlayerFFAPvPFlag(Player* player) override {
@@ -179,57 +180,8 @@ public:
 	}
 };
 
-class cs_battleroyale : public CommandScript
-{
-public:
-    cs_battleroyale() : CommandScript("cs_battleroyale") {}
-
-    Acore::ChatCommands::ChatCommandTable GetCommands() const override
-    {
-        static Acore::ChatCommands::ChatCommandTable BattleRoyaleCommandTable = {
-            {"", HandleBattleYoyaleCommand, SEC_PLAYER, Acore::ChatCommands::Console::No}, 
-            {"point", HandleBRPointCommand, SEC_PLAYER, Acore::ChatCommands::Console::No},
-            {"distance", HandleBRDistanceCommand, SEC_PLAYER, Acore::ChatCommands::Console::No},
-            {"test", HandleBRTestCommand, SEC_PLAYER, Acore::ChatCommands::Console::No}
-        };
-
-        static Acore::ChatCommands::ChatCommandTable BattleRoyaleBaseTable = {
-            {"battleroyale", BattleRoyaleCommandTable}
-        };
-
-        return BattleRoyaleBaseTable;
-    }
-
-    static bool HandleBattleYoyaleCommand(ChatHandler *handler)
-    {
-        // handler->SendSysMessage("|cff4CFF00BRCommands::|r point: set point, distance: calculate distance.");
-        return true;
-    }
-
-    static bool HandleBRPointCommand(ChatHandler *handler)
-    {
-        // sBattleRoyaleMgr->CreateReferencePoint(handler->GetSession()->GetPlayer());
-        // handler->SendSysMessage("|cff4CFF00BRCommands::|r Punto de medicion establecido.");
-        return true;
-    }
-
-    static bool HandleBRDistanceCommand(ChatHandler *handler)
-    {
-        // handler->PSendSysMessage("|cff4CFF00BRCommands::|r La distancia es: %f.", sBattleRoyaleMgr->GetDistanceFromPoint(handler->GetSession()->GetPlayer()));
-        return true;
-    }
-
-    static bool HandleBRTestCommand(ChatHandler *handler)
-    {
-        // sBattleRoyaleMgr->CrearNave(handler->GetSession()->GetPlayer());
-        // handler->SendSysMessage("|cff4CFF00BRCommands::|r Probando la nave.");
-        return true;
-    }
-};
-
 void AddModBattleRoyaleScripts() {
     new ModBattleRoyalePlayer();
     new BattleRoyaleWorldScript();
     new npc_battleroyale();
-    new cs_battleroyale();
 }

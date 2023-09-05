@@ -349,7 +349,7 @@ void BattleRoyaleMgr::NotifyTimeRemainingToStart(uint32 delay)
             {
                 case 0:
                 {
-                    (*it).second->GetSession()->SendNotification("|cff00ff00¡Que comience la batalla de |cffDA70D6%s|cff00ff00!", BRZonesNames[rotationMapIndex]);
+                    (*it).second->GetSession()->SendNotification("|cff00ff00¡Que comience la batalla de |cffDA70D6%s|cff00ff00!", BRZonesNames[rotationMapIndex].c_str());
                     break;
                 }                
                 case 5:

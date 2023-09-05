@@ -161,8 +161,8 @@ private:
     int rotationMapIndex;
     int eventCurrentStatus;
 
-    int eventMinPlayers;
-    int eventMaxPlayers;
+    uint32 eventMinPlayers;
+    uint32 eventMaxPlayers;
 
     int secondsTicksHelper;
     int startRemainingTime;
