@@ -49,30 +49,6 @@ const float BRSecureZoneDists[10] = {
     16.5f
 };
 
-enum BREventStatus
-{
-    STATUS_NO_ENOUGH_PLAYERS                = 0,      // No hay suficientes jugadores.
-    STATUS_SUMMONING_PLAYERS                = 1,      // Se ha comenzado a teletransportar jugadores a la zona central.
-    STATUS_SHIP_WAITING                     = 2,      // Ahora se estan moviendo a los jugadores a la nave en espera.
-    STATUS_SHIP_MOVING                      = 3,      // La nave esta en camino a su destino.
-    STATUS_SHIP_NEAR_CENTER                 = 4,      // La nave se encuentra sobrevolando la zona segura.
-    STATUS_BATTLE_STARTED                   = 5,      // La batalla ha iniciado.
-};
-
-enum BRSpells
-{
-    SPELL_PARACHUTE_DALARAN                 = 45472,  // Paracaidas que te ponen en Dalaran.
-};
-
-enum BRGameObjects
-{
-    GAMEOBJECT_SHIP                         = 194675, // El tren de Ulduar.
-    GAMEOBJECT_MAP_CENTER                   = 500000, // CUSTOM: Centro del mapa (Para calculo de distancia de zona segura).
-    GAMEOBJECT_SECURE_ZONE_BASE             = 500001, // CUSTOM: Cúpula de ulduar para identificar visualmente los límites de la zona segura.
-    GAMEOBJECT_SECURE_ZONE_COUNT            = 10,     // Cantidad de zonas seguras (ID consecutivos a partir de GAMEOBJECT_SECURE_ZONE_BASE).
-    GAMEOBJECT_SECURE_ZONE_SIZE             = 66,     // Radio de la zona segura cuando la escala es x1.0f.
-};
-
 // -- FUNCIONES -- //
 BattleRoyaleMgr::BattleRoyaleMgr()
 {
