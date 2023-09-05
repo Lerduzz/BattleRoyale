@@ -18,9 +18,10 @@ const std::string BRZonesNames[BRMapCount] =
     "Kalimdor: Hyjal"
 };
 
+// DIST: 2294, ALT: 297.
 const float BRZonesShipStart[BRMapCount][4] =
 {
-    { 3067.581055f, -2164.183105f, 1559.483765f, 0.0f - M_PI / 2.0f }
+    { 2967.581055f, -2164.183105f, 1556.483765f, 0.0f - M_PI / 2.0f }
 };
 
 // -- FUNCIONES -- //
