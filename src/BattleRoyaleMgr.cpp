@@ -4,8 +4,9 @@
 #include "Player.h"
 
 // -- CONSTANTES -- //
-const int BRMapCount = 1;
+const int secureZoneUpdateInterval = 10000; // TODO: Configuracion (defaul: 60000).
 
+const int BRMapCount = 1;
 const int BRMapID[BRMapCount] = { 1 };
 
 const Position BRZonesCenter[BRMapCount] =
@@ -88,24 +89,6 @@ void BattleRoyaleMgr::HandlePlayerLogout(Player *player)
         ep_Players.erase(guid);
         ep_PlayersData.erase(guid);
     }
-}
-
-void BattleRoyaleMgr::StartEvent(uint32 guid)
-{
-	if (!guid)
-	{
-	 	for (BattleRoyalePlayerList::iterator it = ep_Players.begin(); it != ep_Players.end(); ++it)
-        {
-            (*it).second->SetByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
-        }
-	}
-	else
-    {
-        ep_Players[guid]->SetByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
-    }
-
-    // TEST de Mover Nave
-    eventCurrentStatus = STATUS_BATTLE_STARTED;
 }
 
 /**
@@ -212,9 +195,9 @@ void BattleRoyaleMgr::HandleOnWoldUpdate(uint32 diff)
             if (secondsTicksHelper <= 0) {
                 secondsTicksHelper = 1000;
                 if (startRemainingTime <= 0) {
+                    eventCurrentStatus = STATUS_BATTLE_STARTED;
                     NotifyTimeRemainingToStart(0);
-                    secureZoneDelay = 60000;
-                    StartEvent(0);
+                    secureZoneDelay = secureZoneUpdateInterval;
                 } else {
                     if (startRemainingTime % 5 == 0) {
                         NotifyTimeRemainingToStart(startRemainingTime);
@@ -265,13 +248,14 @@ void BattleRoyaleMgr::HandleOnWoldUpdate(uint32 diff)
             if (secondsTicksHelper <= 0) {
                 secondsTicksHelper = 1000;
                 OutOfZoneDamage();
+                AddFFAPvPFlag();
             } else {
                 secondsTicksHelper -= diff;
             }
             if (secureZoneDelay <= 0) {
                 SpawnSecureZone();
                 NotifySecureZoneReduced();
-                secureZoneDelay = 10000; // TODO: Configurable (Default = 60000).
+                secureZoneDelay = secureZoneUpdateInterval;
                 secureZoneAnnounced = false;
             } else {
                 if (secureZoneDelay <= 5000 && !secureZoneAnnounced) {
@@ -293,7 +277,7 @@ void BattleRoyaleMgr::HandleOnWoldUpdate(uint32 diff)
 bool BattleRoyaleMgr::ForceFFAPvPFlag(Player* player)
 {
     if (eventCurrentStatus != STATUS_BATTLE_STARTED || ep_Players.find(player->GetGUID().GetCounter()) == ep_Players.end()) return false;
-    return true;
+    return !(go_TransportShip && player->GetTransport() && player->GetExactDist(go_TransportShip) < 25.0f);
 }
 
 bool BattleRoyaleMgr::RestrictPlayerFunctions(Player* player)
@@ -603,7 +587,25 @@ void BattleRoyaleMgr::OutOfZoneDamage()
                 ep_PlayersData[(*it).first].SetDTick(0);
             }
         }
-    }        
+    }
+}
+
+/**
+ * @brief Controla cuando poner al jugador en modo FFA PvP.
+ * 
+ */
+void BattleRoyaleMgr::AddFFAPvPFlag()
+{
+    if (ep_Players.size())
+    {
+        for (BattleRoyalePlayerList::iterator it = ep_Players.begin(); it != ep_Players.end(); ++it)
+        {
+            if ((*it).second && (*it).second->IsAlive() && ForceFFAPvPFlag((*it).second) && !((*it).second->HasByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP)))
+            {
+                (*it).second->SetByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
+            }
+        }
+    }
 }
 
 /**

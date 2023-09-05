@@ -118,7 +118,6 @@ public:
     void HandlePlayerLogout(Player *player);
     void HandleReleaseGhost(Player *player, uint32 oldArea, uint32 newArea);
     void HandleOnWoldUpdate(uint32 diff);
-    void StartEvent(uint32 guid);
     void TeleportToEvent(uint32 guid);
     void ExitFromEvent(uint32 guid);
     bool ForceFFAPvPFlag(Player* player);
@@ -142,6 +141,7 @@ private:
     void Dismount(Player* player);
     void AddParachuteToAllPlayers();
     void OutOfZoneDamage();
+    void AddFFAPvPFlag();
     void ResetFullEvent();
     
     BattleRoyalePlayerList ep_PlayersQueue;
