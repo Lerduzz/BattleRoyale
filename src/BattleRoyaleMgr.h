@@ -116,10 +116,9 @@ public:
     
     void HandlePlayerJoin(Player *player);
     void HandlePlayerLogout(Player *player);
-    void HandleReleaseGhost(Player *player, uint32 oldArea, uint32 newArea);
+    void HandleReleaseGhost(Player *player);
     void HandleOnWoldUpdate(uint32 diff);
     void TeleportToEvent(uint32 guid);
-    void ExitFromEvent(uint32 guid);
     bool ForceFFAPvPFlag(Player* player);
     void PreventPvPBeforeBattle(Player* player, bool state);
     bool RestrictPlayerFunctions(Player* player);

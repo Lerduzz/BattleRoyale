@@ -89,6 +89,12 @@ void BattleRoyaleMgr::HandlePlayerLogout(Player *player)
         ep_Players.erase(guid);
         ep_PlayersData.erase(guid);
     }
+
+    // TEMP: Finalizar evento al no quedar nadie en el.
+    if (!ep_Players.size())
+    {
+        eventCurrentStatus = STATUS_NO_ENOUGH_PLAYERS;
+    }
 }
 
 /**
@@ -137,50 +143,28 @@ void BattleRoyaleMgr::TeleportToEvent(uint32 guid)
 	}
 }
 
-void BattleRoyaleMgr::ExitFromEvent(uint32 guid)
+/**
+ * @brief Saca al personaje del evento al liberar el espiritu.
+ * 
+ * @param player 
+ */
+void BattleRoyaleMgr::HandleReleaseGhost(Player *player)
 {
-	if (!guid)
-	{
-		for (BattleRoyalePlayerList::iterator it = ep_Players.begin(); it != ep_Players.end(); ++it)
-		{
-            if (!(*it).second->IsAlive()) ResurrectPlayer((*it).second);
-            ExitFromPhaseEvent((*it).first);
-            (*it).second->TeleportTo(ep_PlayersData[(*it).first].GetMap(), ep_PlayersData[(*it).first].GetX(), ep_PlayersData[(*it).first].GetY(), ep_PlayersData[(*it).first].GetZ(), ep_PlayersData[(*it).first].GetO());
-            (*it).second->SaveToDB(false, false);
-            ep_Players.erase((*it).first);
-		    ep_PlayersData.erase((*it).first);
-		}
+    if (!ep_Players.size()) return;
+    uint32 guid = player->GetGUID().GetCounter();
+    if (ep_Players.find(guid) == ep_Players.end()) return;
+    if (!player->IsAlive()) ResurrectPlayer(player);
+    ExitFromPhaseEvent(guid);
+    ep_Players[guid]->TeleportTo(ep_PlayersData[guid].GetMap(), ep_PlayersData[guid].GetX(), ep_PlayersData[guid].GetY(), ep_PlayersData[guid].GetZ(), ep_PlayersData[guid].GetO());
+    ep_Players[guid]->SaveToDB(false, false);
+    ep_Players.erase(guid);
+	ep_PlayersData.erase(guid);
 
-        // TODO: Esto no debe ir aqui.
-        go_CenterOfBattle->GetMap()->SetVisibilityRange(World::GetMaxVisibleDistanceOnContinents());
-	}
-	else
-	{
-        if (!ep_Players[guid]->IsAlive()) ResurrectPlayer(ep_Players[guid]);
-        ExitFromPhaseEvent(guid);
-        ep_Players[guid]->TeleportTo(ep_PlayersData[guid].GetMap(), ep_PlayersData[guid].GetX(), ep_PlayersData[guid].GetY(), ep_PlayersData[guid].GetZ(), ep_PlayersData[guid].GetO());
-        ep_Players[guid]->SaveToDB(false, false);
-        ep_Players.erase(guid);
-	    ep_PlayersData.erase(guid);
-	}
-}
-
-void BattleRoyaleMgr::HandleReleaseGhost(Player *player, uint32 oldArea, uint32 newArea)
-{
-    // if (ep_Players.find(player->GetGUID().GetCounter()) == ep_Players.end()) return;
-	// if ((oldArea == 1741 || oldArea == 2177) && newArea == 1741 && !player->IsAlive())
-    // {
-    //     player->TeleportTo(0, -13246.281f, 193.465f, 31.019f, 1.130f);
-    //     ResurrectPlayer(player);
-    // }
-    // else if ((oldArea == 1741 || oldArea == 2177) && newArea != 1741 && newArea != 2177)
-    // {
-    //     if (!player->IsAlive()) ResurrectPlayer(player);
-    //     ExitFromPhaseEvent(player->GetGUID().GetCounter());
-    //     ep_Players.erase(player->GetGUID().GetCounter());
-    //     ep_PlayersData.erase(player->GetGUID().GetCounter());
-    //     ChatHandler(player->GetSession()).PSendSysMessage("|cff4CFF00BattleRoyale::|r Has abandonado la zona del evento.");
-    // }
+    // TEMP: Finalizar evento al no quedar nadie en el.
+    if (!ep_Players.size())
+    {
+        eventCurrentStatus = STATUS_NO_ENOUGH_PLAYERS;
+    }
 }
 
 void BattleRoyaleMgr::HandleOnWoldUpdate(uint32 diff)
@@ -264,9 +248,6 @@ void BattleRoyaleMgr::HandleOnWoldUpdate(uint32 diff)
                 }
                 if (secureZoneIndex <= SECURE_ZONE_COUNT) {
                     secureZoneDelay -= diff;
-                } else {
-                    ExitFromEvent(0); // TODO: Esto no va aqui.
-                    eventCurrentStatus = STATUS_NO_ENOUGH_PLAYERS;  // TODO: Esto no va aqui.
                 }
             }
             break;
@@ -495,6 +476,7 @@ void BattleRoyaleMgr::StorePlayerStartPosition(uint32 guid)
  */
 void BattleRoyaleMgr::TeleportPlayerBeforeShip(uint32 guid)
 {
+    
     if (ep_Players.find(guid) != ep_Players.end())
     {
         float ox = ShipOffsets[summonOffsetIndex][0];

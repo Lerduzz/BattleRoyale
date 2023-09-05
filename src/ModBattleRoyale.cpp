@@ -51,12 +51,18 @@ public:
     }
     
     void OnLogout(Player* player) override {
-        sBattleRoyaleMgr->HandlePlayerLogout(player);
+        if (sConfigMgr->GetOption<bool>("BattleRoyale.Enabled", true))
+        {
+            sBattleRoyaleMgr->HandlePlayerLogout(player);
+        }
     }
 
-    void OnUpdateArea(Player *player, uint32 oldArea, uint32 newArea) override
+    void OnPlayerReleasedGhost(Player *player) override
 	{
-		// sBattleRoyaleMgr->HandleReleaseGhost(player, oldArea, newArea);
+        if (sConfigMgr->GetOption<bool>("BattleRoyale.Enabled", true))
+        {
+            sBattleRoyaleMgr->HandleReleaseGhost(player);
+        }
 	}
 
     bool BRForcePlayerFFAPvPFlag(Player* player) override {
