@@ -116,7 +116,6 @@ public:
     
     void HandlePlayerJoin(Player *player);
     void HandlePlayerLogout(Player *player);
-    void HandleGiveReward(Player *player);
     void HandleReleaseGhost(Player *player, uint32 oldArea, uint32 newArea);
     void HandleOnWoldUpdate(uint32 diff);
     void StartEvent(uint32 guid);
