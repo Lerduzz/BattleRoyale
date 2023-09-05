@@ -19,6 +19,61 @@ typedef std::map<uint32, Player*> BattleRoyalePlayerList;
 // GUIDLow es la llave, Datos de los personajes en el evento.
 typedef std::map<uint32, BattleRoyaleData> BattleRoyalePlayerData;
 
+// 49 Offsets para que los jugadores no salgan apilados.
+const int BROffsetsCount = 49;
+const float ShipOffsets[BROffsetsCount][2] = 
+{
+    { 0.0f, 0.0f },
+    { 0.0f, 1.5f },
+    { 0.0f, 3.0f },
+    { 0.0f, 4.5f },
+    { 0.0f, -1.5f },
+    { 0.0f, -3.0f },
+    { 0.0f, -4.5f },
+    { 1.5f, 0.0f },
+    { 1.5f, 1.5f },
+    { 1.5f, 3.0f },
+    { 1.5f, 4.5f },
+    { 1.5f, -1.5f },
+    { 1.5f, -3.0f },
+    { 1.5f, -4.5f },
+    { 3.0f, 0.0f },
+    { 3.0f, 1.5f },
+    { 3.0f, 3.0f },
+    { 3.0f, 4.5f },
+    { 3.0f, -1.5f },
+    { 3.0f, -3.0f },
+    { 3.0f, -4.5f },
+    { 4.5f, 0.0f },
+    { 4.5f, 1.5f },
+    { 4.5f, 3.0f },
+    { 4.5f, 4.5f },
+    { 4.5f, -1.5f },
+    { 4.5f, -3.0f },
+    { 4.5f, -4.5f },
+    { -1.5f, 0.0f },
+    { -1.5f, 1.5f },
+    { -1.5f, 3.0f },
+    { -1.5f, 4.5f },
+    { -1.5f, -1.5f },
+    { -1.5f, -3.0f },
+    { -1.5f, -4.5f },
+    { -3.0f, 0.0f },
+    { -3.0f, 1.5f },
+    { -3.0f, 3.0f },
+    { -3.0f, 4.5f },
+    { -3.0f, -1.5f },
+    { -3.0f, -3.0f },
+    { -3.0f, -4.5f },
+    { -4.5f, 0.0f },
+    { -4.5f, 1.5f },
+    { -4.5f, 3.0f },
+    { -4.5f, 4.5f },
+    { -4.5f, -1.5f },
+    { -4.5f, -3.0f },
+    { -4.5f, -4.5f }
+};
+
 class BattleRoyaleMgr
 {
     BattleRoyaleMgr();

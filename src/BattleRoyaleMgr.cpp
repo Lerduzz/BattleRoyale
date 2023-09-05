@@ -5,7 +5,6 @@
 
 // -- CONSTANTES -- //
 const int BRMapCount = 1;
-const int BROffsetsCount = 49;
 
 const int BRMapID[BRMapCount] = { 1 };
 
@@ -22,59 +21,6 @@ const std::string BRZonesNames[BRMapCount] =
 const float BRZonesShipStart[BRMapCount][4] =
 {
     { 3067.581055f, -2164.183105f, 1559.483765f, 0.0f - M_PI / 2.0f }
-};
-
-const float ShipOffsets[BROffsetsCount][2] = 
-{
-    { 0.0f, 0.0f },
-    { 0.0f, 1.5f },
-    { 0.0f, 3.0f },
-    { 0.0f, 4.5f },
-    { 0.0f, -1.5f },
-    { 0.0f, -3.0f },
-    { 0.0f, -4.5f },
-    { 1.5f, 0.0f },
-    { 1.5f, 1.5f },
-    { 1.5f, 3.0f },
-    { 1.5f, 4.5f },
-    { 1.5f, -1.5f },
-    { 1.5f, -3.0f },
-    { 1.5f, -4.5f },
-    { 3.0f, 0.0f },
-    { 3.0f, 1.5f },
-    { 3.0f, 3.0f },
-    { 3.0f, 4.5f },
-    { 3.0f, -1.5f },
-    { 3.0f, -3.0f },
-    { 3.0f, -4.5f },
-    { 4.5f, 0.0f },
-    { 4.5f, 1.5f },
-    { 4.5f, 3.0f },
-    { 4.5f, 4.5f },
-    { 4.5f, -1.5f },
-    { 4.5f, -3.0f },
-    { 4.5f, -4.5f },
-    { -1.5f, 0.0f },
-    { -1.5f, 1.5f },
-    { -1.5f, 3.0f },
-    { -1.5f, 4.5f },
-    { -1.5f, -1.5f },
-    { -1.5f, -3.0f },
-    { -1.5f, -4.5f },
-    { -3.0f, 0.0f },
-    { -3.0f, 1.5f },
-    { -3.0f, 3.0f },
-    { -3.0f, 4.5f },
-    { -3.0f, -1.5f },
-    { -3.0f, -3.0f },
-    { -3.0f, -4.5f },
-    { -4.5f, 0.0f },
-    { -4.5f, 1.5f },
-    { -4.5f, 3.0f },
-    { -4.5f, 4.5f },
-    { -4.5f, -1.5f },
-    { -4.5f, -3.0f },
-    { -4.5f, -4.5f }
 };
 
 const float BRSecureZoneZPlus[10] = { 
