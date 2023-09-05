@@ -23,32 +23,6 @@ const float BRZonesShipStart[BRMapCount][4] =
     { 3067.581055f, -2164.183105f, 1559.483765f, 0.0f - M_PI / 2.0f }
 };
 
-const float BRSecureZoneZPlus[10] = { 
-    297.0f,
-    264.0f,
-    231.0f,
-    198.0f,
-    165.0f,
-    132.0f,
-    99.0f,
-    66.0f,
-    33.0f,
-    16.5f
-};
-
-const float BRSecureZoneDists[10] = {
-    297.0f,
-    264.0f,
-    231.0f,
-    198.0f,
-    165.0f,
-    132.0f,
-    99.0f,
-    66.0f,
-    33.0f,
-    16.5f
-};
-
 // -- FUNCIONES -- //
 BattleRoyaleMgr::BattleRoyaleMgr()
 {
@@ -373,7 +347,7 @@ void BattleRoyaleMgr::HandleOnWoldUpdate(uint32 diff)
                     NotifySecureZoneReduceWarn(5);
                     secureZoneAnnounced = true;
                 }
-                if (secureZoneIndex <= 10) {
+                if (secureZoneIndex <= SECURE_ZONE_COUNT) {
                     secureZoneDelay -= diff;
                 } else {
                     ExitFromEvent(0); // TODO: Esto no va aqui.
@@ -524,8 +498,8 @@ bool BattleRoyaleMgr::SpawnSecureZone()
             go_SecureZone->Delete();
             go_SecureZone = nullptr;
         }
-        if (secureZoneIndex < 10) {
-            go_SecureZone = go_CenterOfBattle->SummonGameObject(GAMEOBJECT_SECURE_ZONE_BASE + secureZoneIndex, BRZonesCenter[rotationMapIndex].GetPositionX(), BRZonesCenter[rotationMapIndex].GetPositionY(), BRZonesCenter[rotationMapIndex].GetPositionZ() + BRSecureZoneZPlus[secureZoneIndex], 0, 0, 0, 0, 0, 2 * 60);
+        if (secureZoneIndex < SECURE_ZONE_COUNT) {
+            go_SecureZone = go_CenterOfBattle->SummonGameObject(GAMEOBJECT_SECURE_ZONE_BASE + secureZoneIndex, BRZonesCenter[rotationMapIndex].GetPositionX(), BRZonesCenter[rotationMapIndex].GetPositionY(), BRZonesCenter[rotationMapIndex].GetPositionZ() + BRSecureZoneScales[secureZoneIndex] * 66.0f, 0, 0, 0, 0, 0, 2 * 60);
             go_SecureZone->SetPhaseMask(2, true);
             go_SecureZone->SetVisibilityDistanceOverride(VisibilityDistanceType::Infinite);
         }
@@ -610,7 +584,7 @@ void BattleRoyaleMgr::OutOfZoneDamage()
         for (BattleRoyalePlayerList::iterator it = ep_Players.begin(); it != ep_Players.end(); ++it)
         {
             float distance = (*it).second->GetExactDist(go_CenterOfBattle);
-            if (secureZoneIndex > 0 && distance > BRSecureZoneDists[secureZoneIndex - 1]) {
+            if (secureZoneIndex > 0 && distance > BRSecureZoneScales[secureZoneIndex - 1] * 66.0f) {
                 ep_PlayersData[(*it).first].SetDTick(ep_PlayersData[(*it).first].GetDTick() + 1);
                 uint32 damage = (*it).second->GetMaxHealth() * (2 * sqrt(ep_PlayersData[(*it).first].GetDTick()) + secureZoneIndex) / 100;
                 (*it).second->GetSession()->SendNotification("|cffff0000¡Has recibido |cffDA70D6%u|cffff0000 de daño, adéntrate en la zona segura!", damage);
