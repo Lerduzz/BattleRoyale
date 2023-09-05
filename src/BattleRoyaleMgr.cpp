@@ -100,9 +100,9 @@ void BattleRoyaleMgr::HandlePlayerLogout(Player *player)
 void BattleRoyaleMgr::HandleOnPVPLill(Player *killer, Player *killed)
 {
     if (!killer || !killed) return;
-    if (!ep_Players.size() || eventCurrentStatus != STATUS_IN_PROGRESS) return;
+    if (!ep_Players.size() || eventCurrentStatus != STATUS_BATTLE_STARTED) return;
     uint32 guid_r = killer->GetGUID().GetCounter();
-    uint32 guid_d = killer->GetGUID().GetCounter();
+    uint32 guid_d = killed->GetGUID().GetCounter();
     if (ep_Players.find(guid_r) == ep_Players.end() || ep_Players.find(guid_d) == ep_Players.end()) return;
     killed->CastSpell(killer, 6277, true);
     ChatHandler handler = ChatHandler(killer->GetSession());
