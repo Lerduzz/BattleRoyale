@@ -42,10 +42,10 @@ enum BRGameObjects
     GAMEOBJECT_SHIP                         = 194675, // El tren de Ulduar.
     GAMEOBJECT_MAP_CENTER                   = 500000, // CUSTOM: Centro del mapa (Para calculo de distancia de zona segura).
     GAMEOBJECT_SECURE_ZONE_BASE             = 500001, // CUSTOM: Cúpula de ulduar para identificar visualmente los límites de la zona segura.
-    SECURE_ZONE_COUNT                       = 12,     // Cantidad de zonas seguras (ID consecutivos a partir de GAMEOBJECT_SECURE_ZONE_BASE).
+    SECURE_ZONE_COUNT                       = 10,     // Cantidad de zonas seguras (ID consecutivos a partir de GAMEOBJECT_SECURE_ZONE_BASE).
 };
 
-const float BRSecureZoneScales[SECURE_ZONE_COUNT] = { 6.0f, 5.5f, 5.0f, 4.5f, 4.0f, 3.5f, 3.0f, 2.5f, 2.0f, 1.5f, 1.0f, 0.5f };
+const float BRSecureZoneScales[SECURE_ZONE_COUNT] = { 5.0f, 4.5f, 4.0f, 3.5f, 3.0f, 2.5f, 2.0f, 1.5f, 1.0f, 0.5f };
 
 // 49 Offsets para que los jugadores no salgan apilados.
 const int BROffsetsCount = 49;

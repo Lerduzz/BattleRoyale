@@ -477,7 +477,6 @@ bool BattleRoyaleMgr::SpawnTheCenterOfBattle()
             go_CenterOfBattle = nullptr;
         }
         go_CenterOfBattle = go_TransportShip->SummonGameObject(GAMEOBJECT_MAP_CENTER, BRZonesCenter[rotationMapIndex].GetPositionX(), BRZonesCenter[rotationMapIndex].GetPositionY(), BRZonesCenter[rotationMapIndex].GetPositionZ(), 0, 0, 0, 0, 0, 15 * 60);
-        go_CenterOfBattle->GetMap()->SetVisibilityRange(500.0f);
         return true;
     }
     return false;
