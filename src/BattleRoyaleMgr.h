@@ -121,6 +121,7 @@ public:
     void TeleportToEvent(uint32 guid);
     void ExitFromEvent(uint32 guid);
     bool ForceFFAPvPFlag(Player* player);
+    void PreventPvPBeforeBattle(Player* player, bool state);
     bool RestrictPlayerFunctions(Player* player);
 
     
@@ -142,7 +143,6 @@ private:
     void AddParachuteToAllPlayers();
     void OutOfZoneDamage();
     void AddFFAPvPFlag();
-    void PreventPvPBeforeBattle(Player* player, bool state);
     void ResetFullEvent();
     
     BattleRoyalePlayerList ep_PlayersQueue;

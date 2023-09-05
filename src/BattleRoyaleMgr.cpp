@@ -276,11 +276,14 @@ void BattleRoyaleMgr::HandleOnWoldUpdate(uint32 diff)
 
 bool BattleRoyaleMgr::ForceFFAPvPFlag(Player* player)
 {
-    if (ep_Players.size())
-    {
-        if (eventCurrentStatus != STATUS_BATTLE_STARTED || ep_Players.find(player->GetGUID().GetCounter()) == ep_Players.end()) return false;
-        return !(go_TransportShip && player->GetTransport() && player->GetExactDist(go_TransportShip) < 25.0f);
-    }
+    if (eventCurrentStatus != STATUS_BATTLE_STARTED || !ep_Players.size() || ep_Players.find(player->GetGUID().GetCounter()) == ep_Players.end()) return false;
+    return !(go_TransportShip && player->GetTransport() && player->GetExactDist(go_TransportShip) < 25.0f);
+}
+
+void BattleRoyaleMgr::PreventPvPBeforeBattle(Player* player, bool state)
+{
+    if (!state || !ep_Players.size()) return;
+    if (ep_Players.find(player->GetGUID().GetCounter()) != ep_Players.end() && !ForceFFAPvPFlag(player)) player->SetPvP(false);
 }
 
 bool BattleRoyaleMgr::RestrictPlayerFunctions(Player* player)
@@ -302,7 +305,7 @@ void BattleRoyaleMgr::ExitFromPhaseEvent(uint32 guid)
     ep_Players[guid]->UpdateObjectVisibility();
 }
 
-void BattleRoyaleMgr::ResurrectPlayer(Player *player)
+void BattleRoyaleMgr::ResurrectPlayer(Player* player)
 {
 	player->ResurrectPlayer(1.0f);
     player->SpawnCorpseBones();
@@ -611,15 +614,6 @@ void BattleRoyaleMgr::AddFFAPvPFlag()
             }
         }
     }
-}
-
-void BattleRoyaleMgr::PreventPvPBeforeBattle(Player *player, bool state)
-{
-    /*if (state == true && !sBattleRoyaleMgr->ForceFFAPvPFlag(player))
-    {
-        player->SetPvP(false);
-    }*/
-    if (state == true) player->SetPvP(false);
 }
 
 /**

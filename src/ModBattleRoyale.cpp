@@ -78,7 +78,8 @@ public:
     // -- RESTRICCIONES DE PERSONAJE -- //
     bool CanJoinLfg(Player* player, uint8 /*roles*/, lfg::LfgDungeonSet& /*dungeons*/, const std::string& /*comment*/) override
     {
-        if (sConfigMgr->GetOption<bool>("BattleRoyale.Enabled", true)) {
+        if (sConfigMgr->GetOption<bool>("BattleRoyale.Enabled", true))
+        {
             return !sBattleRoyaleMgr->RestrictPlayerFunctions(player);
         }
         return true;
@@ -86,7 +87,8 @@ public:
 
     bool CanGroupInvite(Player* player, std::string& /*membername*/) override
     {
-        if (sConfigMgr->GetOption<bool>("BattleRoyale.Enabled", true)) {
+        if (sConfigMgr->GetOption<bool>("BattleRoyale.Enabled", true))
+        {
             return !sBattleRoyaleMgr->RestrictPlayerFunctions(player);
         }
         return true;
@@ -94,7 +96,8 @@ public:
 
     bool CanGroupAccept(Player* player, Group* /*group*/) override
     {
-        if (sConfigMgr->GetOption<bool>("BattleRoyale.Enabled", true)) {
+        if (sConfigMgr->GetOption<bool>("BattleRoyale.Enabled", true))
+        {
             return !sBattleRoyaleMgr->RestrictPlayerFunctions(player);
         }
         return true;
@@ -102,7 +105,8 @@ public:
 
     bool CanBattleFieldPort(Player* player, uint8 /*arenaType*/, BattlegroundTypeId /*BGTypeID*/, uint8 /*action*/) override
     {
-        if (sConfigMgr->GetOption<bool>("BattleRoyale.Enabled", true)) {
+        if (sConfigMgr->GetOption<bool>("BattleRoyale.Enabled", true))
+        {
             return !sBattleRoyaleMgr->RestrictPlayerFunctions(player);
         }
         return true;
@@ -110,7 +114,8 @@ public:
 
     bool CanJoinInArenaQueue(Player* player, ObjectGuid /*BattlemasterGuid*/, uint8 /*arenaslot*/, BattlegroundTypeId /*BGTypeID*/, uint8 /*joinAsGroup*/, uint8 /*IsRated*/, GroupJoinBattlegroundResult& err) override
     {
-        if (sConfigMgr->GetOption<bool>("BattleRoyale.Enabled", true)) {
+        if (sConfigMgr->GetOption<bool>("BattleRoyale.Enabled", true))
+        {
             err = GroupJoinBattlegroundResult::ERR_BATTLEGROUND_NOT_IN_BATTLEGROUND;
             return !sBattleRoyaleMgr->RestrictPlayerFunctions(player);
         }
@@ -119,7 +124,8 @@ public:
 
     bool CanJoinInBattlegroundQueue(Player* player, ObjectGuid /*BattlemasterGuid*/, BattlegroundTypeId /*BGTypeID*/, uint8 /*joinAsGroup*/, GroupJoinBattlegroundResult& err) override
     {
-        if (sConfigMgr->GetOption<bool>("BattleRoyale.Enabled", true)) {
+        if (sConfigMgr->GetOption<bool>("BattleRoyale.Enabled", true))
+        {
             err = GroupJoinBattlegroundResult::ERR_BATTLEGROUND_NOT_IN_BATTLEGROUND;
             return !sBattleRoyaleMgr->RestrictPlayerFunctions(player);
         }
