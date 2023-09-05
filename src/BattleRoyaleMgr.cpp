@@ -236,7 +236,7 @@ void BattleRoyaleMgr::HandleOnWoldUpdate(uint32 diff)
                         go_TransportShip->SetLootState(GO_READY);
                         go_TransportShip->UseDoorOrButton(autoCloseTime, false, nullptr);
                     }
-                    if (eventCurrentStatus == STATUS_SHIP_MOVING && summonRemainingTime <= 10)
+                    if (eventCurrentStatus == STATUS_SHIP_MOVING && summonRemainingTime <= 5)
                     {
                         eventCurrentStatus = STATUS_SHIP_NEAR_CENTER;
                         secureZoneIndex = 0;
