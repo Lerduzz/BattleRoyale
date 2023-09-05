@@ -155,8 +155,8 @@ void BattleRoyaleMgr::HandleReleaseGhost(Player *player)
     if (ep_Players.find(guid) == ep_Players.end()) return;
     if (!player->IsAlive()) ResurrectPlayer(player);
     ExitFromPhaseEvent(guid);
-    ep_Players[guid]->TeleportTo(ep_PlayersData[guid].GetMap(), ep_PlayersData[guid].GetX(), ep_PlayersData[guid].GetY(), ep_PlayersData[guid].GetZ(), ep_PlayersData[guid].GetO());
-    ep_Players[guid]->SaveToDB(false, false);
+    player->TeleportTo(ep_PlayersData[guid].GetMap(), ep_PlayersData[guid].GetX(), ep_PlayersData[guid].GetY(), ep_PlayersData[guid].GetZ(), ep_PlayersData[guid].GetO());
+    player->SaveToDB(false, false);
     ep_Players.erase(guid);
 	ep_PlayersData.erase(guid);
 
