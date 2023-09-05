@@ -371,7 +371,7 @@ void BattleRoyaleMgr::NotifyTimeRemainingToStart(uint32 delay)
                 case 20:
                 case 25:
                 {
-                    (*it).second->GetSession()->SendNotification("|cff00ff00Faltan |cffDA70D6%u|cff00ff00 segundos para llegar. |cffff0000¡NO TE TIRES!", delay);
+                    (*it).second->GetSession()->SendNotification("|cff00ff00Faltan |cffDA70D6%u|cff00ff00 segundos para llegar. |cffff0000¡NO TE TIRES!", delay - 5);
                     break;
                 }
                 case 30:
@@ -383,7 +383,7 @@ void BattleRoyaleMgr::NotifyTimeRemainingToStart(uint32 delay)
                 {
                     if (delay > 30 && delay <= 60)
                     {
-                        (*it).second->GetSession()->SendNotification("|cff00ff00Faltan |cffDA70D6%u|cff00ff00 segundos para encender motores. |cffff0000¡NO TE TIRES!", delay);
+                        (*it).second->GetSession()->SendNotification("|cff00ff00Faltan |cffDA70D6%u|cff00ff00 segundos para encender motores. |cffff0000¡NO TE TIRES!", delay - 30);
                     }
                     else 
                     {
