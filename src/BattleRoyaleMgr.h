@@ -163,7 +163,7 @@ private:
     int eventMaxPlayers;
 
     int secondsTicksHelper;
-    int summonRemainingTime;
+    int startRemainingTime;
 
     int summonOffsetIndex;    
 };

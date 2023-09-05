@@ -118,7 +118,7 @@ void BattleRoyaleMgr::TeleportToEvent(uint32 guid)
 	if (!guid)
 	{
         if (eventCurrentStatus != STATUS_NO_ENOUGH_PLAYERS) return;
-        summonRemainingTime = 65;
+        startRemainingTime = 65;
         eventCurrentStatus = STATUS_SUMMONING_PLAYERS;
         for (BattleRoyalePlayerQueue::iterator it = ep_PlayersQueue.begin(); it != ep_PlayersQueue.end(); ++it)
 		{
@@ -211,15 +211,15 @@ void BattleRoyaleMgr::HandleOnWoldUpdate(uint32 diff)
         {
             if (secondsTicksHelper <= 0) {
                 secondsTicksHelper = 1000;
-                if (summonRemainingTime <= 0) {
+                if (startRemainingTime <= 0) {
                     NotifyTimeRemainingToStart(0);
                     secureZoneDelay = 60000;
                     StartEvent(0);
                 } else {
-                    if (summonRemainingTime % 5 == 0) {
-                        NotifyTimeRemainingToStart(srt);
+                    if (startRemainingTime % 5 == 0) {
+                        NotifyTimeRemainingToStart(startRemainingTime);
                     }
-                    if (eventCurrentStatus == STATUS_SUMMONING_PLAYERS && summonRemainingTime <= 60)
+                    if (eventCurrentStatus == STATUS_SUMMONING_PLAYERS && startRemainingTime <= 60)
                     {
                         eventCurrentStatus = STATUS_SHIP_WAITING;
                         if (!SpawnTransportShip()) {
@@ -228,14 +228,14 @@ void BattleRoyaleMgr::HandleOnWoldUpdate(uint32 diff)
                         }
                         TeleportPlayersToShip();
                     }
-                    if (eventCurrentStatus == STATUS_SHIP_WAITING && summonRemainingTime <= 30 && go_TransportShip)
+                    if (eventCurrentStatus == STATUS_SHIP_WAITING && startRemainingTime <= 30 && go_TransportShip)
                     {
                         eventCurrentStatus = STATUS_SHIP_MOVING;
                         uint32_t const autoCloseTime = go_TransportShip->GetGOInfo()->GetAutoCloseTime() ? 10000u : 0u;
                         go_TransportShip->SetLootState(GO_READY);
                         go_TransportShip->UseDoorOrButton(autoCloseTime, false, nullptr);
                     }
-                    if (eventCurrentStatus == STATUS_SHIP_MOVING && summonRemainingTime <= 5)
+                    if (eventCurrentStatus == STATUS_SHIP_MOVING && startRemainingTime <= 5)
                     {
                         eventCurrentStatus = STATUS_SHIP_NEAR_CENTER;
                         secureZoneIndex = 0;
@@ -253,7 +253,7 @@ void BattleRoyaleMgr::HandleOnWoldUpdate(uint32 diff)
                         }
                         AddParachuteToAllPlayers();
                     }
-                    summonRemainingTime--;
+                    startRemainingTime--;
                 }
             } else {
                 secondsTicksHelper -= diff;
