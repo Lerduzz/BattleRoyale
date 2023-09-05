@@ -276,8 +276,11 @@ void BattleRoyaleMgr::HandleOnWoldUpdate(uint32 diff)
 
 bool BattleRoyaleMgr::ForceFFAPvPFlag(Player* player)
 {
-    if (eventCurrentStatus != STATUS_BATTLE_STARTED || ep_Players.find(player->GetGUID().GetCounter()) == ep_Players.end()) return false;
-    return !(go_TransportShip && player->GetTransport() && player->GetExactDist(go_TransportShip) < 25.0f);
+    if (ep_Players.size())
+    {
+        if (eventCurrentStatus != STATUS_BATTLE_STARTED || ep_Players.find(player->GetGUID().GetCounter()) == ep_Players.end()) return false;
+        return !(go_TransportShip && player->GetTransport() && player->GetExactDist(go_TransportShip) < 25.0f);
+    }
 }
 
 bool BattleRoyaleMgr::RestrictPlayerFunctions(Player* player)
@@ -608,6 +611,15 @@ void BattleRoyaleMgr::AddFFAPvPFlag()
             }
         }
     }
+}
+
+void BattleRoyaleMgr::PreventPvPBeforeBattle(Player *player, bool state)
+{
+    /*if (state == true && !sBattleRoyaleMgr->ForceFFAPvPFlag(player))
+    {
+        player->SetPvP(false);
+    }*/
+    if (state == true) player->SetPvP(false);
 }
 
 /**

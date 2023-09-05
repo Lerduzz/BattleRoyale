@@ -142,6 +142,7 @@ private:
     void AddParachuteToAllPlayers();
     void OutOfZoneDamage();
     void AddFFAPvPFlag();
+    void PreventPvPBeforeBattle(Player* player, bool state);
     void ResetFullEvent();
     
     BattleRoyalePlayerList ep_PlayersQueue;

@@ -60,10 +60,19 @@ public:
 	}
 
     bool BRForcePlayerFFAPvPFlag(Player* player) override {
-        if (sConfigMgr->GetOption<bool>("BattleRoyale.Enabled", true)) {
+        if (sConfigMgr->GetOption<bool>("BattleRoyale.Enabled", true))
+        {
             return sBattleRoyaleMgr->ForceFFAPvPFlag(player);
         }
         return false;
+    }
+
+    void OnPlayerPVPFlagChange(Player* player, bool state) override
+    {
+        if (sConfigMgr->GetOption<bool>("BattleRoyale.Enabled", true))
+        {
+            sBattleRoyaleMgr->PreventPvPBeforeBattle(player, state);
+        }
     }
 
     // -- RESTRICCIONES DE PERSONAJE -- //
