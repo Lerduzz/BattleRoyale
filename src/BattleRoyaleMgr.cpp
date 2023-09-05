@@ -340,7 +340,7 @@ void BattleRoyaleMgr::HandleOnWoldUpdate(uint32 diff)
             if (secureZoneDelay <= 0) {
                 SpawnSecureZone();
                 NotifySecureZoneReduced();
-                secureZoneDelay = 60000;
+                secureZoneDelay = 10000; // TODO: Configurable (Default = 60000).
                 secureZoneAnnounced = false;
             } else {
                 if (secureZoneDelay <= 5000 && !secureZoneAnnounced) {

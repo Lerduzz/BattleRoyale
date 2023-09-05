@@ -2,8 +2,8 @@ SET
 @Entry 		:= 500000,
 @DisplayID  := 8612,
 @Name       := 'Zona Segura BR';
-DELETE FROM `gameobject_template` WHERE `entry` >= @Entry+0 AND `entry` < @Entry+11;
-DELETE FROM `gameobject_template_addon` WHERE `entry` >= @Entry+0 AND `entry` < @Entry+11;
+DELETE FROM `gameobject_template` WHERE `entry` >= @Entry+0 AND `entry` <= @Entry+12;
+DELETE FROM `gameobject_template_addon` WHERE `entry` >= @Entry+0 AND `entry` <= @Entry+12;
 
 -- Centro de la partida: se puede intentar poner un AZ de luz.
 INSERT INTO `gameobject_template` (`entry`, `displayId`, `name`, `size`, `type`) VALUES (@Entry+0, 0, "Centro Invisible BR", 1.0, 5);
