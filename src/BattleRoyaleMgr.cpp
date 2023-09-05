@@ -27,54 +27,54 @@ const float BRZonesShipStart[BRMapCount][4] =
 const float ShipOffsets[BROffsetsCount][2] = 
 {
     { 0.0f, 0.0f },
-    { 0.0f, 0.5f },
-    { 0.0f, 1.0f },
     { 0.0f, 1.5f },
-    { 0.0f, -0.5f },
-    { 0.0f, -1.0f },
+    { 0.0f, 3.0f },
+    { 0.0f, 4.5f },
     { 0.0f, -1.5f },
-    { 0.5f, 0.0f },
-    { 0.5f, 0.5f },
-    { 0.5f, 1.0f },
-    { 0.5f, 1.5f },
-    { 0.5f, -0.5f },
-    { 0.5f, -1.0f },
-    { 0.5f, -1.5f },
-    { 1.0f, 0.0f },
-    { 1.0f, 0.5f },
-    { 1.0f, 1.0f },
-    { 1.0f, 1.5f },
-    { 1.0f, -0.5f },
-    { 1.0f, -1.0f },
-    { 1.0f, -1.5f },
+    { 0.0f, -3.0f },
+    { 0.0f, -4.5f },
     { 1.5f, 0.0f },
-    { 1.5f, 0.5f },
-    { 1.5f, 1.0f },
     { 1.5f, 1.5f },
-    { 1.5f, -0.5f },
-    { 1.5f, -1.0f },
+    { 1.5f, 3.0f },
+    { 1.5f, 4.5f },
     { 1.5f, -1.5f },
-    { -0.5f, 0.0f },
-    { -0.5f, 0.5f },
-    { -0.5f, 1.0f },
-    { -0.5f, 1.5f },
-    { -0.5f, -0.5f },
-    { -0.5f, -1.0f },
-    { -0.5f, -1.5f },
-    { -1.0f, 0.0f },
-    { -1.0f, 0.5f },
-    { -1.0f, 1.0f },
-    { -1.0f, 1.5f },
-    { -1.0f, -0.5f },
-    { -1.0f, -1.0f },
-    { -1.0f, -1.5f },
+    { 1.5f, -3.0f },
+    { 1.5f, -4.5f },
+    { 3.0f, 0.0f },
+    { 3.0f, 1.5f },
+    { 3.0f, 3.0f },
+    { 3.0f, 4.5f },
+    { 3.0f, -1.5f },
+    { 3.0f, -3.0f },
+    { 3.0f, -4.5f },
+    { 4.5f, 0.0f },
+    { 4.5f, 1.5f },
+    { 4.5f, 3.0f },
+    { 4.5f, 4.5f },
+    { 4.5f, -1.5f },
+    { 4.5f, -3.0f },
+    { 4.5f, -4.5f },
     { -1.5f, 0.0f },
-    { -1.5f, 0.5f },
-    { -1.5f, 1.0f },
     { -1.5f, 1.5f },
-    { -1.5f, -0.5f },
-    { -1.5f, -1.0f },
-    { -1.5f, -1.5f }
+    { -1.5f, 3.0f },
+    { -1.5f, 4.5f },
+    { -1.5f, -1.5f },
+    { -1.5f, -3.0f },
+    { -1.5f, -4.5f },
+    { -3.0f, 0.0f },
+    { -3.0f, 1.5f },
+    { -3.0f, 3.0f },
+    { -3.0f, 4.5f },
+    { -3.0f, -1.5f },
+    { -3.0f, -3.0f },
+    { -3.0f, -4.5f },
+    { -4.5f, 0.0f },
+    { -4.5f, 1.5f },
+    { -4.5f, 3.0f },
+    { -4.5f, 4.5f },
+    { -4.5f, -1.5f },
+    { -4.5f, -3.0f },
+    { -4.5f, -4.5f }
 };
 
 const float BRSecureZoneZPlus[10] = { 
@@ -636,8 +636,8 @@ void BattleRoyaleMgr::TeleportPlayerBeforeShip(uint32 guid)
 {
     if (ep_Players.find(guid) != ep_Players.end())
     {
-        float ox = ShipOffsets[summonOffsetIndex][0] * 3;
-        float oy = ShipOffsets[summonOffsetIndex][1] * 3;
+        float ox = ShipOffsets[summonOffsetIndex][0];
+        float oy = ShipOffsets[summonOffsetIndex][1];
         summonOffsetIndex++;
         if (summonOffsetIndex >= BROffsetsCount) summonOffsetIndex = 0;
         ep_Players[guid]->TeleportTo(BRMapID[rotationMapIndex], BRZonesShipStart[rotationMapIndex][0] + ox, BRZonesShipStart[rotationMapIndex][1] + oy, BRZonesShipStart[rotationMapIndex][2] + 15.0f, 0.0f);
@@ -654,8 +654,8 @@ void BattleRoyaleMgr::TeleportPlayerToShip(uint32 guid)
 {
     if (ep_Players.find(guid) != ep_Players.end())
     {
-        float ox = ShipOffsets[summonOffsetIndex][0] * 3;
-        float oy = ShipOffsets[summonOffsetIndex][1] * 3;
+        float ox = ShipOffsets[summonOffsetIndex][0];
+        float oy = ShipOffsets[summonOffsetIndex][1];
         summonOffsetIndex++;
         if (summonOffsetIndex >= BROffsetsCount) summonOffsetIndex = 0;
         ep_Players[guid]->TeleportTo(BRMapID[rotationMapIndex], BRZonesShipStart[rotationMapIndex][0] + ox, BRZonesShipStart[rotationMapIndex][1] + oy, BRZonesShipStart[rotationMapIndex][2] + 1.5f, 0.0f);
