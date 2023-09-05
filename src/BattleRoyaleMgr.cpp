@@ -118,7 +118,7 @@ void BattleRoyaleMgr::TeleportToEvent(uint32 guid)
 	if (!guid)
 	{
         if (eventCurrentStatus != STATUS_NO_ENOUGH_PLAYERS) return;
-        summonRemainingTime = 60;
+        summonRemainingTime = 65;
         eventCurrentStatus = STATUS_SUMMONING_PLAYERS;
         for (BattleRoyalePlayerQueue::iterator it = ep_PlayersQueue.begin(); it != ep_PlayersQueue.end(); ++it)
 		{
@@ -216,11 +216,10 @@ void BattleRoyaleMgr::HandleOnWoldUpdate(uint32 diff)
                     secureZoneDelay = 60000;
                     StartEvent(0);
                 } else {
-                    int srt = summonRemainingTime;
-                    if (srt == 5 || srt == 10 || srt == 15 || srt == 20 || srt == 25 || srt == 30 || srt == 35 || srt == 40 || srt == 45 || srt == 50 || srt == 55 || srt == 60) {
+                    if (summonRemainingTime % 5 == 0) {
                         NotifyTimeRemainingToStart(srt);
                     }
-                    if (eventCurrentStatus == STATUS_SUMMONING_PLAYERS && summonRemainingTime <= 55)
+                    if (eventCurrentStatus == STATUS_SUMMONING_PLAYERS && summonRemainingTime <= 60)
                     {
                         eventCurrentStatus = STATUS_SHIP_WAITING;
                         if (!SpawnTransportShip()) {
@@ -345,14 +344,53 @@ void BattleRoyaleMgr::NotifySecureZoneReduced()
     }
 }
 
+/**
+ * @brief Sistema de notificaciones previas a la batalla.
+ * 
+ * @param delay 
+ */
 void BattleRoyaleMgr::NotifyTimeRemainingToStart(uint32 delay)
 {
-    if (ep_Players.size()){
+    if (ep_Players.size())
+    {
         for (BattleRoyalePlayerList::iterator it = ep_Players.begin(); it != ep_Players.end(); ++it) {
-            if (delay == 0){
-                (*it).second->GetSession()->SendNotification("|cff00ff00¡Que comience la batalla de |cffDA70D6%s|cff00ff00!", BRZonesNames[rotationMapIndex]);
-            } else {
-                (*it).second->GetSession()->SendNotification("|cff00ff00¡La batalla iniciará en |cffDA70D6%u|cff00ff00 segundos!", delay);
+            switch (delay)
+            {
+                case 0:
+                {
+                    (*it).second->GetSession()->SendNotification("|cff00ff00¡Que comience la batalla de |cffDA70D6%s|cff00ff00!", BRZonesNames[rotationMapIndex]);
+                    break;
+                }                
+                case 5:
+                {
+                    (*it).second->GetSession()->SendNotification("|cff00ff00Ya tienes paracaidas. |cff0000ff¡PUEDES SALTAR!");
+                    break;
+                }                
+                case 10:
+                case 15:
+                case 20:
+                case 25:
+                {
+                    (*it).second->GetSession()->SendNotification("|cff00ff00Faltan |cffDA70D6%u|cff00ff00 segundos para llegar. |cffff0000¡NO TE TIRES!", delay);
+                    break;
+                }
+                case 30:
+                {
+                    (*it).second->GetSession()->SendNotification("|cff00ff00La nave comienza a moverse. |cffff0000¡NO TE TIRES!");
+                    break;
+                }
+                default:
+                {
+                    if (delay > 30 && delay <= 60)
+                    {
+                        (*it).second->GetSession()->SendNotification("|cff00ff00Faltan |cffDA70D6%u|cff00ff00 segundos para encender motores. |cffff0000¡NO TE TIRES!", delay);
+                    }
+                    else 
+                    {
+                        (*it).second->GetSession()->SendNotification("|cff00ff00No tengas miedo. |cff0000ff¡LLEGANDO A LA NAVE!");
+                    }
+                    break;
+                }
             }
         }
     }
