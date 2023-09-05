@@ -116,6 +116,7 @@ public:
     
     void HandlePlayerJoin(Player *player);
     void HandlePlayerLogout(Player *player);
+    void HandleOnPVPLill(Player* killer, Player* killed);
     bool HandleReleaseGhost(Player *player);
     void HandleOnWoldUpdate(uint32 diff);
     void TeleportToEvent(uint32 guid);

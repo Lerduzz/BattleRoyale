@@ -97,6 +97,48 @@ void BattleRoyaleMgr::HandlePlayerLogout(Player *player)
     }
 }
 
+void BattleRoyaleMgr::HandleOnPVPLill(Player *killer, Player *killed)
+{
+    if (!killer || !killed) return;
+    if (!ep_Players.size() || eventCurrentStatus != STATUS_IN_PROGRESS) return;
+    uint32 guid_r = killer->GetGUID().GetCounter();
+    uint32 guid_d = killer->GetGUID().GetCounter();
+    if (ep_Players.find(guid_r) == ep_Players.end() || ep_Players.find(guid_d) == ep_Players.end()) return;
+    killer->CastSpell(killed, 6277, true);
+}
+
+/**
+ * @brief Decide si se debe retornar al jugador o dejar que valla al cementerio.
+ * 
+ * @param player 
+ * @return true: Retornado!
+ * @return false: Dejar por defecto!
+ */
+bool BattleRoyaleMgr::HandleReleaseGhost(Player *player)
+{
+    if (!ep_Players.size()) return false;
+    uint32 guid = player->GetGUID().GetCounter();
+    if (ep_Players.find(guid) == ep_Players.end()) return false;
+    if (!player->isPossessing())
+    {
+        player->StopCastingBindSight();
+    }    
+    if (!player->IsAlive()) ResurrectPlayer(player);
+    ExitFromPhaseEvent(guid);
+    player->TeleportTo(ep_PlayersData[guid].GetMap(), ep_PlayersData[guid].GetX(), ep_PlayersData[guid].GetY(), ep_PlayersData[guid].GetZ(), ep_PlayersData[guid].GetO());
+    player->SaveToDB(false, false);
+    ep_Players.erase(guid);
+	ep_PlayersData.erase(guid);
+    
+    // TEMP: Finalizar evento al no quedar nadie en el.
+    if (!ep_Players.size())
+    {
+        eventCurrentStatus = STATUS_NO_ENOUGH_PLAYERS;
+    }
+
+    return true;
+}
+
 /**
  * @brief Teletransporta todos los personajes al aire sobre el spawn de la nave. / De manera individual elije si mandar a un personaje a la nave o encima en el aire.
  * 
@@ -141,34 +183,6 @@ void BattleRoyaleMgr::TeleportToEvent(uint32 guid)
             ep_PlayersQueue.erase(guid);
         }
 	}
-}
-
-/**
- * @brief Decide si se debe retornar al jugador o dejar que valla al cementerio.
- * 
- * @param player 
- * @return true: Retornado!
- * @return false: Dejar por defecto!
- */
-bool BattleRoyaleMgr::HandleReleaseGhost(Player *player)
-{
-    if (!ep_Players.size()) return false;
-    uint32 guid = player->GetGUID().GetCounter();
-    if (ep_Players.find(guid) == ep_Players.end()) return false;
-    if (!player->IsAlive()) ResurrectPlayer(player);
-    ExitFromPhaseEvent(guid);
-    player->TeleportTo(ep_PlayersData[guid].GetMap(), ep_PlayersData[guid].GetX(), ep_PlayersData[guid].GetY(), ep_PlayersData[guid].GetZ(), ep_PlayersData[guid].GetO());
-    player->SaveToDB(false, false);
-    ep_Players.erase(guid);
-	ep_PlayersData.erase(guid);
-    
-    // TEMP: Finalizar evento al no quedar nadie en el.
-    if (!ep_Players.size())
-    {
-        eventCurrentStatus = STATUS_NO_ENOUGH_PLAYERS;
-    }
-
-    return true;
 }
 
 void BattleRoyaleMgr::HandleOnWoldUpdate(uint32 diff)

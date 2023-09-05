@@ -41,6 +41,14 @@ public:
         }
     }
 
+    void OnPVPKill(Player* killer, Player* killed) override
+    {
+        if (sConfigMgr->GetOption<bool>("BattleRoyale.Enabled", true))
+        {
+            sBattleRoyaleMgr->HandleOnPVPLill(killer, killed);
+        }
+    }
+
     bool CanRepopAtGraveyard(Player *player) override
 	{
         if (sConfigMgr->GetOption<bool>("BattleRoyale.Enabled", true))
