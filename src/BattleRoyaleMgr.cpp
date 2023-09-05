@@ -305,7 +305,7 @@ void BattleRoyaleMgr::HandleOnWoldUpdate(uint32 diff)
                         go_TransportShip->SetLootState(GO_READY);
                         go_TransportShip->UseDoorOrButton(autoCloseTime, false, nullptr);
                     }
-                    if (eventCurrentStatus == STATUS_SHIP_MOVING && summonRemainingTime <= 15)
+                    if (eventCurrentStatus == STATUS_SHIP_MOVING && summonRemainingTime <= 10)
                     {
                         eventCurrentStatus = STATUS_SHIP_NEAR_CENTER;
                         secureZoneIndex = 0;
@@ -321,6 +321,7 @@ void BattleRoyaleMgr::HandleOnWoldUpdate(uint32 diff)
                             ResetFullEvent();
                             return;
                         }
+                        AddParachuteToAllPlayers();
                     }
                     summonRemainingTime--;
                 }
@@ -593,6 +594,22 @@ void BattleRoyaleMgr::Dismount(Player* player)
             player->RemoveAurasByType(SPELL_AURA_MOUNTED);
             player->SetSpeed(MOVE_RUN, 1, true);
             player->SetSpeed(MOVE_FLIGHT, 1, true);
+        }
+    }
+}
+
+/**
+ * @brief Coloca un paracaidas a todos los participantes del evento (en la nave) que se activa al estar en el aire.
+ * 
+ */
+void BattleRoyaleMgr::AddParachuteToAllPlayers()
+{
+    if (ep_Players.size())
+    {
+        for (BattleRoyalePlayerList::iterator it = ep_Players.begin(); it != ep_Players.end(); ++it)
+        {
+            // TODO: Condiciones para poner el paracaidas (Que exista, que se encuentre en la nave).
+            (*it).second->AddAura(SPELL_PARACHUTE_DALARAN, (*it).second);
         }
     }
 }

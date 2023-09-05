@@ -141,6 +141,7 @@ private:
     void TeleportPlayerToShip(uint32 guid);
     void TeleportPlayersToShip();
     void Dismount(Player* player);
+    void AddParachuteToAllPlayers();
     void OutOfZoneDamage();
     void ResetFullEvent();
     
