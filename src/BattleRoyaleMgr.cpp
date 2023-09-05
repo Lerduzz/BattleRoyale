@@ -4,7 +4,7 @@
 #include "Player.h"
 
 // -- CONSTANTES -- //
-const int secureZoneUpdateInterval = 10000; // TODO: Configuracion (defaul: 60000).
+const int secureZoneUpdateInterval = 60000; // TODO: Configuracion (defaul: 60000).
 
 const int BRMapCount = 1;
 const int BRMapID[BRMapCount] = { 1 };
@@ -104,7 +104,9 @@ void BattleRoyaleMgr::HandleOnPVPLill(Player *killer, Player *killed)
     uint32 guid_r = killer->GetGUID().GetCounter();
     uint32 guid_d = killer->GetGUID().GetCounter();
     if (ep_Players.find(guid_r) == ep_Players.end() || ep_Players.find(guid_d) == ep_Players.end()) return;
-    killer->CastSpell(killed, 6277, true);
+    killed->CastSpell(killer, 6277, true);
+    ChatHandler handler = ChatHandler(killer->GetSession());
+    NotifyPvPKill(handler.GetNameLink(killer), handler.GetNameLink(killed));
 }
 
 /**
@@ -122,7 +124,7 @@ bool BattleRoyaleMgr::HandleReleaseGhost(Player *player)
     if (!player->isPossessing())
     {
         player->StopCastingBindSight();
-    }    
+    }
     if (!player->IsAlive()) ResurrectPlayer(player);
     ExitFromPhaseEvent(guid);
     player->TeleportTo(ep_PlayersData[guid].GetMap(), ep_PlayersData[guid].GetX(), ep_PlayersData[guid].GetY(), ep_PlayersData[guid].GetZ(), ep_PlayersData[guid].GetO());
@@ -381,6 +383,24 @@ void BattleRoyaleMgr::NotifyTimeRemainingToStart(uint32 delay)
                     break;
                 }
             }
+        }
+    }
+}
+
+/**
+ * @brief Notifica los KILL JcJ.
+ * 
+ * @param handler 
+ * @param killer 
+ * @param killed 
+ */
+void BattleRoyaleMgr::NotifyPvPKill(std::string killer, std::string killed)
+{
+    if (ep_Players.size())
+    {
+        for (BattleRoyalePlayerList::iterator it = ep_Players.begin(); it != ep_Players.end(); ++it)
+        {
+            ChatHandler((*it).second->GetSession()).PSendSysMessage("|cff4CFF00BattleRoyale::|r ¡%s ha eliminado a %s!.", killer, killed);
         }
     }
 }
