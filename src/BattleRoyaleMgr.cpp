@@ -518,9 +518,13 @@ void BattleRoyaleMgr::StorePlayerStartPosition(uint32 guid)
     if (ep_Players.find(guid) != ep_Players.end())
     {
         if (ep_Players[guid]->GetMap()->Instanceable())
+        {
             ep_PlayersData[guid].SetPosition(ep_Players[guid]->m_homebindMapId, ep_Players[guid]->m_homebindX, ep_Players[guid]->m_homebindY, ep_Players[guid]->m_homebindZ, ep_Players[guid]->GetOrientation());
+        }            
         else
+        {
             ep_PlayersData[guid].SetPosition(ep_Players[guid]->GetMapId(), ep_Players[guid]->GetPositionX(), ep_Players[guid]->GetPositionY(), ep_Players[guid]->GetPositionZ(), ep_Players[guid]->GetOrientation());
+        }
     }
 }
 
@@ -537,6 +541,7 @@ void BattleRoyaleMgr::TeleportPlayerBeforeShip(uint32 guid)
         float oy = ShipOffsets[summonOffsetIndex][1];
         summonOffsetIndex++;
         if (summonOffsetIndex >= BROffsetsCount) summonOffsetIndex = 0;
+        Dismount(ep_Players[guid]);
         ep_Players[guid]->TeleportTo(BRMapID[rotationMapIndex], BRZonesShipStart[rotationMapIndex][0] + ox, BRZonesShipStart[rotationMapIndex][1] + oy, BRZonesShipStart[rotationMapIndex][2] + 15.0f, 0.0f);
         ep_Players[guid]->AddAura(SPELL_PARACHUTE_DALARAN, ep_Players[guid]);
     }
@@ -555,6 +560,7 @@ void BattleRoyaleMgr::TeleportPlayerToShip(uint32 guid)
         float oy = ShipOffsets[summonOffsetIndex][1];
         summonOffsetIndex++;
         if (summonOffsetIndex >= BROffsetsCount) summonOffsetIndex = 0;
+        Dismount(ep_Players[guid]);
         ep_Players[guid]->TeleportTo(BRMapID[rotationMapIndex], BRZonesShipStart[rotationMapIndex][0] + ox, BRZonesShipStart[rotationMapIndex][1] + oy, BRZonesShipStart[rotationMapIndex][2] + 1.5f, 0.0f);
     }
 }
@@ -569,6 +575,25 @@ void BattleRoyaleMgr::TeleportPlayersToShip()
     for (BattleRoyalePlayerList::iterator it = ep_Players.begin(); it != ep_Players.end(); ++it)
     {
         TeleportPlayerToShip((*it).first);
+    }
+}
+
+/**
+ * @brief Desmonta a un personaje si se encuentra montado y no es en ruta de vuelo.
+ * 
+ * @param player 
+ */
+void BattleRoyaleMgr::Dismount(Player* player)
+{
+    if (player && player->IsMounted())
+    {
+        if (!player->IsInFlight())
+        {
+            player->Dismount();
+            player->RemoveAurasByType(SPELL_AURA_MOUNTED);
+            player->SetSpeed(MOVE_RUN, 1, true);
+            player->SetSpeed(MOVE_FLIGHT, 1, true);
+        }
     }
 }
 

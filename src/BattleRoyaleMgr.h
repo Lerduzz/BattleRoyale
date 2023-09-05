@@ -140,6 +140,7 @@ private:
     void TeleportPlayerBeforeShip(uint32 guid);
     void TeleportPlayerToShip(uint32 guid);
     void TeleportPlayersToShip();
+    void Dismount(Player* player);
     void OutOfZoneDamage();
     void ResetFullEvent();
     
