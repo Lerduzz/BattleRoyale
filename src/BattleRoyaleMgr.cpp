@@ -76,12 +76,10 @@ void BattleRoyaleMgr::GestionarJugadorDesconectar(Player* player)
 
 void BattleRoyaleMgr::GestionarMuerteJcJ(Player* killer, Player* killed)
 {
-    if (!killer || !killed) return;
-    if (!list_Jugadores.size() || estadoActual != ESTADO_BATALLA_EN_CURSO) return;
-    if (!EstaEnEvento(killer) || !EstaEnEvento(killed)) return;
+    if (!killer || !killed || !HayJugadores() || estadoActual != ESTADO_BATALLA_EN_CURSO || killer == killed || !EstaEnEvento(killer) || !EstaEnEvento(killed)) return;
     list_Datos[killer->GetGUID().GetCounter()].kills++;
     killed->CastSpell(killer, 6277, true);
-    NotificarMuerteJcJ(ChatHandler(killer->GetSession()).GetNameLink(killer), ChatHandler(killed->GetSession()).GetNameLink(killed), list_Datos[killer->GetGUID().GetCounter()].kills);
+    NotificarMuerteJcJ(Chat(killer).GetNameLink(killer), Chat(killed).GetNameLink(killed), list_Datos[killer->GetGUID().GetCounter()].kills);
 }
 
 void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
@@ -482,7 +480,7 @@ void BattleRoyaleMgr::CondicionDeVictoria()
                     if ((*it).second && (*it).second->IsAlive())
                     {
                         std::ostringstream msg;
-                        msg << "|cff4CFF00BattleRoyale::|r La ronda ha finalizado, el ganador ha sido " << Chat((*it).second).GetNameLink((*it).second) << " y ha eliminado a |cff4CFF00" << list_Datos[(*it).first].kills << "|r.";
+                        msg << "|cff4CFF00BattleRoyale::|r La ronda ha finalizado, el ganador ha sido " << Chat((*it).second).GetNameLink((*it).second) << " eliminando a |cff0000ff" << list_Datos[(*it).first].kills << "|r.";
                         sWorld->SendServerMessage(SERVER_MSG_STRING, msg.str().c_str());
                     }
                     SalirDelEvento((*it).first);
