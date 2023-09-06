@@ -480,7 +480,7 @@ void BattleRoyaleMgr::CondicionDeVictoria()
                     if ((*it).second && (*it).second->IsAlive())
                     {
                         std::ostringstream msg;
-                        msg << "|cff4CFF00BattleRoyale::|r La ronda ha finalizado, el ganador ha sido " << Chat((*it).second).GetNameLink((*it).second) << " eliminando a |cff0000ff" << list_Datos[(*it).first].kills << "|r.";
+                        msg << "|cff4CFF00BattleRoyale::|r Ronda ha finalizado, ganador: " << Chat((*it).second).GetNameLink((*it).second) << ", racha: |cff0000ff" << list_Datos[(*it).first].kills << "|r.";
                         sWorld->SendServerMessage(SERVER_MSG_STRING, msg.str().c_str());
                     }
                     SalirDelEvento((*it).first);
