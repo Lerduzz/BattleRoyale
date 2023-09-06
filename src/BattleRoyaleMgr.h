@@ -15,7 +15,7 @@ typedef std::map<uint32, BattleRoyaleData> BR_DatosDePersonajes;
 
 enum BR_EstadosEvento
 {
-    ESTADO_NO_SUFICIENTES_JUGADORES         = 0,
+    ESTADO_NO_HAY_SUFICIENTES_JUGADORES     = 0,
     ESTADO_INVOCANDO_JUGADORES              = 1,
     ESTADO_NAVE_EN_ESPERA                   = 2,
     ESTADO_NAVE_EN_MOVIMIENTO               = 3,
@@ -80,17 +80,26 @@ public:
         return instance;
     }
     
-    void GestionarJugadorEntrando(Player *player);
-    void GestionarJugadorDesconectar(Player *player);
+    void GestionarJugadorEntrando(Player* player);
+    void GestionarJugadorDesconectar(Player* player);
     void GestionarMuerteJcJ(Player* killer, Player* killed);
     void GestionarActualizacionMundo(uint32 diff);
     void PrevenirJcJEnLaNave(Player* player, bool state);
-    bool PuedeReaparecerEnCementerio(Player *player);
-    bool DebeRestringirFunciones(Player* player) { return eventCurrentStatus > ESTADO_NO_SUFICIENTES_JUGADORES && IsInEvent(player); };
-    bool DebeForzarJcJTcT(Player* player) { return !(eventCurrentStatus != ESTADO_BATALLA_EN_CURSO || !HayJugadores() || !IsInEvent(player)) || !(obj_Nave && player->GetTransport() && player->GetExactDist(obj_Nave) < 25.0f); };
+    bool PuedeReaparecerEnCementerio(Player* player);
+    bool DebeRestringirFunciones(Player* player) { return estadoActual > ESTADO_NO_HAY_SUFICIENTES_JUGADORES && EstaEnEvento(player); };
+    bool DebeForzarJcJTcT(Player* player) { return !(estadoActual != ESTADO_BATALLA_EN_CURSO || !HayJugadores() || !EstaEnEvento(player)) || !(obj_Nave && player->GetTransport() && player->GetExactDist(obj_Nave) < 25.0f); };
     
 private:
     void RestablecerTodoElEvento();
+    void IniciarNuevaRonda();
+    void AlmacenarPosicionInicial(uint32 guid);
+    void LlamarAntesQueNave(uint32 guid);
+    
+
+
+
+
+
     void TeleportToEvent(uint32 guid);
     void EnterToPhaseEvent(uint32 guid);
     void ExitFromPhaseEvent(uint32 guid);
@@ -102,8 +111,6 @@ private:
     bool SpawnTransportShip();
     bool SpawnTheCenterOfBattle();
     bool SpawnSecureZone();
-    void StorePlayerStartPosition(uint32 guid);
-    void TeleportPlayerBeforeShip(uint32 guid);
     void TeleportPlayerToShip(uint32 guid);
     void TeleportPlayersToShip();
     void Dismount(Player* player);
@@ -111,35 +118,45 @@ private:
     void OutOfZoneDamage();
     void AddFFAPvPFlag();
     void ExitFromEvent(uint32 guid, bool logout = false);
-    bool IsInQueue(Player* player) { return ep_PlayersQueue.find(player->GetGUID().GetCounter()) != ep_PlayersQueue.end(); };
-    bool IsInEvent(Player* player) { return ep_Players.find(player->GetGUID().GetCounter()) != ep_Players.end(); };
-    bool IsQueuedEnoughPlayers() { return ep_PlayersQueue.size() >= conf_JugadoresMinimo; };
-    bool IsEventFull() { return ep_Players.size() >= conf_JugadoresMaximo; };
-    bool HayJugadores() { return ep_Players.size() > 0; };
     
-    BR_ListaDePersonajes ep_PlayersQueue;
-    BR_ListaDePersonajes ep_Players;
-    BR_DatosDePersonajes ep_PlayersData;
+
+
+
+
+    bool HayJugadores() { return list_Jugadores.size() > 0; };
+    bool EstaEnCola(Player* player) { return list_Cola.find(player->GetGUID().GetCounter()) != list_Cola.end(); };
+    bool EstaEnEvento(Player* player) { return list_Jugadores.find(player->GetGUID().GetCounter()) != list_Jugadores.end(); };
+    bool EstaEnEvento(uint32 guid) { return list_Jugadores.find(guid) != list_Jugadores.end(); };
+    bool EstaLlenoElEvento() { return list_Jugadores.size() >= conf_JugadoresMaximo; };
+    bool HaySuficientesEnCola() { return list_Cola.size() >= conf_JugadoresMinimo; };
+    ChatHandler Chat(Player* player) { return ChatHandler(player->GetSession()); };
+    
+    BR_ListaDePersonajes list_Cola;
+    BR_ListaDePersonajes list_Jugadores;
+    BR_DatosDePersonajes list_Datos;
     
     GameObject* obj_Zona;
     GameObject* obj_Centro;    
     GameObject* obj_Nave;
 
-    int secureZoneIndex;
-    int secureZoneDelay;
-    bool secureZoneAnnounced;
-    
-    int rotationMapIndex;
-    int eventCurrentStatus;
-
-    int secondsTicksHelper;
-    int startRemainingTime;
-
-    int summonOffsetIndex;
+    int estadoActual;
+    int tiempoRestanteSeg;
 
     uint32 conf_JugadoresMinimo;
     uint32 conf_JugadoresMaximo;
     uint32 conf_IntervaloEntreRecuccionDeZona;
+
+
+    
+
+
+    int secureZoneIndex;
+    int secureZoneDelay;
+    bool secureZoneAnnounced;    
+    int rotationMapIndex;    
+    int secondsTicksHelper;
+    int summonOffsetIndex;
+
 };
 
 #define sBattleRoyaleMgr BattleRoyaleMgr::instance()
