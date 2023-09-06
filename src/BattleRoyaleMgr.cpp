@@ -514,7 +514,7 @@ void BattleRoyaleMgr::StorePlayerStartPosition(uint32 guid)
  */
 void BattleRoyaleMgr::TeleportPlayerBeforeShip(uint32 guid)
 {
-    
+    if (!ep_Players.size()) return;
     if (ep_Players.find(guid) != ep_Players.end())
     {
         float ox = ShipOffsets[summonOffsetIndex][0];
@@ -535,6 +535,7 @@ void BattleRoyaleMgr::TeleportPlayerBeforeShip(uint32 guid)
  */
 void BattleRoyaleMgr::TeleportPlayerToShip(uint32 guid)
 {
+    if (!ep_Players.size()) return;
     if (ep_Players.find(guid) != ep_Players.end())
     {
         float ox = ShipOffsets[summonOffsetIndex][0];
@@ -553,7 +554,7 @@ void BattleRoyaleMgr::TeleportPlayerToShip(uint32 guid)
  */
 void BattleRoyaleMgr::TeleportPlayersToShip()
 {
-    if (ep_Players.size() == 0) return;
+    if (!ep_Players.size()) return;
     for (BattleRoyalePlayerList::iterator it = ep_Players.begin(); it != ep_Players.end(); ++it)
     {
         TeleportPlayerToShip((*it).first);
