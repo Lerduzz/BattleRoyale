@@ -193,6 +193,7 @@ bool BattleRoyaleMgr::PuedeReaparecerEnCementerio(Player *player)
 {
     if (HayJugadores() && EstaEnEvento(player)) {
         SalirDelEvento(player->GetGUID().GetCounter());
+        return false;
     }
     return true;
 }
