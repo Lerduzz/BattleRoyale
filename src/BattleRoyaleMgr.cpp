@@ -103,11 +103,11 @@ void BattleRoyaleMgr::GestionarMuesteJcJ(Player *killer, Player *killed)
  * @return true: Retornado!
  * @return false: Dejar por defecto!
  */
-bool BattleRoyaleMgr::GestionarLiberarEspiritu(Player *player)
+bool BattleRoyaleMgr::PuedeReaparecerEnCementerio(Player *player)
 {
-    if (!ep_Players.size()) return false;
+    if (!ep_Players.size()) return true;
     uint32 guid = player->GetGUID().GetCounter();
-    if (ep_Players.find(guid) == ep_Players.end()) return false;
+    if (ep_Players.find(guid) == ep_Players.end()) return true;
     if (!player->isPossessing())
     {
         player->StopCastingBindSight();
@@ -125,7 +125,7 @@ bool BattleRoyaleMgr::GestionarLiberarEspiritu(Player *player)
         eventCurrentStatus = ESTADO_NO_SUFICIENTES_JUGADORES;
     }
 
-    return true;
+    return false;
 }
 
 /**
@@ -267,7 +267,7 @@ bool BattleRoyaleMgr::ForceFFAPvPFlag(Player* player)
     return !(go_TransportShip && player->GetTransport() && player->GetExactDist(go_TransportShip) < 25.0f);
 }
 
-void BattleRoyaleMgr::PreventPvPBeforeBattle(Player* player, bool state)
+void BattleRoyaleMgr::PrevenirJcJEnLaNave(Player* player, bool state)
 {
     if (!state || !ep_Players.size()) return;
     if (ep_Players.find(player->GetGUID().GetCounter()) != ep_Players.end() && !ForceFFAPvPFlag(player)) player->SetPvP(false);

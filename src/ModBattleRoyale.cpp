@@ -53,7 +53,7 @@ public:
 	{
         if (sConfigMgr->GetOption<bool>("BattleRoyale.Enabled", true))
         {
-            return !sBattleRoyaleMgr->GestionarLiberarEspiritu(player);
+            return sBattleRoyaleMgr->PuedeReaparecerEnCementerio(player);
         }
         return true;
 	}
@@ -70,7 +70,7 @@ public:
     {
         if (sConfigMgr->GetOption<bool>("BattleRoyale.Enabled", true))
         {
-            sBattleRoyaleMgr->PreventPvPBeforeBattle(player, state);
+            sBattleRoyaleMgr->PrevenirJcJEnLaNave(player, state);
         }
     }
 

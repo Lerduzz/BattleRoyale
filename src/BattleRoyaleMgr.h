@@ -65,15 +65,16 @@ public:
     void GestionarJugadorEntrando(Player *player);
     void GestionarJugadorDesconectar(Player *player);
     void GestionarMuesteJcJ(Player* killer, Player* killed);
-    bool GestionarLiberarEspiritu(Player *player);
     void GestionarActualizacionMundo(uint32 diff);
-    void TeleportToEvent(uint32 guid);
+    void PrevenirJcJEnLaNave(Player* player, bool state);
+    bool PuedeReaparecerEnCementerio(Player *player);
     bool ForceFFAPvPFlag(Player* player);
-    void PreventPvPBeforeBattle(Player* player, bool state);
     bool RestrictPlayerFunctions(Player* player);
+    
 
     
 private:
+    void TeleportToEvent(uint32 guid);
     void EnterToPhaseEvent(uint32 guid);
     void ExitFromPhaseEvent(uint32 guid);
     void ResurrectPlayer(Player *player);
