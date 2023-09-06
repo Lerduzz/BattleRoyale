@@ -213,7 +213,17 @@ private:
             }
         }
     };
-        
+    void NotificarNaveRetirada()
+    {
+        if (HayJugadores())
+        {
+            for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
+            {
+                (*it).second->GetSession()->SendNotification("|cff0000ff¡La nave se ha retirado!");
+            }
+        }
+    };
+
     BR_ListaDePersonajes list_Cola;
     BR_ListaDePersonajes list_Jugadores;
     BR_DatosDePersonajes list_Datos;
@@ -223,8 +233,9 @@ private:
     GameObject* obj_Nave;
 
     int estadoActual;
-    int tiempoRestanteSeg;
+    int tiempoRestanteInicio;
     int tiempoRestanteZona;
+    int tiempoRestanteNave;
     int indiceDeVariacion;
     int indiceDelMapa;
     int indiceDeZona;

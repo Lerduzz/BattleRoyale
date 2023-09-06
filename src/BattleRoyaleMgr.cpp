@@ -95,15 +95,16 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
         {
             if (indicadorDeSegundos <= 0) {
                 indicadorDeSegundos = 1000;
-                if (tiempoRestanteSeg <= 0) {
+                if (tiempoRestanteInicio <= 0) {
                     estadoActual = ESTADO_BATALLA_EN_CURSO;
                     NotificarTiempoParaIniciar(0);
                     tiempoRestanteZona = conf_IntervaloEntreRecuccionDeZona;
+                    tiempoRestanteNave = 30;
                 } else {
-                    if (tiempoRestanteSeg % 5 == 0) {
-                        NotificarTiempoParaIniciar(tiempoRestanteSeg);
+                    if (tiempoRestanteInicio % 5 == 0) {
+                        NotificarTiempoParaIniciar(tiempoRestanteInicio);
                     }
-                    if (estadoActual == ESTADO_INVOCANDO_JUGADORES && tiempoRestanteSeg <= 60)
+                    if (estadoActual == ESTADO_INVOCANDO_JUGADORES && tiempoRestanteInicio <= 60)
                     {
                         estadoActual = ESTADO_NAVE_EN_ESPERA;
                         if (!InvocarNave()) {
@@ -112,14 +113,14 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
                         }
                         LlamarTodosDentroDeNave();
                     }
-                    if (estadoActual == ESTADO_NAVE_EN_ESPERA && tiempoRestanteSeg <= 30 && obj_Nave)
+                    if (estadoActual == ESTADO_NAVE_EN_ESPERA && tiempoRestanteInicio <= 30 && obj_Nave)
                     {
                         estadoActual = ESTADO_NAVE_EN_MOVIMIENTO;
                         uint32_t const autoCloseTime = obj_Nave->GetGOInfo()->GetAutoCloseTime() ? 10000u : 0u;
                         obj_Nave->SetLootState(GO_READY);
                         obj_Nave->UseDoorOrButton(autoCloseTime, false, nullptr);
                     }
-                    if (estadoActual == ESTADO_NAVE_EN_MOVIMIENTO && tiempoRestanteSeg <= 5)
+                    if (estadoActual == ESTADO_NAVE_EN_MOVIMIENTO && tiempoRestanteInicio <= 5)
                     {
                         estadoActual = ESTADO_NAVE_CERCA_DEL_CENTRO;
                         indiceDeZona = 0;
@@ -137,7 +138,7 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
                         }
                         PonerTodosLosParacaidas();
                     }
-                    tiempoRestanteSeg--;
+                    tiempoRestanteInicio--;
                 }
             } else {
                 indicadorDeSegundos -= diff;
@@ -151,6 +152,15 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
                 ControlDeReglas();
                 EfectoFueraDeZona();
                 ActivarJcJTcT();
+                if (--tiempoRestanteNave <= 0)
+                {
+                    if (obj_Nave) {
+                        obj_Nave->DespawnOrUnsummon();
+                        obj_Nave->Delete();
+                        obj_Nave = nullptr;
+                        NotificarNaveRetirada();
+                    }
+                }
             } else {
                 indicadorDeSegundos -= diff;
             }
@@ -220,7 +230,7 @@ void BattleRoyaleMgr::IniciarNuevaRonda()
     {
         estadoActual = ESTADO_INVOCANDO_JUGADORES;
         SiguienteMapa();
-        tiempoRestanteSeg = 70;
+        tiempoRestanteInicio = 70;
         for (BR_ColaDePersonajes::iterator it = list_Cola.begin(); it != list_Cola.end(); ++it)
 	    {
             if (!EstaLlenoElEvento())
@@ -438,8 +448,8 @@ void BattleRoyaleMgr::ControlDeReglas()
         {
             if ((*it).second && (*it).second->IsAlive())
             {
-                if ((*it).second->HasAura(31700)) SalirDelEvento((*it).first);                                   // 1. No utilizar vuelo mundial.
-                if (obj_Centro && (*it).second->GetExactDist(obj_Centro) > 650.0f) SalirDelEvento((*it).first);  // 2. No alejarse demasiado del centro.
+                if ((*it).second->HasAura(31700)) SalirDelEvento((*it).first);
+                if (obj_Centro && (*it).second->GetExactDist(obj_Centro) > 650.0f) SalirDelEvento((*it).first);
             }
         }
     }
