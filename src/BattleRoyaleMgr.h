@@ -115,13 +115,14 @@ private:
     int rotationMapIndex;
     int eventCurrentStatus;
 
-    uint32 eventMinPlayers;
-    uint32 eventMaxPlayers;
-
     int secondsTicksHelper;
     int startRemainingTime;
 
-    int summonOffsetIndex;    
+    int summonOffsetIndex;
+
+    uint32 eventMinPlayers;
+    uint32 eventMaxPlayers;
+    uint32 secureZoneUpdateInterval;
 };
 
 #define sBattleRoyaleMgr BattleRoyaleMgr::instance()

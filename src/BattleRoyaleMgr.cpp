@@ -3,8 +3,6 @@
 #include "Chat.h"
 #include "Player.h"
 
-const int secureZoneUpdateInterval = 60000; // TODO: Configuracion (defaul: 60000).
-
 const int BRMapCount = 1;
 const int BRMapID[BRMapCount] = { 1 };
 
@@ -27,6 +25,7 @@ BattleRoyaleMgr::BattleRoyaleMgr()
 {
     eventMinPlayers = sConfigMgr->GetOption<int32>("BattleRoyale.MinPlayers", 25);
     eventMaxPlayers = sConfigMgr->GetOption<int32>("BattleRoyale.MaxPlayers", 50);
+    secureZoneUpdateInterval = sConfigMgr->GetOption<int32>("BattleRoyale.SecureZoneInterval", 60000);
     go_SecureZone = nullptr;
     go_CenterOfBattle = nullptr;
     go_TransportShip = nullptr;
