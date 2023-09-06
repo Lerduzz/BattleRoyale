@@ -71,7 +71,7 @@ void BattleRoyaleMgr::GestionarJugadorEntrando(Player* player)
 
 void BattleRoyaleMgr::GestionarJugadorDesconectar(Player* player)
 {
-    if (EstaEnEvento(player)) SalirDelEvento(player->GetGUID().GetCounter(), true);
+    if (EstaEnEvento(player) || EstaEnCola(player)) SalirDelEvento(player->GetGUID().GetCounter(), true);
 }
 
 void BattleRoyaleMgr::GestionarMuerteJcJ(Player* killer, Player* killed)

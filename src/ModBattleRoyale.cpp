@@ -140,9 +140,8 @@ public:
 
     bool OnGossipHello(Player* player, Creature* creature)
     {
-        AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/ICONS/Inv_misc_bone_skull_02:24:24:-18|tQuiero participar en el evento.", 0, 1);
-        AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/ICONS/Inv_misc_bone_skull_02:24:24:-18|tQuiero salir de la cola del evento.", 0, 2);
-        AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/ICONS/Inv_letter_09:24:24:-18|tSalir", 0, 3);
+        AddGossipItemFor(player, GOSSIP_ICON_TALK, "Quiero participar en el evento.", 0, 1);
+        AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Quiero salir de la cola del evento.", 0, 2);
         SendGossipMenuFor(player, 200000, creature->GetGUID());
         return true;
     }
@@ -158,8 +157,6 @@ public:
         case 2:
             sBattleRoyaleMgr->GestionarJugadorDesconectar(player);
             ChatHandler(player->GetSession()).PSendSysMessage("|cff4CFF00BattleRoyale::|r Ya no estas en cola para el evento.");
-            break;
-        case 3:
             break;
         }
         CloseGossipMenuFor(player);
