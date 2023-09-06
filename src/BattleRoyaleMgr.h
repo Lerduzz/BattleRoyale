@@ -95,8 +95,13 @@ private:
     void AlmacenarPosicionInicial(uint32 guid);
     void LlamarAntesQueNave(uint32 guid);    
     void LlamarDentroDeNave(uint32 guid);
+    void LlamarTodosDentroDeNave();
     void SalirDelEvento(uint32 guid, bool logout = false);
     void RevivirJugador(Player *player);
+    bool InvocarNave();
+    bool InvocarCentroDelMapa();
+    bool InvocarZonaSegura();
+    
     
 
 
@@ -105,12 +110,7 @@ private:
 
     void NotifySecureZoneReduceWarn(uint32 delay);
     void NotifySecureZoneReduced();
-    void NotifyTimeRemainingToStart(uint32 delay);
     void NotifyPvPKill(std::string killer, std::string killed, int kills);
-    bool SpawnTransportShip();
-    bool SpawnTheCenterOfBattle();
-    bool SpawnSecureZone();
-    void TeleportPlayersToShip();
     void AddParachuteToAllPlayers();
     void OutOfZoneDamage();
     void AddFFAPvPFlag();
@@ -151,6 +151,52 @@ private:
             }
         }
     };
+    void NotificarTiempoParaIniciar(uint32 delay)
+    {
+        if (HayJugadores())
+        {
+            for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it) {
+                switch (delay)
+                {
+                    case 0:
+                    {
+                        (*it).second->GetSession()->SendNotification("|cff00ff00¡Que comience la batalla de |cffDA70D6%s|cff00ff00!", BR_NombreDeMapas[indiceDelMapa].c_str());
+                        break;
+                    }                
+                    case 5:
+                    {
+                        (*it).second->GetSession()->SendNotification("|cff00ff00Ya tienes paracaidas. |cff0000ff¡PUEDES SALTAR!");
+                        break;
+                    }                
+                    case 10:
+                    case 15:
+                    case 20:
+                    case 25:
+                    {
+                        (*it).second->GetSession()->SendNotification("|cff00ff00Faltan |cffDA70D6%u|cff00ff00 segundos para llegar. |cffff0000¡NO TE TIRES!", delay - 5);
+                        break;
+                    }
+                    case 30:
+                    {
+                        (*it).second->GetSession()->SendNotification("|cff00ff00La nave comienza a moverse. |cffff0000¡NO TE TIRES!");
+                        break;
+                    }
+                    default:
+                    {
+                        if (delay > 30 && delay <= 60)
+                        {
+                            (*it).second->GetSession()->SendNotification("|cff00ff00Faltan |cffDA70D6%u|cff00ff00 segundos para encender motores. |cffff0000¡NO TE TIRES!", delay - 30);
+                        }
+                        else 
+                        {
+                            (*it).second->GetSession()->SendNotification("|cff00ff00No tengas miedo. |cff0000ff¡LLEGANDO A LA NAVE!");
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+    };
         
     BR_ListaDePersonajes list_Cola;
     BR_ListaDePersonajes list_Jugadores;
@@ -161,9 +207,11 @@ private:
     GameObject* obj_Nave;
 
     int estadoActual;
-    int tiempoRestanteSeg;    
+    int tiempoRestanteSeg;
+    int tiempoRestanteZona;
     int indiceDeVariacion;
     int indiceDelMapa;
+    int indicadorDeSegundos;
 
     uint32 conf_JugadoresMinimo;
     uint32 conf_JugadoresMaximo;
@@ -174,9 +222,7 @@ private:
 
 
     int secureZoneIndex;
-    int secureZoneDelay;
-    bool secureZoneAnnounced; 
-    int secondsTicksHelper;
+    bool secureZoneAnnounced;
 
 };
 
