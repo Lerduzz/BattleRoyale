@@ -112,6 +112,7 @@ private:
     void CondicionDeVictoria();
     void FinalizarRonda(bool announce, Player* winner = nullptr);
     bool HayJugadores() { return list_Jugadores.size() > 0; };
+    bool HayCola() { return list_Cola.size() > 0; };
     bool EstaEnCola(Player* player) { return list_Cola.find(player->GetGUID().GetCounter()) != list_Cola.end(); };
     bool EstaEnCola(uint32 guid) { return list_Cola.find(guid) != list_Cola.end(); };
     bool EstaEnEvento(Player* player) { return list_Jugadores.find(player->GetGUID().GetCounter()) != list_Jugadores.end(); };

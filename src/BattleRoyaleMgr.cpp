@@ -104,12 +104,12 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
                     }
                     if (estadoActual == ESTADO_INVOCANDO_JUGADORES && tiempoRestanteInicio <= 60)
                     {
-                        estadoActual = ESTADO_NAVE_EN_ESPERA;
                         if (!InvocarNave()) {
                             RestablecerTodoElEvento();
                             return;
                         }
                         LlamarTodosDentroDeNave();
+                        estadoActual = ESTADO_NAVE_EN_ESPERA;
                     }
                     if (estadoActual == ESTADO_NAVE_EN_ESPERA && tiempoRestanteInicio <= 30 && obj_Nave)
                     {
@@ -213,16 +213,29 @@ void BattleRoyaleMgr::IniciarNuevaRonda()
         estadoActual = ESTADO_INVOCANDO_JUGADORES;
         SiguienteMapa();
         tiempoRestanteInicio = 67;
-        for (BR_ColaDePersonajes::iterator it = list_Cola.begin(); it != list_Cola.end(); ++it)
-	    {
-            if (!EstaLlenoElEvento())
+        if (HayCola())
+        {
+            for (BR_ColaDePersonajes::iterator it = list_Cola.begin(); it != list_Cola.end(); ++it)
+	        {
+                if (!EstaLlenoElEvento())
+                {
+                    list_Jugadores[(*it).first] = (*it).second;
+                    AlmacenarPosicionInicial((*it).first);
+                    LlamarAntesQueNave((*it).first);
+                }
+                else
+                {
+                    break;
+                }
+	        }
+            if (HayJugadores())
             {
-                list_Jugadores[(*it).first] = (*it).second;
-                AlmacenarPosicionInicial((*it).first);
-                LlamarAntesQueNave((*it).first);
-            }            
-	    }
-        if (HayJugadores()) for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it) list_Cola.erase((*it).first);
+                for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
+                {
+                    if (EstaEnCola((*it).first)) list_Cola.erase((*it).first);
+                }
+            }
+        }
     }
 }
 
@@ -260,7 +273,7 @@ void BattleRoyaleMgr::LlamarDentroDeNave(uint32 guid)
     float oy = BR_VariacionesDePosicion[indiceDeVariacion][1];
     SiguientePosicion();
     Desmontar(list_Jugadores[guid]);
-    list_Jugadores[guid]->TeleportTo(BR_IdentificadorDeMapas[indiceDelMapa], BR_InicioDeLaNave[indiceDelMapa][0] + ox, BR_InicioDeLaNave[indiceDelMapa][1] + oy, BR_InicioDeLaNave[indiceDelMapa][2] + 1.5f, 0.0f);
+    list_Jugadores[guid]->TeleportTo(BR_IdentificadorDeMapas[indiceDelMapa], BR_InicioDeLaNave[indiceDelMapa][0] + ox, BR_InicioDeLaNave[indiceDelMapa][1] + oy, BR_InicioDeLaNave[indiceDelMapa][2] + 0.5f, 0.0f);
     list_Jugadores[guid]->SetPvP(false);
     list_Jugadores[guid]->SaveToDB(false, false);
 }
@@ -272,6 +285,32 @@ void BattleRoyaleMgr::LlamarTodosDentroDeNave()
         for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
         {
             LlamarDentroDeNave((*it).first);
+        }
+    }
+    if (!EstaLlenoElEvento())
+    {
+        if (HayCola())
+        {
+            for (BR_ColaDePersonajes::iterator it = list_Cola.begin(); it != list_Cola.end(); ++it)
+	        {
+                if (!EstaLlenoElEvento())
+                {
+                    list_Jugadores[(*it).first] = (*it).second;
+                    AlmacenarPosicionInicial((*it).first);
+                    LlamarDentroDeNave((*it).first);
+                }
+                else
+                {
+                    break;
+                }
+	        }
+            if (HayJugadores())
+            {
+                for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
+                {
+                    if (EstaEnCola((*it).first)) list_Cola.erase((*it).first);
+                }
+            }
         }
     }
 }
