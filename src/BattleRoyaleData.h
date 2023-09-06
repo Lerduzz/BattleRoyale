@@ -15,8 +15,8 @@ public:
     float GetY();
     float GetZ();
     float GetO();
-    int GetDTick();
-    void SetDTick(int dt);
+    int dmg_tick;
+    int kills;
 
 private:
     int start_map;
@@ -24,7 +24,7 @@ private:
     float start_y;
     float start_z;
     float start_o;
-    int damage_tick;
+    
 };
 
 #endif

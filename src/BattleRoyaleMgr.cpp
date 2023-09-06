@@ -605,14 +605,17 @@ void BattleRoyaleMgr::OutOfZoneDamage()
     {
         for (BattleRoyalePlayerList::iterator it = ep_Players.begin(); it != ep_Players.end(); ++it)
         {
-            float distance = (*it).second->GetExactDist(go_CenterOfBattle);
-            if (secureZoneIndex > 0 && distance > BRSecureZoneScales[secureZoneIndex - 1] * 66.0f) {
-                ep_PlayersData[(*it).first].SetDTick(ep_PlayersData[(*it).first].GetDTick() + 1);
-                uint32 damage = (*it).second->GetMaxHealth() * (2 * sqrt(ep_PlayersData[(*it).first].GetDTick()) + secureZoneIndex) / 100;
-                (*it).second->GetSession()->SendNotification("|cffff0000¡Has recibido |cffDA70D6%u|cffff0000 de daño, adéntrate en la zona segura!", damage);
-                Unit::DealDamage(nullptr, (*it).second, damage, nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false, true);
-            } else {
-                ep_PlayersData[(*it).first].SetDTick(0);
+            if ((*it).second && (*it).second->IsAlive())
+            {
+                float distance = (*it).second->GetExactDist(go_CenterOfBattle);
+                if (secureZoneIndex > 0 && distance > BRSecureZoneScales[secureZoneIndex - 1] * 66.0f) {
+                    ep_PlayersData[(*it).first].dmg_tick++;
+                    uint32 damage = (*it).second->GetMaxHealth() * (2 * sqrt(ep_PlayersData[(*it).first].dmg_tick) + secureZoneIndex) / 100;
+                    (*it).second->GetSession()->SendNotification("|cffff0000¡Has recibido |cffDA70D6%u|cffff0000 de daño, adéntrate en la zona segura!", damage);
+                    Unit::DealDamage(nullptr, (*it).second, damage, nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false, true);
+                } else {
+                    ep_PlayersData[(*it).first].dmg_tick = 0;
+                }
             }
         }
     }
