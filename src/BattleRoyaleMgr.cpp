@@ -241,6 +241,7 @@ void BattleRoyaleMgr::AlmacenarPosicionInicial(uint32 guid)
 void BattleRoyaleMgr::LlamarAntesQueNave(uint32 guid)
 {
     CambiarDimension_Entrar(guid);
+    SalirDeGrupo(list_Jugadores[guid]);
     float ox = BR_VariacionesDePosicion[indiceDeVariacion][0];
     float oy = BR_VariacionesDePosicion[indiceDeVariacion][1];
     SiguientePosicion();
@@ -254,6 +255,7 @@ void BattleRoyaleMgr::LlamarAntesQueNave(uint32 guid)
 void BattleRoyaleMgr::LlamarDentroDeNave(uint32 guid)
 {
     CambiarDimension_Entrar(guid);
+    SalirDeGrupo(list_Jugadores[guid]);
     float ox = BR_VariacionesDePosicion[indiceDeVariacion][0];
     float oy = BR_VariacionesDePosicion[indiceDeVariacion][1];
     SiguientePosicion();

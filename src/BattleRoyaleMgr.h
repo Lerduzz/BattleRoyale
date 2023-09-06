@@ -86,7 +86,7 @@ public:
     void GestionarActualizacionMundo(uint32 diff);
     void PrevenirJcJEnLaNave(Player* player, bool state);
     bool PuedeReaparecerEnCementerio(Player* player);
-    bool DebeRestringirFunciones(Player* player) { return estadoActual > ESTADO_NO_HAY_SUFICIENTES_JUGADORES && EstaEnEvento(player); };
+    bool DebeRestringirFunciones(Player* player) { return estadoActual > ESTADO_NO_HAY_SUFICIENTES_JUGADORES && HayJugadores() && EstaEnEvento(player); };
     bool DebeForzarJcJTcT(Player* player) 
     {
         if (estadoActual != ESTADO_BATALLA_EN_CURSO || !HayJugadores() || !EstaEnEvento(player)) return false;
@@ -121,6 +121,11 @@ private:
     ChatHandler Chat(Player* player) { return ChatHandler(player->GetSession()); };
     void SiguienteMapa() { if (++indiceDelMapa >= CANTIDAD_DE_MAPAS) indiceDelMapa = 0; };
     void SiguientePosicion() { if (++indiceDeVariacion >= CANTIDAD_DE_VARIACIONES) indiceDeVariacion = 0; };
+    void SalirDeGrupo(Player* player)
+    { 
+        player->RemoveFromGroup(); 
+        player->UninviteFromGroup();
+    };
     void CambiarDimension_Entrar(uint32 guid)
     {
         list_Jugadores[guid]->SetPhaseMask(2, false);
