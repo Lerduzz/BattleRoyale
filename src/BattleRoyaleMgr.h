@@ -101,24 +101,9 @@ private:
     bool InvocarNave();
     bool InvocarCentroDelMapa();
     bool InvocarZonaSegura();
-    
-    
-
-
-
-
-
-    void NotifySecureZoneReduceWarn(uint32 delay);
-    void NotifySecureZoneReduced();
-    void NotifyPvPKill(std::string killer, std::string killed, int kills);
-    void AddParachuteToAllPlayers();
-    void OutOfZoneDamage();
-    void AddFFAPvPFlag();
-    
-
-
-
-
+    void PonerTodosLosParacaidas();
+    void EfectoFueraDeZona();
+    void ActivarJcJTcT();
     bool HayJugadores() { return list_Jugadores.size() > 0; };
     bool EstaEnCola(Player* player) { return list_Cola.find(player->GetGUID().GetCounter()) != list_Cola.end(); };
     bool EstaEnEvento(Player* player) { return list_Jugadores.find(player->GetGUID().GetCounter()) != list_Jugadores.end(); };
@@ -197,6 +182,36 @@ private:
             }
         }
     };
+    void NotificarZonaReducida()
+    {
+        if (HayJugadores())
+        {
+            for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
+            {
+                (*it).second->GetSession()->SendNotification("|cffff0000¡ALERTA: La zona segura se ha actualizado!");
+            }
+        }
+    };
+    void NotificarAdvertenciaDeZona(uint32 delay)
+    {
+        if (HayJugadores())
+        {
+            for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
+            {
+                (*it).second->GetSession()->SendNotification("|cff00ff00¡La zona segura se reducirá en |cffDA70D6%u|cff00ff00 segundos!", delay);
+            }
+        }
+    };
+    void NotificarMuerteJcJ(std::string killer, std::string killed, int kills)
+    {
+        if (HayJugadores())
+        {
+            for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
+            {
+                ChatHandler((*it).second->GetSession()).PSendSysMessage("|cff4CFF00BattleRoyale::|r ¡%s ha eliminado a %s!. Racha de %i.", killer, killed, kills);
+            }
+        }
+    };
         
     BR_ListaDePersonajes list_Cola;
     BR_ListaDePersonajes list_Jugadores;
@@ -211,18 +226,13 @@ private:
     int tiempoRestanteZona;
     int indiceDeVariacion;
     int indiceDelMapa;
+    int indiceDeZona;
     int indicadorDeSegundos;
+    bool estaLaZonaAnunciada;
 
     uint32 conf_JugadoresMinimo;
     uint32 conf_JugadoresMaximo;
     uint32 conf_IntervaloEntreRecuccionDeZona;
-
-
-    
-
-
-    int secureZoneIndex;
-    bool secureZoneAnnounced;
 
 };
 

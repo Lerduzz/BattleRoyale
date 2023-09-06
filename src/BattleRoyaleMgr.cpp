@@ -81,8 +81,7 @@ void BattleRoyaleMgr::GestionarMuerteJcJ(Player* killer, Player* killed)
     if (!EstaEnEvento(killer) || !EstaEnEvento(killed)) return;
     list_Datos[killer->GetGUID().GetCounter()].kills++;
     killed->CastSpell(killer, 6277, true);
-    // TODO: Llevar una lista de los espectadores de un jugador y al morir comprobar y mover los espectadores al nuevo asesino.
-    NotifyPvPKill(ChatHandler(killer->GetSession()).GetNameLink(killer), ChatHandler(killed->GetSession()).GetNameLink(killed), list_Datos[killer->GetGUID().GetCounter()].kills);
+    NotificarMuerteJcJ(ChatHandler(killer->GetSession()).GetNameLink(killer), ChatHandler(killed->GetSession()).GetNameLink(killed), list_Datos[killer->GetGUID().GetCounter()].kills);
 }
 
 void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
@@ -123,9 +122,9 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
                     if (estadoActual == ESTADO_NAVE_EN_MOVIMIENTO && tiempoRestanteSeg <= 5)
                     {
                         estadoActual = ESTADO_NAVE_CERCA_DEL_CENTRO;
-                        secureZoneIndex = 0;
+                        indiceDeZona = 0;
                         tiempoRestanteZona = 0;
-                        secureZoneAnnounced = false;
+                        estaLaZonaAnunciada = false;
                         obj_Centro = nullptr;
                         obj_Zona = nullptr;
                         if (!InvocarCentroDelMapa()) {
@@ -136,7 +135,7 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
                             RestablecerTodoElEvento();
                             return;
                         }
-                        AddParachuteToAllPlayers();
+                        PonerTodosLosParacaidas();
                     }
                     tiempoRestanteSeg--;
                 }
@@ -149,22 +148,22 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
         {
             if (indicadorDeSegundos <= 0) {
                 indicadorDeSegundos = 1000;
-                OutOfZoneDamage();
-                AddFFAPvPFlag();
+                EfectoFueraDeZona();
+                ActivarJcJTcT();
             } else {
                 indicadorDeSegundos -= diff;
             }
             if (tiempoRestanteZona <= 0) {
                 InvocarZonaSegura();
-                NotifySecureZoneReduced();
+                NotificarZonaReducida();
                 tiempoRestanteZona = conf_IntervaloEntreRecuccionDeZona;
-                secureZoneAnnounced = false;
+                estaLaZonaAnunciada = false;
             } else {
-                if (tiempoRestanteZona <= 5000 && !secureZoneAnnounced) {
-                    NotifySecureZoneReduceWarn(5);
-                    secureZoneAnnounced = true;
+                if (tiempoRestanteZona <= 5000 && !estaLaZonaAnunciada) {
+                    NotificarAdvertenciaDeZona(5);
+                    estaLaZonaAnunciada = true;
                 }
-                if (secureZoneIndex <= CANTIDAD_DE_ZONAS) {
+                if (indiceDeZona <= CANTIDAD_DE_ZONAS) {
                     tiempoRestanteZona -= diff;
                 }
             }
@@ -362,51 +361,18 @@ bool BattleRoyaleMgr::InvocarZonaSegura()
             obj_Zona->Delete();
             obj_Zona = nullptr;
         }
-        if (secureZoneIndex < CANTIDAD_DE_ZONAS) {
-            obj_Zona = obj_Centro->SummonGameObject(OBJETO_ZONA_SEGURA_INICIAL + secureZoneIndex, BR_CentroDeMapas[indiceDelMapa].GetPositionX(), BR_CentroDeMapas[indiceDelMapa].GetPositionY(), BR_CentroDeMapas[indiceDelMapa].GetPositionZ() + BR_EscalasDeZonaSegura[secureZoneIndex] * 66.0f, 0, 0, 0, 0, 0, 2 * 60);
+        if (indiceDeZona < CANTIDAD_DE_ZONAS) {
+            obj_Zona = obj_Centro->SummonGameObject(OBJETO_ZONA_SEGURA_INICIAL + indiceDeZona, BR_CentroDeMapas[indiceDelMapa].GetPositionX(), BR_CentroDeMapas[indiceDelMapa].GetPositionY(), BR_CentroDeMapas[indiceDelMapa].GetPositionZ() + BR_EscalasDeZonaSegura[indiceDeZona] * 66.0f, 0, 0, 0, 0, 0, 2 * 60);
             obj_Zona->SetPhaseMask(2, true);
             obj_Zona->SetVisibilityDistanceOverride(VisibilityDistanceType::Infinite);
         }
-        secureZoneIndex++;
+        indiceDeZona++;
         return true;
     }
     return false;
 }
 
-void BattleRoyaleMgr::NotifySecureZoneReduceWarn(uint32 delay)
-{
-    if (list_Jugadores.size())
-    {
-        for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
-        {
-            (*it).second->GetSession()->SendNotification("|cff00ff00¡La zona segura se reducirá en |cffDA70D6%u|cff00ff00 segundos!", delay);
-        }
-    }
-}
-
-void BattleRoyaleMgr::NotifySecureZoneReduced()
-{
-    if (list_Jugadores.size())
-    {
-        for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
-        {
-            (*it).second->GetSession()->SendNotification("|cffff0000¡ALERTA: La zona segura se ha actualizado!");
-        }
-    }
-}
-
-void BattleRoyaleMgr::NotifyPvPKill(std::string killer, std::string killed, int kills)
-{
-    if (list_Jugadores.size())
-    {
-        for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
-        {
-            ChatHandler((*it).second->GetSession()).PSendSysMessage("|cff4CFF00BattleRoyale::|r ¡%s ha eliminado a %s!. Racha de %i.", killer, killed, kills);
-        }
-    }
-}
-
-void BattleRoyaleMgr::AddParachuteToAllPlayers()
+void BattleRoyaleMgr::PonerTodosLosParacaidas()
 {
     if (list_Jugadores.size())
     {
@@ -420,7 +386,7 @@ void BattleRoyaleMgr::AddParachuteToAllPlayers()
     }
 }
 
-void BattleRoyaleMgr::OutOfZoneDamage()
+void BattleRoyaleMgr::EfectoFueraDeZona()
 {
     if (list_Jugadores.size())
     {
@@ -429,9 +395,9 @@ void BattleRoyaleMgr::OutOfZoneDamage()
             if ((*it).second && (*it).second->IsAlive())
             {
                 float distance = (*it).second->GetExactDist(obj_Centro);
-                if (secureZoneIndex > 0 && distance > BR_EscalasDeZonaSegura[secureZoneIndex - 1] * 66.0f) {
+                if (indiceDeZona > 0 && distance > BR_EscalasDeZonaSegura[indiceDeZona - 1] * 66.0f) {
                     list_Datos[(*it).first].dmg_tick++;
-                    uint32 damage = (*it).second->GetMaxHealth() * (2 * sqrt(list_Datos[(*it).first].dmg_tick) + secureZoneIndex) / 100;
+                    uint32 damage = (*it).second->GetMaxHealth() * (2 * sqrt(list_Datos[(*it).first].dmg_tick) + indiceDeZona) / 100;
                     (*it).second->GetSession()->SendNotification("|cffff0000¡Has recibido |cffDA70D6%u|cffff0000 de daño, adéntrate en la zona segura!", damage);
                     Unit::DealDamage(nullptr, (*it).second, damage, nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false, true);
                 } else {
@@ -442,7 +408,7 @@ void BattleRoyaleMgr::OutOfZoneDamage()
     }
 }
 
-void BattleRoyaleMgr::AddFFAPvPFlag()
+void BattleRoyaleMgr::ActivarJcJTcT()
 {
     if (list_Jugadores.size())
     {
