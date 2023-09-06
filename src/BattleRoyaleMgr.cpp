@@ -320,6 +320,8 @@ bool BattleRoyaleMgr::InvocarNave()
                 float rot2 = std::sin(o / 2);
                 float rot3 = cos(o / 2);
                 obj_Nave = (*it).second->SummonGameObject(OBJETO_NAVE, x, y, z, o, 0, 0, rot2, rot3, 2 * 60);
+                obj_Nave->SetPhaseMask(2, true);
+                obj_Nave->SetVisibilityDistanceOverride(VisibilityDistanceType::Infinite);
                 success = true;
                 break;
             }
@@ -334,6 +336,8 @@ bool BattleRoyaleMgr::InvocarCentroDelMapa()
     {
         DesaparecerCentro();
         obj_Centro = obj_Nave->SummonGameObject(OBJETO_CENTRO_DEL_MAPA, BR_CentroDeMapas[indiceDelMapa].GetPositionX(), BR_CentroDeMapas[indiceDelMapa].GetPositionY(), BR_CentroDeMapas[indiceDelMapa].GetPositionZ(), 0, 0, 0, 0, 0, 15 * 60);
+        obj_Centro->SetPhaseMask(2, true);
+        obj_Centro->SetVisibilityDistanceOverride(VisibilityDistanceType::Infinite);
         return true;
     }
     return false;
