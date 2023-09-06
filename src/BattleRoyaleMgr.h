@@ -87,7 +87,11 @@ public:
     void PrevenirJcJEnLaNave(Player* player, bool state);
     bool PuedeReaparecerEnCementerio(Player* player);
     bool DebeRestringirFunciones(Player* player) { return estadoActual > ESTADO_NO_HAY_SUFICIENTES_JUGADORES && EstaEnEvento(player); };
-    bool DebeForzarJcJTcT(Player* player) { return !(estadoActual != ESTADO_BATALLA_EN_CURSO || !HayJugadores() || !EstaEnEvento(player)) || !(obj_Nave && player->GetTransport() && player->GetExactDist(obj_Nave) < 25.0f); };
+    bool DebeForzarJcJTcT(Player* player) 
+    {
+        if (estadoActual != ESTADO_BATALLA_EN_CURSO || !HayJugadores() || !EstaEnEvento(player)) return false;
+        return !(obj_Nave && player->GetTransport() && player->GetExactDist(obj_Nave) < 25.0f);
+    };
     
 private:
     void RestablecerTodoElEvento();
