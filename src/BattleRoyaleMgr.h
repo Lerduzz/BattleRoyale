@@ -94,7 +94,6 @@ private:
     void IniciarNuevaRonda();
     void AlmacenarPosicionInicial(uint32 guid);
     void LlamarAntesQueNave(uint32 guid);
-    void Desmontar(Player* player);
     
 
 
@@ -138,6 +137,19 @@ private:
     {
         list_Jugadores[guid]->SetPhaseMask(1, false);
         list_Jugadores[guid]->UpdateObjectVisibility();
+    };
+    void Desmontar(Player* player)
+    {
+        if (player && player->IsAlive() && player->IsMounted())
+        {
+            if (!player->IsInFlight())
+            {
+                player->Dismount();
+                player->RemoveAurasByType(SPELL_AURA_MOUNTED);
+                player->SetSpeed(MOVE_RUN, 1, true);
+                player->SetSpeed(MOVE_FLIGHT, 1, true);
+            }
+        }
     };
         
     BR_ListaDePersonajes list_Cola;

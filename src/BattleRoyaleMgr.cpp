@@ -32,23 +32,38 @@ void BattleRoyaleMgr::GestionarJugadorEntrando(Player *player)
         Chat(player).PSendSysMessage("|cff4CFF00BattleRoyale::|r Ya estas dentro del evento.");
         return;
     }
-    uint32 guid = player->GetGUID().GetCounter();
-    list_Cola[guid] = player;
-    Chat(player).PSendSysMessage("|cff4CFF00BattleRoyale::|r Te has unido a la cola del evento. Jugadores en cola: %u (Cada ronda necesita entre %u y %u jugadores.", list_Cola.size(), conf_JugadoresMinimo, conf_JugadoresMaximo);
     switch (estadoActual)
     {
         case ESTADO_NO_HAY_SUFICIENTES_JUGADORES:
         {
+            list_Cola[player->GetGUID().GetCounter()] = player;
             if (HaySuficientesEnCola()) {
                 IniciarNuevaRonda();
+            }
+            else
+            {
+                Chat(player).PSendSysMessage("|cff4CFF00BattleRoyale::|r Te has unido a la cola del evento. Jugadores en cola: %u/%u.", list_Cola.size(), conf_JugadoresMinimo);
             }
             break;
         }
         case ESTADO_NAVE_EN_ESPERA:
         {
-            if (!EstaLlenoElEvento()) {
-                TeleportToEvent(guid);
+            if (EstaLlenoElEvento()) {
+                list_Cola[player->GetGUID().GetCounter()] = player;
+                Chat(player).PSendSysMessage("|cff4CFF00BattleRoyale::|r Te has unido a la cola del evento. Jugadores en cola: %u/%u. El evento esta lleno, espera la otra ronda.", list_Cola.size(), conf_JugadoresMinimo);
             }
+            else
+            {
+                list_Jugadores[player->GetGUID().GetCounter()] = player;
+                AlmacenarPosicionInicial(player->GetGUID().GetCounter());
+                LlamarAntesQueNave(player->GetGUID().GetCounter());
+            }
+            break;
+        }
+        default:
+        {
+            list_Cola[player->GetGUID().GetCounter()] = player;
+            Chat(player).PSendSysMessage("|cff4CFF00BattleRoyale::|r Te has unido a la cola del evento. Jugadores en cola: %u/%u. El evento esta en curso, espera la otra ronda.", list_Cola.size(), conf_JugadoresMinimo);
             break;
         }
     }
@@ -226,7 +241,6 @@ void BattleRoyaleMgr::IniciarNuevaRonda()
                 list_Jugadores[(*it).first] = (*it).second;
                 AlmacenarPosicionInicial((*it).first);
                 LlamarAntesQueNave((*it).first);
-                list_Jugadores[(*it).first]->SaveToDB(false, false);
             }            
 	    }
         if (HayJugadores()) for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it) list_Cola.erase((*it).first);
@@ -260,46 +274,16 @@ void BattleRoyaleMgr::LlamarAntesQueNave(uint32 guid)
         Desmontar(list_Jugadores[guid]);
         list_Jugadores[guid]->SetPvP(false);
         list_Jugadores[guid]->TeleportTo(BR_IdentificadorDeMapas[indiceDelMapa], BR_InicioDeLaNave[indiceDelMapa][0] + ox, BR_InicioDeLaNave[indiceDelMapa][1] + oy, BR_InicioDeLaNave[indiceDelMapa][2] + 15.0f, 0.0f);
+        list_Jugadores[guid]->SaveToDB(false, false);
         list_Jugadores[guid]->AddAura(HECHIZO_PARACAIDAS, list_Jugadores[guid]);
-    }
-}
-
-void BattleRoyaleMgr::Desmontar(Player* player)
-{
-    if (player && player->IsAlive() && player->IsMounted())
-    {
-        if (!player->IsInFlight())
-        {
-            player->Dismount();
-            player->RemoveAurasByType(SPELL_AURA_MOUNTED);
-            player->SetSpeed(MOVE_RUN, 1, true);
-            player->SetSpeed(MOVE_FLIGHT, 1, true);
-        }
     }
 }
 
 void BattleRoyaleMgr::TeleportToEvent(uint32 guid)
 {
-	if (!guid)
-	{
-        
-    }
-	else
-	{
-        if (estadoActual == ESTADO_INVOCANDO_JUGADORES)
-        {
+	
             list_Jugadores[guid] = list_Cola[guid];
-            AlmacenarPosicionInicial(guid);
-            LlamarAntesQueNave(guid);            
-            CambiarDimension_Entrar(guid);
-            list_Jugadores[guid]->SaveToDB(false, false);
-            list_Cola.erase(guid);
-        } 
-        else if (estadoActual == ESTADO_NAVE_EN_ESPERA)
-        {
-            list_Jugadores[guid] = list_Cola[guid];
-            AlmacenarPosicionInicial(guid);
-            TeleportPlayerToShip(guid);
+            
             CambiarDimension_Entrar(guid);
             list_Jugadores[guid]->SaveToDB(false, false);
             list_Cola.erase(guid);
