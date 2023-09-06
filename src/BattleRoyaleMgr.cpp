@@ -5,22 +5,21 @@
 
 BattleRoyaleMgr::BattleRoyaleMgr()
 {
-    eventMinPlayers = sConfigMgr->GetOption<int32>("BattleRoyale.MinPlayers", 25);
-    eventMaxPlayers = sConfigMgr->GetOption<int32>("BattleRoyale.MaxPlayers", 50);
-    secureZoneUpdateInterval = sConfigMgr->GetOption<int32>("BattleRoyale.SecureZoneInterval", 60000);
-    go_SecureZone = nullptr;
-    go_CenterOfBattle = nullptr;
-    go_TransportShip = nullptr;
-    ResetFullEvent();
+    conf_JugadoresMinimo = sConfigMgr->GetOption<int32>("BattleRoyale.MinPlayers", 25);
+    conf_JugadoresMaximo = sConfigMgr->GetOption<int32>("BattleRoyale.MaxPlayers", 50);
+    conf_IntervaloEntreRecuccionDeZona = sConfigMgr->GetOption<int32>("BattleRoyale.SecureZoneInterval", 60000);
+    obj_Zona = nullptr;
+    obj_Centro = nullptr;
+    obj_Nave = nullptr;
+    RestablecerTodoElEvento();
 }
 
 BattleRoyaleMgr::~BattleRoyaleMgr()
 {
-    ep_PlayersQueue.clear();
-	ep_Players.clear();
-    ep_PlayersData.clear();
+    RestablecerTodoElEvento();
 }
 
+// --- PUBLICO --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void BattleRoyaleMgr::GestionarJugadorEntrando(Player *player)
 {
     if (IsInQueue(player))
@@ -35,7 +34,7 @@ void BattleRoyaleMgr::GestionarJugadorEntrando(Player *player)
     }
     uint32 guid = player->GetGUID().GetCounter();
     ep_PlayersQueue[guid] = player;
-    ChatHandler(player->GetSession()).PSendSysMessage("|cff4CFF00BattleRoyale::|r Te has unido a la cola del evento. Jugadores en cola: %u/%u.", ep_PlayersQueue.size(), eventMinPlayers);
+    ChatHandler(player->GetSession()).PSendSysMessage("|cff4CFF00BattleRoyale::|r Te has unido a la cola del evento. Jugadores en cola: %u/%u.", ep_PlayersQueue.size(), conf_JugadoresMinimo);
     switch (eventCurrentStatus)
     {
         case ESTADO_NO_SUFICIENTES_JUGADORES:
@@ -56,11 +55,6 @@ void BattleRoyaleMgr::GestionarJugadorEntrando(Player *player)
     }
 }
 
-/**
- * @brief Sacar del evento al desconectarse.
- * 
- * @param player 
- */
 void BattleRoyaleMgr::GestionarJugadorDesconectar(Player *player)
 {
     if (IsInEvent(player)) ExitFromEvent(player->GetGUID().GetCounter(), true);
@@ -77,13 +71,100 @@ void BattleRoyaleMgr::GestionarMuerteJcJ(Player *killer, Player *killed)
     NotifyPvPKill(ChatHandler(killer->GetSession()).GetNameLink(killer), ChatHandler(killed->GetSession()).GetNameLink(killed), ep_PlayersData[killer->GetGUID().GetCounter()].kills);
 }
 
-/**
- * @brief Decide si se debe retornar al jugador o dejar que valla al cementerio.
- * 
- * @param player 
- * @return true: Retornado!
- * @return false: Dejar por defecto!
- */
+void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
+{
+    switch(eventCurrentStatus)
+    {
+        case ESTADO_INVOCANDO_JUGADORES:
+        case ESTADO_NAVE_EN_ESPERA:
+        case ESTADO_NAVE_EN_MOVIMIENTO:
+        case ESTADO_NAVE_CERCA_DEL_CENTRO:
+        {
+            if (secondsTicksHelper <= 0) {
+                secondsTicksHelper = 1000;
+                if (startRemainingTime <= 0) {
+                    eventCurrentStatus = ESTADO_BATALLA_EN_CURSO;
+                    NotifyTimeRemainingToStart(0);
+                    secureZoneDelay = conf_IntervaloEntreRecuccionDeZona;
+                } else {
+                    if (startRemainingTime % 5 == 0) {
+                        NotifyTimeRemainingToStart(startRemainingTime);
+                    }
+                    if (eventCurrentStatus == ESTADO_INVOCANDO_JUGADORES && startRemainingTime <= 60)
+                    {
+                        eventCurrentStatus = ESTADO_NAVE_EN_ESPERA;
+                        if (!SpawnTransportShip()) {
+                            RestablecerTodoElEvento();
+                            return;
+                        }
+                        TeleportPlayersToShip();
+                    }
+                    if (eventCurrentStatus == ESTADO_NAVE_EN_ESPERA && startRemainingTime <= 30 && obj_Nave)
+                    {
+                        eventCurrentStatus = ESTADO_NAVE_EN_MOVIMIENTO;
+                        uint32_t const autoCloseTime = obj_Nave->GetGOInfo()->GetAutoCloseTime() ? 10000u : 0u;
+                        obj_Nave->SetLootState(GO_READY);
+                        obj_Nave->UseDoorOrButton(autoCloseTime, false, nullptr);
+                    }
+                    if (eventCurrentStatus == ESTADO_NAVE_EN_MOVIMIENTO && startRemainingTime <= 5)
+                    {
+                        eventCurrentStatus = ESTADO_NAVE_CERCA_DEL_CENTRO;
+                        secureZoneIndex = 0;
+                        secureZoneDelay = 0;
+                        secureZoneAnnounced = false;
+                        obj_Centro = nullptr;
+                        obj_Zona = nullptr;
+                        if (!SpawnTheCenterOfBattle()) {
+                            RestablecerTodoElEvento();
+                            return;
+                        }
+                        if (!SpawnSecureZone()) {
+                            RestablecerTodoElEvento();
+                            return;
+                        }
+                        AddParachuteToAllPlayers();
+                    }
+                    startRemainingTime--;
+                }
+            } else {
+                secondsTicksHelper -= diff;
+            }
+            break;
+        }
+        case ESTADO_BATALLA_EN_CURSO:
+        {
+            if (secondsTicksHelper <= 0) {
+                secondsTicksHelper = 1000;
+                OutOfZoneDamage();
+                AddFFAPvPFlag();
+            } else {
+                secondsTicksHelper -= diff;
+            }
+            if (secureZoneDelay <= 0) {
+                SpawnSecureZone();
+                NotifySecureZoneReduced();
+                secureZoneDelay = conf_IntervaloEntreRecuccionDeZona;
+                secureZoneAnnounced = false;
+            } else {
+                if (secureZoneDelay <= 5000 && !secureZoneAnnounced) {
+                    NotifySecureZoneReduceWarn(5);
+                    secureZoneAnnounced = true;
+                }
+                if (secureZoneIndex <= CANTIDAD_DE_ZONAS) {
+                    secureZoneDelay -= diff;
+                }
+            }
+            break;
+        }
+    }
+}
+
+void BattleRoyaleMgr::PrevenirJcJEnLaNave(Player* player, bool state)
+{
+    if (!state || !ep_Players.size()) return;
+    if (ep_Players.find(player->GetGUID().GetCounter()) != ep_Players.end() && !DebeForzarJcJTcT(player)) player->SetPvP(false);
+}
+
 bool BattleRoyaleMgr::PuedeReaparecerEnCementerio(Player *player)
 {
     if (HayJugadores() && IsInEvent(player)) {
@@ -105,11 +186,33 @@ bool BattleRoyaleMgr::PuedeReaparecerEnCementerio(Player *player)
     return true;
 }
 
-/**
- * @brief Teletransporta todos los personajes al aire sobre el spawn de la nave. / De manera individual elije si mandar a un personaje a la nave o encima en el aire.
- * 
- * @param guid 
- */
+// --- PRIVADO --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void BattleRoyaleMgr::RestablecerTodoElEvento()
+{
+    ep_PlayersQueue.clear();
+	ep_Players.clear();
+    ep_PlayersData.clear();
+    rotationMapIndex = 0;
+    eventCurrentStatus = ESTADO_NO_SUFICIENTES_JUGADORES;
+    secondsTicksHelper = 1000;
+    summonOffsetIndex = 0;
+    if (obj_Zona) {
+        obj_Zona->DespawnOrUnsummon();
+        obj_Zona->Delete();
+        obj_Zona = nullptr;
+    }
+    if (obj_Centro) {
+        obj_Centro->DespawnOrUnsummon();
+        obj_Centro->Delete();
+        obj_Centro = nullptr;
+    }
+    if (obj_Nave) {
+        obj_Nave->DespawnOrUnsummon();
+        obj_Nave->Delete();
+        obj_Nave = nullptr;
+    }
+}
+
 void BattleRoyaleMgr::TeleportToEvent(uint32 guid)
 {
 	if (!guid)
@@ -150,101 +253,6 @@ void BattleRoyaleMgr::TeleportToEvent(uint32 guid)
 	}
 }
 
-void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
-{
-    switch(eventCurrentStatus)
-    {
-        case ESTADO_INVOCANDO_JUGADORES:
-        case ESTADO_NAVE_EN_ESPERA:
-        case ESTADO_NAVE_EN_MOVIMIENTO:
-        case ESTADO_NAVE_CERCA_DEL_CENTRO:
-        {
-            if (secondsTicksHelper <= 0) {
-                secondsTicksHelper = 1000;
-                if (startRemainingTime <= 0) {
-                    eventCurrentStatus = ESTADO_BATALLA_EN_CURSO;
-                    NotifyTimeRemainingToStart(0);
-                    secureZoneDelay = secureZoneUpdateInterval;
-                } else {
-                    if (startRemainingTime % 5 == 0) {
-                        NotifyTimeRemainingToStart(startRemainingTime);
-                    }
-                    if (eventCurrentStatus == ESTADO_INVOCANDO_JUGADORES && startRemainingTime <= 60)
-                    {
-                        eventCurrentStatus = ESTADO_NAVE_EN_ESPERA;
-                        if (!SpawnTransportShip()) {
-                            ResetFullEvent();
-                            return;
-                        }
-                        TeleportPlayersToShip();
-                    }
-                    if (eventCurrentStatus == ESTADO_NAVE_EN_ESPERA && startRemainingTime <= 30 && go_TransportShip)
-                    {
-                        eventCurrentStatus = ESTADO_NAVE_EN_MOVIMIENTO;
-                        uint32_t const autoCloseTime = go_TransportShip->GetGOInfo()->GetAutoCloseTime() ? 10000u : 0u;
-                        go_TransportShip->SetLootState(GO_READY);
-                        go_TransportShip->UseDoorOrButton(autoCloseTime, false, nullptr);
-                    }
-                    if (eventCurrentStatus == ESTADO_NAVE_EN_MOVIMIENTO && startRemainingTime <= 5)
-                    {
-                        eventCurrentStatus = ESTADO_NAVE_CERCA_DEL_CENTRO;
-                        secureZoneIndex = 0;
-                        secureZoneDelay = 0;
-                        secureZoneAnnounced = false;
-                        go_CenterOfBattle = nullptr;
-                        go_SecureZone = nullptr;
-                        if (!SpawnTheCenterOfBattle()) {
-                            ResetFullEvent();
-                            return;
-                        }
-                        if (!SpawnSecureZone()) {
-                            ResetFullEvent();
-                            return;
-                        }
-                        AddParachuteToAllPlayers();
-                    }
-                    startRemainingTime--;
-                }
-            } else {
-                secondsTicksHelper -= diff;
-            }
-            break;
-        }
-        case ESTADO_BATALLA_EN_CURSO:
-        {
-            if (secondsTicksHelper <= 0) {
-                secondsTicksHelper = 1000;
-                OutOfZoneDamage();
-                AddFFAPvPFlag();
-            } else {
-                secondsTicksHelper -= diff;
-            }
-            if (secureZoneDelay <= 0) {
-                SpawnSecureZone();
-                NotifySecureZoneReduced();
-                secureZoneDelay = secureZoneUpdateInterval;
-                secureZoneAnnounced = false;
-            } else {
-                if (secureZoneDelay <= 5000 && !secureZoneAnnounced) {
-                    NotifySecureZoneReduceWarn(5);
-                    secureZoneAnnounced = true;
-                }
-                if (secureZoneIndex <= CANTIDAD_DE_ZONAS) {
-                    secureZoneDelay -= diff;
-                }
-            }
-            break;
-        }
-    }
-}
-
-void BattleRoyaleMgr::PrevenirJcJEnLaNave(Player* player, bool state)
-{
-    if (!state || !ep_Players.size()) return;
-    if (ep_Players.find(player->GetGUID().GetCounter()) != ep_Players.end() && !DebeForzarJcJTcT(player)) player->SetPvP(false);
-}
-
-// -- Private functions -- //
 void BattleRoyaleMgr::EnterToPhaseEvent(uint32 guid)
 {
 	ep_Players[guid]->SetPhaseMask(2, false);
@@ -286,11 +294,6 @@ void BattleRoyaleMgr::NotifySecureZoneReduced()
     }
 }
 
-/**
- * @brief Sistema de notificaciones previas a la batalla.
- * 
- * @param delay 
- */
 void BattleRoyaleMgr::NotifyTimeRemainingToStart(uint32 delay)
 {
     if (ep_Players.size())
@@ -338,13 +341,6 @@ void BattleRoyaleMgr::NotifyTimeRemainingToStart(uint32 delay)
     }
 }
 
-/**
- * @brief Notifica los KILL JcJ.
- * 
- * @param handler 
- * @param killer 
- * @param killed 
- */
 void BattleRoyaleMgr::NotifyPvPKill(std::string killer, std::string killed, int kills)
 {
     if (ep_Players.size())
@@ -356,12 +352,6 @@ void BattleRoyaleMgr::NotifyPvPKill(std::string killer, std::string killed, int 
     }
 }
 
-/**
- * @brief Hace que el primer jugador de la lista invoque la nave.
- * 
- * @return true 
- * @return false 
- */
 bool BattleRoyaleMgr::SpawnTransportShip()
 {
     bool success = false;
@@ -371,10 +361,10 @@ bool BattleRoyaleMgr::SpawnTransportShip()
         {
             if ((*it).second)
             {
-                if (go_TransportShip) {
-                    go_TransportShip->DespawnOrUnsummon();
-                    go_TransportShip->Delete();
-                    go_TransportShip = nullptr;
+                if (obj_Nave) {
+                    obj_Nave->DespawnOrUnsummon();
+                    obj_Nave->Delete();
+                    obj_Nave = nullptr;
                 }
                 float x = BR_InicioDeLaNave[rotationMapIndex][0];
                 float y = BR_InicioDeLaNave[rotationMapIndex][1];
@@ -382,7 +372,7 @@ bool BattleRoyaleMgr::SpawnTransportShip()
                 float o = BR_InicioDeLaNave[rotationMapIndex][3];
                 float rot2 = std::sin(o / 2);
                 float rot3 = cos(o / 2);
-                go_TransportShip = (*it).second->SummonGameObject(OBJETO_NAVE, x, y, z, o, 0, 0, rot2, rot3, 2 * 60);
+                obj_Nave = (*it).second->SummonGameObject(OBJETO_NAVE, x, y, z, o, 0, 0, rot2, rot3, 2 * 60);
                 success = true;
                 break;
             }
@@ -391,46 +381,34 @@ bool BattleRoyaleMgr::SpawnTransportShip()
     return success;
 }
 
-/**
- * @brief Hace que la propia nave invoque el centro de la batalla.
- * 
- * @return true 
- * @return false 
- */
 bool BattleRoyaleMgr::SpawnTheCenterOfBattle()
 {
-    if (go_TransportShip)
+    if (obj_Nave)
     {
-        if (go_CenterOfBattle) {
-            go_CenterOfBattle->DespawnOrUnsummon();
-            go_CenterOfBattle->Delete();
-            go_CenterOfBattle = nullptr;
+        if (obj_Centro) {
+            obj_Centro->DespawnOrUnsummon();
+            obj_Centro->Delete();
+            obj_Centro = nullptr;
         }
-        go_CenterOfBattle = go_TransportShip->SummonGameObject(OBJETO_CENTRO_DEL_MAPA, BR_CentroDeMapas[rotationMapIndex].GetPositionX(), BR_CentroDeMapas[rotationMapIndex].GetPositionY(), BR_CentroDeMapas[rotationMapIndex].GetPositionZ(), 0, 0, 0, 0, 0, 15 * 60);
+        obj_Centro = obj_Nave->SummonGameObject(OBJETO_CENTRO_DEL_MAPA, BR_CentroDeMapas[rotationMapIndex].GetPositionX(), BR_CentroDeMapas[rotationMapIndex].GetPositionY(), BR_CentroDeMapas[rotationMapIndex].GetPositionZ(), 0, 0, 0, 0, 0, 15 * 60);
         return true;
     }
     return false;
 }
 
-/**
- * @brief Hace que el centro de la batalla invoque a la zona segura.
- * 
- * @return true 
- * @return false 
- */
 bool BattleRoyaleMgr::SpawnSecureZone()
 {
-    if (go_CenterOfBattle)
+    if (obj_Centro)
     {
-        if (go_SecureZone) {
-            go_SecureZone->DespawnOrUnsummon();
-            go_SecureZone->Delete();
-            go_SecureZone = nullptr;
+        if (obj_Zona) {
+            obj_Zona->DespawnOrUnsummon();
+            obj_Zona->Delete();
+            obj_Zona = nullptr;
         }
         if (secureZoneIndex < CANTIDAD_DE_ZONAS) {
-            go_SecureZone = go_CenterOfBattle->SummonGameObject(OBJETO_ZONA_SEGURA_INICIAL + secureZoneIndex, BR_CentroDeMapas[rotationMapIndex].GetPositionX(), BR_CentroDeMapas[rotationMapIndex].GetPositionY(), BR_CentroDeMapas[rotationMapIndex].GetPositionZ() + BR_EscalasDeZonaSegura[secureZoneIndex] * 66.0f, 0, 0, 0, 0, 0, 2 * 60);
-            go_SecureZone->SetPhaseMask(2, true);
-            go_SecureZone->SetVisibilityDistanceOverride(VisibilityDistanceType::Infinite);
+            obj_Zona = obj_Centro->SummonGameObject(OBJETO_ZONA_SEGURA_INICIAL + secureZoneIndex, BR_CentroDeMapas[rotationMapIndex].GetPositionX(), BR_CentroDeMapas[rotationMapIndex].GetPositionY(), BR_CentroDeMapas[rotationMapIndex].GetPositionZ() + BR_EscalasDeZonaSegura[secureZoneIndex] * 66.0f, 0, 0, 0, 0, 0, 2 * 60);
+            obj_Zona->SetPhaseMask(2, true);
+            obj_Zona->SetVisibilityDistanceOverride(VisibilityDistanceType::Infinite);
         }
         secureZoneIndex++;
         return true;
@@ -438,11 +416,6 @@ bool BattleRoyaleMgr::SpawnSecureZone()
     return false;
 }
 
-/**
- * @brief Almacena la posicion a la que se debe enviar al personaje tras salir del evento.
- * 
- * @param guid 
- */
 void BattleRoyaleMgr::StorePlayerStartPosition(uint32 guid)
 {
     if (ep_Players.find(guid) != ep_Players.end())
@@ -458,11 +431,6 @@ void BattleRoyaleMgr::StorePlayerStartPosition(uint32 guid)
     }
 }
 
-/**
- * @brief Teletransporta a un personaje unas yardas encima de donde aparecera la nave y le pone paracaidas.
- * 
- * @param guid 
- */
 void BattleRoyaleMgr::TeleportPlayerBeforeShip(uint32 guid)
 {
     if (!ep_Players.size()) return;
@@ -479,11 +447,6 @@ void BattleRoyaleMgr::TeleportPlayerBeforeShip(uint32 guid)
     }
 }
 
-/**
- * @brief Teletransporta a un personaje a la nave.
- * 
- * @param guid 
- */
 void BattleRoyaleMgr::TeleportPlayerToShip(uint32 guid)
 {
     if (!ep_Players.size()) return;
@@ -499,10 +462,6 @@ void BattleRoyaleMgr::TeleportPlayerToShip(uint32 guid)
     }
 }
 
-/**
- * @brief Teletransporta a todos los personajes del evento hacia el interior de la nave.
- * 
- */
 void BattleRoyaleMgr::TeleportPlayersToShip()
 {
     if (!ep_Players.size()) return;
@@ -512,11 +471,6 @@ void BattleRoyaleMgr::TeleportPlayersToShip()
     }
 }
 
-/**
- * @brief Desmonta a un personaje si se encuentra montado y no es en ruta de vuelo.
- * 
- * @param player 
- */
 void BattleRoyaleMgr::Dismount(Player* player)
 {
     if (player && player->IsAlive() && player->IsMounted())
@@ -531,17 +485,13 @@ void BattleRoyaleMgr::Dismount(Player* player)
     }
 }
 
-/**
- * @brief Coloca un paracaidas a todos los participantes del evento (en la nave) que se activa al estar en el aire.
- * 
- */
 void BattleRoyaleMgr::AddParachuteToAllPlayers()
 {
     if (ep_Players.size())
     {
         for (BR_ListaDePersonajes::iterator it = ep_Players.begin(); it != ep_Players.end(); ++it)
         {
-            if (go_TransportShip && (*it).second && (*it).second->GetTransport() && (*it).second->GetExactDist(go_TransportShip) < 25.0f && (*it).second->IsAlive())
+            if (obj_Nave && (*it).second && (*it).second->GetTransport() && (*it).second->GetExactDist(obj_Nave) < 25.0f && (*it).second->IsAlive())
             {
                 (*it).second->AddAura(HECHIZO_PARACAIDAS, (*it).second);
             }
@@ -549,10 +499,6 @@ void BattleRoyaleMgr::AddParachuteToAllPlayers()
     }
 }
 
-/**
- * @brief Causa daño a todos los que esten fuera de la zona segura.
- * 
- */
 void BattleRoyaleMgr::OutOfZoneDamage()
 {
     if (ep_Players.size())
@@ -561,7 +507,7 @@ void BattleRoyaleMgr::OutOfZoneDamage()
         {
             if ((*it).second && (*it).second->IsAlive())
             {
-                float distance = (*it).second->GetExactDist(go_CenterOfBattle);
+                float distance = (*it).second->GetExactDist(obj_Centro);
                 if (secureZoneIndex > 0 && distance > BR_EscalasDeZonaSegura[secureZoneIndex - 1] * 66.0f) {
                     ep_PlayersData[(*it).first].dmg_tick++;
                     uint32 damage = (*it).second->GetMaxHealth() * (2 * sqrt(ep_PlayersData[(*it).first].dmg_tick) + secureZoneIndex) / 100;
@@ -575,10 +521,6 @@ void BattleRoyaleMgr::OutOfZoneDamage()
     }
 }
 
-/**
- * @brief Controla cuando poner al jugador en modo FFA PvP.
- * 
- */
 void BattleRoyaleMgr::AddFFAPvPFlag()
 {
     if (ep_Players.size())
@@ -593,12 +535,6 @@ void BattleRoyaleMgr::AddFFAPvPFlag()
     }
 }
 
-/**
- * @brief Saca a un jugador del evento y lo teletransporta a donde estaba.
- * 
- * @param guid 
- * @param logout 
- */
 void BattleRoyaleMgr::ExitFromEvent(uint32 guid, bool logout)
 {
     if (ep_PlayersQueue.find(guid) != ep_PlayersQueue.end()) {
@@ -614,35 +550,5 @@ void BattleRoyaleMgr::ExitFromEvent(uint32 guid, bool logout)
     if (!ep_Players.size())
     {
         eventCurrentStatus = ESTADO_NO_SUFICIENTES_JUGADORES;
-    }
-}
-
-/**
- * @brief Reinicia el valor de todas las variables del evento (El boton de pánico).
- * 
- */
-void BattleRoyaleMgr::ResetFullEvent()
-{
-    ep_PlayersQueue.clear();
-	ep_Players.clear();
-    ep_PlayersData.clear();
-    rotationMapIndex = 0;
-    eventCurrentStatus = ESTADO_NO_SUFICIENTES_JUGADORES;
-    secondsTicksHelper = 1000;
-    summonOffsetIndex = 0;
-    if (go_SecureZone) {
-        go_SecureZone->DespawnOrUnsummon();
-        go_SecureZone->Delete();
-        go_SecureZone = nullptr;
-    }
-    if (go_CenterOfBattle) {
-        go_CenterOfBattle->DespawnOrUnsummon();
-        go_CenterOfBattle->Delete();
-        go_CenterOfBattle = nullptr;
-    }
-    if (go_TransportShip) {
-        go_TransportShip->DespawnOrUnsummon();
-        go_TransportShip->Delete();
-        go_TransportShip = nullptr;
     }
 }

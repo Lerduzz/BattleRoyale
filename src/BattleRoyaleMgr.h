@@ -87,9 +87,10 @@ public:
     void PrevenirJcJEnLaNave(Player* player, bool state);
     bool PuedeReaparecerEnCementerio(Player *player);
     bool DebeRestringirFunciones(Player* player) { return eventCurrentStatus > ESTADO_NO_SUFICIENTES_JUGADORES && IsInEvent(player); };
-    bool DebeForzarJcJTcT(Player* player) { return !(eventCurrentStatus != ESTADO_BATALLA_EN_CURSO || !HayJugadores() || !IsInEvent(player)) || !(go_TransportShip && player->GetTransport() && player->GetExactDist(go_TransportShip) < 25.0f); };
+    bool DebeForzarJcJTcT(Player* player) { return !(eventCurrentStatus != ESTADO_BATALLA_EN_CURSO || !HayJugadores() || !IsInEvent(player)) || !(obj_Nave && player->GetTransport() && player->GetExactDist(obj_Nave) < 25.0f); };
     
 private:
+    void RestablecerTodoElEvento();
     void TeleportToEvent(uint32 guid);
     void EnterToPhaseEvent(uint32 guid);
     void ExitFromPhaseEvent(uint32 guid);
@@ -110,21 +111,19 @@ private:
     void OutOfZoneDamage();
     void AddFFAPvPFlag();
     void ExitFromEvent(uint32 guid, bool logout = false);
-    void ResetFullEvent();
-
     bool IsInQueue(Player* player) { return ep_PlayersQueue.find(player->GetGUID().GetCounter()) != ep_PlayersQueue.end(); };
     bool IsInEvent(Player* player) { return ep_Players.find(player->GetGUID().GetCounter()) != ep_Players.end(); };
-    bool IsQueuedEnoughPlayers() { return ep_PlayersQueue.size() >= eventMinPlayers; };
-    bool IsEventFull() { return ep_Players.size() >= eventMaxPlayers; };
+    bool IsQueuedEnoughPlayers() { return ep_PlayersQueue.size() >= conf_JugadoresMinimo; };
+    bool IsEventFull() { return ep_Players.size() >= conf_JugadoresMaximo; };
     bool HayJugadores() { return ep_Players.size() > 0; };
     
     BR_ListaDePersonajes ep_PlayersQueue;
     BR_ListaDePersonajes ep_Players;
     BR_DatosDePersonajes ep_PlayersData;
     
-    GameObject* go_SecureZone;
-    GameObject* go_CenterOfBattle;    
-    GameObject* go_TransportShip;
+    GameObject* obj_Zona;
+    GameObject* obj_Centro;    
+    GameObject* obj_Nave;
 
     int secureZoneIndex;
     int secureZoneDelay;
@@ -138,9 +137,9 @@ private:
 
     int summonOffsetIndex;
 
-    uint32 eventMinPlayers;
-    uint32 eventMaxPlayers;
-    uint32 secureZoneUpdateInterval;
+    uint32 conf_JugadoresMinimo;
+    uint32 conf_JugadoresMaximo;
+    uint32 conf_IntervaloEntreRecuccionDeZona;
 };
 
 #define sBattleRoyaleMgr BattleRoyaleMgr::instance()
