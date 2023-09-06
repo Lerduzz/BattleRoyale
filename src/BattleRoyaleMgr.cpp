@@ -212,7 +212,7 @@ void BattleRoyaleMgr::IniciarNuevaRonda()
     {
         estadoActual = ESTADO_INVOCANDO_JUGADORES;
         SiguienteMapa();
-        tiempoRestanteInicio = 70;
+        tiempoRestanteInicio = 67;
         for (BR_ColaDePersonajes::iterator it = list_Cola.begin(); it != list_Cola.end(); ++it)
 	    {
             if (!EstaLlenoElEvento())
