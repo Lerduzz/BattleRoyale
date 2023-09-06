@@ -182,7 +182,6 @@ void BattleRoyaleMgr::PrevenirJcJEnLaNave(Player* player, bool state)
 bool BattleRoyaleMgr::PuedeReaparecerEnCementerio(Player *player)
 {
     if (HayJugadores() && EstaEnEvento(player)) {
-        if (!player->IsAlive()) RevivirJugador(player);
         SalirDelEvento(player->GetGUID().GetCounter());
     }
     return true;
@@ -292,6 +291,7 @@ void BattleRoyaleMgr::SalirDelEvento(uint32 guid, bool logout)
         CambiarDimension_Salir(guid);
         if(!logout)
         {
+            if (!list_Jugadores[guid]->IsAlive()) RevivirJugador(list_Jugadores[guid]);
             if (!list_Jugadores[guid]->isPossessing()) list_Jugadores[guid]->StopCastingBindSight();
             list_Jugadores[guid]->TeleportTo(list_Datos[guid].GetMap(), list_Datos[guid].GetX(), list_Datos[guid].GetY(), list_Datos[guid].GetZ(), list_Datos[guid].GetO());
             list_Jugadores[guid]->SaveToDB(false, false);
@@ -438,7 +438,8 @@ void BattleRoyaleMgr::ControlDeReglas()
         {
             if ((*it).second && (*it).second->IsAlive())
             {
-                if ((*it).second->HasAura(31700)) SalirDelEvento((*it).first); // 1. No utilizar vuelo mundial.
+                if ((*it).second->HasAura(31700)) SalirDelEvento((*it).first);                                   // 1. No utilizar vuelo mundial.
+                if (obj_Centro && (*it).second->GetExactDist(obj_Centro) > 650.0f) SalirDelEvento((*it).first);  // 2. No alejarse demasiado del centro.
             }
         }
     }
