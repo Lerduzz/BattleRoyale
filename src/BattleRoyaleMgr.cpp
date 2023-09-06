@@ -567,7 +567,7 @@ void BattleRoyaleMgr::TeleportPlayersToShip()
  */
 void BattleRoyaleMgr::Dismount(Player* player)
 {
-    if (player && player->IsMounted())
+    if (player && player->IsAlive() && player->IsMounted())
     {
         if (!player->IsInFlight())
         {
@@ -589,8 +589,10 @@ void BattleRoyaleMgr::AddParachuteToAllPlayers()
     {
         for (BattleRoyalePlayerList::iterator it = ep_Players.begin(); it != ep_Players.end(); ++it)
         {
-            // TODO: Condiciones para poner el paracaidas (Que exista, que se encuentre en la nave).
-            (*it).second->AddAura(SPELL_PARACHUTE_DALARAN, (*it).second);
+            if (go_TransportShip && (*it).second && (*it).second->GetTransport() && (*it).second->GetExactDist(go_TransportShip) < 25.0f && (*it).second->IsAlive())
+            {
+                (*it).second->AddAura(SPELL_PARACHUTE_DALARAN, (*it).second);
+            }
         }
     }
 }
