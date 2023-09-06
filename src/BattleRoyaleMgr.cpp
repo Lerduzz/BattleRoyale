@@ -56,7 +56,7 @@ void BattleRoyaleMgr::GestionarJugadorEntrando(Player *player)
             {
                 list_Jugadores[player->GetGUID().GetCounter()] = player;
                 AlmacenarPosicionInicial(player->GetGUID().GetCounter());
-                LlamarAntesQueNave(player->GetGUID().GetCounter());
+                LlamarDentroDeNave(player->GetGUID().GetCounter());
             }
             break;
         }
@@ -71,7 +71,7 @@ void BattleRoyaleMgr::GestionarJugadorEntrando(Player *player)
 
 void BattleRoyaleMgr::GestionarJugadorDesconectar(Player *player)
 {
-    if (EstaEnEvento(player)) ExitFromEvent(player->GetGUID().GetCounter(), true);
+    if (EstaEnEvento(player)) SalirDelEvento(player->GetGUID().GetCounter(), true);
 }
 
 void BattleRoyaleMgr::GestionarMuerteJcJ(Player *killer, Player *killed)
@@ -279,6 +279,39 @@ void BattleRoyaleMgr::LlamarAntesQueNave(uint32 guid)
     }
 }
 
+void BattleRoyaleMgr::LlamarDentroDeNave(uint32 guid)
+{
+    if (!list_Jugadores.size()) return;
+    if (list_Jugadores.find(guid) != list_Jugadores.end())
+    {
+        float ox = BR_VariacionesDePosicion[indiceDeVariacion][0];
+        float oy = BR_VariacionesDePosicion[indiceDeVariacion][1];
+        indiceDeVariacion++;
+        if (indiceDeVariacion >= CANTIDAD_DE_VARIACIONES) indiceDeVariacion = 0;
+        Desmontar(list_Jugadores[guid]);
+        list_Jugadores[guid]->SetPvP(false);
+        list_Jugadores[guid]->TeleportTo(BR_IdentificadorDeMapas[indiceDelMapa], BR_InicioDeLaNave[indiceDelMapa][0] + ox, BR_InicioDeLaNave[indiceDelMapa][1] + oy, BR_InicioDeLaNave[indiceDelMapa][2] + 1.5f, 0.0f);
+    }
+}
+
+void BattleRoyaleMgr::SalirDelEvento(uint32 guid, bool logout)
+{
+    if (list_Cola.find(guid) != list_Cola.end()) {
+        list_Cola.erase(guid);
+    };
+    if (list_Jugadores.find(guid) != list_Jugadores.end()) {
+        CambiarDimension_Salir(guid);
+        list_Jugadores.erase(guid);
+        list_Datos.erase(guid);
+    }
+
+    // TEMP: Finalizar evento al no quedar nadie en el.
+    if (!list_Jugadores.size())
+    {
+        estadoActual = ESTADO_NO_HAY_SUFICIENTES_JUGADORES;
+    }
+}
+
 void BattleRoyaleMgr::TeleportToEvent(uint32 guid)
 {
 	
@@ -442,27 +475,12 @@ bool BattleRoyaleMgr::SpawnSecureZone()
     return false;
 }
 
-void BattleRoyaleMgr::TeleportPlayerToShip(uint32 guid)
-{
-    if (!list_Jugadores.size()) return;
-    if (list_Jugadores.find(guid) != list_Jugadores.end())
-    {
-        float ox = BR_VariacionesDePosicion[indiceDeVariacion][0];
-        float oy = BR_VariacionesDePosicion[indiceDeVariacion][1];
-        indiceDeVariacion++;
-        if (indiceDeVariacion >= CANTIDAD_DE_VARIACIONES) indiceDeVariacion = 0;
-        Desmontar(list_Jugadores[guid]);
-        list_Jugadores[guid]->SetPvP(false);
-        list_Jugadores[guid]->TeleportTo(BR_IdentificadorDeMapas[indiceDelMapa], BR_InicioDeLaNave[indiceDelMapa][0] + ox, BR_InicioDeLaNave[indiceDelMapa][1] + oy, BR_InicioDeLaNave[indiceDelMapa][2] + 1.5f, 0.0f);
-    }
-}
-
 void BattleRoyaleMgr::TeleportPlayersToShip()
 {
     if (!list_Jugadores.size()) return;
     for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
     {
-        TeleportPlayerToShip((*it).first);
+        LlamarDentroDeNave((*it).first);
     }
 }
 
@@ -513,23 +531,5 @@ void BattleRoyaleMgr::AddFFAPvPFlag()
                 (*it).second->SetByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
             }
         }
-    }
-}
-
-void BattleRoyaleMgr::ExitFromEvent(uint32 guid, bool logout)
-{
-    if (list_Cola.find(guid) != list_Cola.end()) {
-        list_Cola.erase(guid);
-    };
-    if (list_Jugadores.find(guid) != list_Jugadores.end()) {
-        CambiarDimension_Salir(guid);
-        list_Jugadores.erase(guid);
-        list_Datos.erase(guid);
-    }
-
-    // TEMP: Finalizar evento al no quedar nadie en el.
-    if (!list_Jugadores.size())
-    {
-        estadoActual = ESTADO_NO_HAY_SUFICIENTES_JUGADORES;
     }
 }

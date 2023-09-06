@@ -93,7 +93,9 @@ private:
     void RestablecerTodoElEvento();
     void IniciarNuevaRonda();
     void AlmacenarPosicionInicial(uint32 guid);
-    void LlamarAntesQueNave(uint32 guid);
+    void LlamarAntesQueNave(uint32 guid);    
+    void LlamarDentroDeNave(uint32 guid);
+    void SalirDelEvento(uint32 guid, bool logout = false);
     
 
 
@@ -109,12 +111,10 @@ private:
     bool SpawnTransportShip();
     bool SpawnTheCenterOfBattle();
     bool SpawnSecureZone();
-    void TeleportPlayerToShip(uint32 guid);
     void TeleportPlayersToShip();
     void AddParachuteToAllPlayers();
     void OutOfZoneDamage();
     void AddFFAPvPFlag();
-    void ExitFromEvent(uint32 guid, bool logout = false);
     
 
 
