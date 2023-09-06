@@ -107,7 +107,7 @@ bool BattleRoyaleMgr::PuedeReaparecerEnCementerio(Player *player)
     if (HayJugadores() && IsInEvent(player)) {
         if (!player->isPossessing()) player->StopCastingBindSight();
         if (!player->IsAlive()) ResurrectPlayer(player);
-        uint32 guid = player->GetGUID().GetCounter()
+        uint32 guid = player->GetGUID().GetCounter();
         ExitFromPhaseEvent(guid);
         player->TeleportTo(ep_PlayersData[guid].GetMap(), ep_PlayersData[guid].GetX(), ep_PlayersData[guid].GetY(), ep_PlayersData[guid].GetZ(), ep_PlayersData[guid].GetO());
         player->SaveToDB(false, false);
