@@ -112,8 +112,8 @@ private:
     bool EstaLlenoElEvento() { return list_Jugadores.size() >= conf_JugadoresMaximo; };
     bool HaySuficientesEnCola() { return list_Cola.size() >= conf_JugadoresMinimo; };
     ChatHandler Chat(Player* player) { return ChatHandler(player->GetSession()); };
-    void SiguienteMapa() { if (indiceDelMapa++ >= CANTIDAD_DE_MAPAS) indiceDelMapa = 0; };
-    void SiguientePosicion() { if (indiceDeVariacion++ >= CANTIDAD_DE_VARIACIONES) indiceDeVariacion = 0; };
+    void SiguienteMapa() { if (++indiceDelMapa >= CANTIDAD_DE_MAPAS) indiceDelMapa = 0; };
+    void SiguientePosicion() { if (++indiceDeVariacion >= CANTIDAD_DE_VARIACIONES) indiceDeVariacion = 0; };
     void CambiarDimension_Entrar(uint32 guid)
     {
         list_Jugadores[guid]->SetPhaseMask(2, false);
