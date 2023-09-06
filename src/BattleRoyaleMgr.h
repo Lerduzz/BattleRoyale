@@ -105,6 +105,7 @@ private:
     void EfectoFueraDeZona();
     void ActivarJcJTcT();
     void ControlDeReglas();
+    void CondicionDeVictoria();
     bool HayJugadores() { return list_Jugadores.size() > 0; };
     bool EstaEnCola(Player* player) { return list_Cola.find(player->GetGUID().GetCounter()) != list_Cola.end(); };
     bool EstaEnEvento(Player* player) { return list_Jugadores.find(player->GetGUID().GetCounter()) != list_Jugadores.end(); };

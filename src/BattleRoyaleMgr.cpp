@@ -150,6 +150,7 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
             if (indicadorDeSegundos <= 0) {
                 indicadorDeSegundos = 1000;
                 ControlDeReglas();
+                CondicionDeVictoria();
                 EfectoFueraDeZona();
                 ActivarJcJTcT();
                 if (--tiempoRestanteNave <= 0)
@@ -185,8 +186,7 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
 
 void BattleRoyaleMgr::PrevenirJcJEnLaNave(Player* player, bool state)
 {
-    if (!state || !list_Jugadores.size()) return;
-    if (list_Jugadores.find(player->GetGUID().GetCounter()) != list_Jugadores.end() && !DebeForzarJcJTcT(player)) player->SetPvP(false);
+    if (state && HayJugadores() && EstaEnEvento(player) && !DebeForzarJcJTcT(player)) player->SetPvP(false);
 }
 
 bool BattleRoyaleMgr::PuedeReaparecerEnCementerio(Player *player)
@@ -264,8 +264,8 @@ void BattleRoyaleMgr::LlamarAntesQueNave(uint32 guid)
     float oy = BR_VariacionesDePosicion[indiceDeVariacion][1];
     SiguientePosicion();
     Desmontar(list_Jugadores[guid]);
-    list_Jugadores[guid]->SetPvP(false);
     list_Jugadores[guid]->TeleportTo(BR_IdentificadorDeMapas[indiceDelMapa], BR_InicioDeLaNave[indiceDelMapa][0] + ox, BR_InicioDeLaNave[indiceDelMapa][1] + oy, BR_InicioDeLaNave[indiceDelMapa][2] + 15.0f, 0.0f);
+    list_Jugadores[guid]->SetPvP(false);
     list_Jugadores[guid]->SaveToDB(false, false);
     list_Jugadores[guid]->AddAura(HECHIZO_PARACAIDAS, list_Jugadores[guid]);
 }
@@ -277,8 +277,8 @@ void BattleRoyaleMgr::LlamarDentroDeNave(uint32 guid)
     float oy = BR_VariacionesDePosicion[indiceDeVariacion][1];
     SiguientePosicion();
     Desmontar(list_Jugadores[guid]);
-    list_Jugadores[guid]->SetPvP(false);
     list_Jugadores[guid]->TeleportTo(BR_IdentificadorDeMapas[indiceDelMapa], BR_InicioDeLaNave[indiceDelMapa][0] + ox, BR_InicioDeLaNave[indiceDelMapa][1] + oy, BR_InicioDeLaNave[indiceDelMapa][2] + 1.5f, 0.0f);
+    list_Jugadores[guid]->SetPvP(false);
     list_Jugadores[guid]->SaveToDB(false, false);
 }
 
@@ -451,6 +451,55 @@ void BattleRoyaleMgr::ControlDeReglas()
             {
                 if ((*it).second->HasAura(31700)) SalirDelEvento((*it).first);
                 if (obj_Centro && (*it).second->GetExactDist(obj_Centro) > 650.0f) SalirDelEvento((*it).first);
+            }
+        }
+    }
+}
+
+void BattleRoyaleMgr::CondicionDeVictoria()
+{
+    if (estadoActual == ESTADO_BATALLA_EN_CURSO)
+    {
+        if (HayJugadores())
+        {
+            int cantidadVivos = 0;
+            for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
+            {
+                if ((*it).second && (*it).second->IsAlive()) cantidadVivos++;
+            }
+            if (cantidadVivos == 0)
+            {
+                estadoActual = ESTADO_NO_HAY_SUFICIENTES_JUGADORES;
+                if (HaySuficientesEnCola())
+                {
+                    IniciarNuevaRonda();
+                }
+            }
+            else if (cantidadVivos == 1)
+            {
+                for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
+                {
+                    if ((*it).second && (*it).second->IsAlive())
+                    {
+                        std::ostringstream msg;
+                        msg << "|cff4CFF00BattleRoyale::|r La ronda ha finalizado, el ganador ha sido " << Chat((*it).second).GetNameLink((*it).second) << " y ha eliminado a |cff4CFF00" << list_Datos[(*it).first].kills << "|r.";
+                        sWorld->SendServerMessage(SERVER_MSG_STRING, msg.str().c_str());
+                    }
+                    SalirDelEvento((*it).first);
+                }
+                estadoActual = ESTADO_NO_HAY_SUFICIENTES_JUGADORES;
+                if (HaySuficientesEnCola())
+                {
+                    IniciarNuevaRonda();
+                }
+            }
+        }
+        else
+        {
+            estadoActual = ESTADO_NO_HAY_SUFICIENTES_JUGADORES;
+            if (HaySuficientesEnCola())
+            {
+                IniciarNuevaRonda();
             }
         }
     }
