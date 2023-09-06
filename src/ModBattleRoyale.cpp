@@ -37,7 +37,7 @@ public:
     void OnLogout(Player* player) override {
         if (sConfigMgr->GetOption<bool>("BattleRoyale.Enabled", true))
         {
-            sBattleRoyaleMgr->HandlePlayerLogout(player);
+            sBattleRoyaleMgr->GestionarJugadorDesconectar(player);
         }
     }
 
@@ -45,7 +45,7 @@ public:
     {
         if (sConfigMgr->GetOption<bool>("BattleRoyale.Enabled", true))
         {
-            sBattleRoyaleMgr->HandleOnPVPLill(killer, killed);
+            sBattleRoyaleMgr->GestionarMuesteJcJ(killer, killed);
         }
     }
 
@@ -53,7 +53,7 @@ public:
 	{
         if (sConfigMgr->GetOption<bool>("BattleRoyale.Enabled", true))
         {
-            return !sBattleRoyaleMgr->HandleReleaseGhost(player);
+            return !sBattleRoyaleMgr->GestionarLiberarEspiritu(player);
         }
         return true;
 	}
@@ -153,10 +153,10 @@ public:
         switch (action)
         {
         case 1:
-            sBattleRoyaleMgr->HandlePlayerJoin(player);
+            sBattleRoyaleMgr->GestionarJugadorEntrando(player);
             break;
         case 2:
-            sBattleRoyaleMgr->HandlePlayerLogout(player);
+            sBattleRoyaleMgr->GestionarJugadorDesconectar(player);
             ChatHandler(player->GetSession()).PSendSysMessage("|cff4CFF00BattleRoyale::|r Ya no estas en cola para el evento.");
             break;
         case 3:
@@ -176,7 +176,7 @@ public:
 	}
 	void OnUpdate(uint32 diff) override
 	{
-		sBattleRoyaleMgr->HandleOnWoldUpdate(diff);
+		sBattleRoyaleMgr->GestionarActualizacionMundo(diff);
 	}
 };
 

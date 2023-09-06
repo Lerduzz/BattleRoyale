@@ -62,11 +62,11 @@ public:
         return instance;
     }
     
-    void HandlePlayerJoin(Player *player);
-    void HandlePlayerLogout(Player *player);
-    void HandleOnPVPLill(Player* killer, Player* killed);
-    bool HandleReleaseGhost(Player *player);
-    void HandleOnWoldUpdate(uint32 diff);
+    void GestionarJugadorEntrando(Player *player);
+    void GestionarJugadorDesconectar(Player *player);
+    void GestionarMuesteJcJ(Player* killer, Player* killed);
+    bool GestionarLiberarEspiritu(Player *player);
+    void GestionarActualizacionMundo(uint32 diff);
     void TeleportToEvent(uint32 guid);
     bool ForceFFAPvPFlag(Player* player);
     void PreventPvPBeforeBattle(Player* player, bool state);

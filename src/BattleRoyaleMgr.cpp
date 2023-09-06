@@ -40,7 +40,7 @@ BattleRoyaleMgr::~BattleRoyaleMgr()
     ep_PlayersData.clear();
 }
 
-void BattleRoyaleMgr::HandlePlayerJoin(Player *player)
+void BattleRoyaleMgr::GestionarJugadorEntrando(Player *player)
 {
     if (IsInQueue(player))
     {
@@ -80,12 +80,12 @@ void BattleRoyaleMgr::HandlePlayerJoin(Player *player)
  * 
  * @param player 
  */
-void BattleRoyaleMgr::HandlePlayerLogout(Player *player)
+void BattleRoyaleMgr::GestionarJugadorDesconectar(Player *player)
 {
     if (IsInEvent(player)) ExitFromEvent(player->GetGUID().GetCounter(), true);
 }
 
-void BattleRoyaleMgr::HandleOnPVPLill(Player *killer, Player *killed)
+void BattleRoyaleMgr::GestionarMuesteJcJ(Player *killer, Player *killed)
 {
     if (!killer || !killed) return;
     if (!ep_Players.size() || eventCurrentStatus != ESTADO_BATALLA_EN_CURSO) return;
@@ -103,7 +103,7 @@ void BattleRoyaleMgr::HandleOnPVPLill(Player *killer, Player *killed)
  * @return true: Retornado!
  * @return false: Dejar por defecto!
  */
-bool BattleRoyaleMgr::HandleReleaseGhost(Player *player)
+bool BattleRoyaleMgr::GestionarLiberarEspiritu(Player *player)
 {
     if (!ep_Players.size()) return false;
     uint32 guid = player->GetGUID().GetCounter();
@@ -173,7 +173,7 @@ void BattleRoyaleMgr::TeleportToEvent(uint32 guid)
 	}
 }
 
-void BattleRoyaleMgr::HandleOnWoldUpdate(uint32 diff)
+void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
 {
     switch(eventCurrentStatus)
     {
