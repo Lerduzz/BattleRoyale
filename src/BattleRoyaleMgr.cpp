@@ -42,7 +42,7 @@ void BattleRoyaleMgr::GestionarJugadorEntrando(Player* player)
             }
             else
             {
-                Chat(player).PSendSysMessage("|cff4CFF00BattleRoyale::|r Te has unido a la cola del evento. Jugadores en cola: %u/%u.", list_Cola.size(), conf_JugadoresMinimo);
+                Chat(player).PSendSysMessage("|cff4CFF00BattleRoyale::|r Te has unido a la cola del evento. Jugadores en cola: |cff4CFF00%u|r/|cff4CFF00%u|r.", list_Cola.size(), conf_JugadoresMinimo);
             }
             break;
         }
@@ -50,7 +50,7 @@ void BattleRoyaleMgr::GestionarJugadorEntrando(Player* player)
         {
             if (EstaLlenoElEvento()) {
                 list_Cola[player->GetGUID().GetCounter()] = player;
-                Chat(player).PSendSysMessage("|cff4CFF00BattleRoyale::|r Te has unido a la cola del evento. Jugadores en cola: %u/%u. El evento esta lleno, espera la otra ronda.", list_Cola.size(), conf_JugadoresMinimo);
+                Chat(player).PSendSysMessage("|cff4CFF00BattleRoyale::|r Te has unido a la cola del evento. Jugadores en cola: |cff4CFF00%u|r/|cff4CFF00%u|r. Evento lleno, espera a que termine la ronda.", list_Cola.size(), conf_JugadoresMinimo);
             }
             else
             {
@@ -63,7 +63,7 @@ void BattleRoyaleMgr::GestionarJugadorEntrando(Player* player)
         default:
         {
             list_Cola[player->GetGUID().GetCounter()] = player;
-            Chat(player).PSendSysMessage("|cff4CFF00BattleRoyale::|r Te has unido a la cola del evento. Jugadores en cola: %u/%u. El evento esta en curso, espera la otra ronda.", list_Cola.size(), conf_JugadoresMinimo);
+            Chat(player).PSendSysMessage("|cff4CFF00BattleRoyale::|r Te has unido a la cola del evento. Jugadores en cola: |cff4CFF00%u|r/|cff4CFF00%u|r. Evento en curso, espera a que termine la ronda.", list_Cola.size(), conf_JugadoresMinimo);
             break;
         }
     }
@@ -464,7 +464,7 @@ void BattleRoyaleMgr::FinalizarRonda(bool announce, Player* winner)
     if (announce && winner && EstaEnEvento(winner))
     {
         std::ostringstream msg;
-        msg << "|cff4CFF00BattleRoyale::|r Ronda ha finalizado, ganador: " << Chat(winner).GetNameLink(winner) << ", racha: |cff0000ff" << list_Datos[winner->GetGUID().GetCounter()].kills << "|r.";
+        msg << "|cff4CFF00BattleRoyale::|r Ronda finalizada, ganador: " << Chat(winner).GetNameLink(winner) << ", racha: |cff4CFF00" << list_Datos[winner->GetGUID().GetCounter()].kills << "|r.";
         sWorld->SendServerMessage(SERVER_MSG_STRING, msg.str().c_str());
     }
     if (HayJugadores()) for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it) SalirDelEvento((*it).first);
