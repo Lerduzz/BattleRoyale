@@ -45,7 +45,7 @@ public:
     {
         if (sConfigMgr->GetOption<bool>("BattleRoyale.Enabled", true))
         {
-            sBattleRoyaleMgr->GestionarMuesteJcJ(killer, killed);
+            sBattleRoyaleMgr->GestionarMuerteJcJ(killer, killed);
         }
     }
 
@@ -61,7 +61,7 @@ public:
     bool BRForcePlayerFFAPvPFlag(Player* player) override {
         if (sConfigMgr->GetOption<bool>("BattleRoyale.Enabled", true))
         {
-            return sBattleRoyaleMgr->ForceFFAPvPFlag(player);
+            return sBattleRoyaleMgr->DebeForzarJcJTcT(player);
         }
         return false;
     }
@@ -78,7 +78,7 @@ public:
     {
         if (sConfigMgr->GetOption<bool>("BattleRoyale.Enabled", true))
         {
-            return !sBattleRoyaleMgr->RestrictPlayerFunctions(player);
+            return !sBattleRoyaleMgr->DebeRestringirFunciones(player);
         }
         return true;
     }
@@ -87,7 +87,7 @@ public:
     {
         if (sConfigMgr->GetOption<bool>("BattleRoyale.Enabled", true))
         {
-            return !sBattleRoyaleMgr->RestrictPlayerFunctions(player);
+            return !sBattleRoyaleMgr->DebeRestringirFunciones(player);
         }
         return true;
     }
@@ -96,7 +96,7 @@ public:
     {
         if (sConfigMgr->GetOption<bool>("BattleRoyale.Enabled", true))
         {
-            return !sBattleRoyaleMgr->RestrictPlayerFunctions(player);
+            return !sBattleRoyaleMgr->DebeRestringirFunciones(player);
         }
         return true;
     }
@@ -105,7 +105,7 @@ public:
     {
         if (sConfigMgr->GetOption<bool>("BattleRoyale.Enabled", true))
         {
-            return !sBattleRoyaleMgr->RestrictPlayerFunctions(player);
+            return !sBattleRoyaleMgr->DebeRestringirFunciones(player);
         }
         return true;
     }
@@ -115,7 +115,7 @@ public:
         if (sConfigMgr->GetOption<bool>("BattleRoyale.Enabled", true))
         {
             err = GroupJoinBattlegroundResult::ERR_BATTLEGROUND_NOT_IN_BATTLEGROUND;
-            return !sBattleRoyaleMgr->RestrictPlayerFunctions(player);
+            return !sBattleRoyaleMgr->DebeRestringirFunciones(player);
         }
         return true;
     }
@@ -125,7 +125,7 @@ public:
         if (sConfigMgr->GetOption<bool>("BattleRoyale.Enabled", true))
         {
             err = GroupJoinBattlegroundResult::ERR_BATTLEGROUND_NOT_IN_BATTLEGROUND;
-            return !sBattleRoyaleMgr->RestrictPlayerFunctions(player);
+            return !sBattleRoyaleMgr->DebeRestringirFunciones(player);
         }
         return true;
     }

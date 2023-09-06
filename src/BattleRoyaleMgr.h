@@ -64,14 +64,12 @@ public:
     
     void GestionarJugadorEntrando(Player *player);
     void GestionarJugadorDesconectar(Player *player);
-    void GestionarMuesteJcJ(Player* killer, Player* killed);
+    void GestionarMuerteJcJ(Player* killer, Player* killed);
     void GestionarActualizacionMundo(uint32 diff);
     void PrevenirJcJEnLaNave(Player* player, bool state);
     bool PuedeReaparecerEnCementerio(Player *player);
-    bool ForceFFAPvPFlag(Player* player);
-    bool RestrictPlayerFunctions(Player* player);
-    
-
+    bool DebeRestringirFunciones(Player* player) { return eventCurrentStatus > ESTADO_NO_SUFICIENTES_JUGADORES && IsInEvent(player); };
+    bool DebeForzarJcJTcT(Player* player) { return !(eventCurrentStatus != ESTADO_BATALLA_EN_CURSO || !HayJugadores() || !IsInEvent(player)) || !(go_TransportShip && player->GetTransport() && player->GetExactDist(go_TransportShip) < 25.0f); };
     
 private:
     void TeleportToEvent(uint32 guid);
@@ -100,6 +98,7 @@ private:
     bool IsInEvent(Player* player) { return ep_Players.find(player->GetGUID().GetCounter()) != ep_Players.end(); };
     bool IsQueuedEnoughPlayers() { return ep_PlayersQueue.size() >= eventMinPlayers; };
     bool IsEventFull() { return ep_Players.size() >= eventMaxPlayers; };
+    bool HayJugadores() { return ep_Players.size() > 0; };
     
     BR_ListaDePersonajes ep_PlayersQueue;
     BR_ListaDePersonajes ep_Players;

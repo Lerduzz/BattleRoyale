@@ -85,7 +85,7 @@ void BattleRoyaleMgr::GestionarJugadorDesconectar(Player *player)
     if (IsInEvent(player)) ExitFromEvent(player->GetGUID().GetCounter(), true);
 }
 
-void BattleRoyaleMgr::GestionarMuesteJcJ(Player *killer, Player *killed)
+void BattleRoyaleMgr::GestionarMuerteJcJ(Player *killer, Player *killed)
 {
     if (!killer || !killed) return;
     if (!ep_Players.size() || eventCurrentStatus != ESTADO_BATALLA_EN_CURSO) return;
@@ -105,27 +105,23 @@ void BattleRoyaleMgr::GestionarMuesteJcJ(Player *killer, Player *killed)
  */
 bool BattleRoyaleMgr::PuedeReaparecerEnCementerio(Player *player)
 {
-    if (!ep_Players.size()) return true;
-    uint32 guid = player->GetGUID().GetCounter();
-    if (ep_Players.find(guid) == ep_Players.end()) return true;
-    if (!player->isPossessing())
-    {
-        player->StopCastingBindSight();
-    }
-    if (!player->IsAlive()) ResurrectPlayer(player);
-    ExitFromPhaseEvent(guid);
-    player->TeleportTo(ep_PlayersData[guid].GetMap(), ep_PlayersData[guid].GetX(), ep_PlayersData[guid].GetY(), ep_PlayersData[guid].GetZ(), ep_PlayersData[guid].GetO());
-    player->SaveToDB(false, false);
-    ep_Players.erase(guid);
-	ep_PlayersData.erase(guid);
-    
-    // TEMP: Finalizar evento al no quedar nadie en el.
-    if (!ep_Players.size())
-    {
-        eventCurrentStatus = ESTADO_NO_SUFICIENTES_JUGADORES;
-    }
+    if (HayJugadores() && IsInEvent(player)) {
+        if (!player->isPossessing()) player->StopCastingBindSight();
+        if (!player->IsAlive()) ResurrectPlayer(player);
+        uint32 guid = player->GetGUID().GetCounter()
+        ExitFromPhaseEvent(guid);
+        player->TeleportTo(ep_PlayersData[guid].GetMap(), ep_PlayersData[guid].GetX(), ep_PlayersData[guid].GetY(), ep_PlayersData[guid].GetZ(), ep_PlayersData[guid].GetO());
+        player->SaveToDB(false, false);
+        ep_Players.erase(guid);
+	    ep_PlayersData.erase(guid);
 
-    return false;
+        // TEMP: Finalizar evento al no quedar nadie en el.
+        if (!ep_Players.size())
+        {
+            eventCurrentStatus = ESTADO_NO_SUFICIENTES_JUGADORES;
+        }
+    }
+    return true;
 }
 
 /**
@@ -261,22 +257,10 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
     }
 }
 
-bool BattleRoyaleMgr::ForceFFAPvPFlag(Player* player)
-{
-    if (eventCurrentStatus != ESTADO_BATALLA_EN_CURSO || !ep_Players.size() || ep_Players.find(player->GetGUID().GetCounter()) == ep_Players.end()) return false;
-    return !(go_TransportShip && player->GetTransport() && player->GetExactDist(go_TransportShip) < 25.0f);
-}
-
 void BattleRoyaleMgr::PrevenirJcJEnLaNave(Player* player, bool state)
 {
     if (!state || !ep_Players.size()) return;
-    if (ep_Players.find(player->GetGUID().GetCounter()) != ep_Players.end() && !ForceFFAPvPFlag(player)) player->SetPvP(false);
-}
-
-bool BattleRoyaleMgr::RestrictPlayerFunctions(Player* player)
-{
-    if (eventCurrentStatus > ESTADO_NO_SUFICIENTES_JUGADORES && ep_Players.find(player->GetGUID().GetCounter()) != ep_Players.end()) return true;
-    return false;
+    if (ep_Players.find(player->GetGUID().GetCounter()) != ep_Players.end() && !DebeForzarJcJTcT(player)) player->SetPvP(false);
 }
 
 // -- Private functions -- //
@@ -620,7 +604,7 @@ void BattleRoyaleMgr::AddFFAPvPFlag()
     {
         for (BR_ListaDePersonajes::iterator it = ep_Players.begin(); it != ep_Players.end(); ++it)
         {
-            if ((*it).second && (*it).second->IsAlive() && ForceFFAPvPFlag((*it).second) && !((*it).second->HasByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP)))
+            if ((*it).second && (*it).second->IsAlive() && DebeForzarJcJTcT((*it).second) && !((*it).second->HasByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP)))
             {
                 (*it).second->SetByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
             }
