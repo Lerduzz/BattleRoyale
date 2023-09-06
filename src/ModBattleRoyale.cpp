@@ -58,14 +58,6 @@ public:
         return true;
 	}
 
-    bool BattleRoyaleForzarJcJTcTScript(Player* player) override {
-        if (sConfigMgr->GetOption<bool>("BattleRoyale.Enabled", true))
-        {
-            return sBattleRoyaleMgr->DebeForzarJcJTcT(player);
-        }
-        return false;
-    }
-
     void OnPlayerPVPFlagChange(Player* player, bool state) override
     {
         if (sConfigMgr->GetOption<bool>("BattleRoyale.Enabled", true))
@@ -128,6 +120,14 @@ public:
             return !sBattleRoyaleMgr->DebeRestringirFunciones(player);
         }
         return true;
+    }
+
+    bool BattleRoyaleForzarJcJTcTScript(Player* player) override {
+        if (sConfigMgr->GetOption<bool>("BattleRoyale.Enabled", true))
+        {
+            return sBattleRoyaleMgr->DebeForzarJcJTcT(player);
+        }
+        return false;
     }
 };
 
