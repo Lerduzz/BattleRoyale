@@ -132,7 +132,7 @@ private:
     void NotifySecureZoneReduceWarn(uint32 delay);
     void NotifySecureZoneReduced();
     void NotifyTimeRemainingToStart(uint32 delay);
-    void NotifyPvPKill(std::string killer, std::string killed);
+    void NotifyPvPKill(std::string killer, std::string killed, int kills);
     bool SpawnTransportShip();
     bool SpawnTheCenterOfBattle();
     bool SpawnSecureZone();

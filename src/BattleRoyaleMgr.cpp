@@ -104,9 +104,11 @@ void BattleRoyaleMgr::HandleOnPVPLill(Player *killer, Player *killed)
     uint32 guid_r = killer->GetGUID().GetCounter();
     uint32 guid_d = killed->GetGUID().GetCounter();
     if (ep_Players.find(guid_r) == ep_Players.end() || ep_Players.find(guid_d) == ep_Players.end()) return;
+    ep_PlayersData[guid_r].kills++;
     killed->CastSpell(killer, 6277, true);
+    // TODO: Llevar una lista de los espectadores de un jugador y al morir comprobar y mover los espectadores al nuevo asesino.
     ChatHandler handler = ChatHandler(killer->GetSession());
-    NotifyPvPKill(handler.GetNameLink(killer), handler.GetNameLink(killed));
+    NotifyPvPKill(handler.GetNameLink(killer), handler.GetNameLink(killed), ep_PlayersData[guid_r].kills);
 }
 
 /**
@@ -394,13 +396,13 @@ void BattleRoyaleMgr::NotifyTimeRemainingToStart(uint32 delay)
  * @param killer 
  * @param killed 
  */
-void BattleRoyaleMgr::NotifyPvPKill(std::string killer, std::string killed)
+void BattleRoyaleMgr::NotifyPvPKill(std::string killer, std::string killed, int kills)
 {
     if (ep_Players.size())
     {
         for (BattleRoyalePlayerList::iterator it = ep_Players.begin(); it != ep_Players.end(); ++it)
         {
-            ChatHandler((*it).second->GetSession()).PSendSysMessage("|cff4CFF00BattleRoyale::|r ¡%s ha eliminado a %s!.", killer, killed);
+            ChatHandler((*it).second->GetSession()).PSendSysMessage("|cff4CFF00BattleRoyale::|r ¡%s ha eliminado a %s!. Racha de %i.", killer, killed, kills);
         }
     }
 }
