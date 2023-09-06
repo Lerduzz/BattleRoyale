@@ -110,8 +110,10 @@ private:
     void ActivarJcJTcT();
     void ControlDeReglas();
     void CondicionDeVictoria();
+    void FinalizarRonda(bool announce, Player* winner = nullptr);
     bool HayJugadores() { return list_Jugadores.size() > 0; };
     bool EstaEnCola(Player* player) { return list_Cola.find(player->GetGUID().GetCounter()) != list_Cola.end(); };
+    bool EstaEnCola(uint32 guid) { return list_Cola.find(guid) != list_Cola.end(); };
     bool EstaEnEvento(Player* player) { return list_Jugadores.find(player->GetGUID().GetCounter()) != list_Jugadores.end(); };
     bool EstaEnEvento(uint32 guid) { return list_Jugadores.find(guid) != list_Jugadores.end(); };
     bool EstaLlenoElEvento() { return list_Jugadores.size() >= conf_JugadoresMaximo; };
@@ -227,6 +229,42 @@ private:
                 (*it).second->GetSession()->SendNotification("|cff0000ff¡La nave se ha retirado!");
             }
         }
+    };
+    void DesaparecerTodosLosObjetos()
+    {
+        DesaparecerZona();
+        DesaparecerCentro();
+        DesaparecerNave();
+    };
+    bool DesaparecerZona()
+    {
+        if (obj_Zona) {
+            obj_Zona->DespawnOrUnsummon();
+            obj_Zona->Delete();
+            obj_Zona = nullptr;
+            return true;
+        }
+        return false;
+    };
+    bool DesaparecerCentro()
+    {
+        if (obj_Centro) {
+            obj_Centro->DespawnOrUnsummon();
+            obj_Centro->Delete();
+            obj_Centro = nullptr;
+            return true;
+        }
+        return false;
+    };
+    bool DesaparecerNave()
+    {
+        if (obj_Nave) {
+            obj_Nave->DespawnOrUnsummon();
+            obj_Nave->Delete();
+            obj_Nave = nullptr;
+            return true;
+        }
+        return false;
     };
 
     BR_ListaDePersonajes list_Cola;

@@ -153,14 +153,11 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
                 ActivarJcJTcT();
                 if (--tiempoRestanteNave <= 0)
                 {
-                    if (obj_Nave) {
-                        obj_Nave->DespawnOrUnsummon();
-                        obj_Nave->Delete();
-                        obj_Nave = nullptr;
-                        NotificarNaveRetirada();
-                    }
+                    if (DesaparecerNave()) NotificarNaveRetirada();
                 }
-            } else {
+            }
+            else
+            {
                 indicadorDeSegundos -= diff;
             }
             if (tiempoRestanteZona <= 0) {
@@ -206,21 +203,7 @@ void BattleRoyaleMgr::RestablecerTodoElEvento()
     estadoActual = ESTADO_NO_HAY_SUFICIENTES_JUGADORES;
     indicadorDeSegundos = 1000;
     indiceDeVariacion = 0;
-    if (obj_Zona) {
-        obj_Zona->DespawnOrUnsummon();
-        obj_Zona->Delete();
-        obj_Zona = nullptr;
-    }
-    if (obj_Centro) {
-        obj_Centro->DespawnOrUnsummon();
-        obj_Centro->Delete();
-        obj_Centro = nullptr;
-    }
-    if (obj_Nave) {
-        obj_Nave->DespawnOrUnsummon();
-        obj_Nave->Delete();
-        obj_Nave = nullptr;
-    }
+    DesaparecerTodosLosObjetos();
 }
 
 void BattleRoyaleMgr::IniciarNuevaRonda()
@@ -293,10 +276,12 @@ void BattleRoyaleMgr::LlamarTodosDentroDeNave()
 
 void BattleRoyaleMgr::SalirDelEvento(uint32 guid, bool logout)
 {
-    if (list_Cola.find(guid) != list_Cola.end()) {
+    if (EstaEnCola(guid))
+    {
         list_Cola.erase(guid);
     };
-    if (list_Jugadores.find(guid) != list_Jugadores.end()) {
+    if (EstaEnEvento(guid))
+    {
         CambiarDimension_Salir(guid);
         if(!logout)
         {
@@ -327,11 +312,7 @@ bool BattleRoyaleMgr::InvocarNave()
         {
             if ((*it).second)
             {
-                if (obj_Nave) {
-                    obj_Nave->DespawnOrUnsummon();
-                    obj_Nave->Delete();
-                    obj_Nave = nullptr;
-                }
+                DesaparecerNave();
                 float x = BR_InicioDeLaNave[indiceDelMapa][0];
                 float y = BR_InicioDeLaNave[indiceDelMapa][1];
                 float z = BR_InicioDeLaNave[indiceDelMapa][2];
@@ -351,11 +332,7 @@ bool BattleRoyaleMgr::InvocarCentroDelMapa()
 {
     if (obj_Nave)
     {
-        if (obj_Centro) {
-            obj_Centro->DespawnOrUnsummon();
-            obj_Centro->Delete();
-            obj_Centro = nullptr;
-        }
+        DesaparecerCentro();
         obj_Centro = obj_Nave->SummonGameObject(OBJETO_CENTRO_DEL_MAPA, BR_CentroDeMapas[indiceDelMapa].GetPositionX(), BR_CentroDeMapas[indiceDelMapa].GetPositionY(), BR_CentroDeMapas[indiceDelMapa].GetPositionZ(), 0, 0, 0, 0, 0, 15 * 60);
         return true;
     }
@@ -366,11 +343,7 @@ bool BattleRoyaleMgr::InvocarZonaSegura()
 {
     if (obj_Centro)
     {
-        if (obj_Zona) {
-            obj_Zona->DespawnOrUnsummon();
-            obj_Zona->Delete();
-            obj_Zona = nullptr;
-        }
+        DesaparecerZona();
         if (indiceDeZona < CANTIDAD_DE_ZONAS) {
             obj_Zona = obj_Centro->SummonGameObject(OBJETO_ZONA_SEGURA_INICIAL + indiceDeZona, BR_CentroDeMapas[indiceDelMapa].GetPositionX(), BR_CentroDeMapas[indiceDelMapa].GetPositionY(), BR_CentroDeMapas[indiceDelMapa].GetPositionZ() + BR_EscalasDeZonaSegura[indiceDeZona] * 66.0f, 0, 0, 0, 0, 0, 2 * 60);
             obj_Zona->SetPhaseMask(2, true);
@@ -461,44 +434,37 @@ void BattleRoyaleMgr::CondicionDeVictoria()
         if (HayJugadores())
         {
             int cantidadVivos = 0;
+            Player* vivo = nullptr;
             for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
             {
-                if ((*it).second && (*it).second->IsAlive()) cantidadVivos++;
-            }
-            if (cantidadVivos == 0)
-            {
-                estadoActual = ESTADO_NO_HAY_SUFICIENTES_JUGADORES;
-                if (HaySuficientesEnCola())
+                if ((*it).second && (*it).second->IsAlive())
                 {
-                    IniciarNuevaRonda();
+                    cantidadVivos++;
+                    vivo = (*it).second;
                 }
             }
-            else if (cantidadVivos == 1)
+            if (cantidadVivos <= 1)
             {
-                for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
-                {
-                    if ((*it).second && (*it).second->IsAlive())
-                    {
-                        std::ostringstream msg;
-                        msg << "|cff4CFF00BattleRoyale::|r Ronda ha finalizado, ganador: " << Chat((*it).second).GetNameLink((*it).second) << ", racha: |cff0000ff" << list_Datos[(*it).first].kills << "|r.";
-                        sWorld->SendServerMessage(SERVER_MSG_STRING, msg.str().c_str());
-                    }
-                    SalirDelEvento((*it).first);
-                }
-                estadoActual = ESTADO_NO_HAY_SUFICIENTES_JUGADORES;
-                if (HaySuficientesEnCola())
-                {
-                    IniciarNuevaRonda();
-                }
+                FinalizarRonda(cantidadVivos == 1, vivo);
             }
         }
         else
         {
-            estadoActual = ESTADO_NO_HAY_SUFICIENTES_JUGADORES;
-            if (HaySuficientesEnCola())
-            {
-                IniciarNuevaRonda();
-            }
+            FinalizarRonda(false);
         }
     }
+}
+
+void BattleRoyaleMgr::FinalizarRonda(bool announce, Player* winner)
+{
+    if (announce && winner && EstaEnEvento(winner))
+    {
+        std::ostringstream msg;
+        msg << "|cff4CFF00BattleRoyale::|r Ronda ha finalizado, ganador: " << Chat(winner).GetNameLink(winner) << ", racha: |cff0000ff" << list_Datos[winner->GetGUID().GetCounter()].kills << "|r.";
+        sWorld->SendServerMessage(SERVER_MSG_STRING, msg.str().c_str());
+    }
+    if (HayJugadores()) for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it) SalirDelEvento((*it).first);
+    DesaparecerTodosLosObjetos();
+    estadoActual = ESTADO_NO_HAY_SUFICIENTES_JUGADORES;
+    if (HaySuficientesEnCola()) IniciarNuevaRonda();
 }
