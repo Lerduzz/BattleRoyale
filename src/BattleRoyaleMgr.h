@@ -9,47 +9,37 @@
 #include "Player.h"
 
 class BattleRoyaleData;
+typedef std::map<uint32, Player*> BR_ColaDePersonajes;
+typedef std::map<uint32, Player*> BR_ListaDePersonajes;
+typedef std::map<uint32, BattleRoyaleData> BR_DatosDePersonajes;
 
-// GUIDLow es la llave, Lista de personajes en cola para el evento.
-typedef std::map<uint32, Player*> BattleRoyalePlayerQueue;
-
-// GUIDLow es la llave, Lista de personajes en el evento.
-typedef std::map<uint32, Player*> BattleRoyalePlayerList;
-
-// GUIDLow es la llave, Datos de los personajes en el evento.
-typedef std::map<uint32, BattleRoyaleData> BattleRoyalePlayerData;
-
-// Estados del evento.
-enum BREventStatus
+enum BR_EstadosEvento
 {
-    STATUS_NO_ENOUGH_PLAYERS                = 0,      // No hay suficientes jugadores.
-    STATUS_SUMMONING_PLAYERS                = 1,      // Se ha comenzado a teletransportar jugadores a la zona central.
-    STATUS_SHIP_WAITING                     = 2,      // Ahora se estan moviendo a los jugadores a la nave en espera.
-    STATUS_SHIP_MOVING                      = 3,      // La nave esta en camino a su destino.
-    STATUS_SHIP_NEAR_CENTER                 = 4,      // La nave se encuentra sobrevolando la zona segura.
-    STATUS_BATTLE_STARTED                   = 5,      // La batalla ha iniciado.
+    ESTADO_NO_SUFICIENTES_JUGADORES         = 0,
+    ESTADO_INVOCANDO_JUGADORES              = 1,
+    ESTADO_NAVE_EN_ESPERA                   = 2,
+    ESTADO_NAVE_EN_MOVIMIENTO               = 3,
+    ESTADO_NAVE_CERCA_DEL_CENTRO            = 4,
+    ESTADO_BATALLA_EN_CURSO                 = 5,
 };
 
-// Hechizos utilizados.
-enum BRSpells
+enum BR_Hechizos
 {
-    SPELL_PARACHUTE_DALARAN                 = 45472,  // Paracaidas que te ponen en Dalaran.
+    HECHIZO_PARACAIDAS                      = 45472,
 };
 
-// Objetos de mapeado.
-enum BRGameObjects
+enum BR_ObjetosMundo
 {
-    GAMEOBJECT_SHIP                         = 194675, // El tren de Ulduar.
-    GAMEOBJECT_MAP_CENTER                   = 500000, // CUSTOM: Centro del mapa (Para calculo de distancia de zona segura).
-    GAMEOBJECT_SECURE_ZONE_BASE             = 500001, // CUSTOM: Cúpula de ulduar para identificar visualmente los límites de la zona segura.
-    SECURE_ZONE_COUNT                       = 10,     // Cantidad de zonas seguras (ID consecutivos a partir de GAMEOBJECT_SECURE_ZONE_BASE).
+    OBJETO_NAVE                             = 194675,
+    OBJETO_CENTRO_DEL_MAPA                  = 500000,
+    OBJETO_ZONA_SEGURA_INICIAL              = 500001,
 };
 
-const float BRSecureZoneScales[SECURE_ZONE_COUNT] = { 5.0f, 4.5f, 4.0f, 3.5f, 3.0f, 2.5f, 2.0f, 1.5f, 1.0f, 0.5f };
+const int CANTIDAD_DE_ZONAS                 = 10;
+const float BR_EscalasDeZonaSegura[CANTIDAD_DE_ZONAS] = { 5.0f, 4.5f, 4.0f, 3.5f, 3.0f, 2.5f, 2.0f, 1.5f, 1.0f, 0.5f };
 
-// 49 Offsets para que los jugadores no salgan apilados.
-const int BROffsetsCount = 49;
-const float ShipOffsets[BROffsetsCount][2] = 
+const int CANTIDAD_DE_VARIACIONES = 49;
+const float BR_VariacionesDePosicion[CANTIDAD_DE_VARIACIONES][2] = 
 {
     { 0.0f, 0.0f },
     { 0.0f, 1.5f },
@@ -152,9 +142,9 @@ private:
     bool IsQueuedEnoughPlayers() { return ep_PlayersQueue.size() >= eventMinPlayers; };
     bool IsEventFull() { return ep_Players.size() >= eventMaxPlayers; };
     
-    BattleRoyalePlayerList ep_PlayersQueue;
-    BattleRoyalePlayerList ep_Players;
-    BattleRoyalePlayerData ep_PlayersData;
+    BR_ListaDePersonajes ep_PlayersQueue;
+    BR_ListaDePersonajes ep_Players;
+    BR_DatosDePersonajes ep_PlayersData;
     
     GameObject* go_SecureZone;
     GameObject* go_CenterOfBattle;    
