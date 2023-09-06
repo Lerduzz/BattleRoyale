@@ -144,7 +144,13 @@ private:
     void AddParachuteToAllPlayers();
     void OutOfZoneDamage();
     void AddFFAPvPFlag();
+    void ExitFromEvent(uint32 guid, bool logout = false);
     void ResetFullEvent();
+
+    bool IsInQueue(Player* player) { return ep_PlayersQueue.find(player->GetGUID().GetCounter()) != ep_PlayersQueue.end(); };
+    bool IsInEvent(Player* player) { return ep_Players.find(player->GetGUID().GetCounter()) != ep_Players.end(); };
+    bool IsQueuedEnoughPlayers() { return ep_PlayersQueue.size() >= eventMinPlayers; };
+    bool IsEventFull() { return ep_Players.size() >= eventMaxPlayers; };
     
     BattleRoyalePlayerList ep_PlayersQueue;
     BattleRoyalePlayerList ep_Players;

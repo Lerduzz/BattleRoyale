@@ -3,7 +3,6 @@
 #include "Chat.h"
 #include "Player.h"
 
-// -- CONSTANTES -- //
 const int secureZoneUpdateInterval = 60000; // TODO: Configuracion (defaul: 60000).
 
 const int BRMapCount = 1;
@@ -19,13 +18,11 @@ const std::string BRZonesNames[BRMapCount] =
     "Kalimdor: Hyjal"
 };
 
-// DIST: 2294, ALT: 297.
 const float BRZonesShipStart[BRMapCount][4] =
 {
     { 2967.581055f, -2164.183105f, 1556.483765f, 0.0f - M_PI / 2.0f }
 };
 
-// -- FUNCIONES -- //
 BattleRoyaleMgr::BattleRoyaleMgr()
 {
     eventMinPlayers = sConfigMgr->GetOption<int32>("BattleRoyale.MinPlayers", 25);
@@ -45,24 +42,24 @@ BattleRoyaleMgr::~BattleRoyaleMgr()
 
 void BattleRoyaleMgr::HandlePlayerJoin(Player *player)
 {
-    uint32 guid = player->GetGUID().GetCounter();
-    if (ep_PlayersQueue.find(guid) != ep_PlayersQueue.end())
+    if (IsInQueue(player))
     {
         ChatHandler(player->GetSession()).PSendSysMessage("|cff4CFF00BattleRoyale::|r Ya estas en cola para el evento.");
         return;
     }
-    if (ep_Players.find(guid) != ep_Players.end())
+    if (IsInEvent(player))
     {
         ChatHandler(player->GetSession()).PSendSysMessage("|cff4CFF00BattleRoyale::|r Ya estas dentro del evento.");
         return;
     }
+    uint32 guid = player->GetGUID().GetCounter();
     ep_PlayersQueue[guid] = player;
     ChatHandler(player->GetSession()).PSendSysMessage("|cff4CFF00BattleRoyale::|r Te has unido a la cola del evento. Jugadores en cola: %u/%u.", ep_PlayersQueue.size(), eventMinPlayers);
     switch (eventCurrentStatus)
     {
         case STATUS_NO_ENOUGH_PLAYERS:
         {
-            if (ep_PlayersQueue.size() >= eventMinPlayers) {
+            if (IsQueuedEnoughPlayers()) {
                 TeleportToEvent(0);
             }
             break;
@@ -70,7 +67,7 @@ void BattleRoyaleMgr::HandlePlayerJoin(Player *player)
         case STATUS_SUMMONING_PLAYERS:
         case STATUS_SHIP_WAITING:
         {
-            if (ep_Players.size() < eventMaxPlayers) {
+            if (!IsEventFull()) {
                 TeleportToEvent(guid);
             }
             break;
@@ -78,37 +75,25 @@ void BattleRoyaleMgr::HandlePlayerJoin(Player *player)
     }
 }
 
+/**
+ * @brief Sacar del evento al desconectarse.
+ * 
+ * @param player 
+ */
 void BattleRoyaleMgr::HandlePlayerLogout(Player *player)
 {
-    uint32 guid = player->GetGUID().GetCounter();
-    if (ep_PlayersQueue.find(guid) != ep_PlayersQueue.end()) {
-        ep_PlayersQueue.erase(guid);
-    };
-    if (ep_Players.find(guid) != ep_Players.end()) {
-        ExitFromPhaseEvent(guid);
-        ep_Players.erase(guid);
-        ep_PlayersData.erase(guid);
-    }
-
-    // TEMP: Finalizar evento al no quedar nadie en el.
-    if (!ep_Players.size())
-    {
-        eventCurrentStatus = STATUS_NO_ENOUGH_PLAYERS;
-    }
+    if (IsInEvent(player)) ExitFromEvent(player->GetGUID().GetCounter(), true);
 }
 
 void BattleRoyaleMgr::HandleOnPVPLill(Player *killer, Player *killed)
 {
     if (!killer || !killed) return;
     if (!ep_Players.size() || eventCurrentStatus != STATUS_BATTLE_STARTED) return;
-    uint32 guid_r = killer->GetGUID().GetCounter();
-    uint32 guid_d = killed->GetGUID().GetCounter();
-    if (ep_Players.find(guid_r) == ep_Players.end() || ep_Players.find(guid_d) == ep_Players.end()) return;
-    ep_PlayersData[guid_r].kills++;
+    if (!IsInEvent(killer) || !IsInEvent(killed)) return;
+    ep_PlayersData[killer->GetGUID().GetCounter()].kills++;
     killed->CastSpell(killer, 6277, true);
     // TODO: Llevar una lista de los espectadores de un jugador y al morir comprobar y mover los espectadores al nuevo asesino.
-    ChatHandler handler = ChatHandler(killer->GetSession());
-    NotifyPvPKill(handler.GetNameLink(killer), handler.GetNameLink(killed), ep_PlayersData[guid_r].kills);
+    NotifyPvPKill(ChatHandler(killer->GetSession()).GetNameLink(killer), ChatHandler(killed->GetSession()).GetNameLink(killed), ep_PlayersData[killer->GetGUID().GetCounter()].kills);
 }
 
 /**
@@ -157,12 +142,11 @@ void BattleRoyaleMgr::TeleportToEvent(uint32 guid)
         eventCurrentStatus = STATUS_SUMMONING_PLAYERS;
         for (BattleRoyalePlayerQueue::iterator it = ep_PlayersQueue.begin(); it != ep_PlayersQueue.end(); ++it)
 		{
-            uint32 guid = (*it).first;
-            ep_Players[guid] = (*it).second;
-            StorePlayerStartPosition(guid);
-            TeleportPlayerBeforeShip(guid);            
-            EnterToPhaseEvent(guid);
-            ep_Players[guid]->SaveToDB(false, false);
+            ep_Players[(*it).first] = (*it).second;
+            StorePlayerStartPosition((*it).first);
+            TeleportPlayerBeforeShip((*it).first);            
+            EnterToPhaseEvent((*it).first);
+            ep_Players[(*it).first]->SaveToDB(false, false);
 		}
         for (BattleRoyalePlayerList::iterator it = ep_Players.begin(); it != ep_Players.end(); ++it) ep_PlayersQueue.erase((*it).first);
     }
@@ -641,6 +625,30 @@ void BattleRoyaleMgr::AddFFAPvPFlag()
                 (*it).second->SetByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
             }
         }
+    }
+}
+
+/**
+ * @brief Saca a un jugador del evento y lo teletransporta a donde estaba.
+ * 
+ * @param guid 
+ * @param logout 
+ */
+void BattleRoyaleMgr::ExitFromEvent(uint32 guid, bool logout)
+{
+    if (ep_PlayersQueue.find(guid) != ep_PlayersQueue.end()) {
+        ep_PlayersQueue.erase(guid);
+    };
+    if (ep_Players.find(guid) != ep_Players.end()) {
+        ExitFromPhaseEvent(guid);
+        ep_Players.erase(guid);
+        ep_PlayersData.erase(guid);
+    }
+
+    // TEMP: Finalizar evento al no quedar nadie en el.
+    if (!ep_Players.size())
+    {
+        eventCurrentStatus = STATUS_NO_ENOUGH_PLAYERS;
     }
 }
 
