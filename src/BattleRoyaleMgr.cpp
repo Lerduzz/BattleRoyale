@@ -182,20 +182,8 @@ void BattleRoyaleMgr::PrevenirJcJEnLaNave(Player* player, bool state)
 bool BattleRoyaleMgr::PuedeReaparecerEnCementerio(Player *player)
 {
     if (HayJugadores() && EstaEnEvento(player)) {
-        if (!player->isPossessing()) player->StopCastingBindSight();
-        if (!player->IsAlive()) ResurrectPlayer(player);
-        uint32 guid = player->GetGUID().GetCounter();
-        CambiarDimension_Salir(guid);
-        player->TeleportTo(list_Datos[guid].GetMap(), list_Datos[guid].GetX(), list_Datos[guid].GetY(), list_Datos[guid].GetZ(), list_Datos[guid].GetO());
-        player->SaveToDB(false, false);
-        list_Jugadores.erase(guid);
-	    list_Datos.erase(guid);
-
-        // TEMP: Finalizar evento al no quedar nadie en el.
-        if (!list_Jugadores.size())
-        {
-            estadoActual = ESTADO_NO_HAY_SUFICIENTES_JUGADORES;
-        }
+        if (!player->IsAlive()) RevivirJugador(player);
+        SalirDelEvento(player->GetGUID().GetCounter());
     }
     return true;
 }
@@ -249,49 +237,39 @@ void BattleRoyaleMgr::IniciarNuevaRonda()
 
 void BattleRoyaleMgr::AlmacenarPosicionInicial(uint32 guid)
 {
-    if (list_Jugadores.find(guid) != list_Jugadores.end())
+    if (list_Jugadores[guid]->GetMap()->Instanceable())
     {
-        if (list_Jugadores[guid]->GetMap()->Instanceable())
-        {
-            list_Datos[guid].SetPosition(list_Jugadores[guid]->m_homebindMapId, list_Jugadores[guid]->m_homebindX, list_Jugadores[guid]->m_homebindY, list_Jugadores[guid]->m_homebindZ, list_Jugadores[guid]->GetOrientation());
-        }            
-        else
-        {
-            list_Datos[guid].SetPosition(list_Jugadores[guid]->GetMapId(), list_Jugadores[guid]->GetPositionX(), list_Jugadores[guid]->GetPositionY(), list_Jugadores[guid]->GetPositionZ(), list_Jugadores[guid]->GetOrientation());
-        }
+        list_Datos[guid].SetPosition(list_Jugadores[guid]->m_homebindMapId, list_Jugadores[guid]->m_homebindX, list_Jugadores[guid]->m_homebindY, list_Jugadores[guid]->m_homebindZ, list_Jugadores[guid]->GetOrientation());
+    } 
+    else
+    {
+        list_Datos[guid].SetPosition(list_Jugadores[guid]->GetMapId(), list_Jugadores[guid]->GetPositionX(), list_Jugadores[guid]->GetPositionY(), list_Jugadores[guid]->GetPositionZ(), list_Jugadores[guid]->GetOrientation());
     }
 }
 
 void BattleRoyaleMgr::LlamarAntesQueNave(uint32 guid)
 {
-    if (HayJugadores() && EstaEnEvento(guid))
-    {
-        CambiarDimension_Entrar(guid);
-        float ox = BR_VariacionesDePosicion[indiceDeVariacion][0];
-        float oy = BR_VariacionesDePosicion[indiceDeVariacion][1];
-        indiceDeVariacion++;
-        if (indiceDeVariacion >= CANTIDAD_DE_VARIACIONES) indiceDeVariacion = 0;
-        Desmontar(list_Jugadores[guid]);
-        list_Jugadores[guid]->SetPvP(false);
-        list_Jugadores[guid]->TeleportTo(BR_IdentificadorDeMapas[indiceDelMapa], BR_InicioDeLaNave[indiceDelMapa][0] + ox, BR_InicioDeLaNave[indiceDelMapa][1] + oy, BR_InicioDeLaNave[indiceDelMapa][2] + 15.0f, 0.0f);
-        list_Jugadores[guid]->SaveToDB(false, false);
-        list_Jugadores[guid]->AddAura(HECHIZO_PARACAIDAS, list_Jugadores[guid]);
-    }
+    CambiarDimension_Entrar(guid);
+    float ox = BR_VariacionesDePosicion[indiceDeVariacion][0];
+    float oy = BR_VariacionesDePosicion[indiceDeVariacion][1];
+    SiguientePosicion();
+    Desmontar(list_Jugadores[guid]);
+    list_Jugadores[guid]->SetPvP(false);
+    list_Jugadores[guid]->TeleportTo(BR_IdentificadorDeMapas[indiceDelMapa], BR_InicioDeLaNave[indiceDelMapa][0] + ox, BR_InicioDeLaNave[indiceDelMapa][1] + oy, BR_InicioDeLaNave[indiceDelMapa][2] + 15.0f, 0.0f);
+    list_Jugadores[guid]->SaveToDB(false, false);
+    list_Jugadores[guid]->AddAura(HECHIZO_PARACAIDAS, list_Jugadores[guid]);
 }
 
 void BattleRoyaleMgr::LlamarDentroDeNave(uint32 guid)
 {
-    if (!list_Jugadores.size()) return;
-    if (list_Jugadores.find(guid) != list_Jugadores.end())
-    {
-        float ox = BR_VariacionesDePosicion[indiceDeVariacion][0];
-        float oy = BR_VariacionesDePosicion[indiceDeVariacion][1];
-        indiceDeVariacion++;
-        if (indiceDeVariacion >= CANTIDAD_DE_VARIACIONES) indiceDeVariacion = 0;
-        Desmontar(list_Jugadores[guid]);
-        list_Jugadores[guid]->SetPvP(false);
-        list_Jugadores[guid]->TeleportTo(BR_IdentificadorDeMapas[indiceDelMapa], BR_InicioDeLaNave[indiceDelMapa][0] + ox, BR_InicioDeLaNave[indiceDelMapa][1] + oy, BR_InicioDeLaNave[indiceDelMapa][2] + 1.5f, 0.0f);
-    }
+    CambiarDimension_Entrar(guid);
+    float ox = BR_VariacionesDePosicion[indiceDeVariacion][0];
+    float oy = BR_VariacionesDePosicion[indiceDeVariacion][1];
+    SiguientePosicion();
+    Desmontar(list_Jugadores[guid]);
+    list_Jugadores[guid]->SetPvP(false);
+    list_Jugadores[guid]->TeleportTo(BR_IdentificadorDeMapas[indiceDelMapa], BR_InicioDeLaNave[indiceDelMapa][0] + ox, BR_InicioDeLaNave[indiceDelMapa][1] + oy, BR_InicioDeLaNave[indiceDelMapa][2] + 1.5f, 0.0f);
+    list_Jugadores[guid]->SaveToDB(false, false);
 }
 
 void BattleRoyaleMgr::SalirDelEvento(uint32 guid, bool logout)
@@ -301,30 +279,19 @@ void BattleRoyaleMgr::SalirDelEvento(uint32 guid, bool logout)
     };
     if (list_Jugadores.find(guid) != list_Jugadores.end()) {
         CambiarDimension_Salir(guid);
+        if(!logout)
+        {
+            if (!list_Jugadores[guid]->isPossessing()) list_Jugadores[guid]->StopCastingBindSight();
+            list_Jugadores[guid]->TeleportTo(list_Datos[guid].GetMap(), list_Datos[guid].GetX(), list_Datos[guid].GetY(), list_Datos[guid].GetZ(), list_Datos[guid].GetO());
+            list_Jugadores[guid]->SaveToDB(false, false);
+        }
         list_Jugadores.erase(guid);
         list_Datos.erase(guid);
-    }
-
-    // TEMP: Finalizar evento al no quedar nadie en el.
-    if (!list_Jugadores.size())
-    {
-        estadoActual = ESTADO_NO_HAY_SUFICIENTES_JUGADORES;
+        
     }
 }
 
-void BattleRoyaleMgr::TeleportToEvent(uint32 guid)
-{
-	
-            list_Jugadores[guid] = list_Cola[guid];
-            
-            CambiarDimension_Entrar(guid);
-            list_Jugadores[guid]->SaveToDB(false, false);
-            list_Cola.erase(guid);
-        }
-	}
-}
-
-void BattleRoyaleMgr::ResurrectPlayer(Player* player)
+void BattleRoyaleMgr::RevivirJugador(Player* player)
 {
 	player->ResurrectPlayer(1.0f);
     player->SpawnCorpseBones();
