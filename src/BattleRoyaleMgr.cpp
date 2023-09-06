@@ -148,6 +148,7 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
         {
             if (indicadorDeSegundos <= 0) {
                 indicadorDeSegundos = 1000;
+                ControlDeReglas();
                 EfectoFueraDeZona();
                 ActivarJcJTcT();
             } else {
@@ -374,7 +375,7 @@ bool BattleRoyaleMgr::InvocarZonaSegura()
 
 void BattleRoyaleMgr::PonerTodosLosParacaidas()
 {
-    if (list_Jugadores.size())
+    if (HayJugadores())
     {
         for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
         {
@@ -395,7 +396,7 @@ void BattleRoyaleMgr::PonerTodosLosParacaidas()
 
 void BattleRoyaleMgr::EfectoFueraDeZona()
 {
-    if (list_Jugadores.size())
+    if (HayJugadores())
     {
         for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
         {
@@ -417,13 +418,27 @@ void BattleRoyaleMgr::EfectoFueraDeZona()
 
 void BattleRoyaleMgr::ActivarJcJTcT()
 {
-    if (list_Jugadores.size())
+    if (HayJugadores())
     {
         for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
         {
             if ((*it).second && (*it).second->IsAlive() && DebeForzarJcJTcT((*it).second) && !((*it).second->HasByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP)))
             {
                 (*it).second->SetByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
+            }
+        }
+    }
+}
+
+void BattleRoyaleMgr::ControlDeReglas()
+{
+    if(HayJugadores())
+    {
+        for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
+        {
+            if ((*it).second && (*it).second->IsAlive())
+            {
+                if ((*it).second->HasAura(31700)) SalirDelEvento((*it).first); // 1. No utilizar vuelo mundial.
             }
         }
     }
