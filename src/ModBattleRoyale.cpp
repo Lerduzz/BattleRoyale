@@ -58,7 +58,7 @@ public:
         return true;
 	}
 
-    bool BRForcePlayerFFAPvPFlag(Player* player) override {
+    bool BattleRoyaleForzarJcJTcTScript(Player* player) override {
         if (sConfigMgr->GetOption<bool>("BattleRoyale.Enabled", true))
         {
             return sBattleRoyaleMgr->DebeForzarJcJTcT(player);
