@@ -3,24 +3,6 @@
 #include "Chat.h"
 #include "Player.h"
 
-const int BRMapCount = 1;
-const int BRMapID[BRMapCount] = { 1 };
-
-const Position BRZonesCenter[BRMapCount] =
-{
-    { 5261.581055f, -2164.183105f, 1259.483765f }       // 1: Kalimdor: Hyjal
-};
-
-const std::string BRZonesNames[BRMapCount] =
-{
-    "Kalimdor: Hyjal"
-};
-
-const float BRZonesShipStart[BRMapCount][4] =
-{
-    { 2967.581055f, -2164.183105f, 1556.483765f, 0.0f - M_PI / 2.0f }
-};
-
 BattleRoyaleMgr::BattleRoyaleMgr()
 {
     eventMinPlayers = sConfigMgr->GetOption<int32>("BattleRoyale.MinPlayers", 25);
@@ -318,7 +300,7 @@ void BattleRoyaleMgr::NotifyTimeRemainingToStart(uint32 delay)
             {
                 case 0:
                 {
-                    (*it).second->GetSession()->SendNotification("|cff00ff00¡Que comience la batalla de |cffDA70D6%s|cff00ff00!", BRZonesNames[rotationMapIndex].c_str());
+                    (*it).second->GetSession()->SendNotification("|cff00ff00¡Que comience la batalla de |cffDA70D6%s|cff00ff00!", BR_NombreDeMapas[rotationMapIndex].c_str());
                     break;
                 }                
                 case 5:
@@ -394,10 +376,10 @@ bool BattleRoyaleMgr::SpawnTransportShip()
                     go_TransportShip->Delete();
                     go_TransportShip = nullptr;
                 }
-                float x = BRZonesShipStart[rotationMapIndex][0];
-                float y = BRZonesShipStart[rotationMapIndex][1];
-                float z = BRZonesShipStart[rotationMapIndex][2];
-                float o = BRZonesShipStart[rotationMapIndex][3];
+                float x = BR_InicioDeLaNave[rotationMapIndex][0];
+                float y = BR_InicioDeLaNave[rotationMapIndex][1];
+                float z = BR_InicioDeLaNave[rotationMapIndex][2];
+                float o = BR_InicioDeLaNave[rotationMapIndex][3];
                 float rot2 = std::sin(o / 2);
                 float rot3 = cos(o / 2);
                 go_TransportShip = (*it).second->SummonGameObject(OBJETO_NAVE, x, y, z, o, 0, 0, rot2, rot3, 2 * 60);
@@ -424,7 +406,7 @@ bool BattleRoyaleMgr::SpawnTheCenterOfBattle()
             go_CenterOfBattle->Delete();
             go_CenterOfBattle = nullptr;
         }
-        go_CenterOfBattle = go_TransportShip->SummonGameObject(OBJETO_CENTRO_DEL_MAPA, BRZonesCenter[rotationMapIndex].GetPositionX(), BRZonesCenter[rotationMapIndex].GetPositionY(), BRZonesCenter[rotationMapIndex].GetPositionZ(), 0, 0, 0, 0, 0, 15 * 60);
+        go_CenterOfBattle = go_TransportShip->SummonGameObject(OBJETO_CENTRO_DEL_MAPA, BR_CentroDeMapas[rotationMapIndex].GetPositionX(), BR_CentroDeMapas[rotationMapIndex].GetPositionY(), BR_CentroDeMapas[rotationMapIndex].GetPositionZ(), 0, 0, 0, 0, 0, 15 * 60);
         return true;
     }
     return false;
@@ -446,7 +428,7 @@ bool BattleRoyaleMgr::SpawnSecureZone()
             go_SecureZone = nullptr;
         }
         if (secureZoneIndex < CANTIDAD_DE_ZONAS) {
-            go_SecureZone = go_CenterOfBattle->SummonGameObject(OBJETO_ZONA_SEGURA_INICIAL + secureZoneIndex, BRZonesCenter[rotationMapIndex].GetPositionX(), BRZonesCenter[rotationMapIndex].GetPositionY(), BRZonesCenter[rotationMapIndex].GetPositionZ() + BR_EscalasDeZonaSegura[secureZoneIndex] * 66.0f, 0, 0, 0, 0, 0, 2 * 60);
+            go_SecureZone = go_CenterOfBattle->SummonGameObject(OBJETO_ZONA_SEGURA_INICIAL + secureZoneIndex, BR_CentroDeMapas[rotationMapIndex].GetPositionX(), BR_CentroDeMapas[rotationMapIndex].GetPositionY(), BR_CentroDeMapas[rotationMapIndex].GetPositionZ() + BR_EscalasDeZonaSegura[secureZoneIndex] * 66.0f, 0, 0, 0, 0, 0, 2 * 60);
             go_SecureZone->SetPhaseMask(2, true);
             go_SecureZone->SetVisibilityDistanceOverride(VisibilityDistanceType::Infinite);
         }
@@ -492,7 +474,7 @@ void BattleRoyaleMgr::TeleportPlayerBeforeShip(uint32 guid)
         if (summonOffsetIndex >= CANTIDAD_DE_VARIACIONES) summonOffsetIndex = 0;
         Dismount(ep_Players[guid]);
         ep_Players[guid]->SetPvP(false);
-        ep_Players[guid]->TeleportTo(BRMapID[rotationMapIndex], BRZonesShipStart[rotationMapIndex][0] + ox, BRZonesShipStart[rotationMapIndex][1] + oy, BRZonesShipStart[rotationMapIndex][2] + 15.0f, 0.0f);
+        ep_Players[guid]->TeleportTo(BR_IdentificadorDeMapas[rotationMapIndex], BR_InicioDeLaNave[rotationMapIndex][0] + ox, BR_InicioDeLaNave[rotationMapIndex][1] + oy, BR_InicioDeLaNave[rotationMapIndex][2] + 15.0f, 0.0f);
         ep_Players[guid]->AddAura(HECHIZO_PARACAIDAS, ep_Players[guid]);
     }
 }
@@ -513,7 +495,7 @@ void BattleRoyaleMgr::TeleportPlayerToShip(uint32 guid)
         if (summonOffsetIndex >= CANTIDAD_DE_VARIACIONES) summonOffsetIndex = 0;
         Dismount(ep_Players[guid]);
         ep_Players[guid]->SetPvP(false);
-        ep_Players[guid]->TeleportTo(BRMapID[rotationMapIndex], BRZonesShipStart[rotationMapIndex][0] + ox, BRZonesShipStart[rotationMapIndex][1] + oy, BRZonesShipStart[rotationMapIndex][2] + 1.5f, 0.0f);
+        ep_Players[guid]->TeleportTo(BR_IdentificadorDeMapas[rotationMapIndex], BR_InicioDeLaNave[rotationMapIndex][0] + ox, BR_InicioDeLaNave[rotationMapIndex][1] + oy, BR_InicioDeLaNave[rotationMapIndex][2] + 1.5f, 0.0f);
     }
 }
 
