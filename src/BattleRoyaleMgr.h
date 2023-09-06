@@ -94,6 +94,7 @@ private:
     void IniciarNuevaRonda();
     void AlmacenarPosicionInicial(uint32 guid);
     void LlamarAntesQueNave(uint32 guid);
+    void Desmontar(Player* player);
     
 
 
@@ -101,8 +102,6 @@ private:
 
 
     void TeleportToEvent(uint32 guid);
-    void EnterToPhaseEvent(uint32 guid);
-    void ExitFromPhaseEvent(uint32 guid);
     void ResurrectPlayer(Player *player);
     void NotifySecureZoneReduceWarn(uint32 delay);
     void NotifySecureZoneReduced();
@@ -113,7 +112,6 @@ private:
     bool SpawnSecureZone();
     void TeleportPlayerToShip(uint32 guid);
     void TeleportPlayersToShip();
-    void Dismount(Player* player);
     void AddParachuteToAllPlayers();
     void OutOfZoneDamage();
     void AddFFAPvPFlag();
@@ -130,7 +128,18 @@ private:
     bool EstaLlenoElEvento() { return list_Jugadores.size() >= conf_JugadoresMaximo; };
     bool HaySuficientesEnCola() { return list_Cola.size() >= conf_JugadoresMinimo; };
     ChatHandler Chat(Player* player) { return ChatHandler(player->GetSession()); };
-    
+    void SiguienteMapa() { if (indiceDelMapa++ >= CANTIDAD_DE_MAPAS) indiceDelMapa = 0; };
+    void CambiarDimension_Entrar(uint32 guid)
+    {
+        list_Jugadores[guid]->SetPhaseMask(2, false);
+        list_Jugadores[guid]->UpdateObjectVisibility();
+    };
+    void CambiarDimension_Salir(uint32 guid)
+    {
+        list_Jugadores[guid]->SetPhaseMask(1, false);
+        list_Jugadores[guid]->UpdateObjectVisibility();
+    };
+        
     BR_ListaDePersonajes list_Cola;
     BR_ListaDePersonajes list_Jugadores;
     BR_DatosDePersonajes list_Datos;
@@ -140,7 +149,9 @@ private:
     GameObject* obj_Nave;
 
     int estadoActual;
-    int tiempoRestanteSeg;
+    int tiempoRestanteSeg;    
+    int indiceDeVariacion;
+    int indiceDelMapa;
 
     uint32 conf_JugadoresMinimo;
     uint32 conf_JugadoresMaximo;
@@ -152,10 +163,8 @@ private:
 
     int secureZoneIndex;
     int secureZoneDelay;
-    bool secureZoneAnnounced;    
-    int rotationMapIndex;    
+    bool secureZoneAnnounced; 
     int secondsTicksHelper;
-    int summonOffsetIndex;
 
 };
 
