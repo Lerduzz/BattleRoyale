@@ -7,6 +7,7 @@
 #include "BattleRoyaleData.h"
 #include "Chat.h"
 #include "Player.h"
+#include "Transport.h"
 
 class BattleRoyaleData;
 typedef std::map<uint32, Player*> BR_ColaDePersonajes;
@@ -269,6 +270,7 @@ private:
     bool DesaparecerNave()
     {
         if (obj_Nave) {
+            if(Transport* tp = obj_Nave->ToTransport()) tp->CleanupsBeforeDelete();
             obj_Nave->RemoveFromWorld();
             delete obj_Nave;
             obj_Nave = nullptr;
