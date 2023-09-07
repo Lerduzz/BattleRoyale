@@ -31,6 +31,7 @@ enum BR_Hechizos
 enum BR_ObjetosMundo
 {
     OBJETO_NAVE                             = 194675,
+    OBJETO_COFRE                            = 499999,
     OBJETO_CENTRO_DEL_MAPA                  = 500000,
     OBJETO_ZONA_SEGURA_INICIAL              = 500001,
 };
