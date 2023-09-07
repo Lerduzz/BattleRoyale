@@ -69,7 +69,7 @@ const std::string BR_NombreDeMapas[CANTIDAD_DE_MAPAS] =
 const float BR_InicioDeLaNave[CANTIDAD_DE_MAPAS][4] =
 {
     { 2967.581055f, -2164.183105f, 1556.483765f, 0.0f - M_PI / 2.0f },
-    { -4695.309082f, 5705.214844f, 304.050505f, 0.0f - M_PI }
+    { -2401.309082f, 3411.214844f, 304.050505f, 0.0f + M_PI / 2.0f }
 };
 
 class BattleRoyaleMgr
