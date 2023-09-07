@@ -51,22 +51,25 @@ const float BR_VariacionesDePosicion[CANTIDAD_DE_VARIACIONES][2] =
     { -4.5f, -4.5f }, { -3.0f, -4.5f }, { -1.5f, -4.5f }, {  0.0f, -4.5f }, {  1.5f, -4.5f }, {  3.0f, -4.5f }, {  4.5f, -4.5f }
 };
 
-const int CANTIDAD_DE_MAPAS = 1;
-const int BR_IdentificadorDeMapas[CANTIDAD_DE_MAPAS] = { 1 };
+const int CANTIDAD_DE_MAPAS = 2;
+const int BR_IdentificadorDeMapas[CANTIDAD_DE_MAPAS] = { 1, 1 };
 
 const Position BR_CentroDeMapas[CANTIDAD_DE_MAPAS] =
 {
-    { 5261.581055f, -2164.183105f, 1259.483765f }
+    { 5261.581055f, -2164.183105f, 1259.483765f },
+    { -4695.309082f, 3411.214844f, 7.050505f }
 };
 
 const std::string BR_NombreDeMapas[CANTIDAD_DE_MAPAS] =
 {
-    "Kalimdor: Hyjal"
+    "Kalimdor: Hyjal",
+    "Kalimdor: Ruinas de Solarsal"
 };
 
 const float BR_InicioDeLaNave[CANTIDAD_DE_MAPAS][4] =
 {
-    { 2967.581055f, -2164.183105f, 1556.483765f, 0.0f - M_PI / 2.0f }
+    { 2967.581055f, -2164.183105f, 1556.483765f, 0.0f - M_PI / 2.0f },
+    { -4695.309082f, 5705.214844f, 304.050505f, 0.0f - M_PI }
 };
 
 class BattleRoyaleMgr
