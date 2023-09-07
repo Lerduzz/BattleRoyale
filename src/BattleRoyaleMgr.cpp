@@ -158,15 +158,8 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
                 CondicionDeVictoria();
                 EfectoFueraDeZona();
                 ActivarJcJTcT();
-                if (--tiempoRestanteNave <= 0)
-                {
-                    if (DesaparecerNave()) NotificarNaveRetirada();
-                }
-            }
-            else
-            {
-                indicadorDeSegundos -= diff;
-            }
+                if (--tiempoRestanteNave <= 0) if (DesaparecerNave()) NotificarNaveRetirada();
+            } else indicadorDeSegundos -= diff;
             if (tiempoRestanteZona <= 0) {
                 InvocarZonaSegura();
                 NotificarZonaReducida();
@@ -210,6 +203,7 @@ void BattleRoyaleMgr::RestablecerTodoElEvento()
     estadoActual = ESTADO_NO_HAY_SUFICIENTES_JUGADORES;
     indicadorDeSegundos = 1000;
     indiceDeVariacion = 0;
+    estaLaZonaActiva = false;
     DesaparecerTodosLosObjetos();
 }
 
@@ -400,8 +394,13 @@ bool BattleRoyaleMgr::InvocarZonaSegura()
             obj_Zona = obj_Centro->SummonGameObject(OBJETO_ZONA_SEGURA_INICIAL + indiceDeZona, BR_CentroDeMapas[indiceDelMapa].GetPositionX(), BR_CentroDeMapas[indiceDelMapa].GetPositionY(), BR_CentroDeMapas[indiceDelMapa].GetPositionZ() + BR_EscalasDeZonaSegura[indiceDeZona] * 66.0f, 0, 0, 0, 0, 0, 2 * 60);
             obj_Zona->SetPhaseMask(2, true);
             obj_Zona->SetVisibilityDistanceOverride(VisibilityDistanceType::Infinite);
+            indiceDeZona++;
+            estaLaZonaActiva = true;
         }
-        indiceDeZona++;
+        else
+        {
+            estaLaZonaActiva = false;
+        }
         return true;
     }
     return false;
@@ -437,7 +436,7 @@ void BattleRoyaleMgr::EfectoFueraDeZona()
             if (obj_Centro && (*it).second && (*it).second->IsAlive())
             {
                 float distance = (*it).second->GetExactDist(obj_Centro);
-                if (indiceDeZona > 0 && distance > BR_EscalasDeZonaSegura[indiceDeZona - 1] * 66.0f) {
+                if (!estaLaZonaActiva || (indiceDeZona > 0 && distance > BR_EscalasDeZonaSegura[indiceDeZona - 1] * 66.0f)) {
                     list_Datos[(*it).first].dmg_tick++;
                     uint32 damage = (*it).second->GetMaxHealth() * (2 * sqrt(list_Datos[(*it).first].dmg_tick) + indiceDeZona) / 100;
                     (*it).second->GetSession()->SendNotification("|cffff0000¡Has recibido |cffDA70D6%u|cffff0000 de daño, adéntrate en la zona segura!", damage);

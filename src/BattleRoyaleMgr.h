@@ -290,6 +290,7 @@ private:
     int indiceDeZona;
     int indicadorDeSegundos;
     bool estaLaZonaAnunciada;
+    bool estaLaZonaActiva;
 
     uint32 conf_JugadoresMinimo;
     uint32 conf_JugadoresMaximo;
