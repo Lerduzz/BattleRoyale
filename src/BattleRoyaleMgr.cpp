@@ -274,7 +274,7 @@ void BattleRoyaleMgr::LlamarDentroDeNave(uint32 guid)
     float oy = BR_VariacionesDePosicion[indiceDeVariacion][1];
     SiguientePosicion();
     Desmontar(list_Jugadores[guid]);
-    list_Jugadores[guid]->TeleportTo(BR_IdentificadorDeMapas[indiceDelMapa], BR_InicioDeLaNave[indiceDelMapa][0] + ox, BR_InicioDeLaNave[indiceDelMapa][1] + oy, BR_InicioDeLaNave[indiceDelMapa][2] + 0.5f, 0.0f);
+    list_Jugadores[guid]->TeleportTo(BR_IdentificadorDeMapas[indiceDelMapa], BR_InicioDeLaNave[indiceDelMapa][0] + ox, BR_InicioDeLaNave[indiceDelMapa][1] + oy, BR_InicioDeLaNave[indiceDelMapa][2] + 0.5f, BR_InicioDeLaNave[indiceDelMapa][3] + M_PI / 2.0f);
     list_Jugadores[guid]->SetPvP(false);
     list_Jugadores[guid]->SaveToDB(false, false);
 }
