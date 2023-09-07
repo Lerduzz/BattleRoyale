@@ -434,7 +434,7 @@ void BattleRoyaleMgr::EfectoFueraDeZona()
     {
         for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
         {
-            if ((*it).second && (*it).second->IsAlive())
+            if (obj_Centro && (*it).second && (*it).second->IsAlive())
             {
                 float distance = (*it).second->GetExactDist(obj_Centro);
                 if (indiceDeZona > 0 && distance > BR_EscalasDeZonaSegura[indiceDeZona - 1] * 66.0f) {
