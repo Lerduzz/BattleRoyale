@@ -472,7 +472,7 @@ void BattleRoyaleMgr::ControlDeReglas()
             if ((*it).second && (*it).second->IsAlive())
             {
                 if ((*it).second->HasAura(31700)) SalirDelEvento((*it).first);
-                if (obj_Centro && (*it).second->GetExactDist(obj_Centro) > 650.0f) SalirDelEvento((*it).first);
+                if (obj_Centro && (*it).second->GetExactDist(obj_Centro) > 1147.0f) SalirDelEvento((*it).first);
             }
         }
     }

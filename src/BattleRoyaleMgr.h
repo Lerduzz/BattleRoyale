@@ -250,7 +250,7 @@ private:
     {
         if (obj_Zona) {
             if (obj_Zona->IsInWorld()) obj_Zona->DespawnOrUnsummon();
-            obj_Zona->Delete();
+            delete obj_Zona;
             obj_Zona = nullptr;
             return true;
         }
@@ -260,7 +260,7 @@ private:
     {
         if (obj_Centro) {
             if (obj_Centro->IsInWorld()) obj_Centro->DespawnOrUnsummon();
-            obj_Centro->Delete();
+            delete obj_Centro;
             obj_Centro = nullptr;
             return true;
         }
@@ -270,7 +270,7 @@ private:
     {
         if (obj_Nave) {
             if (obj_Nave->IsInWorld()) obj_Nave->DespawnOrUnsummon();
-            obj_Nave->Delete();
+            delete obj_Nave;
             obj_Nave = nullptr;
             return true;
         }
