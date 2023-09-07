@@ -249,7 +249,7 @@ private:
     bool DesaparecerZona()
     {
         if (obj_Zona) {
-            obj_Zona->DespawnOrUnsummon();
+            if (obj_Zona->IsInWorld()) obj_Zona->DespawnOrUnsummon();
             obj_Zona->Delete();
             obj_Zona = nullptr;
             return true;
@@ -259,7 +259,7 @@ private:
     bool DesaparecerCentro()
     {
         if (obj_Centro) {
-            obj_Centro->DespawnOrUnsummon();
+            if (obj_Centro->IsInWorld()) obj_Centro->DespawnOrUnsummon();
             obj_Centro->Delete();
             obj_Centro = nullptr;
             return true;
@@ -269,7 +269,7 @@ private:
     bool DesaparecerNave()
     {
         if (obj_Nave) {
-            obj_Nave->DespawnOrUnsummon();
+            if (obj_Nave->IsInWorld()) obj_Nave->DespawnOrUnsummon();
             obj_Nave->Delete();
             obj_Nave = nullptr;
             return true;
