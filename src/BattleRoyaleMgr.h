@@ -7,6 +7,7 @@
 #include "BattleRoyaleData.h"
 #include "Chat.h"
 #include "Player.h"
+#include "GameObject.h"
 #include "Transport.h"
 
 class BattleRoyaleData;
