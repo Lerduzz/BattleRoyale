@@ -508,14 +508,9 @@ void BattleRoyaleMgr::CondicionDeVictoria()
 
 void BattleRoyaleMgr::FinalizarRonda(bool announce, Player* winner /* = nullptr*/)
 {
-    if (announce && winner && EstaEnEvento(winner))
-    {
-        std::ostringstream msg;
-        msg << "|cff4CFF00BattleRoyale::|r Ronda finalizada, ganador: " << Chat(winner).GetNameLink(winner) << ", víctimas: |cff4CFF00" << list_Datos[winner->GetGUID().GetCounter()].kills << "|r.";
-        sWorld->SendServerMessage(SERVER_MSG_STRING, msg.str().c_str());
-    }
-    if (HayJugadores()) for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it) SalirDelEvento((*it).first);
+    if (announce && winner && EstaEnEvento(winner)) NotificarGanadorAlMundo(winner, list_Datos[winner->GetGUID().GetCounter()].kills);
     DesaparecerTodosLosObjetos();
+    while (HayJugadores()) SalirDelEvento((*list_Jugadores.begin()).first);
     estadoActual = ESTADO_NO_HAY_SUFICIENTES_JUGADORES;
     if (HaySuficientesEnCola()) IniciarNuevaRonda();
 }
