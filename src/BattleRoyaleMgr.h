@@ -153,16 +153,8 @@ private:
         player->RemoveFromGroup(); 
         player->UninviteFromGroup();
     };
-    void CambiarDimension_Entrar(uint32 guid)
-    {
-        list_Jugadores[guid]->SetPhaseMask(DIMENSION_EVENTO, false);
-        list_Jugadores[guid]->UpdateObjectVisibility();
-    };
-    void CambiarDimension_Salir(uint32 guid)
-    {
-        list_Jugadores[guid]->SetPhaseMask(DIMENSION_NORMAL, false);
-        list_Jugadores[guid]->UpdateObjectVisibility();
-    };
+    void CambiarDimension_Entrar(uint32 guid) { list_Jugadores[guid]->SetPhaseMask(DIMENSION_EVENTO, true); };
+    void CambiarDimension_Salir(uint32 guid) { list_Jugadores[guid]->SetPhaseMask(DIMENSION_NORMAL, true); };
     void Desmontar(Player* player)
     {
         if (player && player->IsAlive() && player->IsMounted())

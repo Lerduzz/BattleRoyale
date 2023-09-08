@@ -404,7 +404,6 @@ bool BattleRoyaleMgr::InvocarCentroDelMapa()
 
 bool BattleRoyaleMgr::InvocarZonaSegura()
 {
-    LOG_ERROR("br.nave", "BattleRoyaleMgr::InvocarZonaSegura: OBJETO = {}, MAPA = {}, ESCALA = {}, INDICE = {}!", OBJETO_ZONA_SEGURA_INICIAL + indiceDeZona, BR_IdentificadorDeMapas[indiceDelMapa], BR_EscalasDeZonaSegura[indiceDeZona], indiceDeZona);
     DesaparecerZona();
     if (indiceDeZona < CANTIDAD_DE_ZONAS)
     {
