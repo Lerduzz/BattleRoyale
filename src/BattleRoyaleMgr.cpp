@@ -352,7 +352,7 @@ bool BattleRoyaleMgr::InvocarNave()
         }
         else
         {
-            LOG_ERROR("br.nave", "BattleRoyaleMgr::InvocarNave: No se ha podido obtener el mapa para la nave (MAPA: {})!", BR_IdentificadorDeMapas[indiceDelMapa]);
+            LOG_ERROR("br.nave", "BattleRoyaleMgr::InvocarNave: No se ha podido obtener el mapa para la nave (MAPA: {})!", mapID);
         }
     }
     else
@@ -392,7 +392,7 @@ bool BattleRoyaleMgr::InvocarCentroDelMapa()
         }
         else
         {
-            LOG_ERROR("br.nave", "BattleRoyaleMgr::InvocarCentroDelMapa: No se ha podido obtener el mapa para el centro (MAPA: {})!", BR_IdentificadorDeMapas[indiceDelMapa]);
+            LOG_ERROR("br.nave", "BattleRoyaleMgr::InvocarCentroDelMapa: No se ha podido obtener el mapa para el centro (MAPA: {})!", mapID);
         }
     }
     else
@@ -404,22 +404,47 @@ bool BattleRoyaleMgr::InvocarCentroDelMapa()
 
 bool BattleRoyaleMgr::InvocarZonaSegura()
 {
-    if (obj_Centro)
+    DesaparecerZona();
+    if (indiceDeZona < CANTIDAD_DE_ZONAS)
     {
-        DesaparecerZona();
-        if (indiceDeZona < CANTIDAD_DE_ZONAS) {
-            obj_Zona = obj_Centro->SummonGameObject(OBJETO_ZONA_SEGURA_INICIAL + indiceDeZona, BR_CentroDeMapas[indiceDelMapa].GetPositionX(), BR_CentroDeMapas[indiceDelMapa].GetPositionY(), BR_CentroDeMapas[indiceDelMapa].GetPositionZ() + BR_EscalasDeZonaSegura[indiceDeZona] * 66.0f, 0, 0, 0, 0, 0, 2 * 60);
-            obj_Zona->SetPhaseMask(2, true);
-            obj_Zona->SetVisibilityDistanceOverride(VisibilityDistanceType::Infinite);
-            indiceDeZona++;
-            estaLaZonaActiva = true;
+        if (HayJugadores())
+        {
+            int mapID = BR_IdentificadorDeMapas[indiceDelMapa];
+            Map* map = sMapMgr->FindBaseNonInstanceMap(mapID);
+            if (map)
+            {
+                float x = BR_CentroDeMapas[indiceDelMapa].GetPositionX();
+                float y = BR_CentroDeMapas[indiceDelMapa].GetPositionY();
+                float z = BR_CentroDeMapas[indiceDelMapa].GetPositionZ() + BR_EscalasDeZonaSegura[indiceDeZona] * 66.0f;
+                map->LoadGrid(x, y);
+                obj_Zona = sObjectMgr->IsGameObjectStaticTransport(OBJETO_ZONA_SEGURA_INICIAL + indiceDeZona) ? new StaticTransport() : new GameObject();
+                if (obj_Zona->Create(map->GenerateLowGuid<HighGuid::GameObject>(), OBJETO_ZONA_SEGURA_INICIAL + indiceDeZona, map, DIMENSION_EVENTO, x, y, z, 0, G3D::Quat(), 100, GO_STATE_READY))
+                {
+                    obj_Zona->SetSpawnedByDefault(false);
+                    obj_Zona->SetVisibilityDistanceOverride(VisibilityDistanceType::Infinite);
+                    map->AddToMap(obj_Zona);
+                    indiceDeZona++;
+                    estaLaZonaActiva = true;
+                    return true;
+                }
+                else
+                {
+                    LOG_ERROR("br.nave", "BattleRoyaleMgr::InvocarCentroDelMapa: No se ha podido invocar la zona (OBJETO = {})!", OBJETO_ZONA_SEGURA_INICIAL + indiceDeZona);
+                    delete obj_Zona;
+                    obj_Zona = nullptr;
+                }
+            }
+            else
+            {
+                LOG_ERROR("br.nave", "BattleRoyaleMgr::InvocarCentroDelMapa: No se ha podido obtener el mapa para la zona (MAPA: {})!", mapID);
+            }
         }
         else
         {
-            estaLaZonaActiva = false;
+            LOG_ERROR("br.nave", "BattleRoyaleMgr::InvocarCentroDelMapa: No se ha invocado la zona (OBJETO = {}) porque no hay jugadores!", OBJETO_ZONA_SEGURA_INICIAL + indiceDeZona);
         }
-        return true;
     }
+    estaLaZonaActiva = false;
     return false;
 }
 
