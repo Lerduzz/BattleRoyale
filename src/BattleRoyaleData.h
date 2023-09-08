@@ -22,7 +22,7 @@ private:
     float start_y;
     float start_z;
     float start_o;
-    
+
 };
 
 #endif
