@@ -16,8 +16,8 @@ typedef std::map<uint32, BattleRoyaleData> BR_DatosDePersonajes;
 
 enum BR_Dimensiones
 {
-    DIMENSION_NORMAL                        = 1,
-    DIMENSION_EVENTO                        = 2,
+    DIMENSION_NORMAL                        = 0x00000001,
+    DIMENSION_EVENTO                        = 0x00000002,
 };
 
 enum BR_EstadosEvento
