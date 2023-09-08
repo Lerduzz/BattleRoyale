@@ -323,7 +323,8 @@ bool BattleRoyaleMgr::InvocarNave()
 {
     if (HayJugadores())
     {
-        Map* map = sMapMgr->CreateBaseMap(BR_IdentificadorDeMapas[indiceDelMapa]);
+        int mapID = BR_IdentificadorDeMapas[indiceDelMapa];
+        Map* map = sMapMgr->FindBaseNonInstanceMap(mapID);
         if (map)
         {
             DesaparecerNave();
@@ -333,12 +334,13 @@ bool BattleRoyaleMgr::InvocarNave()
             float o = BR_InicioDeLaNave[indiceDelMapa][3];
             float rot2 = std::sin(o / 2);
             float rot3 = cos(o / 2);
-            obj_Nave = new GameObject();
-            if (obj_Nave->Create(map->GenerateLowGuid<HighGuid::GameObject>(), OBJETO_NAVE, map, DIMENSION_EVENTO, x, y, z, o, G3D::Quat(0, 0, rot2, rot3), 0, GO_STATE_READY))
+            map->LoadGrid(x, y);
+            obj_Nave = sObjectMgr->IsGameObjectStaticTransport(OBJETO_NAVE) ? new StaticTransport() : new GameObject();
+            if (obj_Nave->Create(map->GenerateLowGuid<HighGuid::GameObject>(), OBJETO_NAVE, map, DIMENSION_EVENTO, x, y, z, o, G3D::Quat(0, 0, rot2, rot3), 100, GO_STATE_READY))
             {
+                obj_Nave->SetSpawnedByDefault(false);
                 obj_Nave->SetVisibilityDistanceOverride(VisibilityDistanceType::Infinite);
                 map->AddToMap(obj_Nave);
-                obj_Nave->setActive(true);
                 return true;
             }
             else
@@ -352,6 +354,10 @@ bool BattleRoyaleMgr::InvocarNave()
         {
             LOG_ERROR("br.nave", "BattleRoyaleMgr::InvocarNave: No se ha podido obtener el mapa para la nave (MAPA: {})!", BR_IdentificadorDeMapas[indiceDelMapa]);
         }
+    }
+    else
+    {
+        LOG_ERROR("br.nave", "BattleRoyaleMgr::InvocarNave: No se ha invocado la nave (OBJETO_NAVE = {}) porque no hay jugadores!", OBJETO_NAVE);
     }
     return false;
 }
