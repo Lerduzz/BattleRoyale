@@ -397,7 +397,9 @@ void BattleRoyaleMgr::PonerTodosLosParacaidas()
             {
                 if ((*it).second)
                 {
-                    SalirDelEvento((*it).first);
+                    uint32 guid = (*it).first;
+                    ++it;
+                    SalirDelEvento(guid);
                 }
                 else
                 {
