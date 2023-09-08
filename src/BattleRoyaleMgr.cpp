@@ -247,9 +247,6 @@ void BattleRoyaleMgr::LlamarDentroDeNave(uint32 guid)
     player->SetPvP(false);
     player->SaveToDB(false, false);
     player->GetMotionMaster()->MoveFall();
-
-    // Prueba de arreglo a cuando no sales en la nave.
-    // if (obj_Nave) obj_Nave->ToTransport()->AddPassenger(player);
 }
 
 void BattleRoyaleMgr::SalirDelEvento(uint32 guid, bool logout /* = false*/)
