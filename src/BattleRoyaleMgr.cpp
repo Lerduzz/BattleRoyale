@@ -115,8 +115,8 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
                             RestablecerTodoElEvento();
                             return;
                         }
-                        LlamarTodosDentroDeNave();
                         estadoActual = ESTADO_NAVE_EN_ESPERA;
+                        LlamarTodosDentroDeNave();
                     }
                     if (estadoActual == ESTADO_NAVE_EN_ESPERA && tiempoRestanteInicio <= 30 && obj_Nave)
                     {
