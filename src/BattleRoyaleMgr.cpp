@@ -322,29 +322,35 @@ void BattleRoyaleMgr::RevivirJugador(Player* player)
 
 bool BattleRoyaleMgr::InvocarNave()
 {
-    bool success = false;
     if (HayJugadores())
     {
-        for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
+        Map* map = sMapMgr->CreateBaseMap(BR_IdentificadorDeMapas[indiceDelMapa]);
+        if (map)
         {
-            if ((*it).second)
+            DesaparecerNave();
+            float x = BR_InicioDeLaNave[indiceDelMapa][0];
+            float y = BR_InicioDeLaNave[indiceDelMapa][1];
+            float z = BR_InicioDeLaNave[indiceDelMapa][2];
+            float o = BR_InicioDeLaNave[indiceDelMapa][3];
+            float rot2 = std::sin(o / 2);
+            float rot3 = cos(o / 2);
+            obj_Nave = new GameObject();
+            if (obj_Nave->Create(map->GenerateLowGuid<HighGuid::GameObject>(), OBJETO_NAVE, map, DIMENSION_EVENTO, x, y, z, o, G3D::Quat(0, 0, rot2, rot3), 0, GO_STATE_READY))
             {
-                DesaparecerNave();
-                float x = BR_InicioDeLaNave[indiceDelMapa][0];
-                float y = BR_InicioDeLaNave[indiceDelMapa][1];
-                float z = BR_InicioDeLaNave[indiceDelMapa][2];
-                float o = BR_InicioDeLaNave[indiceDelMapa][3];
-                float rot2 = std::sin(o / 2);
-                float rot3 = cos(o / 2);
-                obj_Nave = (*it).second->SummonGameObject(OBJETO_NAVE, x, y, z, o, 0, 0, rot2, rot3, 2 * 60);
-                obj_Nave->SetPhaseMask(2, true);
                 obj_Nave->SetVisibilityDistanceOverride(VisibilityDistanceType::Infinite);
-                success = true;
-                break;
+                map->AddToMap(obj_Nave);
+                obj_Nave->setActive(true);
+                return true;
+            }
+            else
+            {
+                LOG_ERROR("br.nave", "BattleRoyaleMgr::InvocarNave: No se ha podido invocar la nave (OBJETO: {}, MAPA: {})!", OBJETO_NAVE, BR_IdentificadorDeMapas[indiceDelMapa]);
+                delete obj_Nave;
+                obj_Nave = nullptr;
             }
         }
     }
-    return success;
+    return false;
 }
 
 bool BattleRoyaleMgr::InvocarCentroDelMapa()

@@ -14,6 +14,12 @@ typedef std::map<uint32, Player*> BR_ColaDePersonajes;
 typedef std::map<uint32, Player*> BR_ListaDePersonajes;
 typedef std::map<uint32, BattleRoyaleData> BR_DatosDePersonajes;
 
+enum BR_Dimensiones
+{
+    DIMENSION_NORMAL                        = 1,
+    DIMENSION_EVENTO                        = 2,
+};
+
 enum BR_EstadosEvento
 {
     ESTADO_NO_HAY_SUFICIENTES_JUGADORES     = 0,
