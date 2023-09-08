@@ -335,7 +335,7 @@ bool BattleRoyaleMgr::InvocarNave()
             float rot2 = std::sin(o / 2);
             float rot3 = cos(o / 2);
             map->LoadGrid(x, y);
-            obj_Nave = sObjectMgr->IsGameObjectStaticTransport(OBJETO_NAVE) ? new StaticTransport() : new GameObject();
+            obj_Nave = new StaticTransport();
             if (obj_Nave->Create(map->GenerateLowGuid<HighGuid::GameObject>(), OBJETO_NAVE, map, DIMENSION_EVENTO, x, y, z, o, G3D::Quat(0, 0, rot2, rot3), 100, GO_STATE_READY))
             {
                 obj_Nave->SetSpawnedByDefault(false);
@@ -375,7 +375,7 @@ bool BattleRoyaleMgr::InvocarCentroDelMapa()
             float y = BR_CentroDeMapas[indiceDelMapa].GetPositionY();
             float z = BR_CentroDeMapas[indiceDelMapa].GetPositionZ();
             map->LoadGrid(x, y);
-            obj_Centro = sObjectMgr->IsGameObjectStaticTransport(OBJETO_NAVE) ? new StaticTransport() : new GameObject();
+            obj_Centro = new GameObject();
             if (obj_Centro->Create(map->GenerateLowGuid<HighGuid::GameObject>(), OBJETO_CENTRO_DEL_MAPA, map, DIMENSION_EVENTO, x, y, z, 0, G3D::Quat(), 100, GO_STATE_READY))
             {
                 obj_Centro->SetSpawnedByDefault(false);
@@ -417,7 +417,7 @@ bool BattleRoyaleMgr::InvocarZonaSegura()
                 float y = BR_CentroDeMapas[indiceDelMapa].GetPositionY();
                 float z = BR_CentroDeMapas[indiceDelMapa].GetPositionZ() + BR_EscalasDeZonaSegura[indiceDeZona] * 66.0f;
                 map->LoadGrid(x, y);
-                obj_Zona = sObjectMgr->IsGameObjectStaticTransport(OBJETO_ZONA_SEGURA_INICIAL + indiceDeZona) ? new StaticTransport() : new GameObject();
+                obj_Zona = new GameObject();
                 if (obj_Zona->Create(map->GenerateLowGuid<HighGuid::GameObject>(), OBJETO_ZONA_SEGURA_INICIAL + indiceDeZona, map, DIMENSION_EVENTO, x, y, z, 0, G3D::Quat(), 100, GO_STATE_READY))
                 {
                     obj_Zona->SetSpawnedByDefault(false);
