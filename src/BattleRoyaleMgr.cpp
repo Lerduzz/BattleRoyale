@@ -7,7 +7,7 @@ BattleRoyaleMgr::BattleRoyaleMgr()
 {
     conf_JugadoresMinimo = sConfigMgr->GetOption<int32>("BattleRoyale.MinPlayers", 25);
     conf_JugadoresMaximo = sConfigMgr->GetOption<int32>("BattleRoyale.MaxPlayers", 50);
-    conf_IntervaloEntreRecuccionDeZona = sConfigMgr->GetOption<int32>("BattleRoyale.SecureZoneInterval", 60000);
+    conf_IntervaloDeZona = sConfigMgr->GetOption<int32>("BattleRoyale.SecureZoneInterval", 60000);
     obj_Zona = nullptr;
     obj_Centro = nullptr;
     obj_Nave = nullptr;
@@ -103,7 +103,7 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
                 if (tiempoRestanteInicio <= 0) {
                     estadoActual = ESTADO_BATALLA_EN_CURSO;
                     NotificarTiempoParaIniciar(0);
-                    tiempoRestanteZona = conf_IntervaloEntreRecuccionDeZona;
+                    tiempoRestanteZona = conf_IntervaloDeZona;
                     tiempoRestanteNave = 30;
                 } else {
                     if (tiempoRestanteInicio % 5 == 0) {
@@ -163,7 +163,7 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
             if (tiempoRestanteZona <= 0) {
                 InvocarZonaSegura();
                 NotificarZonaReducida();
-                tiempoRestanteZona = conf_IntervaloEntreRecuccionDeZona;
+                tiempoRestanteZona = conf_IntervaloDeZona;
                 estaLaZonaAnunciada = false;
             } else {
                 if (tiempoRestanteZona <= 5000 && !estaLaZonaAnunciada) {
