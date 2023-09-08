@@ -1,8 +1,6 @@
 #ifndef SC_BR_DATA_H
 #define SC_BR_DATA_H
 
-#include "BattleRoyaleMgr.h" // TODO: Creo que esto no hace falta aqui.
-
 class BattleRoyaleData
 {
 public:
