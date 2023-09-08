@@ -454,7 +454,8 @@ void BattleRoyaleMgr::ControlDeReglas()
 {
     if(HayJugadores())
     {
-        for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
+        BR_ListaDePersonajes::iterator it = list_Jugadores.begin();
+        while (it != list_Jugadores.end())
         {
             if ((*it).second && (*it).second->IsAlive())
             {
@@ -464,9 +465,18 @@ void BattleRoyaleMgr::ControlDeReglas()
                     (obj_Centro && (*it).second->GetExactDist(obj_Centro) > 1147.0f)
                 )
                 {
-                    SalirDelEvento((*it).first);
-                    --it; // TODO: Esto no funciona para el primero de la lista.
+                    uint32 guid = (*it).first;
+                    ++it;
+                    SalirDelEvento(guid);
                 }
+                else
+                {
+                    ++it;
+                }
+            }
+            else
+            {
+                ++it;
             }
         }
     }
