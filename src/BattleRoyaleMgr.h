@@ -14,14 +14,19 @@ typedef std::map<uint32, Player*> BR_ColaDePersonajes;
 typedef std::map<uint32, Player*> BR_ListaDePersonajes;
 typedef std::map<uint32, BattleRoyaleData> BR_DatosDePersonajes;
 
+enum BR_Dimensiones
+{
+    DIMENSION_NORMAL                        = 0x00000001,
+    DIMENSION_EVENTO                        = 0x00000002,
+};
+
 enum BR_EstadosEvento
 {
     ESTADO_NO_HAY_SUFICIENTES_JUGADORES     = 0,
     ESTADO_INVOCANDO_JUGADORES              = 1,
-    ESTADO_NAVE_EN_ESPERA                   = 2,
-    ESTADO_NAVE_EN_MOVIMIENTO               = 3,
-    ESTADO_NAVE_CERCA_DEL_CENTRO            = 4,
-    ESTADO_BATALLA_EN_CURSO                 = 5,
+    ESTADO_NAVE_EN_MOVIMIENTO               = 2,
+    ESTADO_NAVE_CERCA_DEL_CENTRO            = 3,
+    ESTADO_BATALLA_EN_CURSO                 = 4,
 };
 
 enum BR_Hechizos
@@ -103,9 +108,7 @@ private:
     void RestablecerTodoElEvento();
     void IniciarNuevaRonda();
     void AlmacenarPosicionInicial(uint32 guid);
-    void LlamarAntesQueNave(uint32 guid);    
     void LlamarDentroDeNave(uint32 guid);
-    void LlamarTodosDentroDeNave();
     void SalirDelEvento(uint32 guid, bool logout = false);
     void RevivirJugador(Player *player);
     bool InvocarNave();
@@ -147,16 +150,8 @@ private:
         player->RemoveFromGroup(); 
         player->UninviteFromGroup();
     };
-    void CambiarDimension_Entrar(uint32 guid)
-    {
-        list_Jugadores[guid]->SetPhaseMask(2, false);
-        list_Jugadores[guid]->UpdateObjectVisibility();
-    };
-    void CambiarDimension_Salir(uint32 guid)
-    {
-        list_Jugadores[guid]->SetPhaseMask(1, false);
-        list_Jugadores[guid]->UpdateObjectVisibility();
-    };
+    void CambiarDimension_Entrar(uint32 guid) { list_Jugadores[guid]->SetPhaseMask(DIMENSION_EVENTO, true); };
+    void CambiarDimension_Salir(uint32 guid) { list_Jugadores[guid]->SetPhaseMask(DIMENSION_NORMAL, true); };
     void Desmontar(Player* player)
     {
         if (player && player->IsAlive() && player->IsMounted())
@@ -205,10 +200,6 @@ private:
                         if (delay > 30 && delay <= 60)
                         {
                             (*it).second->GetSession()->SendNotification("|cff00ff00Faltan |cffDA70D6%u|cff00ff00 segundos para encender motores. |cffff0000¡NO TE TIRES!", delay - 30);
-                        }
-                        else 
-                        {
-                            (*it).second->GetSession()->SendNotification("|cff00ff00No tengas miedo. |cff0000ff¡LLEGANDO A LA NAVE!");
                         }
                         break;
                     }
