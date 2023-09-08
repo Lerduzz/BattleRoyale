@@ -24,10 +24,9 @@ enum BR_EstadosEvento
 {
     ESTADO_NO_HAY_SUFICIENTES_JUGADORES     = 0,
     ESTADO_INVOCANDO_JUGADORES              = 1,
-    ESTADO_NAVE_EN_ESPERA                   = 2,
-    ESTADO_NAVE_EN_MOVIMIENTO               = 3,
-    ESTADO_NAVE_CERCA_DEL_CENTRO            = 4,
-    ESTADO_BATALLA_EN_CURSO                 = 5,
+    ESTADO_NAVE_EN_MOVIMIENTO               = 2,
+    ESTADO_NAVE_CERCA_DEL_CENTRO            = 3,
+    ESTADO_BATALLA_EN_CURSO                 = 4,
 };
 
 enum BR_Hechizos
@@ -109,9 +108,7 @@ private:
     void RestablecerTodoElEvento();
     void IniciarNuevaRonda();
     void AlmacenarPosicionInicial(uint32 guid);
-    void LlamarAntesQueNave(uint32 guid);    
     void LlamarDentroDeNave(uint32 guid);
-    void LlamarTodosDentroDeNave();
     void SalirDelEvento(uint32 guid, bool logout = false);
     void RevivirJugador(Player *player);
     bool InvocarNave();
@@ -203,10 +200,6 @@ private:
                         if (delay > 30 && delay <= 60)
                         {
                             (*it).second->GetSession()->SendNotification("|cff00ff00Faltan |cffDA70D6%u|cff00ff00 segundos para encender motores. |cffff0000¡NO TE TIRES!", delay - 30);
-                        }
-                        else 
-                        {
-                            (*it).second->GetSession()->SendNotification("|cff00ff00No tengas miedo. |cff0000ff¡LLEGANDO A LA NAVE!");
                         }
                         break;
                     }
