@@ -200,11 +200,11 @@ void BattleRoyaleMgr::RestablecerTodoElEvento()
 	list_Jugadores.clear();
     list_Datos.clear();
     indiceDelMapa = 0;
-    estadoActual = ESTADO_NO_HAY_SUFICIENTES_JUGADORES;
     indicadorDeSegundos = 1000;
     indiceDeVariacion = 0;
     estaLaZonaActiva = false;
     DesaparecerTodosLosObjetos();
+    estadoActual = ESTADO_NO_HAY_SUFICIENTES_JUGADORES;
 }
 
 void BattleRoyaleMgr::IniciarNuevaRonda()
@@ -218,23 +218,12 @@ void BattleRoyaleMgr::IniciarNuevaRonda()
         {
             for (BR_ColaDePersonajes::iterator it = list_Cola.begin(); it != list_Cola.end(); ++it)
 	        {
-                if (!EstaLlenoElEvento())
-                {
-                    list_Jugadores[(*it).first] = (*it).second;
-                    AlmacenarPosicionInicial((*it).first);
-                    LlamarAntesQueNave((*it).first);
-                }
-                else
-                {
-                    break;
-                }
-	        }
-            if (HayJugadores())
-            {
-                for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
-                {
-                    if (EstaEnCola((*it).first)) list_Cola.erase((*it).first);
-                }
+                if (EstaLlenoElEvento()) break;
+                list_Jugadores[(*it).first] = (*it).second;
+                AlmacenarPosicionInicial((*it).first);
+                LlamarAntesQueNave((*it).first);
+                list_Cola.erase((*it).first);
+                --it;
             }
         }
     }
