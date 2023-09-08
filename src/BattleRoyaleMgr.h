@@ -313,7 +313,7 @@ private:
             {
                 if ((*it).second && (*it).second->IsAlive())
                 {
-                    (*it).second->AddAura(HECHIZO_PARACAIDAS, (*it).second);
+                    (*it).second->AddAura(HECHIZO_ANTI_SANADORES, (*it).second);
                 }
             }
         }
