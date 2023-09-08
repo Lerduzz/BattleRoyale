@@ -155,12 +155,12 @@ private:
     };
     void CambiarDimension_Entrar(uint32 guid)
     {
-        list_Jugadores[guid]->SetPhaseMask(2, false);
+        list_Jugadores[guid]->SetPhaseMask(DIMENSION_EVENTO, false);
         list_Jugadores[guid]->UpdateObjectVisibility();
     };
     void CambiarDimension_Salir(uint32 guid)
     {
-        list_Jugadores[guid]->SetPhaseMask(1, false);
+        list_Jugadores[guid]->SetPhaseMask(DIMENSION_NORMAL, false);
         list_Jugadores[guid]->UpdateObjectVisibility();
     };
     void Desmontar(Player* player)

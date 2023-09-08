@@ -404,6 +404,7 @@ bool BattleRoyaleMgr::InvocarCentroDelMapa()
 
 bool BattleRoyaleMgr::InvocarZonaSegura()
 {
+    LOG_ERROR("br.nave", "BattleRoyaleMgr::InvocarZonaSegura: OBJETO = {}, MAPA = {}, ESCALA = {}, INDICE = {}!", OBJETO_ZONA_SEGURA_INICIAL + indiceDeZona, BR_IdentificadorDeMapas[indiceDelMapa], BR_EscalasDeZonaSegura[indiceDeZona], indiceDeZona);
     DesaparecerZona();
     if (indiceDeZona < CANTIDAD_DE_ZONAS)
     {
@@ -429,19 +430,19 @@ bool BattleRoyaleMgr::InvocarZonaSegura()
                 }
                 else
                 {
-                    LOG_ERROR("br.nave", "BattleRoyaleMgr::InvocarCentroDelMapa: No se ha podido invocar la zona (OBJETO = {})!", OBJETO_ZONA_SEGURA_INICIAL + indiceDeZona);
+                    LOG_ERROR("br.nave", "BattleRoyaleMgr::InvocarZonaSegura: No se ha podido invocar la zona (OBJETO = {})!", OBJETO_ZONA_SEGURA_INICIAL + indiceDeZona);
                     delete obj_Zona;
                     obj_Zona = nullptr;
                 }
             }
             else
             {
-                LOG_ERROR("br.nave", "BattleRoyaleMgr::InvocarCentroDelMapa: No se ha podido obtener el mapa para la zona (MAPA: {})!", mapID);
+                LOG_ERROR("br.nave", "BattleRoyaleMgr::InvocarZonaSegura: No se ha podido obtener el mapa para la zona (MAPA: {})!", mapID);
             }
         }
         else
         {
-            LOG_ERROR("br.nave", "BattleRoyaleMgr::InvocarCentroDelMapa: No se ha invocado la zona (OBJETO = {}) porque no hay jugadores!", OBJETO_ZONA_SEGURA_INICIAL + indiceDeZona);
+            LOG_ERROR("br.nave", "BattleRoyaleMgr::InvocarZonaSegura: No se ha invocado la zona (OBJETO = {}) porque no hay jugadores!", OBJETO_ZONA_SEGURA_INICIAL + indiceDeZona);
         }
     }
     estaLaZonaActiva = false;
