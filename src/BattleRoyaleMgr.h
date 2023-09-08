@@ -28,6 +28,7 @@ enum BR_EstadosEvento
     ESTADO_NAVE_EN_MOVIMIENTO               = 2,
     ESTADO_NAVE_CERCA_DEL_CENTRO            = 3,
     ESTADO_BATALLA_EN_CURSO                 = 4,
+    ESTADO_BATALLA_TERMINADA                = 5,
 };
 
 enum BR_Hechizos
@@ -313,6 +314,7 @@ private:
     int tiempoRestanteInicio;
     int tiempoRestanteZona;
     int tiempoRestanteNave;
+    int tiempoRestanteFinal;
     int indiceDeVariacion;
     int indiceDelMapa;
     int indiceDeZona;
