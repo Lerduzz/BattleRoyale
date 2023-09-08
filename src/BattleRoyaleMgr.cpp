@@ -236,15 +236,20 @@ void BattleRoyaleMgr::AlmacenarPosicionInicial(uint32 guid)
 
 void BattleRoyaleMgr::LlamarDentroDeNave(uint32 guid)
 {
+    Player* player = list_Jugadores[guid];
     CambiarDimension_Entrar(guid);
-    SalirDeGrupo(list_Jugadores[guid]);
+    SalirDeGrupo(player);
     float ox = BR_VariacionesDePosicion[indiceDeVariacion][0];
     float oy = BR_VariacionesDePosicion[indiceDeVariacion][1];
     SiguientePosicion();
-    Desmontar(list_Jugadores[guid]);
-    list_Jugadores[guid]->TeleportTo(BR_IdentificadorDeMapas[indiceDelMapa], BR_InicioDeLaNave[indiceDelMapa][0] + ox, BR_InicioDeLaNave[indiceDelMapa][1] + oy, BR_InicioDeLaNave[indiceDelMapa][2] + 0.5f, BR_InicioDeLaNave[indiceDelMapa][3] + M_PI / 2.0f);
-    list_Jugadores[guid]->SetPvP(false);
-    list_Jugadores[guid]->SaveToDB(false, false);
+    Desmontar(player);
+    player->TeleportTo(BR_IdentificadorDeMapas[indiceDelMapa], BR_InicioDeLaNave[indiceDelMapa][0] + ox, BR_InicioDeLaNave[indiceDelMapa][1] + oy, BR_InicioDeLaNave[indiceDelMapa][2] + 2.5f, BR_InicioDeLaNave[indiceDelMapa][3] + M_PI / 2.0f);
+    player->SetPvP(false);
+    player->SaveToDB(false, false);
+    player->GetMotionMaster()->MoveFall();
+
+    // Prueba de arreglo a cuando no sales en la nave.
+    if (obj_Nave) obj_Nave->ToTransport()->AddPassenger(player);
 }
 
 void BattleRoyaleMgr::SalirDelEvento(uint32 guid, bool logout /* = false*/)
@@ -297,6 +302,7 @@ bool BattleRoyaleMgr::InvocarNave()
             {
                 obj_Nave->SetVisibilityDistanceOverride(VisibilityDistanceType::Infinite);
                 map->AddToMap(obj_Nave);
+                LOG_ERROR("br.nave", "BattleRoyaleMgr::InvocarNave: Nave invocada en M: {}, X: {}, Y: {}, Z: {}!", mapID, x, y, z);
                 return true;
             }
             else
