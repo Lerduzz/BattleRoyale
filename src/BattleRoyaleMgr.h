@@ -34,6 +34,7 @@ enum BR_EstadosEvento
 enum BR_Hechizos
 {
     HECHIZO_PARACAIDAS                      = 45472,
+    HECHIZO_ANTI_SANADORES                  = 55593,
 };
 
 enum BR_ObjetosMundo
@@ -303,6 +304,19 @@ private:
             return true;
         }
         return false;
+    };
+    void HechizosDeZona()
+    {
+        if (estadoActual == ESTADO_BATALLA_EN_CURSO && HayJugadores())
+        {
+            for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
+            {
+                if ((*it).second && (*it).second->IsAlive())
+                {
+                    (*it).second->AddAura(HECHIZO_PARACAIDAS, (*it).second);
+                }
+            }
+        }
     };
 
     BR_ListaDePersonajes list_Cola;
