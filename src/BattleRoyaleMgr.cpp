@@ -214,17 +214,13 @@ void BattleRoyaleMgr::IniciarNuevaRonda()
         estadoActual = ESTADO_INVOCANDO_JUGADORES;
         SiguienteMapa();
         tiempoRestanteInicio = 67;
-        if (HayCola())
+        while (HayCola() && !EstaLlenoElEvento())
         {
-            for (BR_ColaDePersonajes::iterator it = list_Cola.begin(); it != list_Cola.end(); ++it)
-	        {
-                if (EstaLlenoElEvento()) break;
-                list_Jugadores[(*it).first] = (*it).second;
-                AlmacenarPosicionInicial((*it).first);
-                LlamarAntesQueNave((*it).first);
-                list_Cola.erase((*it).first);
-                --it;
-            }
+            uint32 guid = (*list_Cola.begin()).first;
+            list_Jugadores[guid] = list_Cola[guid];
+            AlmacenarPosicionInicial(guid);
+            LlamarAntesQueNave(guid);
+            list_Cola.erase(guid);
         }
     }
 }
@@ -288,7 +284,7 @@ void BattleRoyaleMgr::LlamarTodosDentroDeNave()
                 AlmacenarPosicionInicial((*it).first);
                 LlamarDentroDeNave((*it).first);
                 list_Cola.erase((*it).first);
-                --it;
+                --it; // TODO: Esto no funciona para el primero de la lista.
 	        }
         }
     }
@@ -399,7 +395,7 @@ void BattleRoyaleMgr::PonerTodosLosParacaidas()
                 else
                 {
                     SalirDelEvento((*it).first);
-                    --it;
+                    --it; // TODO: Esto no funciona para el primero de la lista.
                 }
             }
         }
@@ -457,7 +453,7 @@ void BattleRoyaleMgr::ControlDeReglas()
                 )
                 {
                     SalirDelEvento((*it).first);
-                    --it;
+                    --it; // TODO: Esto no funciona para el primero de la lista.
                 }
             }
         }
