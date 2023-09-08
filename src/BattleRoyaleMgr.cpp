@@ -273,20 +273,13 @@ void BattleRoyaleMgr::LlamarTodosDentroDeNave()
             LlamarDentroDeNave((*it).first);
         }
     }
-    if (!EstaLlenoElEvento())
+    while (HayCola() && !EstaLlenoElEvento() && estadoActual == ESTADO_NAVE_EN_ESPERA && tiempoRestanteInicio >= 35)
     {
-        if (HayCola())
-        {
-            for (BR_ColaDePersonajes::iterator it = list_Cola.begin(); it != list_Cola.end(); ++it)
-	        {
-                if (EstaLlenoElEvento()) break;
-                list_Jugadores[(*it).first] = (*it).second;
-                AlmacenarPosicionInicial((*it).first);
-                LlamarDentroDeNave((*it).first);
-                list_Cola.erase((*it).first);
-                --it; // TODO: Esto no funciona para el primero de la lista.
-	        }
-        }
+        uint32 guid = (*list_Cola.begin()).first;
+        list_Jugadores[guid] = list_Cola[guid];
+        AlmacenarPosicionInicial(guid);
+        LlamarDentroDeNave(guid);
+        list_Cola.erase(guid);
     }
 }
 
