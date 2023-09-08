@@ -414,13 +414,14 @@ void BattleRoyaleMgr::PonerTodosLosParacaidas()
         {
             if (obj_Nave && (*it).second)
             {
-                if ((*it).second->GetTransport() && (*it).second->GetExactDist(obj_Nave) < 25.0f && (*it).second->IsAlive())
+                if (EstaEnLaNave((*it).second) && (*it).second->IsAlive())
                 {
                     (*it).second->AddAura(HECHIZO_PARACAIDAS, (*it).second);
                 }
                 else
                 {
-                    // TODO: SalirDelEvento((*it).first);
+                    SalirDelEvento((*it).first);
+                    --it;
                 }
             }
         }

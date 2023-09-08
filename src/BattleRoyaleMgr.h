@@ -94,8 +94,9 @@ public:
     bool DebeRestringirFunciones(Player* player) { return estadoActual > ESTADO_NO_HAY_SUFICIENTES_JUGADORES && HayJugadores() && EstaEnEvento(player); };
     bool DebeForzarJcJTcT(Player* player) 
     {
+        if (!player) return false;
         if (estadoActual != ESTADO_BATALLA_EN_CURSO || !HayJugadores() || !EstaEnEvento(player)) return false;
-        return !(obj_Nave && player->GetTransport() && player->GetExactDist(obj_Nave) < 25.0f);
+        return !EstaEnLaNave(player);
     };
     
 private:
@@ -122,6 +123,20 @@ private:
     bool EstaEnCola(uint32 guid) { return list_Cola.find(guid) != list_Cola.end(); };
     bool EstaEnEvento(Player* player) { return list_Jugadores.find(player->GetGUID().GetCounter()) != list_Jugadores.end(); };
     bool EstaEnEvento(uint32 guid) { return list_Jugadores.find(guid) != list_Jugadores.end(); };
+    bool EstaEnLaNave(Player* player)
+    {
+        if (player && obj_Nave)
+        {
+            if (Transport* tp = obj_Nave->ToTransport())
+            {
+                if (Transport* playertp = player->GetTransport())
+                {
+                    if (tp == playertp) return true;
+                }
+            }
+        }
+        return false;
+    };
     bool EstaLlenoElEvento() { return list_Jugadores.size() >= conf_JugadoresMaximo; };
     bool HaySuficientesEnCola() { return list_Cola.size() >= conf_JugadoresMinimo; };
     ChatHandler Chat(Player* player) { return ChatHandler(player->GetSession()); };
