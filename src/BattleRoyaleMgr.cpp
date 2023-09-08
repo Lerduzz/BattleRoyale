@@ -345,7 +345,7 @@ bool BattleRoyaleMgr::InvocarNave()
             }
             else
             {
-                LOG_ERROR("br.nave", "BattleRoyaleMgr::InvocarNave: No se ha podido invocar la nave (OBJETO_NAVE = {})!", OBJETO_NAVE);
+                LOG_ERROR("br.nave", "BattleRoyaleMgr::InvocarNave: No se ha podido invocar la nave (OBJETO = {})!", OBJETO_NAVE);
                 delete obj_Nave;
                 obj_Nave = nullptr;
             }
@@ -357,20 +357,47 @@ bool BattleRoyaleMgr::InvocarNave()
     }
     else
     {
-        LOG_ERROR("br.nave", "BattleRoyaleMgr::InvocarNave: No se ha invocado la nave (OBJETO_NAVE = {}) porque no hay jugadores!", OBJETO_NAVE);
+        LOG_ERROR("br.nave", "BattleRoyaleMgr::InvocarNave: No se ha invocado la nave (OBJETO = {}) porque no hay jugadores!", OBJETO_NAVE);
     }
     return false;
 }
 
 bool BattleRoyaleMgr::InvocarCentroDelMapa()
 {
-    if (obj_Nave)
+    if (HayJugadores())
     {
-        DesaparecerCentro();
-        obj_Centro = obj_Nave->SummonGameObject(OBJETO_CENTRO_DEL_MAPA, BR_CentroDeMapas[indiceDelMapa].GetPositionX(), BR_CentroDeMapas[indiceDelMapa].GetPositionY(), BR_CentroDeMapas[indiceDelMapa].GetPositionZ(), 0, 0, 0, 0, 0, 15 * 60);
-        obj_Centro->SetPhaseMask(2, true);
-        obj_Centro->SetVisibilityDistanceOverride(VisibilityDistanceType::Infinite);
-        return true;
+        int mapID = BR_IdentificadorDeMapas[indiceDelMapa];
+        Map* map = sMapMgr->FindBaseNonInstanceMap(mapID);
+        if (map)
+        {
+            DesaparecerCentro();
+            float x = BR_CentroDeMapas[indiceDelMapa].GetPositionX();
+            float y = BR_CentroDeMapas[indiceDelMapa].GetPositionY();
+            float z = BR_CentroDeMapas[indiceDelMapa].GetPositionZ();
+            map->LoadGrid(x, y);
+            obj_Centro = sObjectMgr->IsGameObjectStaticTransport(OBJETO_NAVE) ? new StaticTransport() : new GameObject();
+            if (obj_Centro->Create(map->GenerateLowGuid<HighGuid::GameObject>(), OBJETO_CENTRO_DEL_MAPA, map, DIMENSION_EVENTO, x, y, z, 0, G3D::Quat(), 100, GO_STATE_READY))
+            {
+                obj_Centro->SetSpawnedByDefault(false);
+                obj_Centro->SetVisibilityDistanceOverride(VisibilityDistanceType::Infinite);
+                map->AddToMap(obj_Centro);
+                return true;
+            }
+            else
+            {
+                LOG_ERROR("br.nave", "BattleRoyaleMgr::InvocarCentroDelMapa: No se ha podido invocar el centro (OBJETO = {})!", OBJETO_CENTRO_DEL_MAPA);
+                delete obj_Centro;
+                obj_Centro = nullptr;
+            }
+        }
+        else
+        {
+            LOG_ERROR("br.nave", "BattleRoyaleMgr::InvocarCentroDelMapa: No se ha podido obtener el mapa para el centro (MAPA: {})!", BR_IdentificadorDeMapas[indiceDelMapa]);
+        }
+    }
+    else
+    {
+        LOG_ERROR("br.nave", "BattleRoyaleMgr::InvocarCentroDelMapa: No se ha invocado el centro (OBJETO = {}) porque no hay jugadores!", OBJETO_CENTRO_DEL_MAPA);
     }
     return false;
 }
