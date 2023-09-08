@@ -316,7 +316,7 @@ void BattleRoyaleMgr::LlamarTodosDentroDeNave()
     }
 }
 
-void BattleRoyaleMgr::SalirDelEvento(uint32 guid, bool logout)
+void BattleRoyaleMgr::SalirDelEvento(uint32 guid, bool logout /* = false*/)
 {
     if (EstaEnCola(guid))
     {
@@ -420,7 +420,7 @@ void BattleRoyaleMgr::PonerTodosLosParacaidas()
                 }
                 else
                 {
-                    SalirDelEvento((*it).first);
+                    // TODO: SalirDelEvento((*it).first);
                 }
             }
         }
@@ -471,8 +471,8 @@ void BattleRoyaleMgr::ControlDeReglas()
         {
             if ((*it).second && (*it).second->IsAlive())
             {
-                if ((*it).second->HasAura(31700)) SalirDelEvento((*it).first);
-                if (obj_Centro && (*it).second->GetExactDist(obj_Centro) > 1147.0f) SalirDelEvento((*it).first);
+                // TODO: if ((*it).second->HasAura(31700)) SalirDelEvento((*it).first);
+                // TODO: if (obj_Centro && (*it).second->GetExactDist(obj_Centro) > 1147.0f) SalirDelEvento((*it).first);
             }
         }
     }
@@ -506,7 +506,7 @@ void BattleRoyaleMgr::CondicionDeVictoria()
     }
 }
 
-void BattleRoyaleMgr::FinalizarRonda(bool announce, Player* winner)
+void BattleRoyaleMgr::FinalizarRonda(bool announce, Player* winner /* = nullptr*/)
 {
     if (announce && winner && EstaEnEvento(winner))
     {
@@ -519,3 +519,10 @@ void BattleRoyaleMgr::FinalizarRonda(bool announce, Player* winner)
     estadoActual = ESTADO_NO_HAY_SUFICIENTES_JUGADORES;
     if (HaySuficientesEnCola()) IniciarNuevaRonda();
 }
+
+
+// TODO:
+// - BattleRoyaleMgr::ControlDeReglas(): Borrar un elemento de la lista desde el loop que recorre la lista puede ser la causa del crash.
+//   * Posible solucion: crear una cola independiente a la que se agregaran los jugadores que se deben sacar del evento y cada ves que se compruebe sacar de la lista del evento a los que se encuentren ahí y luego limpiarla.
+//   * Tener e cuenta la ejecucion multihilos para evitar problemas luego.
+// - Me alo y me cai de la nave. Al parecer hay que dejar un margen y no alar si la nave esta a punto de salir.
