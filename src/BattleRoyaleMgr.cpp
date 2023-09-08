@@ -377,25 +377,30 @@ void BattleRoyaleMgr::PonerTodosLosParacaidas()
 {
     if (HayJugadores())
     {
-        for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
+        BR_ListaDePersonajes::iterator it = list_Jugadores.begin();
+        while (it != list_Jugadores.end())
         {
-            if (obj_Nave && (*it).second)
+            if (EstaEnLaNave((*it).second) && (*it).second->IsAlive())
             {
-                if (EstaEnLaNave((*it).second) && (*it).second->IsAlive())
+                (*it).second->AddAura(HECHIZO_PARACAIDAS, (*it).second);
+                ++it;
+            }
+            else
+            {
+                if ((*it).second)
                 {
-                    (*it).second->AddAura(HECHIZO_PARACAIDAS, (*it).second);
+                    SalirDelEvento((*it).first);
                 }
                 else
                 {
-                    SalirDelEvento((*it).first);
-                    --it; // TODO: Esto no funciona para el primero de la lista.
+                    ++it;
                 }
             }
         }
     }
     else
     {
-        FinalizarRonda();
+        FinalizarRonda(false);
     }
 }
 
