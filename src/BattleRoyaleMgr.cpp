@@ -54,9 +54,17 @@ void BattleRoyaleMgr::GestionarJugadorEntrando(Player* player)
             }
             else
             {
-                list_Jugadores[player->GetGUID().GetCounter()] = player;
-                AlmacenarPosicionInicial(player->GetGUID().GetCounter());
-                LlamarDentroDeNave(player->GetGUID().GetCounter());
+                if (tiempoRestanteInicio <= 35)
+                {
+                    list_Jugadores[player->GetGUID().GetCounter()] = player;
+                    AlmacenarPosicionInicial(player->GetGUID().GetCounter());
+                    LlamarDentroDeNave(player->GetGUID().GetCounter());
+                }
+                else
+                {
+                    list_Cola[player->GetGUID().GetCounter()] = player;
+                    Chat(player).PSendSysMessage("|cff4CFF00BattleRoyale::|r Te has unido a la cola del evento. Jugadores en cola: |cff4CFF00%u|r/|cff4CFF00%u|r. Evento en curso, espera a que termine la ronda.", list_Cola.size(), conf_JugadoresMinimo);
+                }
             }
             break;
         }
