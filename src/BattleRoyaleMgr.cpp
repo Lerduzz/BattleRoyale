@@ -1,7 +1,6 @@
 #include "BattleRoyaleMgr.h"
 #include "Config.h"
-#include "Chat.h"
-#include "Player.h"
+#include "MapMgr.h"
 
 BattleRoyaleMgr::BattleRoyaleMgr()
 {
