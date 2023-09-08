@@ -250,7 +250,7 @@ private:
     bool DesaparecerZona()
     {
         if (obj_Zona) {
-            obj_Zona->RemoveFromWorld();
+            obj_Zona->CleanupsBeforeDelete();
             delete obj_Zona;
             obj_Zona = nullptr;
             return true;
@@ -260,7 +260,7 @@ private:
     bool DesaparecerCentro()
     {
         if (obj_Centro) {
-            obj_Centro->RemoveFromWorld();
+            obj_Centro->CleanupsBeforeDelete();
             delete obj_Centro;
             obj_Centro = nullptr;
             return true;
@@ -270,8 +270,14 @@ private:
     bool DesaparecerNave()
     {
         if (obj_Nave) {
-            if(Transport* tp = obj_Nave->ToTransport()) tp->CleanupsBeforeDelete();
-            obj_Nave->RemoveFromWorld();
+            if(Transport* tp = obj_Nave->ToTransport())
+            {
+                tp->CleanupsBeforeDelete();
+            }
+            else
+            {
+                obj_Nave->CleanupsBeforeDelete();
+            }
             delete obj_Nave;
             obj_Nave = nullptr;
             return true;
@@ -282,9 +288,9 @@ private:
     BR_ListaDePersonajes list_Cola;
     BR_ListaDePersonajes list_Jugadores;
     BR_DatosDePersonajes list_Datos;
-    
+
     GameObject* obj_Zona;
-    GameObject* obj_Centro;    
+    GameObject* obj_Centro;
     GameObject* obj_Nave;
 
     int estadoActual;
