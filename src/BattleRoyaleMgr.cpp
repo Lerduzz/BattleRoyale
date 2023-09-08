@@ -343,10 +343,14 @@ bool BattleRoyaleMgr::InvocarNave()
             }
             else
             {
-                LOG_ERROR("br.nave", "BattleRoyaleMgr::InvocarNave: No se ha podido invocar la nave (OBJETO: {}, MAPA: {})!", OBJETO_NAVE, BR_IdentificadorDeMapas[indiceDelMapa]);
+                LOG_ERROR("br.nave", "BattleRoyaleMgr::InvocarNave: No se ha podido invocar la nave (OBJETO_NAVE = {})!", OBJETO_NAVE);
                 delete obj_Nave;
                 obj_Nave = nullptr;
             }
+        }
+        else
+        {
+            LOG_ERROR("br.nave", "BattleRoyaleMgr::InvocarNave: No se ha podido obtener el mapa para la nave (MAPA: {})!", BR_IdentificadorDeMapas[indiceDelMapa]);
         }
     }
     return false;
