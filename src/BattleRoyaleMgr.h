@@ -63,19 +63,22 @@ const int BR_IdentificadorDeMapas[CANTIDAD_DE_MAPAS] = { 1, 1 };
 
 const Position BR_CentroDeMapas[CANTIDAD_DE_MAPAS] =
 {
-    { 5261.581055f, -2164.183105f, 1259.483765f },
+    // { 5261.581055f, -2164.183105f, 1259.483765f },
+    { 157.995544f, -1948.086061f, 87.387062f },
     { -4695.309082f, 3411.214844f, 7.050505f }
 };
 
 const std::string BR_NombreDeMapas[CANTIDAD_DE_MAPAS] =
 {
-    "Kalimdor: Hyjal",
+    // "Kalimdor: Hyjal",
+    "Kalimdor: Las Charcas del Olvido",
     "Kalimdor: Ruinas de Solarsal"
 };
 
 const float BR_InicioDeLaNave[CANTIDAD_DE_MAPAS][4] =
 {
-    { 2967.581055f, -2164.183105f, 1556.483765f, 0.0f - M_PI / 2.0f },
+    // { 2967.581055f, -2164.183105f, 1556.483765f, 0.0f - M_PI / 2.0f },
+    { -2137.581055f, -1948.086061f, 394.387062f, 0.0f - M_PI / 2.0f },
     { -2401.309082f, 3411.214844f, 304.050505f, 0.0f + M_PI / 2.0f }
 };
 
