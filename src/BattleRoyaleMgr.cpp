@@ -522,10 +522,3 @@ void BattleRoyaleMgr::FinalizarRonda(bool announce, Player* winner /* = nullptr*
     estadoActual = ESTADO_NO_HAY_SUFICIENTES_JUGADORES;
     if (HaySuficientesEnCola()) IniciarNuevaRonda();
 }
-
-
-// TODO:
-// - BattleRoyaleMgr::ControlDeReglas(): Borrar un elemento de la lista desde el loop que recorre la lista puede ser la causa del crash.
-//   * Posible solucion: crear una cola independiente a la que se agregaran los jugadores que se deben sacar del evento y cada ves que se compruebe sacar de la lista del evento a los que se encuentren ahí y luego limpiarla.
-//   * Tener e cuenta la ejecucion multihilos para evitar problemas luego.
-// - Me alo y me cai de la nave. Al parecer hay que dejar un margen y no alar si la nave esta a punto de salir.
