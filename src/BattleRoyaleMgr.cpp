@@ -393,6 +393,10 @@ void BattleRoyaleMgr::PonerTodosLosParacaidas()
             }
         }
     }
+    else
+    {
+        FinalizarRonda();
+    }
 }
 
 void BattleRoyaleMgr::EfectoFueraDeZona()
