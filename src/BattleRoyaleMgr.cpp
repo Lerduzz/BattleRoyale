@@ -471,8 +471,15 @@ void BattleRoyaleMgr::ControlDeReglas()
         {
             if ((*it).second && (*it).second->IsAlive())
             {
-                // TODO: if ((*it).second->HasAura(31700)) SalirDelEvento((*it).first);
-                // TODO: if (obj_Centro && (*it).second->GetExactDist(obj_Centro) > 1147.0f) SalirDelEvento((*it).first);
+                if
+                (
+                    ((*it).second->HasAura(31700)) ||
+                    (obj_Centro && (*it).second->GetExactDist(obj_Centro) > 1147.0f)
+                )
+                {
+                    SalirDelEvento((*it).first);
+                    --it;
+                }
             }
         }
     }
