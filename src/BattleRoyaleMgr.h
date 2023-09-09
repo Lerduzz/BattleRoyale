@@ -150,6 +150,11 @@ private:
         return false;
     };
     bool EstaLlenoElEvento() { return list_Jugadores.size() >= conf_JugadoresMaximo; };
+    bool EstaEspectando(Player* player)
+    { 
+        return HayJugadores() && EstaEnEvento(player) && list_Datos[player->GetGUID().GetCounter()].spect 
+            && EstaEnEvento(list_Datos[player->GetGUID().GetCounter()].spect) && list_Jugadores[list_Datos[player->GetGUID().GetCounter()].spect]->IsAlive();
+    };
     bool HaySuficientesEnCola() { return list_Cola.size() >= conf_JugadoresMinimo; };
     ChatHandler Chat(Player* player) { return ChatHandler(player->GetSession()); };
     void SiguienteMapa() { if (++indiceDelMapa >= CANTIDAD_DE_MAPAS) indiceDelMapa = 0; };
@@ -318,6 +323,34 @@ private:
             }
         }
     };
+    Player* EspectarPrimeroDisponible(Player* player)
+    {
+        for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
+        {
+            if ((*it).second && (*it).second->IsAlive() && EspectarJugador(player, (*it).second)) return (*it).second;
+        }
+        return nullptr;
+    };
+    void TodosLosMuertosEspectarme(Player* player)
+    {
+        if (HayJugadores() && player && player->IsAlive() && !EstaEspectando(player))
+        {
+            for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
+            {
+                if ((*it).second && (*it).second != player && !(*it).second->IsAlive() && !EstaEspectando((*it).second)) EspectarJugador((*it).second , player);
+            }
+        }
+    };
+    bool EspectarJugador(Player* player, Player* target)
+    {
+        if (HayJugadores() && player && target && player != target && EstaEnEvento(player) && EstaEnEvento(target) && !player->IsAlive() && target->IsAlive() && !EstaEspectando(player) && player->GetExactDist(target) <= 666.0f)
+        {
+            list_Datos[player->GetGUID().GetCounter()].spect = target->GetGUID().GetCounter();
+            player->CastSpell(target, 6277, true);
+            return true;
+        }
+        return false;
+    }
 
     BR_ListaDePersonajes list_Cola;
     BR_ListaDePersonajes list_Jugadores;

@@ -18,7 +18,7 @@ BattleRoyaleMgr::~BattleRoyaleMgr()
     RestablecerTodoElEvento();
 }
 
-// --- PUBLICO --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// --- PUBLICO ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void BattleRoyaleMgr::GestionarJugadorEntrando(Player* player)
 {
     if (EstaEnCola(player))
@@ -83,10 +83,27 @@ void BattleRoyaleMgr::GestionarJugadorDesconectar(Player* player)
 
 void BattleRoyaleMgr::GestionarMuerteJcJ(Player* killer, Player* killed)
 {
-    if (!killer || !killed || !HayJugadores() || estadoActual != ESTADO_BATALLA_EN_CURSO || killer == killed || !EstaEnEvento(killer) || !EstaEnEvento(killed)) return;
-    list_Datos[killer->GetGUID().GetCounter()].kills++;
-    killed->CastSpell(killer, 6277, true);
-    NotificarMuerteJcJ(Chat(killer).GetNameLink(killer), Chat(killed).GetNameLink(killed), list_Datos[killer->GetGUID().GetCounter()].kills);
+    if (HayJugadores() && estadoActual == ESTADO_BATALLA_EN_CURSO)
+    {
+        if (!killer || !killed || !EstaEnEvento(killer) || !EstaEnEvento(killed)) return;
+        if (killer == killed)
+        {
+            if (Player* spect = EspectarPrimeroDisponible(killed))
+            {
+                TodosLosMuertosEspectarme(spect);
+            }
+            else
+            {
+                SalirDelEvento(killed->GetGUID().GetCounter());
+            }
+        }
+        else
+        {
+            list_Datos[killer->GetGUID().GetCounter()].kills++;
+            TodosLosMuertosEspectarme(killer);
+            NotificarMuerteJcJ(Chat(killer).GetNameLink(killer), Chat(killed).GetNameLink(killed), list_Datos[killer->GetGUID().GetCounter()].kills);
+        }
+    }
 }
 
 void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
@@ -198,7 +215,7 @@ bool BattleRoyaleMgr::PuedeReaparecerEnCementerio(Player *player)
     return true;
 }
 
-// --- PRIVADO --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// --- PRIVADO ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void BattleRoyaleMgr::RestablecerTodoElEvento()
 {
     list_Cola.clear();

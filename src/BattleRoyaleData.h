@@ -1,6 +1,8 @@
 #ifndef SC_BR_DATA_H
 #define SC_BR_DATA_H
 
+#include "Common.h"
+
 class BattleRoyaleData
 {
 public:
@@ -15,6 +17,7 @@ public:
     float GetO();
     int dmg_tick;
     int kills;
+    uint32 spect;
 
 private:
     int start_map;
