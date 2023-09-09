@@ -349,8 +349,8 @@ private:
     {
         if (HayJugadores() && player && target && player != target && EstaEnEvento(player) && EstaEnEvento(target) && !player->IsAlive() && target->IsAlive() && !EstaEspectando(player) && player->GetExactDist(target) <= 666.0f)
         {
-            list_Datos[player->GetGUID().GetCounter()].spect = (*it).first;
-            player->CastSpell((*it).second, 6277, true);
+            list_Datos[player->GetGUID().GetCounter()].spect = target->GetGUID().GetCounter();
+            player->CastSpell(target, 6277, true);
             return true;
         }
         return false;

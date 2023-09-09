@@ -1,6 +1,8 @@
 #ifndef SC_BR_DATA_H
 #define SC_BR_DATA_H
 
+#include "Common.h"
+
 class BattleRoyaleData
 {
 public:
