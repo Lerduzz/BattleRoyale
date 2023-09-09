@@ -150,6 +150,7 @@ private:
         return false;
     };
     bool EstaLlenoElEvento() { return list_Jugadores.size() >= conf_JugadoresMaximo; };
+    bool EstaEspectando(Player* player) { return HayJugadores() && EstaEnEvento(player) && list_Datos[player->GetGUID().GetCounter()].spect && EstaEnEvento(list_Datos[player->GetGUID().GetCounter()].spect); };
     bool HaySuficientesEnCola() { return list_Cola.size() >= conf_JugadoresMinimo; };
     ChatHandler Chat(Player* player) { return ChatHandler(player->GetSession()); };
     void SiguienteMapa() { if (++indiceDelMapa >= CANTIDAD_DE_MAPAS) indiceDelMapa = 0; };
@@ -320,34 +321,40 @@ private:
     };
     Player* EspectarPrimeroDisponible(Player* player)
     {
-        if (HayJugadores() && player && !player->IsAlive() /*&& player->isPossessing()*/)
+        for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
         {
-            for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
+            if ((*it).second && (*it).second->IsAlive() && EspectarJugador(player, (*it).second))
             {
-                if ((*it).second && (*it).second != player && (*it).second->IsAlive() && (*it).second->GetExactDist(player) <= 666.0f)
-                {
-                    LOG_ERROR("br", "EspectarPrimeroDisponible: Nuevo espectador agregado GUID {}.", (*it).first);
-                    player->CastSpell((*it).second, 6277, true);
-                    return (*it).second;
-                }
+                LOG_ERROR("br", "EspectarPrimeroDisponible: Nuevo espectador agregado GUID {}.", (*it).first);
+                return (*it).second;
             }
         }
         return nullptr;
     };
     void TodosLosMuertosEspectarme(Player* player)
     {
-        if (HayJugadores() && player && player->IsAlive())
+        if (HayJugadores() && player && player->IsAlive() && !EstaEspectando(player))
         {
             for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
             {
-                if ((*it).second && (*it).second != player && !(*it).second->IsAlive() /*&& (*it).second->isPossessing()*/)
+                if ((*it).second && (*it).second != player && !(*it).second->IsAlive() && !EstaEspectando((*it).second))
                 {
                     LOG_ERROR("br", "TodosLosMuertosEspectarme: Nuevo espectador agregado GUID {}.", (*it).first);
-                    (*it).second->CastSpell(player, 6277, true);
+                    EspectarJugador((*it).second , player);
                 }
             }
         }
     };
+    bool EspectarJugador(Player* player, Player* target)
+    {
+        if (HayJugadores() && player && target && player != target && EstaEnEvento(player) && EstaEnEvento(target) && !player->IsAlive() && target->IsAlive() && !EstaEspectando(player) && player->GetExactDist(target) <= 666.0f)
+        {
+            list_Datos[player->GetGUID().GetCounter()].spect = (*it).first;
+            player->CastSpell((*it).second, 6277, true);
+            return true;
+        }
+        return false;
+    }
 
     BR_ListaDePersonajes list_Cola;
     BR_ListaDePersonajes list_Jugadores;

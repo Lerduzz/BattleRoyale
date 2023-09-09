@@ -15,6 +15,7 @@ public:
     float GetO();
     int dmg_tick;
     int kills;
+    uint32 spect;
 
 private:
     int start_map;
