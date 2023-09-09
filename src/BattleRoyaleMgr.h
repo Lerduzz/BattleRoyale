@@ -150,7 +150,11 @@ private:
         return false;
     };
     bool EstaLlenoElEvento() { return list_Jugadores.size() >= conf_JugadoresMaximo; };
-    bool EstaEspectando(Player* player) { return HayJugadores() && EstaEnEvento(player) && list_Datos[player->GetGUID().GetCounter()].spect && EstaEnEvento(list_Datos[player->GetGUID().GetCounter()].spect); };
+    bool EstaEspectando(Player* player)
+    { 
+        return HayJugadores() && EstaEnEvento(player) && list_Datos[player->GetGUID().GetCounter()].spect 
+            && EstaEnEvento(list_Datos[player->GetGUID().GetCounter()].spect) && list_Jugadores[list_Datos[player->GetGUID().GetCounter()].spect]->IsAlive();
+    };
     bool HaySuficientesEnCola() { return list_Cola.size() >= conf_JugadoresMinimo; };
     ChatHandler Chat(Player* player) { return ChatHandler(player->GetSession()); };
     void SiguienteMapa() { if (++indiceDelMapa >= CANTIDAD_DE_MAPAS) indiceDelMapa = 0; };
@@ -323,11 +327,7 @@ private:
     {
         for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
         {
-            if ((*it).second && (*it).second->IsAlive() && EspectarJugador(player, (*it).second))
-            {
-                LOG_ERROR("br", "EspectarPrimeroDisponible: Nuevo espectador agregado GUID {}.", (*it).first);
-                return (*it).second;
-            }
+            if ((*it).second && (*it).second->IsAlive() && EspectarJugador(player, (*it).second)) return (*it).second;
         }
         return nullptr;
     };
@@ -337,11 +337,7 @@ private:
         {
             for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
             {
-                if ((*it).second && (*it).second != player && !(*it).second->IsAlive() && !EstaEspectando((*it).second))
-                {
-                    LOG_ERROR("br", "TodosLosMuertosEspectarme: Nuevo espectador agregado GUID {}.", (*it).first);
-                    EspectarJugador((*it).second , player);
-                }
+                if ((*it).second && (*it).second != player && !(*it).second->IsAlive() && !EstaEspectando((*it).second)) EspectarJugador((*it).second , player);
             }
         }
     };
