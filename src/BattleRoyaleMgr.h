@@ -127,7 +127,7 @@ private:
     void EfectoFueraDeZona();
     void ActivarJcJTcT();
     void ControlDeReglas();
-    void CondicionDeVictoria();
+    bool CondicionDeVictoria();
     void FinalizarRonda(bool announce, Player* winner = nullptr);
     bool HayJugadores() { return !list_Jugadores.empty(); };
     bool HayCola() { return !list_Cola.empty(); };
@@ -323,13 +323,18 @@ private:
             }
         }
     };
-    Player* EspectarPrimeroDisponible(Player* player)
+    void VerificarEspectadores()
     {
-        for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
+        if (HayJugadores())
         {
-            if ((*it).second && (*it).second->IsAlive() && EspectarJugador(player, (*it).second)) return (*it).second;
+            for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
+            {
+                if ((*it).second && (*it).second->IsAlive())
+                {
+                    TodosLosMuertosEspectarme((*it).second);
+                }
+            }
         }
-        return nullptr;
     };
     void TodosLosMuertosEspectarme(Player* player)
     {
@@ -341,15 +346,13 @@ private:
             }
         }
     };
-    bool EspectarJugador(Player* player, Player* target)
+    void EspectarJugador(Player* player, Player* target)
     {
         if (HayJugadores() && player && target && player != target && EstaEnEvento(player) && EstaEnEvento(target) && !player->IsAlive() && target->IsAlive() && !EstaEspectando(player) && player->GetExactDist(target) <= 666.0f)
         {
             list_Datos[player->GetGUID().GetCounter()].spect = target->GetGUID().GetCounter();
             player->CastSpell(target, 6277, true);
-            return true;
         }
-        return false;
     }
 
     BR_ListaDePersonajes list_Cola;

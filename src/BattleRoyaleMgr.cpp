@@ -85,24 +85,10 @@ void BattleRoyaleMgr::GestionarMuerteJcJ(Player* killer, Player* killed)
 {
     if (HayJugadores() && estadoActual == ESTADO_BATALLA_EN_CURSO)
     {
-        if (!killer || !killed || !EstaEnEvento(killer) || !EstaEnEvento(killed)) return;
-        if (killer == killed)
-        {
-            if (Player* spect = EspectarPrimeroDisponible(killed))
-            {
-                TodosLosMuertosEspectarme(spect);
-            }
-            else
-            {
-                SalirDelEvento(killed->GetGUID().GetCounter());
-            }
-        }
-        else
-        {
-            list_Datos[killer->GetGUID().GetCounter()].kills++;
-            TodosLosMuertosEspectarme(killer);
-            NotificarMuerteJcJ(Chat(killer).GetNameLink(killer), Chat(killed).GetNameLink(killed), list_Datos[killer->GetGUID().GetCounter()].kills);
-        }
+        if (!killer || !killed || killer == killed || !EstaEnEvento(killer) || !EstaEnEvento(killed)) return;
+        list_Datos[killer->GetGUID().GetCounter()].kills++;
+        TodosLosMuertosEspectarme(killer);
+        NotificarMuerteJcJ(Chat(killer).GetNameLink(killer), Chat(killed).GetNameLink(killed), list_Datos[killer->GetGUID().GetCounter()].kills);
     }
 }
 
@@ -162,9 +148,12 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
             if (indicadorDeSegundos <= 0) {
                 indicadorDeSegundos = 1000;
                 ControlDeReglas();
-                CondicionDeVictoria();
-                EfectoFueraDeZona();
-                ActivarJcJTcT();
+                if (!CondicionDeVictoria())
+                {
+                    EfectoFueraDeZona();
+                    ActivarJcJTcT();
+                    VerificarEspectadores();
+                }
                 if (--tiempoRestanteNave <= 0) if (DesaparecerNave()) NotificarNaveRetirada();
             } else indicadorDeSegundos -= diff;
             if (tiempoRestanteZona <= 0) {
@@ -540,7 +529,7 @@ void BattleRoyaleMgr::ControlDeReglas()
     }
 }
 
-void BattleRoyaleMgr::CondicionDeVictoria()
+bool BattleRoyaleMgr::CondicionDeVictoria()
 {
     if (estadoActual == ESTADO_BATALLA_EN_CURSO)
     {
@@ -559,13 +548,16 @@ void BattleRoyaleMgr::CondicionDeVictoria()
             if (cantidadVivos <= 1)
             {
                 FinalizarRonda(cantidadVivos == 1, vivo);
+                return true;
             }
         }
         else
         {
             FinalizarRonda(false);
+            return true;
         }
     }
+    return false;
 }
 
 void BattleRoyaleMgr::FinalizarRonda(bool announce, Player* winner /* = nullptr*/)
