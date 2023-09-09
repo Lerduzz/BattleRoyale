@@ -318,7 +318,7 @@ private:
             }
         }
     };
-    bool EspectarPrimeroDisponible(Player* player)
+    Player* EspectarPrimeroDisponible(Player* player)
     {
         if (HayJugadores() && player && !player->IsAlive() /*&& player->isPossessing()*/)
         {
@@ -326,12 +326,13 @@ private:
             {
                 if ((*it).second && (*it).second != player && (*it).second->IsAlive() && (*it).second->GetExactDist(player) <= 666.0f)
                 {
+                    LOG_ERROR("br", "EspectarPrimeroDisponible: Nuevo espectador agregado GUID {}.", (*it).first);
                     player->CastSpell((*it).second, 6277, true);
-                    return true;
+                    return (*it).second;
                 }
             }
         }
-        return false;
+        return nullptr;
     };
     void TodosLosMuertosEspectarme(Player* player)
     {
@@ -339,7 +340,7 @@ private:
         {
             for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
             {
-                if ((*it).second && (*it).second != player && !(*it).second->IsAlive() && (*it).second->isPossessing())
+                if ((*it).second && (*it).second != player && !(*it).second->IsAlive() /*&& (*it).second->isPossessing()*/)
                 {
                     LOG_ERROR("br", "TodosLosMuertosEspectarme: Nuevo espectador agregado GUID {}.", (*it).first);
                     (*it).second->CastSpell(player, 6277, true);

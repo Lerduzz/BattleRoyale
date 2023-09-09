@@ -88,7 +88,14 @@ void BattleRoyaleMgr::GestionarMuerteJcJ(Player* killer, Player* killed)
         if (!killer || !killed || !EstaEnEvento(killer) || !EstaEnEvento(killed)) return;
         if (killer == killed)
         {
-            if (!EspectarPrimeroDisponible(killed)) SalirDelEvento(killed->GetGUID().GetCounter());
+            if (Player* spect = EspectarPrimeroDisponible(killed))
+            {
+                TodosLosMuertosEspectarme(spect);
+            }
+            else
+            {
+                SalirDelEvento(killed->GetGUID().GetCounter());
+            }
         }
         else
         {
