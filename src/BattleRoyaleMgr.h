@@ -318,6 +318,34 @@ private:
             }
         }
     };
+    bool EspectarPrimeroDisponible(Player* player)
+    {
+        if (HayJugadores() && player && !player->IsAlive() && player->isPossessing())
+        {
+            for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
+            {
+                if ((*it).second && (*it).second != player && (*it).second->IsAlive())
+                {
+                    player->CastSpell((*it).second, 6277, true);
+                    return true;
+                }
+            }
+        }
+        return false;
+    };
+    void TodosLosMuertosEspectarme(Player* player)
+    {
+        if (HayJugadores() && player && player->IsAlive())
+        {
+            for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
+            {
+                if ((*it).second && (*it).second != player && !(*it).second->IsAlive() && (*it).second->isPossessing())
+                {
+                    (*it).second->CastSpell(player, 6277, true);
+                }
+            }
+        }
+    };
 
     BR_ListaDePersonajes list_Cola;
     BR_ListaDePersonajes list_Jugadores;
