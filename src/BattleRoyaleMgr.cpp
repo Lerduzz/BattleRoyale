@@ -24,12 +24,12 @@ void BattleRoyaleMgr::GestionarJugadorEntrando(Player* player)
     if (!player) return;
     if (player->isUsingLfg())
     {
-        Chat(player).PSendSysMessage("|cff4CFF00BattleRoyale::|r ¡No puedes entrar en la cola mientras utilizas el buscador de mazmorras!");
+        Chat(player).PSendSysMessage("|cff4CFF00BattleRoyale::|r ¡No puedes participar mientras utilizas el buscador de mazmorras!");
         return;
     }
     if (player->InBattlegroundQueue())
     {
-        Chat(player).PSendSysMessage("|cff4CFF00BattleRoyale::|r ¡No puedes entrar en la cola mientras estás en cola para Campos de Batalla o Arenas!");
+        Chat(player).PSendSysMessage("|cff4CFF00BattleRoyale::|r ¡No puedes participar mientras estás en cola para Campos de Batalla o Arenas!");
         return;
     }
     if (EstaEnCola(player))

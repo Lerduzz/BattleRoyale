@@ -72,7 +72,7 @@ public:
         {
             if (sBattleRoyaleMgr->EstaEnCola(player) || sBattleRoyaleMgr->DebeRestringirFunciones(player))
             {
-                ChatHandler(player->GetSession()).SendSysMessage("|cff4CFF00BattleRoyale:|r ¡No puedes hacer eso mientras participas en el modo Battle Royale!.");
+                ChatHandler(player->GetSession()).SendSysMessage("|cff4CFF00BattleRoyale::|r ¡No puedes hacer eso mientras participas en el modo Battle Royale!");
                 return false;
             }
         }
@@ -103,7 +103,7 @@ public:
         {
             if (sBattleRoyaleMgr->EstaEnCola(player) || sBattleRoyaleMgr->DebeRestringirFunciones(player))
             {
-                ChatHandler(player->GetSession()).SendSysMessage("|cff4CFF00BattleRoyale:|r ¡No puedes hacer eso mientras participas en el modo Battle Royale!.");
+                ChatHandler(player->GetSession()).SendSysMessage("|cff4CFF00BattleRoyale::|r ¡No puedes hacer eso mientras participas en el modo Battle Royale!");
                 return false;
             }
         }
@@ -117,7 +117,7 @@ public:
             if (sBattleRoyaleMgr->EstaEnCola(player) || sBattleRoyaleMgr->DebeRestringirFunciones(player))
             {
                 err = GroupJoinBattlegroundResult::ERR_BATTLEGROUND_NOT_IN_BATTLEGROUND;
-                ChatHandler(player->GetSession()).SendSysMessage("|cff4CFF00BattleRoyale:|r ¡No puedes hacer eso mientras participas en el modo Battle Royale!.");
+                ChatHandler(player->GetSession()).SendSysMessage("|cff4CFF00BattleRoyale::|r ¡No puedes hacer eso mientras participas en el modo Battle Royale!");
                 return false;
             }
         }
@@ -131,7 +131,7 @@ public:
             if (sBattleRoyaleMgr->EstaEnCola(player) || sBattleRoyaleMgr->DebeRestringirFunciones(player))
             {
                 err = GroupJoinBattlegroundResult::ERR_BATTLEGROUND_NOT_IN_BATTLEGROUND;
-                ChatHandler(player->GetSession()).SendSysMessage("|cff4CFF00BattleRoyale:|r ¡No puedes hacer eso mientras participas en el modo Battle Royale!.");
+                ChatHandler(player->GetSession()).SendSysMessage("|cff4CFF00BattleRoyale::|r ¡No puedes hacer eso mientras participas en el modo Battle Royale!");
                 return false;
             }
         }
@@ -167,14 +167,39 @@ public:
         player->PlayerTalkClass->ClearMenus();
         switch (action)
         {
-        case 1:
-            sBattleRoyaleMgr->GestionarJugadorEntrando(player);
-            break;
-        case 2:
-            sBattleRoyaleMgr->GestionarJugadorDesconectar(player);
-            ChatHandler(player->GetSession()).PSendSysMessage("|cff4CFF00BattleRoyale::|r Ya no estas en cola para el evento.");
-            break;
-        }
+            case 1:
+            {
+                if (sConfigMgr->GetOption<bool>("BattleRoyale.Enabled", true))
+                {
+                    sBattleRoyaleMgr->GestionarJugadorEntrando(player);
+                }
+                else
+                {
+                    ChatHandler(player->GetSession()).PSendSysMessage("|cff4CFF00BattleRoyale::|r ¡Este modo de juego se encuentra actualmente desactivado!");
+                }
+                break;
+            }   
+            case 2:
+            {
+                if (sConfigMgr->GetOption<bool>("BattleRoyale.Enabled", true))
+                {
+                    if (sBattleRoyaleMgr->EstaEnCola(player))
+                    {
+                        sBattleRoyaleMgr->GestionarJugadorDesconectar(player);
+                        ChatHandler(player->GetSession()).PSendSysMessage("|cff4CFF00BattleRoyale::|r Ya no estas en cola para el evento.");
+                    }
+                    else
+                    {
+                        ChatHandler(player->GetSession()).PSendSysMessage("|cff4CFF00BattleRoyale::|r ¡No estas en cola para el evento!");
+                    }
+                }
+                else
+                {
+                    ChatHandler(player->GetSession()).PSendSysMessage("|cff4CFF00BattleRoyale::|r ¡Este modo de juego se encuentra actualmente desactivado!");
+                }
+                break;
+            }
+        }        
         CloseGossipMenuFor(player);
         return true;
     }
