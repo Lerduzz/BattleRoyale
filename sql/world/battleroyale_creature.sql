@@ -1,8 +1,8 @@
 SET
 @Entry 		:= 200000,
-@Model 		:= 9353,
-@Name 		:= "Maestro del Battle Royale",
-@Title 		:= "Battle Royale en S King Inc",
+@Model 		:= 19301,
+@Name 		:= "Lerduzz el Comandante Supremo",
+@Title 		:= "Gran Maestro del Battle Royale",
 @Icon 		:= "Speak",
 @GossipMenu := 0,
 @MinLevel 	:= 80,
@@ -24,4 +24,4 @@ INSERT INTO creature_template (`entry`, `modelid1`, `name`, `subname`, `IconName
 
 -- NPC TEXT
 DELETE FROM `npc_text` WHERE `ID` = @Entry;
-INSERT INTO `npc_text` (`ID`, `text0_0`) VALUES (@Entry, 'Hola $N. Estoy a tu servicio.\r\nMe encargo de gestionar la cola para el evento Battle Royale de S King Inc.\r\n\r\n¿De que va esto?\r\nEl evento se efectua en una zona aleatoria del mundo (pero solo los participantes pueden verse entre si), los jugadores lucharan por adentrarse en la zona segura mientras intentan sobrevivir en una batalla todos contra todos.');
+INSERT INTO `npc_text` (`ID`, `text0_0`) VALUES (@Entry, 'Saludos $N, como creador del evento Battle Royale de S King Inc me encargo de gestionar la cola de los participantes.\r\n\r\n¿De que va esto?\r\nEl evento se efectua en una zona aleatoria del mundo preparada previamente, los jugadores lucharan por adentrarse en la zona segura mientras intentan sobrevivir en una batalla todos contra todos.\r\n\r\nPara más información visita mi canal de YouTube:\r\nhttps://www.youtube.com/@lerduzz');
