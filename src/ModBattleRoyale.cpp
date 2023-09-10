@@ -70,7 +70,11 @@ public:
     {
         if (sConfigMgr->GetOption<bool>("BattleRoyale.Enabled", true))
         {
-            return !sBattleRoyaleMgr->DebeRestringirFunciones(player);
+            if (sBattleRoyaleMgr->EstaEnCola(player) || sBattleRoyaleMgr->DebeRestringirFunciones(player))
+            {
+                ChatHandler(player->GetSession()).SendSysMessage("|cff4CFF00BattleRoyale:|r ¡No puedes hacer eso mientras participas en el modo Battle Royale!.");
+                return false;
+            }
         }
         return true;
     }
@@ -97,7 +101,11 @@ public:
     {
         if (sConfigMgr->GetOption<bool>("BattleRoyale.Enabled", true))
         {
-            return !sBattleRoyaleMgr->DebeRestringirFunciones(player);
+            if (sBattleRoyaleMgr->EstaEnCola(player) || sBattleRoyaleMgr->DebeRestringirFunciones(player))
+            {
+                ChatHandler(player->GetSession()).SendSysMessage("|cff4CFF00BattleRoyale:|r ¡No puedes hacer eso mientras participas en el modo Battle Royale!.");
+                return false;
+            }
         }
         return true;
     }
@@ -106,9 +114,10 @@ public:
     {
         if (sConfigMgr->GetOption<bool>("BattleRoyale.Enabled", true))
         {
-            if (sBattleRoyaleMgr->DebeRestringirFunciones(player))
+            if (sBattleRoyaleMgr->EstaEnCola(player) || sBattleRoyaleMgr->DebeRestringirFunciones(player))
             {
                 err = GroupJoinBattlegroundResult::ERR_BATTLEGROUND_NOT_IN_BATTLEGROUND;
+                ChatHandler(player->GetSession()).SendSysMessage("|cff4CFF00BattleRoyale:|r ¡No puedes hacer eso mientras participas en el modo Battle Royale!.");
                 return false;
             }
         }
@@ -119,9 +128,10 @@ public:
     {
         if (sConfigMgr->GetOption<bool>("BattleRoyale.Enabled", true))
         {
-            if (sBattleRoyaleMgr->DebeRestringirFunciones(player))
+            if (sBattleRoyaleMgr->EstaEnCola(player) || sBattleRoyaleMgr->DebeRestringirFunciones(player))
             {
                 err = GroupJoinBattlegroundResult::ERR_BATTLEGROUND_NOT_IN_BATTLEGROUND;
+                ChatHandler(player->GetSession()).SendSysMessage("|cff4CFF00BattleRoyale:|r ¡No puedes hacer eso mientras participas en el modo Battle Royale!.");
                 return false;
             }
         }

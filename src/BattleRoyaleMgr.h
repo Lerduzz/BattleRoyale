@@ -106,6 +106,7 @@ public:
     void PrevenirJcJEnLaNave(Player* player, bool state);
     bool PuedeReaparecerEnCementerio(Player* player);
     bool DebeRestringirFunciones(Player* player) { return estadoActual > ESTADO_NO_HAY_SUFICIENTES_JUGADORES && HayJugadores() && EstaEnEvento(player); };
+    bool EstaEnCola(Player* player) { return EstaEnCola(player->GetGUID().GetCounter()); };
     bool DebeForzarJcJTcT(Player* player) 
     {
         if (!player) return false;
@@ -131,7 +132,6 @@ private:
     void FinalizarRonda(bool announce, Player* winner = nullptr);
     bool HayJugadores() { return !list_Jugadores.empty(); };
     bool HayCola() { return !list_Cola.empty(); };
-    bool EstaEnCola(Player* player) { return list_Cola.find(player->GetGUID().GetCounter()) != list_Cola.end(); };
     bool EstaEnCola(uint32 guid) { return list_Cola.find(guid) != list_Cola.end(); };
     bool EstaEnEvento(Player* player) { return list_Jugadores.find(player->GetGUID().GetCounter()) != list_Jugadores.end(); };
     bool EstaEnEvento(uint32 guid) { return list_Jugadores.find(guid) != list_Jugadores.end(); };
@@ -159,7 +159,7 @@ private:
     ChatHandler Chat(Player* player) { return ChatHandler(player->GetSession()); };
     void SiguienteMapa() { if (++indiceDelMapa >= CANTIDAD_DE_MAPAS) indiceDelMapa = 0; };
     void SiguientePosicion() { if (++indiceDeVariacion >= CANTIDAD_DE_VARIACIONES) indiceDeVariacion = 0; };
-    void SalirDeGrupo(Player* player)
+    void DejarGrupo(Player* player)
     { 
         player->RemoveFromGroup(); 
         player->UninviteFromGroup();

@@ -21,14 +21,25 @@ BattleRoyaleMgr::~BattleRoyaleMgr()
 // --- PUBLICO ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void BattleRoyaleMgr::GestionarJugadorEntrando(Player* player)
 {
+    if (!player) return;
+    if (player->isUsingLfg())
+    {
+        Chat(player).PSendSysMessage("|cff4CFF00BattleRoyale::|r ¡No puedes entrar en la cola mientras utilizas el buscador de mazmorras!");
+        return;
+    }
+    if (player->InBattlegroundQueue())
+    {
+        Chat(player).PSendSysMessage("|cff4CFF00BattleRoyale::|r ¡No puedes entrar en la cola mientras estás en cola para Campos de Batalla o Arenas!");
+        return;
+    }
     if (EstaEnCola(player))
     {
-        Chat(player).PSendSysMessage("|cff4CFF00BattleRoyale::|r Ya estas en cola para el evento.");
+        Chat(player).PSendSysMessage("|cff4CFF00BattleRoyale::|r ¡Ya estas en cola para el evento!");
         return;
     }
     if (EstaEnEvento(player))
     {
-        Chat(player).PSendSysMessage("|cff4CFF00BattleRoyale::|r Ya estas dentro del evento.");
+        Chat(player).PSendSysMessage("|cff4CFF00BattleRoyale::|r ¡Ya estas dentro del evento!");
         return;
     }
     switch (estadoActual)
@@ -256,7 +267,7 @@ void BattleRoyaleMgr::LlamarDentroDeNave(uint32 guid)
 {
     Player* player = list_Jugadores[guid];
     CambiarDimension_Entrar(guid);
-    SalirDeGrupo(player);
+    DejarGrupo(player);
     float ox = BR_VariacionesDePosicion[indiceDeVariacion][0];
     float oy = BR_VariacionesDePosicion[indiceDeVariacion][1];
     SiguientePosicion();
