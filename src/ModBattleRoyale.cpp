@@ -106,8 +106,11 @@ public:
     {
         if (sConfigMgr->GetOption<bool>("BattleRoyale.Enabled", true))
         {
-            err = GroupJoinBattlegroundResult::ERR_BATTLEGROUND_NOT_IN_BATTLEGROUND;
-            return !sBattleRoyaleMgr->DebeRestringirFunciones(player);
+            if (sBattleRoyaleMgr->DebeRestringirFunciones(player))
+            {
+                err = GroupJoinBattlegroundResult::ERR_BATTLEGROUND_NOT_IN_BATTLEGROUND;
+                return false;
+            }
         }
         return true;
     }
@@ -116,8 +119,11 @@ public:
     {
         if (sConfigMgr->GetOption<bool>("BattleRoyale.Enabled", true))
         {
-            err = GroupJoinBattlegroundResult::ERR_BATTLEGROUND_NOT_IN_BATTLEGROUND;
-            return !sBattleRoyaleMgr->DebeRestringirFunciones(player);
+            if (sBattleRoyaleMgr->DebeRestringirFunciones(player))
+            {
+                err = GroupJoinBattlegroundResult::ERR_BATTLEGROUND_NOT_IN_BATTLEGROUND;
+                return false;
+            }
         }
         return true;
     }
