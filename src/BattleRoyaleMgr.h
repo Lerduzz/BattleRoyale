@@ -251,6 +251,20 @@ private:
             }
         }
     };
+    void NotificarJugadoresEnCola(Player* player)
+    {
+        if (HayCola())
+        {
+            for (BR_ColaDePersonajes::iterator it = list_Cola.begin(); it != list_Cola.end(); ++it)
+            {
+                if ((*it).second != player)
+                {
+                    ChatHandler h = Chat((*it).second);
+                    h.PSendSysMessage("|cff4CFF00BattleRoyale::|r %s se ha unido a la cola. Jugadores en cola: |cff4CFF00%u|r/|cff4CFF00%u|r.", h.GetNameLink(player), list_Cola.size(), conf_JugadoresMinimo);
+                }
+            }
+        }
+    };
     void NotificarNaveRetirada()
     {
         if (HayJugadores())

@@ -53,6 +53,7 @@ void BattleRoyaleMgr::GestionarJugadorEntrando(Player* player)
             else
             {
                 Chat(player).PSendSysMessage("|cff4CFF00BattleRoyale::|r Te has unido a la cola del evento. Jugadores en cola: |cff4CFF00%u|r/|cff4CFF00%u|r.", list_Cola.size(), conf_JugadoresMinimo);
+                NotificarJugadoresEnCola(player);
             }
             break;
         }
@@ -61,6 +62,7 @@ void BattleRoyaleMgr::GestionarJugadorEntrando(Player* player)
             if (EstaLlenoElEvento()) {
                 list_Cola[player->GetGUID().GetCounter()] = player;
                 Chat(player).PSendSysMessage("|cff4CFF00BattleRoyale::|r Te has unido a la cola del evento. Jugadores en cola: |cff4CFF00%u|r/|cff4CFF00%u|r. Evento lleno, espera a que termine la ronda.", list_Cola.size(), conf_JugadoresMinimo);
+                NotificarJugadoresEnCola(player);
             }
             else
             {
@@ -74,6 +76,7 @@ void BattleRoyaleMgr::GestionarJugadorEntrando(Player* player)
                 {
                     list_Cola[player->GetGUID().GetCounter()] = player;
                     Chat(player).PSendSysMessage("|cff4CFF00BattleRoyale::|r Te has unido a la cola del evento. Jugadores en cola: |cff4CFF00%u|r/|cff4CFF00%u|r. Evento en curso, espera a que termine la ronda.", list_Cola.size(), conf_JugadoresMinimo);
+                    NotificarJugadoresEnCola(player);
                 }
             }
             break;
@@ -82,6 +85,7 @@ void BattleRoyaleMgr::GestionarJugadorEntrando(Player* player)
         {
             list_Cola[player->GetGUID().GetCounter()] = player;
             Chat(player).PSendSysMessage("|cff4CFF00BattleRoyale::|r Te has unido a la cola del evento. Jugadores en cola: |cff4CFF00%u|r/|cff4CFF00%u|r. Evento en curso, espera a que termine la ronda.", list_Cola.size(), conf_JugadoresMinimo);
+            NotificarJugadoresEnCola(player);
             break;
         }
     }
