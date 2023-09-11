@@ -120,11 +120,14 @@ private:
                     case 0:
                     {
                         (*it).second->GetSession()->SendNotification("|cff00ff00¡Que comience la batalla de |cffDA70D6%s|cff00ff00!", BR_NombreDeMapas[indiceDelMapa].c_str());
+                        std::ostringstream msg;
+                        msg << "|cff4CFF00BattleRoyale::|r Ha comenzado una nueva ronda en |cffDA70D6" << BR_NombreDeMapas[indiceDelMapa].c_str() << "|r con |cff4CFF00" << list_Jugadores.size() << "|r jugadores.";
+                        sWorld->SendServerMessage(SERVER_MSG_STRING, msg.str().c_str());
                         break;
                     }                
                     case 5:
                     {
-                        (*it).second->GetSession()->SendNotification("|cff00ff00Ya puedes saltar. |cff0000ff¡REVISA TUS ALAS!");
+                        (*it).second->GetSession()->SendNotification("|cff00ff00¡PUEDES SALTAR CUANDO QUIERAS! |cff0000ff¡REVISA TUS ALAS!");
                         break;
                     }                
                     case 10:
@@ -137,14 +140,14 @@ private:
                     }
                     case 30:
                     {
-                        (*it).second->GetSession()->SendNotification("|cff00ff00La nave comienza a moverse. |cffff0000¡REVISA TUS ALAS!");
+                        (*it).second->GetSession()->SendNotification("|cff00ff00La nave comienza a moverse. |cffff0000¡QUÉDATE EN ELLA HASTA LLEGAR!");
                         break;
                     }
                     default:
                     {
                         if (delay > 30 && delay <= 60)
                         {
-                            (*it).second->GetSession()->SendNotification("|cff00ff00Faltan |cffDA70D6%u|cff00ff00 segundos para encender motores. |cffff0000¡NO TE TIRES!", delay - 30);
+                            (*it).second->GetSession()->SendNotification("|cff00ff00Faltan |cffDA70D6%u|cff00ff00 segundos para encender motores. |cffff0000¡DEBERÍAS REVISAR TUS ALAS!", delay - 30);
                         }
                         break;
                     }
