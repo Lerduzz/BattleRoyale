@@ -42,6 +42,10 @@ public:
         if (estadoActual != ESTADO_BATALLA_EN_CURSO || !HayJugadores() || !EstaEnEvento(player)) return false;
         return !EstaEnLaNave(player);
     };
+    void QuitarAlas(Player* player)
+    {
+        player->DestroyItemCount(17, player->GetItemCount(17), true);
+    };
     
 private:
     void RestablecerTodoElEvento();
@@ -295,7 +299,21 @@ private:
             list_Datos[player->GetGUID().GetCounter()].spect = target->GetGUID().GetCounter();
             player->CastSpell(target, 6277, true);
         }
-    }
+    };
+    void DarAlas(Player* player)
+    {
+        QuitarAlas(player);
+        ItemPosCountVec dest;
+        InventoryResult msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, 17, 1);
+        if (msg == EQUIP_ERR_OK)
+        {
+            if (Item* item = player->StoreNewItem(dest, 17, true)) player->SendNewItem(item, 1, true, false);
+        }
+        else
+        {
+            Chat(player).PSendSysMessage("|cff4CFF00BattleRoyale::|r ¡No has obtenido las alas porque no tienes espacio disponible! ¡RIP! :(");
+        }
+    };
 
     BR_ListaDePersonajes list_Cola;
     BR_ListaDePersonajes list_Jugadores;

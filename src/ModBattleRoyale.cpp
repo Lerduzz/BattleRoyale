@@ -33,6 +33,7 @@ public:
             {
                 ChatHandler(player->GetSession()).SendSysMessage("El modulo |cff4CFF00BattleRoyale|r ha sido activado.");
             }
+            sBattleRoyaleMgr->QuitarAlas(player);
         }
     }
     
