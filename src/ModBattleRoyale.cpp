@@ -27,8 +27,10 @@ public:
     ModBattleRoyalePlayer() : PlayerScript("ModBattleRoyalePlayer") { }
 
     void OnLogin(Player* player) override {
-        if (sConfigMgr->GetOption<bool>("BattleRoyale.Enabled", true)) {
-            if (sConfigMgr->GetOption<bool>("BattleRoyale.Announce", true)) {
+        if (sConfigMgr->GetOption<bool>("BattleRoyale.Enabled", true))
+        {
+            if (sConfigMgr->GetOption<bool>("BattleRoyale.Announce", true))
+            {
                 ChatHandler(player->GetSession()).SendSysMessage("El modulo |cff4CFF00BattleRoyale|r ha sido activado.");
             }
         }
@@ -218,8 +220,39 @@ public:
 	}
 };
 
+class BattleRoyaleItemAlas : public ItemScript
+{
+public:
+    BattleRoyaleItemAlas() : ItemScript("BattleRoyaleItemAlas") { }
+
+    bool OnUse(Player* player, Item* /*item*/, const SpellCastTargets &) override
+    {
+        if (!sConfigMgr->GetOption<bool>("BattleRoyale.Enabled", true))
+        {
+            ChatHandler(player->GetSession()).PSendSysMessage("|cff4CFF00BattleRoyale::|r ¡Este modo de juego se encuentra actualmente desactivado!");
+            return false;
+        }
+        if (!sBattleRoyaleMgr->EstaEnEvento(player))
+        {
+            ChatHandler(player->GetSession()).PSendSysMessage("|cff4CFF00BattleRoyale::|r ¡Solo se puede utilizar mientras participas en este modo de juego!");
+            return false;
+        }
+        if (player->HasAura(HECHIZO_ALAS_MAGICAS))
+        {
+            player->RemoveAurasDueToSpell(HECHIZO_ALAS_MAGICAS);
+            return true;
+        }
+        else
+        {
+            player->AddAura(HECHIZO_ALAS_MAGICAS, player);
+            return false;
+        }
+    }
+};
+
 void AddModBattleRoyaleScripts() {
     new ModBattleRoyalePlayer();
-    new BattleRoyaleWorldScript();
     new npc_battleroyale();
+    new BattleRoyaleWorldScript();
+    new BattleRoyaleItemAlas();
 }

@@ -35,6 +35,7 @@ public:
     bool PuedeReaparecerEnCementerio(Player* player);
     bool DebeRestringirFunciones(Player* player) { return estadoActual > ESTADO_NO_HAY_SUFICIENTES_JUGADORES && HayJugadores() && EstaEnEvento(player); };
     bool EstaEnCola(Player* player) { return EstaEnCola(player->GetGUID().GetCounter()); };
+    bool EstaEnEvento(Player* player) { return EstaEnEvento(player->GetGUID().GetCounter()); };
     bool DebeForzarJcJTcT(Player* player) 
     {
         if (!player) return false;
@@ -61,7 +62,6 @@ private:
     bool HayJugadores() { return !list_Jugadores.empty(); };
     bool HayCola() { return !list_Cola.empty(); };
     bool EstaEnCola(uint32 guid) { return list_Cola.find(guid) != list_Cola.end(); };
-    bool EstaEnEvento(Player* player) { return list_Jugadores.find(player->GetGUID().GetCounter()) != list_Jugadores.end(); };
     bool EstaEnEvento(uint32 guid) { return list_Jugadores.find(guid) != list_Jugadores.end(); };
     bool EstaEnLaNave(Player* player)
     {
