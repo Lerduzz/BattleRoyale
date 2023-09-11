@@ -120,9 +120,6 @@ private:
                     case 0:
                     {
                         (*it).second->GetSession()->SendNotification("|cff00ff00¡Que comience la batalla de |cffDA70D6%s|cff00ff00!", BR_NombreDeMapas[indiceDelMapa].c_str());
-                        std::ostringstream msg;
-                        msg << "|cff4CFF00BattleRoyale::|r Ha comenzado una nueva ronda en |cffDA70D6" << BR_NombreDeMapas[indiceDelMapa].c_str() << "|r con |cff4CFF00" << list_Jugadores.size() << "|r jugadores.";
-                        sWorld->SendServerMessage(SERVER_MSG_STRING, msg.str().c_str());
                         break;
                     }                
                     case 5:
@@ -152,6 +149,12 @@ private:
                         break;
                     }
                 }
+            }
+            if (delay == 0)
+            {
+                std::ostringstream msg;
+                msg << "|cff4CFF00BattleRoyale::|r Ha comenzado una nueva ronda en |cffDA70D6" << BR_NombreDeMapas[indiceDelMapa].c_str() << "|r con |cff4CFF00" << list_Jugadores.size() << "|r jugadores.";
+                sWorld->SendServerMessage(SERVER_MSG_STRING, msg.str().c_str());
             }
         }
     };
