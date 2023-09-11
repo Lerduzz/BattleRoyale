@@ -270,6 +270,7 @@ void BattleRoyaleMgr::AlmacenarPosicionInicial(uint32 guid)
 void BattleRoyaleMgr::LlamarDentroDeNave(uint32 guid)
 {
     Player* player = list_Jugadores[guid];
+    if (!player->IsAlive()) RevivirJugador(player);
     CambiarDimension_Entrar(guid);
     DejarGrupo(player);
     float ox = BR_VariacionesDePosicion[indiceDeVariacion][0];
@@ -278,6 +279,7 @@ void BattleRoyaleMgr::LlamarDentroDeNave(uint32 guid)
     Desmontar(player);
     player->TeleportTo(BR_IdentificadorDeMapas[indiceDelMapa], BR_InicioDeLaNave[indiceDelMapa][0] + ox, BR_InicioDeLaNave[indiceDelMapa][1] + oy, BR_InicioDeLaNave[indiceDelMapa][2] + 2.5f, BR_InicioDeLaNave[indiceDelMapa][3] + M_PI / 2.0f);
     player->SetPvP(false);
+    player->AddAura(HECHIZO_LENGUAJE_BINARIO, player);
     player->SaveToDB(false, false);
     player->GetMotionMaster()->MoveFall();
     DarAlas(player);
@@ -292,13 +294,18 @@ void BattleRoyaleMgr::SalirDelEvento(uint32 guid, bool logout /* = false*/)
     if (EstaEnEvento(guid))
     {
         CambiarDimension_Salir(guid);
+        Player* player = list_Jugadores[guid];
+        if (player->IsAlive())
+        {
+            player->AddAura(HECHIZO_PARACAIDAS, player);
+        }
         if(!logout)
         {
-            if (!list_Jugadores[guid]->IsAlive()) RevivirJugador(list_Jugadores[guid]);
-            if (!list_Jugadores[guid]->isPossessing()) list_Jugadores[guid]->StopCastingBindSight();
-            QuitarAlas(list_Jugadores[guid]);
-            list_Jugadores[guid]->TeleportTo(list_Datos[guid].GetMap(), list_Datos[guid].GetX(), list_Datos[guid].GetY(), list_Datos[guid].GetZ(), list_Datos[guid].GetO());
-            list_Jugadores[guid]->SaveToDB(false, false);
+            if (!player->IsAlive()) RevivirJugador(player);
+            if (!player->isPossessing()) player->StopCastingBindSight();
+            QuitarAlas(player);
+            player->TeleportTo(list_Datos[guid].GetMap(), list_Datos[guid].GetX(), list_Datos[guid].GetY(), list_Datos[guid].GetZ(), list_Datos[guid].GetO());
+            player->SaveToDB(false, false);
         }
         list_Jugadores.erase(guid);
         list_Datos.erase(guid);

@@ -269,8 +269,9 @@ private:
             {
                 if ((*it).second && (*it).second->IsAlive())
                 {
-                    (*it).second->AddAura(HECHIZO_ANTI_SANADORES, (*it).second);
                     (*it).second->AddAura(HECHIZO_ANTI_INVISIBLES, (*it).second);
+                    (*it).second->AddAura(HECHIZO_ANTI_SANADORES, (*it).second);
+                    (*it).second->AddAura(HECHIZO_LENGUAJE_BINARIO, (*it).second);
                 }
             }
         }
