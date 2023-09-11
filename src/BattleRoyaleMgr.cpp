@@ -295,7 +295,7 @@ void BattleRoyaleMgr::SalirDelEvento(uint32 guid, bool logout /* = false*/)
         if (!list_Jugadores[guid]->IsAlive()) RevivirJugador(list_Jugadores[guid]);
         if (!list_Jugadores[guid]->isPossessing()) list_Jugadores[guid]->StopCastingBindSight();
         QuitarAlas(list_Jugadores[guid]);
-        list_Jugadores[guid]->TeleportTo(list_Datos[guid].GetMap(), list_Datos[guid].GetX(), list_Datos[guid].GetY(), list_Datos[guid].GetZ(), list_Datos[guid].GetO());
+        if(!logout) list_Jugadores[guid]->TeleportTo(list_Datos[guid].GetMap(), list_Datos[guid].GetX(), list_Datos[guid].GetY(), list_Datos[guid].GetZ(), list_Datos[guid].GetO());
         list_Jugadores[guid]->SaveToDB(false, false);
         list_Jugadores.erase(guid);
         list_Datos.erase(guid);
