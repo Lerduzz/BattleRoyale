@@ -124,6 +124,7 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
                     tiempoRestanteNave = 30;
                 } else {
                     if (tiempoRestanteInicio % 5 == 0) {
+                        if (estadoActual != ESTADO_NAVE_CERCA_DEL_CENTRO) VerificarJugadoresEnNave();
                         NotificarTiempoParaIniciar(tiempoRestanteInicio);
                     }
                     if (estadoActual == ESTADO_INVOCANDO_JUGADORES && tiempoRestanteInicio <= 30 && obj_Nave)
@@ -149,7 +150,6 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
                             RestablecerTodoElEvento();
                             return;
                         }
-                        PonerTodosLosParacaidas();
                     }
                     tiempoRestanteInicio--;
                 }
@@ -440,39 +440,6 @@ bool BattleRoyaleMgr::InvocarZonaSegura()
         LOG_ERROR("br.nave", "BattleRoyaleMgr::InvocarZonaSegura: No se ha invocado la zona (OBJETO = {}) porque no hay jugadores!", OBJETO_ZONA_SEGURA_INICIAL + indiceDeZona);
     }
     return false;
-}
-
-void BattleRoyaleMgr::PonerTodosLosParacaidas()
-{
-    if (HayJugadores())
-    {
-        BR_ListaDePersonajes::iterator it = list_Jugadores.begin();
-        while (it != list_Jugadores.end())
-        {
-            if (EstaEnLaNave((*it).second) && (*it).second->IsAlive())
-            {
-                (*it).second->AddAura(HECHIZO_PARACAIDAS, (*it).second);
-                ++it;
-            }
-            else
-            {
-                if ((*it).second)
-                {
-                    uint32 guid = (*it).first;
-                    ++it;
-                    SalirDelEvento(guid);
-                }
-                else
-                {
-                    ++it;
-                }
-            }
-        }
-    }
-    else
-    {
-        FinalizarRonda(false);
-    }
 }
 
 void BattleRoyaleMgr::EfectoFueraDeZona()

@@ -57,7 +57,6 @@ private:
     bool InvocarNave();
     bool InvocarCentroDelMapa();
     bool InvocarZonaSegura();
-    void PonerTodosLosParacaidas();
     void EfectoFueraDeZona();
     void ActivarJcJTcT();
     void ControlDeReglas();
@@ -125,7 +124,7 @@ private:
                     }                
                     case 5:
                     {
-                        (*it).second->GetSession()->SendNotification("|cff00ff00Ya tienes paracaidas. |cff0000ff¡PUEDES SALTAR!");
+                        (*it).second->GetSession()->SendNotification("|cff00ff00Ya puedes saltar. |cff0000ff¡REVISA TUS ALAS!");
                         break;
                     }                
                     case 10:
@@ -138,7 +137,7 @@ private:
                     }
                     case 30:
                     {
-                        (*it).second->GetSession()->SendNotification("|cff00ff00La nave comienza a moverse. |cffff0000¡NO TE TIRES!");
+                        (*it).second->GetSession()->SendNotification("|cff00ff00La nave comienza a moverse. |cffff0000¡REVISA TUS ALAS!");
                         break;
                     }
                     default:
@@ -265,6 +264,7 @@ private:
                 if ((*it).second && (*it).second->IsAlive())
                 {
                     (*it).second->AddAura(HECHIZO_ANTI_SANADORES, (*it).second);
+                    (*it).second->AddAura(HECHIZO_ANTI_INVISIBLES, (*it).second);
                 }
             }
         }
@@ -281,6 +281,27 @@ private:
                 }
             }
         }
+    };
+    void VerificarJugadoresEnNave()
+    {
+        if (HayJugadores())
+        {
+            BR_ListaDePersonajes::iterator it = list_Jugadores.begin();
+            while (it != list_Jugadores.end())
+            {
+                if (!EstaEnLaNave((*it).second) || !(*it).second->IsAlive())
+                {
+                    uint32 guid = (*it).first;
+                    ++it;
+                    SalirDelEvento(guid);
+                }
+                else
+                {
+                    ++it;
+                }
+            }
+        }
+        if (!HayJugadores()) FinalizarRonda(false);
     };
     void TodosLosMuertosEspectarme(Player* player)
     {

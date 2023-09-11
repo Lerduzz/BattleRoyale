@@ -21,7 +21,6 @@ enum BR_EstadosEvento
 
 enum BR_Hechizos
 {
-    HECHIZO_PARACAIDAS                      = 45472, // TODO: Deprecated check.
     HECHIZO_ALAS_MAGICAS                    = 24742,
     HECHIZO_ANTI_SANADORES                  = 55593,
     HECHIZO_ANTI_INVISIBLES                 = 34709,
