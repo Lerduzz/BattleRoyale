@@ -124,7 +124,7 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
                     tiempoRestanteNave = 30;
                 } else {
                     if (tiempoRestanteInicio % 5 == 0) {
-                        if (estadoActual != ESTADO_NAVE_CERCA_DEL_CENTRO) VerificarJugadoresEnNave();
+                        if (estadoActual == ESTADO_NAVE_EN_MOVIMIENTO) VerificarJugadoresEnNave();
                         NotificarTiempoParaIniciar(tiempoRestanteInicio);
                     }
                     if (estadoActual == ESTADO_INVOCANDO_JUGADORES && tiempoRestanteInicio <= 30 && obj_Nave)
