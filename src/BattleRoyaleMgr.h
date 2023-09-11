@@ -36,6 +36,20 @@ public:
     bool DebeRestringirFunciones(Player* player) { return estadoActual > ESTADO_NO_HAY_SUFICIENTES_JUGADORES && HayJugadores() && EstaEnEvento(player); };
     bool EstaEnCola(Player* player) { return EstaEnCola(player->GetGUID().GetCounter()); };
     bool EstaEnEvento(Player* player) { return EstaEnEvento(player->GetGUID().GetCounter()); };
+    bool EstaEnLaNave(Player* player)
+    {
+        if (player && obj_Nave)
+        {
+            if (Transport* tp = obj_Nave->ToTransport())
+            {
+                if (Transport* playertp = player->GetTransport())
+                {
+                    if (tp == playertp) return true;
+                }
+            }
+        }
+        return false;
+    };
     bool DebeForzarJcJTcT(Player* player) 
     {
         if (!player) return false;
@@ -66,20 +80,6 @@ private:
     bool HayCola() { return !list_Cola.empty(); };
     bool EstaEnCola(uint32 guid) { return list_Cola.find(guid) != list_Cola.end(); };
     bool EstaEnEvento(uint32 guid) { return list_Jugadores.find(guid) != list_Jugadores.end(); };
-    bool EstaEnLaNave(Player* player)
-    {
-        if (player && obj_Nave)
-        {
-            if (Transport* tp = obj_Nave->ToTransport())
-            {
-                if (Transport* playertp = player->GetTransport())
-                {
-                    if (tp == playertp) return true;
-                }
-            }
-        }
-        return false;
-    };
     bool EstaLlenoElEvento() { return list_Jugadores.size() >= conf_JugadoresMaximo; };
     bool EstaEspectando(Player* player)
     { 
