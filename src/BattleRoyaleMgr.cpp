@@ -66,7 +66,7 @@ void BattleRoyaleMgr::GestionarJugadorEntrando(Player* player)
             }
             else
             {
-                if (tiempoRestanteInicio >= 35)
+                if (tiempoRestanteInicio >= 45)
                 {
                     list_Jugadores[player->GetGUID().GetCounter()] = player;
                     AlmacenarPosicionInicial(player->GetGUID().GetCounter());
