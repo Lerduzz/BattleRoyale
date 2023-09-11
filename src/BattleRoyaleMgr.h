@@ -44,7 +44,7 @@ public:
     };
     void QuitarAlas(Player* player)
     {
-        player->DestroyItemCount(17, player->GetItemCount(17), true);
+        player->DestroyItemCount(17, 9999, true);
     };
     
 private:
