@@ -238,16 +238,20 @@ public:
             ChatHandler(player->GetSession()).PSendSysMessage("|cff4CFF00BattleRoyale::|r ¡Solo se puede utilizar mientras participas en este modo de juego!");
             return false;
         }
+        if (sBattleRoyaleMgr->EstaEnLaNave(player))
+        {
+            ChatHandler(player->GetSession()).PSendSysMessage("|cff4CFF00BattleRoyale::|r ¡No se puede utilizar hasta que saltas de la nave!");
+            return false;
+        }
         if (player->HasAura(HECHIZO_ALAS_MAGICAS))
         {
             player->RemoveAurasDueToSpell(HECHIZO_ALAS_MAGICAS);
-            return false;
         }
         else
         {
             player->AddAura(HECHIZO_ALAS_MAGICAS, player);
-            return false;
         }
+        return false;
     }
 };
 
