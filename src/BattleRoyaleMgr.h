@@ -1,12 +1,12 @@
 #ifndef SC_BR_MGR_H
 #define SC_BR_MGR_H
 
+#include "ConstantesComunes.h"
+#include "BattleRoyaleData.h"
 #include "Common.h"
 #include "SharedDefines.h"
 #include "ScriptMgr.h"
-#include "BattleRoyaleData.h"
 #include "Chat.h"
-#include "Player.h"
 #include "GameObject.h"
 #include "Transport.h"
 
@@ -14,78 +14,6 @@ class BattleRoyaleData;
 typedef std::map<uint32, Player*> BR_ColaDePersonajes;
 typedef std::map<uint32, Player*> BR_ListaDePersonajes;
 typedef std::map<uint32, BattleRoyaleData> BR_DatosDePersonajes;
-
-enum BR_Dimensiones
-{
-    DIMENSION_NORMAL                        = 0x00000001,
-    DIMENSION_EVENTO                        = 0x00000002,
-};
-
-enum BR_EstadosEvento
-{
-    ESTADO_NO_HAY_SUFICIENTES_JUGADORES     = 0,
-    ESTADO_INVOCANDO_JUGADORES              = 1,
-    ESTADO_NAVE_EN_MOVIMIENTO               = 2,
-    ESTADO_NAVE_CERCA_DEL_CENTRO            = 3,
-    ESTADO_BATALLA_EN_CURSO                 = 4,
-    ESTADO_BATALLA_TERMINADA                = 5,
-};
-
-enum BR_Hechizos
-{
-    HECHIZO_PARACAIDAS                      = 45472,
-    HECHIZO_ANTI_SANADORES                  = 55593,
-};
-
-enum BR_ObjetosMundo
-{
-    OBJETO_NAVE                             = 194675,
-    OBJETO_COFRE                            = 499999,
-    OBJETO_CENTRO_DEL_MAPA                  = 500000,
-    OBJETO_ZONA_SEGURA_INICIAL              = 500001,
-};
-
-const int CANTIDAD_DE_ZONAS                 = 10;
-const float BR_EscalasDeZonaSegura[CANTIDAD_DE_ZONAS] = { 5.0f, 4.5f, 4.0f, 3.5f, 3.0f, 2.5f, 2.0f, 1.5f, 1.0f, 0.5f };
-
-const int CANTIDAD_DE_VARIACIONES = 49;
-const float BR_VariacionesDePosicion[CANTIDAD_DE_VARIACIONES][2] = 
-{
-    { -4.5f,  4.5f }, { -3.0f,  4.5f }, { -1.5f,  4.5f }, {  0.0f,  4.5f }, {  1.5f,  4.5f }, {  3.0f,  4.5f }, {  4.5f,  4.5f },
-    { -4.5f,  3.0f }, { -3.0f,  3.0f }, { -1.5f,  3.0f }, {  0.0f,  3.0f }, {  1.5f,  3.0f }, {  3.0f,  3.0f }, {  4.5f,  3.0f },
-    { -4.5f,  1.5f }, { -3.0f,  1.5f }, { -1.5f,  1.5f }, {  0.0f,  1.5f }, {  1.5f,  1.5f }, {  3.0f,  1.5f }, {  4.5f,  1.5f },
-    { -4.5f,  0.0f }, { -3.0f,  0.0f }, { -1.5f,  0.0f }, {  0.0f,  0.0f }, {  1.5f,  0.0f }, {  3.0f,  0.0f }, {  4.5f,  0.0f },
-    { -4.5f, -1.5f }, { -3.0f, -1.5f }, { -1.5f, -1.5f }, {  0.0f, -1.5f }, {  1.5f, -1.5f }, {  3.0f, -1.5f }, {  4.5f, -1.5f },
-    { -4.5f, -3.0f }, { -3.0f, -3.0f }, { -1.5f, -3.0f }, {  0.0f, -3.0f }, {  1.5f, -3.0f }, {  3.0f, -3.0f }, {  4.5f, -3.0f },
-    { -4.5f, -4.5f }, { -3.0f, -4.5f }, { -1.5f, -4.5f }, {  0.0f, -4.5f }, {  1.5f, -4.5f }, {  3.0f, -4.5f }, {  4.5f, -4.5f }
-};
-
-const int CANTIDAD_DE_MAPAS = 4;
-const int BR_IdentificadorDeMapas[CANTIDAD_DE_MAPAS] = { 1, 0, 1, 1 };
-
-const Position BR_CentroDeMapas[CANTIDAD_DE_MAPAS] =
-{
-    { 5261.581055f, -2164.183105f, 1259.483765f },
-    { -14614.625001f, -313.262604f, 0.000001f },
-    { 157.995544f, -1948.086061f, 87.387062f },
-    { -4695.309082f, 3411.214844f, 7.050505f }
-};
-
-const std::string BR_NombreDeMapas[CANTIDAD_DE_MAPAS] =
-{
-    "Kalimdor: Hyjal",
-    "Reinos del Este: Isla Jaguero",
-    "Kalimdor: Las Charcas del Olvido",
-    "Kalimdor: Ruinas de Solarsal"
-};
-
-const float BR_InicioDeLaNave[CANTIDAD_DE_MAPAS][4] =
-{
-    { 2967.581055f, -2164.183105f, 1556.483765f, 0.0f - M_PI / 2.0f },
-    { -12320.625001f, -313.262604f, 297.000001f, 0.0f + M_PI / 2.0f },
-    { -2137.581055f, -1948.086061f, 394.387062f, 0.0f - M_PI / 2.0f },
-    { -2401.309082f, 3411.214844f, 304.050505f, 0.0f + M_PI / 2.0f }
-};
 
 class BattleRoyaleMgr
 {
@@ -107,11 +35,16 @@ public:
     bool PuedeReaparecerEnCementerio(Player* player);
     bool DebeRestringirFunciones(Player* player) { return estadoActual > ESTADO_NO_HAY_SUFICIENTES_JUGADORES && HayJugadores() && EstaEnEvento(player); };
     bool EstaEnCola(Player* player) { return EstaEnCola(player->GetGUID().GetCounter()); };
+    bool EstaEnEvento(Player* player) { return EstaEnEvento(player->GetGUID().GetCounter()); };
     bool DebeForzarJcJTcT(Player* player) 
     {
         if (!player) return false;
         if (estadoActual != ESTADO_BATALLA_EN_CURSO || !HayJugadores() || !EstaEnEvento(player)) return false;
         return !EstaEnLaNave(player);
+    };
+    void QuitarAlas(Player* player)
+    {
+        player->DestroyItemCount(17, 9999, true);
     };
     
 private:
@@ -124,7 +57,6 @@ private:
     bool InvocarNave();
     bool InvocarCentroDelMapa();
     bool InvocarZonaSegura();
-    void PonerTodosLosParacaidas();
     void EfectoFueraDeZona();
     void ActivarJcJTcT();
     void ControlDeReglas();
@@ -133,7 +65,6 @@ private:
     bool HayJugadores() { return !list_Jugadores.empty(); };
     bool HayCola() { return !list_Cola.empty(); };
     bool EstaEnCola(uint32 guid) { return list_Cola.find(guid) != list_Cola.end(); };
-    bool EstaEnEvento(Player* player) { return list_Jugadores.find(player->GetGUID().GetCounter()) != list_Jugadores.end(); };
     bool EstaEnEvento(uint32 guid) { return list_Jugadores.find(guid) != list_Jugadores.end(); };
     bool EstaEnLaNave(Player* player)
     {
@@ -189,11 +120,14 @@ private:
                     case 0:
                     {
                         (*it).second->GetSession()->SendNotification("|cff00ff00¡Que comience la batalla de |cffDA70D6%s|cff00ff00!", BR_NombreDeMapas[indiceDelMapa].c_str());
+                        std::ostringstream msg;
+                        msg << "|cff4CFF00BattleRoyale::|r Ha comenzado una nueva ronda en |cffDA70D6" << BR_NombreDeMapas[indiceDelMapa].c_str() << "|r con |cff4CFF00" << list_Jugadores.size() << "|r jugadores.";
+                        sWorld->SendServerMessage(SERVER_MSG_STRING, msg.str().c_str());
                         break;
                     }                
                     case 5:
                     {
-                        (*it).second->GetSession()->SendNotification("|cff00ff00Ya tienes paracaidas. |cff0000ff¡PUEDES SALTAR!");
+                        (*it).second->GetSession()->SendNotification("|cff00ff00¡PUEDES SALTAR CUANDO QUIERAS! |cff0000ff¡REVISA TUS ALAS!");
                         break;
                     }                
                     case 10:
@@ -206,14 +140,14 @@ private:
                     }
                     case 30:
                     {
-                        (*it).second->GetSession()->SendNotification("|cff00ff00La nave comienza a moverse. |cffff0000¡NO TE TIRES!");
+                        (*it).second->GetSession()->SendNotification("|cff00ff00La nave comienza a moverse. |cffff0000¡QUÉDATE EN ELLA HASTA LLEGAR!");
                         break;
                     }
                     default:
                     {
                         if (delay > 30 && delay <= 60)
                         {
-                            (*it).second->GetSession()->SendNotification("|cff00ff00Faltan |cffDA70D6%u|cff00ff00 segundos para encender motores. |cffff0000¡NO TE TIRES!", delay - 30);
+                            (*it).second->GetSession()->SendNotification("|cff00ff00Faltan |cffDA70D6%u|cff00ff00 segundos para encender motores. |cffff0000¡DEBERÍAS REVISAR TUS ALAS!", delay - 30);
                         }
                         break;
                     }
@@ -333,6 +267,7 @@ private:
                 if ((*it).second && (*it).second->IsAlive())
                 {
                     (*it).second->AddAura(HECHIZO_ANTI_SANADORES, (*it).second);
+                    (*it).second->AddAura(HECHIZO_ANTI_INVISIBLES, (*it).second);
                 }
             }
         }
@@ -349,6 +284,27 @@ private:
                 }
             }
         }
+    };
+    void VerificarJugadoresEnNave()
+    {
+        if (HayJugadores())
+        {
+            BR_ListaDePersonajes::iterator it = list_Jugadores.begin();
+            while (it != list_Jugadores.end())
+            {
+                if (!EstaEnLaNave((*it).second) || !(*it).second->IsAlive())
+                {
+                    uint32 guid = (*it).first;
+                    ++it;
+                    SalirDelEvento(guid);
+                }
+                else
+                {
+                    ++it;
+                }
+            }
+        }
+        if (!HayJugadores()) FinalizarRonda(false);
     };
     void TodosLosMuertosEspectarme(Player* player)
     {
@@ -367,7 +323,21 @@ private:
             list_Datos[player->GetGUID().GetCounter()].spect = target->GetGUID().GetCounter();
             player->CastSpell(target, 6277, true);
         }
-    }
+    };
+    void DarAlas(Player* player)
+    {
+        QuitarAlas(player);
+        ItemPosCountVec dest;
+        InventoryResult msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, 17, 1);
+        if (msg == EQUIP_ERR_OK)
+        {
+            if (Item* item = player->StoreNewItem(dest, 17, true)) player->SendNewItem(item, 1, true, false);
+        }
+        else
+        {
+            Chat(player).PSendSysMessage("|cff4CFF00BattleRoyale::|r ¡No has obtenido las alas porque no tienes espacio disponible! ¡RIP! :(");
+        }
+    };
 
     BR_ListaDePersonajes list_Cola;
     BR_ListaDePersonajes list_Jugadores;

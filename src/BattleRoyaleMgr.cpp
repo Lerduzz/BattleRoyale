@@ -66,7 +66,7 @@ void BattleRoyaleMgr::GestionarJugadorEntrando(Player* player)
             }
             else
             {
-                if (tiempoRestanteInicio >= 35)
+                if (tiempoRestanteInicio >= 45)
                 {
                     list_Jugadores[player->GetGUID().GetCounter()] = player;
                     AlmacenarPosicionInicial(player->GetGUID().GetCounter());
@@ -124,6 +124,7 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
                     tiempoRestanteNave = 30;
                 } else {
                     if (tiempoRestanteInicio % 5 == 0) {
+                        if (estadoActual == ESTADO_NAVE_EN_MOVIMIENTO) VerificarJugadoresEnNave();
                         NotificarTiempoParaIniciar(tiempoRestanteInicio);
                     }
                     if (estadoActual == ESTADO_INVOCANDO_JUGADORES && tiempoRestanteInicio <= 30 && obj_Nave)
@@ -149,7 +150,6 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
                             RestablecerTodoElEvento();
                             return;
                         }
-                        PonerTodosLosParacaidas();
                     }
                     tiempoRestanteInicio--;
                 }
@@ -280,6 +280,7 @@ void BattleRoyaleMgr::LlamarDentroDeNave(uint32 guid)
     player->SetPvP(false);
     player->SaveToDB(false, false);
     player->GetMotionMaster()->MoveFall();
+    DarAlas(player);
 }
 
 void BattleRoyaleMgr::SalirDelEvento(uint32 guid, bool logout /* = false*/)
@@ -295,6 +296,7 @@ void BattleRoyaleMgr::SalirDelEvento(uint32 guid, bool logout /* = false*/)
         {
             if (!list_Jugadores[guid]->IsAlive()) RevivirJugador(list_Jugadores[guid]);
             if (!list_Jugadores[guid]->isPossessing()) list_Jugadores[guid]->StopCastingBindSight();
+            QuitarAlas(list_Jugadores[guid]);
             list_Jugadores[guid]->TeleportTo(list_Datos[guid].GetMap(), list_Datos[guid].GetX(), list_Datos[guid].GetY(), list_Datos[guid].GetZ(), list_Datos[guid].GetO());
             list_Jugadores[guid]->SaveToDB(false, false);
         }
@@ -441,39 +443,6 @@ bool BattleRoyaleMgr::InvocarZonaSegura()
         LOG_ERROR("br.nave", "BattleRoyaleMgr::InvocarZonaSegura: No se ha invocado la zona (OBJETO = {}) porque no hay jugadores!", OBJETO_ZONA_SEGURA_INICIAL + indiceDeZona);
     }
     return false;
-}
-
-void BattleRoyaleMgr::PonerTodosLosParacaidas()
-{
-    if (HayJugadores())
-    {
-        BR_ListaDePersonajes::iterator it = list_Jugadores.begin();
-        while (it != list_Jugadores.end())
-        {
-            if (EstaEnLaNave((*it).second) && (*it).second->IsAlive())
-            {
-                (*it).second->AddAura(HECHIZO_PARACAIDAS, (*it).second);
-                ++it;
-            }
-            else
-            {
-                if ((*it).second)
-                {
-                    uint32 guid = (*it).first;
-                    ++it;
-                    SalirDelEvento(guid);
-                }
-                else
-                {
-                    ++it;
-                }
-            }
-        }
-    }
-    else
-    {
-        FinalizarRonda(false);
-    }
 }
 
 void BattleRoyaleMgr::EfectoFueraDeZona()
