@@ -362,7 +362,7 @@ private:
         }
     };
 
-    BR_ListaDePersonajes list_Cola;
+    BR_ColaDePersonajes list_Cola;
     BR_ListaDePersonajes list_Jugadores;
     BR_DatosDePersonajes list_Datos;
 
