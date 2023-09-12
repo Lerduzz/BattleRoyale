@@ -11,7 +11,6 @@
 #include "Transport.h"
 
 class BattleRoyaleData;
-typedef std::map<uint32, Player*> BR_ColaDePersonajes;
 typedef std::map<uint32, Player*> BR_ListaDePersonajes;
 typedef std::map<uint32, BattleRoyaleData> BR_DatosDePersonajes;
 
@@ -196,7 +195,7 @@ private:
     {
         if (HayCola())
         {
-            for (BR_ColaDePersonajes::iterator it = list_Cola.begin(); it != list_Cola.end(); ++it)
+            for (BR_ListaDePersonajes::iterator it = list_Cola.begin(); it != list_Cola.end(); ++it)
             {
                 if ((*it).second != player)
                 {
@@ -356,10 +355,40 @@ private:
             Chat(player).PSendSysMessage("|cff4CFF00BattleRoyale::|r ¡No has obtenido las alas porque no tienes espacio disponible! ¡RIP! :(");
         }
     };
+    void QuitarAlasProgramado()
+    {
+        if (list_QuitarAlas.size())
+        {
+            BR_ListaDePersonajes::iterator it = list_QuitarAlas.begin();
+            while (it != list_QuitarAlas.end())
+            {
+                if ((*it).second && (*it).second->IsAlive())
+                {
+                    if ((*it).second->IsInWorld() && !(*it).second->IsBeingTeleported())
+                    {
+                        Player* player = (*it).second;
+                        ++it;
+                        QuitarAlas(player);
+                        player->SaveToDB(false, false);
+                        list_QuitarAlas.erase((*it).first);
+                    }
+                    else
+                    {
+                        ++it;
+                    }
+                }
+                else
+                {
+                    ++it;
+                }
+            }
+        }
+    }
 
-    BR_ColaDePersonajes list_Cola;
+    BR_ListaDePersonajes list_Cola;
     BR_ListaDePersonajes list_Jugadores;
     BR_DatosDePersonajes list_Datos;
+    BR_ListaDePersonajes list_QuitarAlas;
 
     GameObject* obj_Zona;
     GameObject* obj_Centro;

@@ -154,6 +154,7 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
                     }
                     tiempoRestanteInicio--;
                 }
+                QuitarAlasProgramado();
             } else {
                 indicadorDeSegundos -= diff;
             }
@@ -171,6 +172,7 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
                     VerificarEspectadores();
                 }
                 if (--tiempoRestanteNave <= 0) if (DesaparecerNave()) NotificarNaveRetirada();
+                QuitarAlasProgramado();
             } else indicadorDeSegundos -= diff;
             if (tiempoRestanteZona <= 0) {
                 if (!InvocarZonaSegura()) {
@@ -205,6 +207,15 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
                     estadoActual = ESTADO_NO_HAY_SUFICIENTES_JUGADORES;
                     if (HaySuficientesEnCola()) IniciarNuevaRonda();
                 }
+                QuitarAlasProgramado();
+            } else indicadorDeSegundos -= diff;
+            break;
+        }
+        default:
+        {
+            if (indicadorDeSegundos <= 0) {
+                indicadorDeSegundos = 1000;
+                QuitarAlasProgramado();
             } else indicadorDeSegundos -= diff;
             break;
         }
@@ -319,15 +330,15 @@ void BattleRoyaleMgr::SalirDelEvento(uint32 guid, bool logout /* = false*/)
         {
             if (!player->IsAlive()) RevivirJugador(player);
             if (!player->isPossessing()) player->StopCastingBindSight();
-            QuitarAlas(player);
+            list_QuitarAlas[guid] = player;
             player->AddAura(HECHIZO_PARACAIDAS, player);
             player->TeleportTo(list_Datos[guid].GetMap(), list_Datos[guid].GetX(), list_Datos[guid].GetY(), list_Datos[guid].GetZ(), list_Datos[guid].GetO());
             player->SaveToDB(false, false);
         }
         list_Jugadores.erase(guid);
         list_Datos.erase(guid);
-        
     }
+    if (logout && list_QuitarAlas.find(guid) != list_QuitarAlas.end()) list_QuitarAlas.erase(guid);
 }
 
 void BattleRoyaleMgr::RevivirJugador(Player* player)
