@@ -56,10 +56,7 @@ public:
         if (estadoActual != ESTADO_BATALLA_EN_CURSO || !HayJugadores() || !EstaEnEvento(player)) return false;
         return !EstaEnLaNave(player);
     };
-    void QuitarAlas(Player* player)
-    {
-        player->DestroyItemCount(17, 9999, true);
-    };
+    void QuitarAlas(Player* player) { player->DestroyItemCount(17, 9999, true); };
     
 private:
     void RestablecerTodoElEvento();
@@ -347,7 +344,17 @@ private:
         InventoryResult msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, 17, 1);
         if (msg == EQUIP_ERR_OK)
         {
-            if (Item* item = player->StoreNewItem(dest, 17, true)) player->SendNewItem(item, 1, true, false);
+            if (Item* item = player->StoreNewItem(dest, 17, true))
+            {
+                player->SendNewItem(item, 1, true, false);
+                uint16 eDest;
+                msg = player->CanEquipItem(NULL_SLOT, eDest, item, true);
+                if (msg == EQUIP_ERR_OK)
+                {
+                    // RemoveItem(INVENTORY_SLOT_BAG_0, i, true);
+                    player->EquipItem(eDest, item, true);
+                }
+            }
         }
         else
         {
