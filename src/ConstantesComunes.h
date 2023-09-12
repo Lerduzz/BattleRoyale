@@ -22,6 +22,7 @@ enum BR_EstadosEvento
 enum BR_Hechizos
 {
     HECHIZO_PARACAIDAS                      = 45472,
+    HECHIZO_PARACAIDAS_EFECTO               = 44795,
     HECHIZO_ALAS_MAGICAS                    = 24742,
     HECHIZO_LENGUAJE_BINARIO                = 50246,
     HECHIZO_ANTI_SANADORES                  = 55593,

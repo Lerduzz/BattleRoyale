@@ -276,7 +276,15 @@ void BattleRoyaleMgr::AlmacenarPosicionInicial(uint32 guid)
 void BattleRoyaleMgr::LlamarDentroDeNave(uint32 guid)
 {
     Player* player = list_Jugadores[guid];
-    if (!player->IsAlive()) RevivirJugador(player);
+    if (player->IsAlive())
+    {
+        if (player->HasAura(HECHIZO_PARACAIDAS)) player->RemoveAurasDueToSpell(HECHIZO_PARACAIDAS);
+        if (player->HasAura(HECHIZO_PARACAIDAS_EFECTO)) player->RemoveAurasDueToSpell(HECHIZO_PARACAIDAS_EFECTO);
+    }
+    else
+    {
+        RevivirJugador(player);
+    }
     CambiarDimension_Entrar(guid);
     DejarGrupo(player);
     float ox = BR_VariacionesDePosicion[indiceDeVariacion][0];
