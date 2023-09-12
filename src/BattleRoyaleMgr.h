@@ -346,16 +346,16 @@ private:
             if (Item* item = player->StoreNewItem(dest, 17, true))
             {
                 player->SendNewItem(item, 1, true, false);
-                Chat(player).PSendSysMessage("|cff4CFF00BattleRoyale::|r Se te han entregado las alas del Battle Royale, con ellas podrás descender de manera segura durante la partida. Debes equiparlas y colocarlas en la barra de acción para facilitar su uso.");
+                Chat(player).PSendSysMessage("|cff4CFF00BattleRoyale::|r Bienvenido a este modo de juego, se te han otorgado tus alas, con ellas podrás descender de manera segura durante la partida. Encuéntra la camisa en tu mochila y equípala. Puedes arrastrarla a la barra de acción para facilitar su uso o activarla con clic derecho en el inventario. |cffff0000Recuerda permanecer en la NAVE hasta que se anuncie que puedes saltar o serás descalificado y expulsado.|r");
             }
             else
             {
-                Chat(player).PSendSysMessage("|cff4CFF00BattleRoyale::|r ¡No has obtenido las alas porque no se ha podido crear el objeto! ¡RIP! :(");
+                Chat(player).PSendSysMessage("|cff4CFF00BattleRoyale::|r ¡No has obtenido las alas porque no se ha podido crear el objeto! |cffff0000¡Descansa en paz! :(|r");
             }
         }
         else
         {
-            Chat(player).PSendSysMessage("|cff4CFF00BattleRoyale::|r ¡No has obtenido las alas porque no tienes espacio disponible! ¡RIP! :(");
+            Chat(player).PSendSysMessage("|cff4CFF00BattleRoyale::|r ¡No has obtenido las alas porque no tienes espacio disponible! |cffff0000¡Descansa en paz! :(|r");
         }
     };
     void DarAlasProgramado()
