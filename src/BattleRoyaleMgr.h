@@ -57,7 +57,7 @@ public:
         return !EstaEnLaNave(player);
     };
     void QuitarAlas(Player* player) { player->DestroyItemCount(17, 9999, true); };
-    
+
 private:
     void RestablecerTodoElEvento();
     void IniciarNuevaRonda();
@@ -347,13 +347,7 @@ private:
             if (Item* item = player->StoreNewItem(dest, 17, true))
             {
                 player->SendNewItem(item, 1, true, false);
-                uint16 eDest;
-                msg = player->CanEquipItem(NULL_SLOT, eDest, item, true);
-                if (msg == EQUIP_ERR_OK)
-                {
-                    // RemoveItem(INVENTORY_SLOT_BAG_0, i, true);
-                    player->EquipItem(eDest, item, true);
-                }
+                item->SendUpdateToPlayer(player);
             }
         }
         else
