@@ -307,13 +307,13 @@ void BattleRoyaleMgr::SalirDelEvento(uint32 guid, bool logout /* = false*/)
             if (player->HasAura(HECHIZO_LENGUAJE_BINARIO)) player->RemoveAurasDueToSpell(HECHIZO_LENGUAJE_BINARIO);
             if (player->HasAura(HECHIZO_ANTI_INVISIBLES)) player->RemoveAurasDueToSpell(HECHIZO_ANTI_INVISIBLES);
             if (player->HasAura(HECHIZO_ANTI_SANADORES)) player->RemoveAurasDueToSpell(HECHIZO_ANTI_SANADORES);
-            player->AddAura(HECHIZO_PARACAIDAS, player);
         }
         if(!logout)
         {
             if (!player->IsAlive()) RevivirJugador(player);
             if (!player->isPossessing()) player->StopCastingBindSight();
             QuitarAlas(player);
+            player->AddAura(HECHIZO_PARACAIDAS, player);
             player->TeleportTo(list_Datos[guid].GetMap(), list_Datos[guid].GetX(), list_Datos[guid].GetY(), list_Datos[guid].GetZ(), list_Datos[guid].GetO());
             player->SaveToDB(false, false);
         }
