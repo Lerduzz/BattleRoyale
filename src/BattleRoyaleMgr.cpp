@@ -265,9 +265,16 @@ void BattleRoyaleMgr::IniciarNuevaRonda()
         while (HayCola() && !EstaLlenoElEvento() && tiempoRestanteInicio >= 60)
         {
             uint32 guid = (*list_Cola.begin()).first;
-            list_Jugadores[guid] = list_Cola[guid];
-            AlmacenarPosicionInicial(guid);
-            LlamarDentroDeNave(guid);
+            if (list_Cola[guid]->IsInFlight())
+            {
+                Chat(list_Cola[guid]).SendSysMessage("|cff4CFF00BattleRoyale::|r ¡No has podido entrar al evento porque vas en ruta de vuelo! ¡Se te ha quitado de la cola!");
+            }
+            else
+            {
+                list_Jugadores[guid] = list_Cola[guid];
+                AlmacenarPosicionInicial(guid);
+                LlamarDentroDeNave(guid);
+            }
             list_Cola.erase(guid);
         }
     }
