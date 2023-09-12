@@ -135,19 +135,20 @@ private:
                     case 35:
                     case 40:
                     {
-                        (*it).second->GetSession()->SendNotification("|cff00ff00Faltan |cffDA70D6%u|cff00ff00 segundos para llegar. |cffff0000¡NO TE TIRES!", delay - 20);
+                        (*it).second->GetSession()->SendNotification("|cff00ff00Faltan |cffDA70D6%u|cff00ff00 segundos para llegar. |cffff0000¡EQUIPA TUS ALAS!", delay - 20);
                         break;
                     }
                     case 45:
                     {
                         (*it).second->GetSession()->SendNotification("|cff00ff00La nave se mueve. |cffff0000¡QUÉDATE EN ELLA HASTA LLEGAR!");
+                        DarAlas((*it).second);
                         break;
                     }
                     default:
                     {
                         if (delay > 45 && delay <= 75)
                         {
-                            (*it).second->GetSession()->SendNotification("|cff00ff00Faltan |cffDA70D6%u|cff00ff00 segundos para encender motores. |cffff0000¡EQUIPA TUS ALAS!", delay - 45);
+                            (*it).second->GetSession()->SendNotification("|cff00ff00Faltan |cffDA70D6%u|cff00ff00 segundos para encender motores. |cffff0000¡NO TE TIRES!", delay - 45);
                         }
                         break;
                     }

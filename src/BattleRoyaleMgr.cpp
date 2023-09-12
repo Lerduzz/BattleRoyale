@@ -296,7 +296,6 @@ void BattleRoyaleMgr::LlamarDentroDeNave(uint32 guid)
     player->AddAura(HECHIZO_LENGUAJE_BINARIO, player);
     player->SaveToDB(false, false);
     player->GetMotionMaster()->MoveFall();
-    DarAlas(player);
 }
 
 void BattleRoyaleMgr::SalirDelEvento(uint32 guid, bool logout /* = false*/)
