@@ -66,7 +66,7 @@ void BattleRoyaleMgr::GestionarJugadorEntrando(Player* player)
             }
             else
             {
-                if (tiempoRestanteInicio >= 45)
+                if (tiempoRestanteInicio >= 60)
                 {
                     list_Jugadores[player->GetGUID().GetCounter()] = player;
                     AlmacenarPosicionInicial(player->GetGUID().GetCounter());
@@ -121,20 +121,20 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
                     estadoActual = ESTADO_BATALLA_EN_CURSO;
                     NotificarTiempoParaIniciar(0);
                     tiempoRestanteZona = conf_IntervaloDeZona;
-                    tiempoRestanteNave = 30;
+                    tiempoRestanteNave = 15;
                 } else {
                     if (tiempoRestanteInicio % 5 == 0) {
                         if (estadoActual == ESTADO_NAVE_EN_MOVIMIENTO) VerificarJugadoresEnNave();
                         NotificarTiempoParaIniciar(tiempoRestanteInicio);
                     }
-                    if (estadoActual == ESTADO_INVOCANDO_JUGADORES && tiempoRestanteInicio <= 30 && obj_Nave)
+                    if (estadoActual == ESTADO_INVOCANDO_JUGADORES && tiempoRestanteInicio <= 45 && obj_Nave)
                     {
                         estadoActual = ESTADO_NAVE_EN_MOVIMIENTO;
                         uint32_t const autoCloseTime = obj_Nave->GetGOInfo()->GetAutoCloseTime() ? 10000u : 0u;
                         obj_Nave->SetLootState(GO_READY);
                         obj_Nave->UseDoorOrButton(autoCloseTime, false, nullptr);
                     }
-                    if (estadoActual == ESTADO_NAVE_EN_MOVIMIENTO && tiempoRestanteInicio <= 5)
+                    if (estadoActual == ESTADO_NAVE_EN_MOVIMIENTO && tiempoRestanteInicio <= 20)
                     {
                         estadoActual = ESTADO_NAVE_CERCA_DEL_CENTRO;
                         indiceDeZona = 0;
@@ -244,13 +244,13 @@ void BattleRoyaleMgr::IniciarNuevaRonda()
     if (estadoActual == ESTADO_NO_HAY_SUFICIENTES_JUGADORES)
     {
         SiguienteMapa();
-        tiempoRestanteInicio = 60;
+        tiempoRestanteInicio = 75;
         if (!InvocarNave()) {
             RestablecerTodoElEvento();
             return;
         }
         estadoActual = ESTADO_INVOCANDO_JUGADORES;
-        while (HayCola() && !EstaLlenoElEvento() && tiempoRestanteInicio >= 35)
+        while (HayCola() && !EstaLlenoElEvento() && tiempoRestanteInicio >= 60)
         {
             uint32 guid = (*list_Cola.begin()).first;
             list_Jugadores[guid] = list_Cola[guid];

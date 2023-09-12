@@ -121,30 +121,37 @@ private:
                     {
                         (*it).second->GetSession()->SendNotification("|cff00ff00¡Que comience la batalla de |cffDA70D6%s|cff00ff00!", BR_NombreDeMapas[indiceDelMapa].c_str());
                         break;
-                    }                
+                    }
                     case 5:
-                    {
-                        (*it).second->GetSession()->SendNotification("|cff00ff00¡PUEDES SALTAR CUANDO QUIERAS! |cff0000ff¡REVISA TUS ALAS!");
-                        break;
-                    }                
                     case 10:
                     case 15:
-                    case 20:
-                    case 25:
                     {
-                        (*it).second->GetSession()->SendNotification("|cff00ff00Faltan |cffDA70D6%u|cff00ff00 segundos para llegar. |cffff0000¡NO TE TIRES!", delay - 5);
+                        (*it).second->GetSession()->SendNotification("|cff00ff00En |cffDA70D6%u|cff00ff00 segundos... |cffff0000¡TODOS PODRÁN ATACARSE!", delay);
                         break;
                     }
+                    case 20:
+                    {
+                        (*it).second->GetSession()->SendNotification("|cff00ff00¡YA PUEDES SALTAR CUANDO QUIERAS! |cffff0000¡REVISA TUS ALAS!");
+                        break;
+                    }                
+                    case 25:
                     case 30:
+                    case 35:
+                    case 40:
+                    {
+                        (*it).second->GetSession()->SendNotification("|cff00ff00Faltan |cffDA70D6%u|cff00ff00 segundos para llegar. |cffff0000¡NO TE TIRES!", delay - 20);
+                        break;
+                    }
+                    case 45:
                     {
                         (*it).second->GetSession()->SendNotification("|cff00ff00La nave comienza a moverse. |cffff0000¡QUÉDATE EN ELLA HASTA LLEGAR!");
                         break;
                     }
                     default:
                     {
-                        if (delay > 30 && delay <= 60)
+                        if (delay > 45 && delay <= 75)
                         {
-                            (*it).second->GetSession()->SendNotification("|cff00ff00Faltan |cffDA70D6%u|cff00ff00 segundos para encender motores. |cffff0000¡DEBERÍAS REVISAR TUS ALAS!", delay - 30);
+                            (*it).second->GetSession()->SendNotification("|cff00ff00Faltan |cffDA70D6%u|cff00ff00 segundos para encender motores. |cffff0000¡EQUIPA TUS ALAS!", delay - 45);
                         }
                         break;
                     }
@@ -153,7 +160,7 @@ private:
             if (delay == 0)
             {
                 std::ostringstream msg;
-                msg << "|cff4CFF00BattleRoyale::|r Ha comenzado una nueva ronda en |cffDA70D6" << BR_NombreDeMapas[indiceDelMapa].c_str() << "|r con |cff4CFF00" << list_Jugadores.size() << "|r jugadores.";
+                msg << "|cff4CFF00BattleRoyale::|r Ronda iniciada en |cffDA70D6" << BR_NombreDeMapas[indiceDelMapa].c_str() << "|r con |cff4CFF00" << list_Jugadores.size() << "|r jugadores.";
                 sWorld->SendServerMessage(SERVER_MSG_STRING, msg.str().c_str());
             }
         }
