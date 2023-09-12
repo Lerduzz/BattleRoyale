@@ -420,7 +420,7 @@ bool BattleRoyaleMgr::InvocarZonaSegura()
         Map* map = sMapMgr->FindBaseNonInstanceMap(mapID);
         if (map)
         {
-            HechizosDeZona();
+            AlReducirseLaZona();
             DesaparecerZona();
             if (indiceDeZona < CANTIDAD_DE_ZONAS)
             {

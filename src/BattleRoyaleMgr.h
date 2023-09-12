@@ -268,10 +268,11 @@ private:
         }
         return false;
     };
-    void HechizosDeZona()
+    void AlReducirseLaZona()
     {
         if (estadoActual == ESTADO_BATALLA_EN_CURSO && HayJugadores())
         {
+            int vivos = 0;
             for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
             {
                 if ((*it).second && (*it).second->IsAlive())
@@ -279,7 +280,12 @@ private:
                     (*it).second->AddAura(HECHIZO_ANTI_INVISIBLES, (*it).second);
                     (*it).second->AddAura(HECHIZO_ANTI_SANADORES, (*it).second);
                     (*it).second->AddAura(HECHIZO_LENGUAJE_BINARIO, (*it).second);
+                    vivos++;
                 }
+            }
+            for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
+            {
+                Chat((*it).second).PSendSysMessage("|cff4CFF00BattleRoyale::|r ¡Efectos de Zona Segura aplicados! Jugadores vivos: |cff4CFF00%u|r, y espectadores: |cff4CFF00%u|r.", vivos, list_Jugadores.size() - vivos);
             }
         }
     };
