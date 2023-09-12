@@ -369,11 +369,12 @@ private:
                 {
                     if ((*it).second->IsInWorld() && !(*it).second->IsBeingTeleported() && EstaEnLaNave((*it).second))
                     {
+                        uint32 guid = (*it).first;
                         Player* player = (*it).second;
                         ++it;
                         DarAlas(player);
                         player->SaveToDB(false, false);
-                        list_DarAlas.erase((*it).first);
+                        list_DarAlas.erase(guid);
                     }
                     else
                     {
@@ -398,11 +399,12 @@ private:
                 {
                     if ((*it).second->IsInWorld() && !(*it).second->IsBeingTeleported())
                     {
+                        uint32 guid = (*it).first;
                         Player* player = (*it).second;
                         ++it;
                         QuitarAlas(player);
                         player->SaveToDB(false, false);
-                        list_QuitarAlas.erase((*it).first);
+                        list_QuitarAlas.erase(guid);
                     }
                     else
                     {
