@@ -11,7 +11,6 @@
 #include "Transport.h"
 
 class BattleRoyaleData;
-typedef std::map<uint32, Player*> BR_ColaDePersonajes;
 typedef std::map<uint32, Player*> BR_ListaDePersonajes;
 typedef std::map<uint32, BattleRoyaleData> BR_DatosDePersonajes;
 
@@ -56,11 +55,8 @@ public:
         if (estadoActual != ESTADO_BATALLA_EN_CURSO || !HayJugadores() || !EstaEnEvento(player)) return false;
         return !EstaEnLaNave(player);
     };
-    void QuitarAlas(Player* player)
-    {
-        player->DestroyItemCount(17, 9999, true);
-    };
-    
+    void QuitarAlas(Player* player) { player->DestroyItemCount(17, 9999, true); };
+
 private:
     void RestablecerTodoElEvento();
     void IniciarNuevaRonda();
@@ -125,7 +121,7 @@ private:
                     case 10:
                     case 15:
                     {
-                        (*it).second->GetSession()->SendNotification("|cff00ff00En |cffDA70D6%u|cff00ff00 segundos... |cffff0000¡TODOS PODRÁN ATACARSE!", delay);
+                        (*it).second->GetSession()->SendNotification("|cff00ff00En |cffDA70D6%u|cff00ff00 segundos... |cffff0000¡PODRÁN ATACARSE!", delay);
                         break;
                     }
                     case 20:
@@ -138,7 +134,7 @@ private:
                     case 35:
                     case 40:
                     {
-                        (*it).second->GetSession()->SendNotification("|cff00ff00Faltan |cffDA70D6%u|cff00ff00 segundos para llegar. |cffff0000¡NO TE TIRES!", delay - 20);
+                        (*it).second->GetSession()->SendNotification("|cff00ff00Faltan |cffDA70D6%u|cff00ff00 segundos para llegar. |cffff0000¡EQUIPA TUS ALAS!", delay - 20);
                         break;
                     }
                     case 45:
@@ -150,7 +146,7 @@ private:
                     {
                         if (delay > 45 && delay <= 75)
                         {
-                            (*it).second->GetSession()->SendNotification("|cff00ff00Faltan |cffDA70D6%u|cff00ff00 segundos para encender motores. |cffff0000¡EQUIPA TUS ALAS!", delay - 45);
+                            (*it).second->GetSession()->SendNotification("|cff00ff00Faltan |cffDA70D6%u|cff00ff00 segundos para encender motores. |cffff0000¡NO TE TIRES!", delay - 45);
                         }
                         break;
                     }
@@ -198,7 +194,7 @@ private:
     {
         if (HayCola())
         {
-            for (BR_ColaDePersonajes::iterator it = list_Cola.begin(); it != list_Cola.end(); ++it)
+            for (BR_ListaDePersonajes::iterator it = list_Cola.begin(); it != list_Cola.end(); ++it)
             {
                 if ((*it).second != player)
                 {
@@ -347,17 +343,89 @@ private:
         InventoryResult msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, 17, 1);
         if (msg == EQUIP_ERR_OK)
         {
-            if (Item* item = player->StoreNewItem(dest, 17, true)) player->SendNewItem(item, 1, true, false);
+            if (Item* item = player->StoreNewItem(dest, 17, true))
+            {
+                player->SendNewItem(item, 1, true, false);
+                Chat(player).PSendSysMessage("|cff4CFF00BattleRoyale::|r Bienvenido a este modo de juego, se te han otorgado tus alas, con ellas podrás descender de manera segura durante la partida.");
+                Chat(player).PSendSysMessage("|cff4CFF00BattleRoyale::|r Encuéntra la camisa en tu mochila y equípala. Puedes arrastrarla a la barra de acción para facilitar su uso o activarla con clic derecho en el inventario.");
+                Chat(player).PSendSysMessage("|cff4CFF00BattleRoyale::|r |cffff0000Recuerda permanecer en la NAVE hasta que se anuncie que puedes saltar o serás descalificado y expulsado.|r");
+            }
+            else
+            {
+                Chat(player).PSendSysMessage("|cff4CFF00BattleRoyale::|r ¡No has obtenido las alas porque no se ha podido crear el objeto! |cffff0000¡Descansa en paz! :(|r");
+            }
         }
         else
         {
-            Chat(player).PSendSysMessage("|cff4CFF00BattleRoyale::|r ¡No has obtenido las alas porque no tienes espacio disponible! ¡RIP! :(");
+            Chat(player).PSendSysMessage("|cff4CFF00BattleRoyale::|r ¡No has obtenido las alas porque no tienes espacio disponible! |cffff0000¡Descansa en paz! :(|r");
         }
     };
+    void DarAlasProgramado()
+    {
+        if (list_DarAlas.size())
+        {
+            BR_ListaDePersonajes::iterator it = list_DarAlas.begin();
+            while (it != list_DarAlas.end())
+            {
+                if ((*it).second && (*it).second->IsAlive())
+                {
+                    if ((*it).second->IsInWorld() && !(*it).second->IsBeingTeleported() && EstaEnLaNave((*it).second))
+                    {
+                        uint32 guid = (*it).first;
+                        Player* player = (*it).second;
+                        ++it;
+                        DarAlas(player);
+                        player->SaveToDB(false, false);
+                        list_DarAlas.erase(guid);
+                    }
+                    else
+                    {
+                        ++it;
+                    }
+                }
+                else
+                {
+                    ++it;
+                }
+            }
+        }
+    }
+    void QuitarAlasProgramado()
+    {
+        if (list_QuitarAlas.size())
+        {
+            BR_ListaDePersonajes::iterator it = list_QuitarAlas.begin();
+            while (it != list_QuitarAlas.end())
+            {
+                if ((*it).second && (*it).second->IsAlive())
+                {
+                    if ((*it).second->IsInWorld() && !(*it).second->IsBeingTeleported())
+                    {
+                        uint32 guid = (*it).first;
+                        Player* player = (*it).second;
+                        ++it;
+                        QuitarAlas(player);
+                        player->SaveToDB(false, false);
+                        list_QuitarAlas.erase(guid);
+                    }
+                    else
+                    {
+                        ++it;
+                    }
+                }
+                else
+                {
+                    ++it;
+                }
+            }
+        }
+    }
 
     BR_ListaDePersonajes list_Cola;
     BR_ListaDePersonajes list_Jugadores;
     BR_DatosDePersonajes list_Datos;
+    BR_ListaDePersonajes list_DarAlas;
+    BR_ListaDePersonajes list_QuitarAlas;
 
     GameObject* obj_Zona;
     GameObject* obj_Centro;
