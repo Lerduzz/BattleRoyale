@@ -127,6 +127,7 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
                         if (estadoActual == ESTADO_NAVE_EN_MOVIMIENTO) VerificarJugadoresEnNave();
                         NotificarTiempoParaIniciar(tiempoRestanteInicio);
                     }
+                    if (estadoActual == ESTADO_INVOCANDO_JUGADORES) DarAlasProgramado();
                     if (estadoActual == ESTADO_INVOCANDO_JUGADORES && tiempoRestanteInicio <= 45 && obj_Nave)
                     {
                         estadoActual = ESTADO_NAVE_EN_MOVIMIENTO;
@@ -307,14 +308,13 @@ void BattleRoyaleMgr::LlamarDentroDeNave(uint32 guid)
     player->AddAura(HECHIZO_LENGUAJE_BINARIO, player);
     player->SaveToDB(false, false);
     player->GetMotionMaster()->MoveFall();
+    list_DarAlas[guid] = player;
 }
 
 void BattleRoyaleMgr::SalirDelEvento(uint32 guid, bool logout /* = false*/)
 {
-    if (EstaEnCola(guid))
-    {
-        list_Cola.erase(guid);
-    };
+    if (list_DarAlas.find(guid) != list_DarAlas.end()) list_DarAlas.erase(guid);
+    if (EstaEnCola(guid)) list_Cola.erase(guid);
     if (EstaEnEvento(guid))
     {
         CambiarDimension_Salir(guid);

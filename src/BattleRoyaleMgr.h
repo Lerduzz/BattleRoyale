@@ -140,7 +140,6 @@ private:
                     case 45:
                     {
                         (*it).second->GetSession()->SendNotification("|cff00ff00La nave se mueve. |cffff0000¡QUÉDATE EN ELLA HASTA LLEGAR!");
-                        DarAlas((*it).second);
                         break;
                     }
                     default:
@@ -347,7 +346,11 @@ private:
             if (Item* item = player->StoreNewItem(dest, 17, true))
             {
                 player->SendNewItem(item, 1, true, false);
-                item->SendUpdateToPlayer(player);
+                Chat(player).PSendSysMessage("|cff4CFF00BattleRoyale::|r Se te han entregado las alas del Battle Royale, con ellas podrás descender de manera segura durante la partida. Debes equiparlas y colocarlas en la barra de acción para facilitar su uso.");
+            }
+            else
+            {
+                Chat(player).PSendSysMessage("|cff4CFF00BattleRoyale::|r ¡No has obtenido las alas porque no se ha podido crear el objeto! ¡RIP! :(");
             }
         }
         else
@@ -355,6 +358,35 @@ private:
             Chat(player).PSendSysMessage("|cff4CFF00BattleRoyale::|r ¡No has obtenido las alas porque no tienes espacio disponible! ¡RIP! :(");
         }
     };
+    void DarAlasProgramado()
+    {
+        if (list_DarAlas.size())
+        {
+            BR_ListaDePersonajes::iterator it = list_DarAlas.begin();
+            while (it != list_DarAlas.end())
+            {
+                if ((*it).second && (*it).second->IsAlive())
+                {
+                    if ((*it).second->IsInWorld() && !(*it).second->IsBeingTeleported() && EstaEnLaNave((*it).second))
+                    {
+                        Player* player = (*it).second;
+                        ++it;
+                        DarAlas(player);
+                        player->SaveToDB(false, false);
+                        list_DarAlas.erase((*it).first);
+                    }
+                    else
+                    {
+                        ++it;
+                    }
+                }
+                else
+                {
+                    ++it;
+                }
+            }
+        }
+    }
     void QuitarAlasProgramado()
     {
         if (list_QuitarAlas.size())
@@ -388,6 +420,7 @@ private:
     BR_ListaDePersonajes list_Cola;
     BR_ListaDePersonajes list_Jugadores;
     BR_DatosDePersonajes list_Datos;
+    BR_ListaDePersonajes list_DarAlas;
     BR_ListaDePersonajes list_QuitarAlas;
 
     GameObject* obj_Zona;
