@@ -144,7 +144,7 @@ private:
                     }
                     case 45:
                     {
-                        (*it).second->GetSession()->SendNotification("|cff00ff00La nave comienza a moverse. |cffff0000¡QUÉDATE EN ELLA HASTA LLEGAR!");
+                        (*it).second->GetSession()->SendNotification("|cff00ff00La nave se mueve. |cffff0000¡QUÉDATE EN ELLA HASTA LLEGAR!");
                         break;
                     }
                     default:
