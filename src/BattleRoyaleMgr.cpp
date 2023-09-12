@@ -285,7 +285,7 @@ void BattleRoyaleMgr::LlamarDentroDeNave(uint32 guid)
     {
         RevivirJugador(player);
     }
-    CambiarDimension_Entrar(guid);
+    player->SetPhaseMask(DIMENSION_EVENTO, true);
     DejarGrupo(player);
     float ox = BR_VariacionesDePosicion[indiceDeVariacion][0];
     float oy = BR_VariacionesDePosicion[indiceDeVariacion][1];
