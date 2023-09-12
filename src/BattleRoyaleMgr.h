@@ -346,7 +346,9 @@ private:
             if (Item* item = player->StoreNewItem(dest, 17, true))
             {
                 player->SendNewItem(item, 1, true, false);
-                Chat(player).PSendSysMessage("|cff4CFF00BattleRoyale::|r Bienvenido a este modo de juego, se te han otorgado tus alas, con ellas podrás descender de manera segura durante la partida. Encuéntra la camisa en tu mochila y equípala. Puedes arrastrarla a la barra de acción para facilitar su uso o activarla con clic derecho en el inventario. |cffff0000Recuerda permanecer en la NAVE hasta que se anuncie que puedes saltar o serás descalificado y expulsado.|r");
+                Chat(player).PSendSysMessage("|cff4CFF00BattleRoyale::|r Bienvenido a este modo de juego, se te han otorgado tus alas, con ellas podrás descender de manera segura durante la partida.");
+                Chat(player).PSendSysMessage("|cff4CFF00BattleRoyale::|r Encuéntra la camisa en tu mochila y equípala. Puedes arrastrarla a la barra de acción para facilitar su uso o activarla con clic derecho en el inventario.");
+                Chat(player).PSendSysMessage("|cff4CFF00BattleRoyale::|r |cffff0000Recuerda permanecer en la NAVE hasta que se anuncie que puedes saltar o serás descalificado y expulsado.|r");
             }
             else
             {
