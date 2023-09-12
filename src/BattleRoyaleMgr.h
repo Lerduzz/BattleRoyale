@@ -121,7 +121,7 @@ private:
                     case 10:
                     case 15:
                     {
-                        (*it).second->GetSession()->SendNotification("|cff00ff00En |cffDA70D6%u|cff00ff00 segundos... |cffff0000¡TODOS PODRÁN ATACARSE!", delay);
+                        (*it).second->GetSession()->SendNotification("|cff00ff00En |cffDA70D6%u|cff00ff00 segundos... |cffff0000¡PODRÁN ATACARSE!", delay);
                         break;
                     }
                     case 20:
