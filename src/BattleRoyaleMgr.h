@@ -360,7 +360,8 @@ private:
     int indiceDelMapa;
     int indiceDeZona;
     int indicadorDeSegundos;
-    bool estaLaZonaAnunciada;
+    bool estaZonaAnunciada5s;
+    bool estaZonaAnunciada10s;
     bool estaLaZonaActiva;
 
     uint32 conf_JugadoresMinimo;

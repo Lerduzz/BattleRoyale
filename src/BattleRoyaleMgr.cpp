@@ -139,7 +139,8 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
                         estadoActual = ESTADO_NAVE_CERCA_DEL_CENTRO;
                         indiceDeZona = 0;
                         tiempoRestanteZona = 0;
-                        estaLaZonaAnunciada = false;
+                        estaZonaAnunciada5s = false;
+                        estaZonaAnunciada10s = false;
                         obj_Centro = nullptr;
                         obj_Zona = nullptr;
                         if (!InvocarCentroDelMapa()) {
@@ -178,11 +179,16 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
                 }
                 NotificarZonaReducida();
                 tiempoRestanteZona = conf_IntervaloDeZona;
-                estaLaZonaAnunciada = false;
+                estaZonaAnunciada5s = false;
+                estaZonaAnunciada10s = false;
             } else {
-                if (tiempoRestanteZona <= 5000 && !estaLaZonaAnunciada) {
+                if (!estaZonaAnunciada5s && tiempoRestanteZona <= 5000) {
                     NotificarAdvertenciaDeZona(5);
-                    estaLaZonaAnunciada = true;
+                    estaZonaAnunciada5s = true;
+                }
+                if (!estaZonaAnunciada10s && tiempoRestanteZona <= 10000) {
+                    NotificarAdvertenciaDeZona(10);
+                    estaZonaAnunciada10s = true;
                 }
                 if (indiceDeZona <= CANTIDAD_DE_ZONAS) {
                     tiempoRestanteZona -= diff;
