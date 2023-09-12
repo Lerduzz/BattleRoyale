@@ -246,12 +246,13 @@ public:
         if (player->HasAura(HECHIZO_ALAS_MAGICAS))
         {
             player->RemoveAurasDueToSpell(HECHIZO_ALAS_MAGICAS);
+            return true;
         }
         else
         {
             player->AddAura(HECHIZO_ALAS_MAGICAS, player);
+            return false;
         }
-        return false;
     }
 };
 
