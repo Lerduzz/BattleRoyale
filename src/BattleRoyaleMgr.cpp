@@ -93,7 +93,7 @@ void BattleRoyaleMgr::GestionarJugadorEntrando(Player* player)
 
 void BattleRoyaleMgr::GestionarJugadorDesconectar(Player* player)
 {
-    if (EstaEnEvento(player) || EstaEnCola(player)) SalirDelEvento(player->GetGUID().GetCounter(), true);
+    if (EstaEnEvento(player) || EstaEnCola(player) || EstaEnListaDeAlas(player)) SalirDelEvento(player->GetGUID().GetCounter(), true);
 }
 
 void BattleRoyaleMgr::GestionarMuerteJcJ(Player* killer, Player* killed)
@@ -314,13 +314,12 @@ void BattleRoyaleMgr::LlamarDentroDeNave(uint32 guid)
     player->SetPvP(false);
     player->AddAura(HECHIZO_LENGUAJE_BINARIO, player);
     player->SaveToDB(false, false);
-    player->GetMotionMaster()->MoveFall();
     list_DarAlas[guid] = player;
 }
 
 void BattleRoyaleMgr::SalirDelEvento(uint32 guid, bool logout /* = false*/)
 {
-    if (list_DarAlas.find(guid) != list_DarAlas.end()) list_DarAlas.erase(guid);
+    if (EstaEnListaDarAlas(guid)) list_DarAlas.erase(guid);
     if (EstaEnCola(guid)) list_Cola.erase(guid);
     if (EstaEnEvento(guid))
     {
@@ -345,7 +344,7 @@ void BattleRoyaleMgr::SalirDelEvento(uint32 guid, bool logout /* = false*/)
         list_Jugadores.erase(guid);
         list_Datos.erase(guid);
     }
-    if (logout && list_QuitarAlas.find(guid) != list_QuitarAlas.end()) list_QuitarAlas.erase(guid);
+    if (logout && EstaEnListaQuitarAlas(guid)) list_QuitarAlas.erase(guid);
 }
 
 void BattleRoyaleMgr::RevivirJugador(Player* player)

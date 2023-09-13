@@ -76,6 +76,10 @@ private:
     bool HayCola() { return !list_Cola.empty(); };
     bool EstaEnCola(uint32 guid) { return list_Cola.find(guid) != list_Cola.end(); };
     bool EstaEnEvento(uint32 guid) { return list_Jugadores.find(guid) != list_Jugadores.end(); };
+    bool EstaEnListaDeAlas(Player* player) { return EstaEnListaDeAlas(player->GetGUID().GetCounter()); };
+    bool EstaEnListaDeAlas(uint32 guid) { return EstaEnListaDarAlas(guid) || EstaEnListaQuitarAlas(guid); };
+    bool EstaEnListaDarAlas(uint32 guid) { return list_DarAlas.find(guid) != list_DarAlas.end(); };
+    bool EstaEnListaQuitarAlas(uint32 guid) { return list_QuitarAlas.find(guid) != list_QuitarAlas.end(); };
     bool EstaLlenoElEvento() { return list_Jugadores.size() >= conf_JugadoresMaximo; };
     bool EstaEspectando(Player* player)
     { 
@@ -375,7 +379,7 @@ private:
                         Player* player = (*it).second;
                         ++it;
                         DarAlas(player);
-                        player->SaveToDB(false, false);
+                        player->GetMotionMaster()->MoveFall();
                         list_DarAlas.erase(guid);
                     }
                     else
@@ -405,7 +409,6 @@ private:
                         Player* player = (*it).second;
                         ++it;
                         QuitarAlas(player);
-                        player->SaveToDB(false, false);
                         list_QuitarAlas.erase(guid);
                     }
                     else
