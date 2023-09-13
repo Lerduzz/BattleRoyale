@@ -422,8 +422,10 @@ private:
     }
 
     BR_ListaDePersonajes list_Cola;
+
     BR_ListaDePersonajes list_Jugadores;
     BR_DatosDePersonajes list_Datos;
+
     BR_ListaDePersonajes list_DarAlas;
     BR_ListaDePersonajes list_QuitarAlas;
 
