@@ -7,7 +7,7 @@ BattleRoyaleMgr::BattleRoyaleMgr()
     conf_JugadoresMinimo = sConfigMgr->GetOption<uint32>("BattleRoyale.MinPlayers", 25);
     conf_JugadoresMaximo = sConfigMgr->GetOption<uint32>("BattleRoyale.MaxPlayers", 50);
     conf_IntervaloDeZona = sConfigMgr->GetOption<uint32>("BattleRoyale.SecureZoneInterval", 60000);
-    QueryResult result = WorldDatabase.Query("SELECT * FROM `battleroyale_maps`;");
+    QueryResult result = WorldDatabase.Query("SELECT `id`, `map_id`, `map_name`, `center_x`, `center_y`, `center_z`, `center_o`, `ship_x`, `ship_y`, `ship_z`, `ship_o` FROM `battleroyale_maps`;");
     if (result)
     {
         do
@@ -31,20 +31,20 @@ BattleRoyaleMgr::BattleRoyaleMgr()
             };
             for (uint32 i = 0; i < CANTIDAD_DE_ZONAS; ++i)
             {
-                QueryResult rspawn = WorldDatabase.Query("SELECT `id`, `pos_x`, `pos_y`, `pos_z`, `pos_o` FROM `battleroyale_maps_spawns` WHERE `zone` = {} AND `map` = {};", i, id);
-                if (rspawn)
+                QueryResult result_spawn = WorldDatabase.Query("SELECT `id`, `pos_x`, `pos_y`, `pos_z`, `pos_o` FROM `battleroyale_maps_spawns` WHERE `zone` = {} AND `map` = {};", i, id);
+                if (result_spawn)
                 {
                     do
                     {
-                        Field* fspawn    = result->Fetch();
-                        uint32 ispawn    = fspawn[0].Get<uint32>();
-                        mapa->ubicacionesMapa[i][ispawn] = {
-                            fspawn[1].Get<float>(),
-                            fspawn[2].Get<float>(),
-                            fspawn[3].Get<float>(),
-                            fspawn[4].Get<float>()
+                        Field* fields_spawn    = result_spawn->Fetch();
+                        uint32 id_spawn    = fields_spawn[0].Get<uint32>();
+                        mapa->ubicacionesMapa[i][id_spawn] = {
+                            fields_spawn[1].Get<float>(),
+                            fields_spawn[2].Get<float>(),
+                            fields_spawn[3].Get<float>(),
+                            fields_spawn[4].Get<float>()
                         };
-                    } while (rspawn->NextRow());
+                    } while (result_spawn->NextRow());
                 }
             }
             list_Mapas[id] = mapa;
