@@ -4,18 +4,36 @@
 
 BattleRoyaleMgr::BattleRoyaleMgr()
 {
-    conf_JugadoresMinimo = sConfigMgr->GetOption<int32>("BattleRoyale.MinPlayers", 25);
-    conf_JugadoresMaximo = sConfigMgr->GetOption<int32>("BattleRoyale.MaxPlayers", 50);
-    conf_IntervaloDeZona = sConfigMgr->GetOption<int32>("BattleRoyale.SecureZoneInterval", 60000);
+    conf_JugadoresMinimo = sConfigMgr->GetOption<uint32>("BattleRoyale.MinPlayers", 25);
+    conf_JugadoresMaximo = sConfigMgr->GetOption<uint32>("BattleRoyale.MaxPlayers", 50);
+    conf_IntervaloDeZona = sConfigMgr->GetOption<uint32>("BattleRoyale.SecureZoneInterval", 60000);
+    QueryResult result = WorldDatabase.Query("SELECT * FROM `battleroyale_maps`;");
+    if (result)
+    {
+        do
+        {
+            Field* fields    = result->Fetch();
+            BR_Mapa* mapa    = new BR_Mapa();
+            uint32 id        = fields[0].Get<uint32>();
+            mapa->idMapa     = fields[1].Get<uint32>();
+            mapa->nombreMapa = fields[2].Get<std::string>();
+            mapa->centroMapa = { 
+                fields[3].Get<float>(),
+                fields[4].Get<float>(),
+                fields[5].Get<float>(),
+                fields[6].Get<float>()
+            };
+            mapa->inicioNave = { 
+                fields[7].Get<float>(),
+                fields[8].Get<float>(),
+                fields[9].Get<float>(),
+                fields[10].Get<float>()
+            };
 
-    // Inicializar (o en un futuro cargar) la lista de mapas preparados.
-    BR_Mapa* mapa1 = new BR_Mapa();
-    mapa1->nombreMapa = "Kalimdor: Hyjal";
-    mapa1->idMapa = 1;
-    mapa1->centroMapa = { 5261.581055f, -2164.183105f, 1259.483765f };
-    mapa1->inicioNave = { 2967.581055f, -2164.183105f, 1556.483765f, 0.0f - M_PI / 2.0f };
-    list_Mapas[1] = mapa1;
-
+            // TODO: Cargar spawns para cada zona en cada mapa.
+            list_Mapas[id] = mapa;
+        } while (result->NextRow());
+    }
     obj_Zona = nullptr;
     obj_Centro = nullptr;
     obj_Nave = nullptr;
