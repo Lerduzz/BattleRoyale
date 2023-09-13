@@ -1,4 +1,5 @@
-CREATE TABLE IF NOT EXISTS `battleroyale_maps` (
+DROP TABLE IF EXISTS `battleroyale_maps`;
+CREATE TABLE `battleroyale_maps` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT, 
     `map_id` INT UNSIGNED NOT NULL DEFAULT 0, 
     `map_name` VARCHAR(255) NOT NULL, 
