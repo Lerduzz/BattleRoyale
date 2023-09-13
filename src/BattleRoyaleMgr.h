@@ -88,7 +88,7 @@ private:
     };
     bool HaySuficientesEnCola() { return list_Cola.size() >= conf_JugadoresMinimo; };
     ChatHandler Chat(Player* player) { return ChatHandler(player->GetSession()); };
-    void SiguienteMapa() { if (++indiceDelMapa >= CANTIDAD_DE_MAPAS) indiceDelMapa = 0; };
+    void SiguienteMapa() { if (++mapaActual == list_Mapas.end()) mapaActual = list_Mapas.begin(); };
     void SiguientePosicion() { if (++indiceDeVariacion >= CANTIDAD_DE_VARIACIONES) indiceDeVariacion = 0; };
     void DejarGrupo(Player* player)
     { 
@@ -118,7 +118,7 @@ private:
                 {
                     case 0:
                     {
-                        (*it).second->GetSession()->SendNotification("|cff00ff00¡Que comience la batalla de |cffDA70D6%s|cff00ff00!", BR_NombreDeMapas[indiceDelMapa].c_str());
+                        (*it).second->GetSession()->SendNotification("|cff00ff00¡Que comience la batalla de |cffDA70D6%s|cff00ff00!", (*mapaActual).second.nombreMapa.c_str());
                         break;
                     }
                     case 5:
@@ -432,6 +432,9 @@ private:
     BR_ListaDePersonajes list_DarAlas;
     BR_ListaDePersonajes list_QuitarAlas;
 
+    BR_ContenedorMapas list_Mapas;
+    BR_ContenedorMapas::iterator mapaActual;
+
     GameObject* obj_Zona;
     GameObject* obj_Centro;
     GameObject* obj_Nave;
@@ -442,7 +445,7 @@ private:
     int tiempoRestanteNave;
     int tiempoRestanteFinal;
     int indiceDeVariacion;
-    int indiceDelMapa;
+
     int indiceDeZona;
     int indicadorDeSegundos;
     bool estaZonaAnunciada5s;
