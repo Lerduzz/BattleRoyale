@@ -7,6 +7,15 @@ BattleRoyaleMgr::BattleRoyaleMgr()
     conf_JugadoresMinimo = sConfigMgr->GetOption<int32>("BattleRoyale.MinPlayers", 25);
     conf_JugadoresMaximo = sConfigMgr->GetOption<int32>("BattleRoyale.MaxPlayers", 50);
     conf_IntervaloDeZona = sConfigMgr->GetOption<int32>("BattleRoyale.SecureZoneInterval", 60000);
+
+    // Inicializar (o en un futuro cargar) la lista de mapas preparados.
+    BR_Mapa* mapa1 = new BR_Mapa();
+    mapa1->nombreMapa = "Kalimdor: Hyjal";
+    mapa1->idMapa = 1;
+    mapa1->centroMapa = { 5261.581055f, -2164.183105f, 1259.483765f };
+    mapa1->inicioNave = { 2967.581055f, -2164.183105f, 1556.483765f, 0.0f - M_PI / 2.0f };
+    list_Mapas[1] = mapa1;
+
     obj_Zona = nullptr;
     obj_Centro = nullptr;
     obj_Nave = nullptr;
@@ -243,7 +252,7 @@ void BattleRoyaleMgr::RestablecerTodoElEvento()
     list_Cola.clear();
 	list_Jugadores.clear();
     list_Datos.clear();
-    indiceDelMapa = 0;
+    mapaActual = list_Mapas.begin();
     indicadorDeSegundos = 1000;
     indiceDeVariacion = 0;
     estaLaZonaActiva = false;
@@ -310,7 +319,7 @@ void BattleRoyaleMgr::LlamarDentroDeNave(uint32 guid)
     float oy = BR_VariacionesDePosicion[indiceDeVariacion][1];
     SiguientePosicion();
     Desmontar(player);
-    player->TeleportTo(BR_IdentificadorDeMapas[indiceDelMapa], BR_InicioDeLaNave[indiceDelMapa][0] + ox, BR_InicioDeLaNave[indiceDelMapa][1] + oy, BR_InicioDeLaNave[indiceDelMapa][2] + 2.5f, BR_InicioDeLaNave[indiceDelMapa][3] + M_PI / 2.0f);
+    player->TeleportTo((*mapaActual).second->idMapa, (*mapaActual).second->inicioNave.GetPositionX() + ox, (*mapaActual).second->inicioNave.GetPositionY() + oy, (*mapaActual).second->inicioNave.GetPositionZ() + 2.5f, (*mapaActual).second->inicioNave.GetOrientation() + M_PI / 2.0f);
     player->SetPvP(false);
     player->AddAura(HECHIZO_LENGUAJE_BINARIO, player);
     player->SaveToDB(false, false);
@@ -358,15 +367,15 @@ bool BattleRoyaleMgr::InvocarNave()
 {
     if (HayCola())
     {
-        int mapID = BR_IdentificadorDeMapas[indiceDelMapa];
+        int mapID = (*mapaActual).second->idMapa;
         Map* map = sMapMgr->FindBaseNonInstanceMap(mapID);
         if (map)
         {
             DesaparecerNave();
-            float x = BR_InicioDeLaNave[indiceDelMapa][0];
-            float y = BR_InicioDeLaNave[indiceDelMapa][1];
-            float z = BR_InicioDeLaNave[indiceDelMapa][2];
-            float o = BR_InicioDeLaNave[indiceDelMapa][3];
+            float x = (*mapaActual).second->inicioNave.GetPositionX();
+            float y = (*mapaActual).second->inicioNave.GetPositionY();
+            float z = (*mapaActual).second->inicioNave.GetPositionZ();
+            float o = (*mapaActual).second->inicioNave.GetOrientation();
             float rot2 = std::sin(o / 2);
             float rot3 = cos(o / 2);
             map->LoadGrid(x, y);
@@ -401,17 +410,18 @@ bool BattleRoyaleMgr::InvocarCentroDelMapa()
 {
     if (HayJugadores())
     {
-        int mapID = BR_IdentificadorDeMapas[indiceDelMapa];
+        int mapID = (*mapaActual).second->idMapa;
         Map* map = sMapMgr->FindBaseNonInstanceMap(mapID);
         if (map)
         {
             DesaparecerCentro();
-            float x = BR_CentroDeMapas[indiceDelMapa].GetPositionX();
-            float y = BR_CentroDeMapas[indiceDelMapa].GetPositionY();
-            float z = BR_CentroDeMapas[indiceDelMapa].GetPositionZ();
+            float x = (*mapaActual).second->centroMapa.GetPositionX();
+            float y = (*mapaActual).second->centroMapa.GetPositionY();
+            float z = (*mapaActual).second->centroMapa.GetPositionZ();
+            float o = (*mapaActual).second->centroMapa.GetOrientation();
             map->LoadGrid(x, y);
             obj_Centro = new GameObject();
-            if (obj_Centro->Create(map->GenerateLowGuid<HighGuid::GameObject>(), OBJETO_CENTRO_DEL_MAPA, map, DIMENSION_EVENTO, x, y, z, 0, G3D::Quat(), 100, GO_STATE_READY))
+            if (obj_Centro->Create(map->GenerateLowGuid<HighGuid::GameObject>(), OBJETO_CENTRO_DEL_MAPA, map, DIMENSION_EVENTO, x, y, z, o, G3D::Quat(), 100, GO_STATE_READY))
             {
                 obj_Centro->SetVisibilityDistanceOverride(VisibilityDistanceType::Infinite);
                 map->AddToMap(obj_Centro);
@@ -440,7 +450,7 @@ bool BattleRoyaleMgr::InvocarZonaSegura()
 {
     if (HayJugadores())
     {
-        int mapID = BR_IdentificadorDeMapas[indiceDelMapa];
+        int mapID = (*mapaActual).second->idMapa;
         Map* map = sMapMgr->FindBaseNonInstanceMap(mapID);
         if (map)
         {
@@ -448,12 +458,13 @@ bool BattleRoyaleMgr::InvocarZonaSegura()
             DesaparecerZona();
             if (indiceDeZona < CANTIDAD_DE_ZONAS)
             {
-                float x = BR_CentroDeMapas[indiceDelMapa].GetPositionX();
-                float y = BR_CentroDeMapas[indiceDelMapa].GetPositionY();
-                float z = BR_CentroDeMapas[indiceDelMapa].GetPositionZ() + BR_EscalasDeZonaSegura[indiceDeZona] * 66.0f;
+                float x = (*mapaActual).second->centroMapa.GetPositionX();
+                float y = (*mapaActual).second->centroMapa.GetPositionY();
+                float z = (*mapaActual).second->centroMapa.GetPositionZ() + BR_EscalasDeZonaSegura[indiceDeZona] * 66.0f;
+                float o = (*mapaActual).second->centroMapa.GetOrientation();
                 map->LoadGrid(x, y);
                 obj_Zona = new GameObject();
-                if (obj_Zona->Create(map->GenerateLowGuid<HighGuid::GameObject>(), OBJETO_ZONA_SEGURA_INICIAL + indiceDeZona, map, DIMENSION_EVENTO, x, y, z, 0, G3D::Quat(), 100, GO_STATE_READY))
+                if (obj_Zona->Create(map->GenerateLowGuid<HighGuid::GameObject>(), OBJETO_ZONA_SEGURA_INICIAL + indiceDeZona, map, DIMENSION_EVENTO, x, y, z, o, G3D::Quat(), 100, GO_STATE_READY))
                 {
                     obj_Zona->SetVisibilityDistanceOverride(VisibilityDistanceType::Infinite);
                     map->AddToMap(obj_Zona);
