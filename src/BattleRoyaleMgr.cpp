@@ -29,8 +29,24 @@ BattleRoyaleMgr::BattleRoyaleMgr()
                 fields[9].Get<float>(),
                 fields[10].Get<float>()
             };
-
-            // TODO: Cargar spawns para cada zona en cada mapa.
+            for (uint32 i = 0; i < CANTIDAD_DE_ZONAS; ++i)
+            {
+                QueryResult rspawn = WorldDatabase.Query("SELECT `id`, `pos_x`, `pos_y`, `pos_z`, `pos_o` FROM `battleroyale_maps_spawns` WHERE `zone` = {} AND `map` = {};", i, id);
+                if (rspawn)
+                {
+                    do
+                    {
+                        Field* fspawn    = result->Fetch();
+                        uint32 ispawn    = fspawn[0].Get<uint32>();
+                        mapa->ubicacionesMapa[i][ispawn] = {
+                            fspawn[1].Get<float>(),
+                            fspawn[2].Get<float>(),
+                            fspawn[3].Get<float>(),
+                            fspawn[4].Get<float>()
+                        };
+                    } while (rspawn->NextRow());
+                }
+            }
             list_Mapas[id] = mapa;
         } while (result->NextRow());
     }
