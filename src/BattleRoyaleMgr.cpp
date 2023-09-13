@@ -298,7 +298,6 @@ void BattleRoyaleMgr::IniciarNuevaRonda()
 {
     if (estadoActual == ESTADO_NO_HAY_SUFICIENTES_JUGADORES)
     {
-        SiguienteMapa();
         tiempoRestanteInicio = 75;
         if (!InvocarNave()) {
             RestablecerTodoElEvento();
@@ -351,13 +350,13 @@ void BattleRoyaleMgr::LlamarDentroDeNave(uint32 guid)
     DejarGrupo(player);
     float ox = BR_VariacionesDePosicion[indiceDeVariacion][0];
     float oy = BR_VariacionesDePosicion[indiceDeVariacion][1];
-    SiguientePosicion();
     Desmontar(player);
     player->TeleportTo((*mapaActual).second->idMapa, (*mapaActual).second->inicioNave.GetPositionX() + ox, (*mapaActual).second->inicioNave.GetPositionY() + oy, (*mapaActual).second->inicioNave.GetPositionZ() + 2.5f, (*mapaActual).second->inicioNave.GetOrientation() + M_PI / 2.0f);
     player->SetPvP(false);
     player->AddAura(HECHIZO_LENGUAJE_BINARIO, player);
     player->SaveToDB(false, false);
     list_DarAlas[guid] = player;
+    SiguientePosicion();
 }
 
 void BattleRoyaleMgr::SalirDelEvento(uint32 guid, bool logout /* = false*/)
@@ -636,5 +635,6 @@ void BattleRoyaleMgr::FinalizarRonda(bool announce, Player* winner /* = nullptr*
     DesaparecerTodosLosObjetos();
     while (HayJugadores()) SalirDelEvento((*list_Jugadores.begin()).first);
     tiempoRestanteFinal = 10;
+    SiguienteMapa();
     estadoActual = ESTADO_BATALLA_TERMINADA;
 }
