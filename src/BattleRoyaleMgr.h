@@ -88,7 +88,7 @@ private:
     };
     bool HaySuficientesEnCola() { return list_Cola.size() >= conf_JugadoresMinimo; };
     ChatHandler Chat(Player* player) { return ChatHandler(player->GetSession()); };
-    void SiguienteMapa() { if (++indiceDelMapa >= CANTIDAD_DE_MAPAS) indiceDelMapa = 0; };
+    void SiguienteMapa() { if (++mapaActual == list_Mapas.end()) mapaActual = list_Mapas.begin(); };
     void SiguientePosicion() { if (++indiceDeVariacion >= CANTIDAD_DE_VARIACIONES) indiceDeVariacion = 0; };
     void DejarGrupo(Player* player)
     { 
@@ -118,7 +118,7 @@ private:
                 {
                     case 0:
                     {
-                        (*it).second->GetSession()->SendNotification("|cff00ff00¡Que comience la batalla de |cffDA70D6%s|cff00ff00!", BR_NombreDeMapas[indiceDelMapa].c_str());
+                        (*it).second->GetSession()->SendNotification("|cff00ff00¡Que comience la batalla de |cffDA70D6%s|cff00ff00!", (*mapaActual).second->nombreMapa.c_str());
                         break;
                     }
                     case 5:
@@ -159,7 +159,7 @@ private:
             if (delay == 0)
             {
                 std::ostringstream msg;
-                msg << "|cff4CFF00BattleRoyale::|r Ronda iniciada en |cffDA70D6" << BR_NombreDeMapas[indiceDelMapa].c_str() << "|r con |cff4CFF00" << list_Jugadores.size() << "|r jugadores.";
+                msg << "|cff4CFF00BattleRoyale::|r Ronda iniciada en |cffDA70D6" << (*mapaActual).second->nombreMapa.c_str() << "|r con |cff4CFF00" << list_Jugadores.size() << "|r jugadores.";
                 sWorld->SendServerMessage(SERVER_MSG_STRING, msg.str().c_str());
             }
         }
@@ -269,22 +269,46 @@ private:
     };
     void AlReducirseLaZona()
     {
-        if (estadoActual == ESTADO_BATALLA_EN_CURSO && HayJugadores())
+        int chestCount = 0;
+        if (indiceDeZona < CANTIDAD_DE_ZONAS && (*mapaActual).second->ubicacionesMapa.find(indiceDeZona) != (*mapaActual).second->ubicacionesMapa.end())
         {
-            int vivos = 0;
-            for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
+            BR_UbicacionZona temp = (*mapaActual).second->ubicacionesMapa[indiceDeZona];
+            for (BR_UbicacionZona::iterator it = temp.begin(); it != temp.end(); ++it)
             {
-                if ((*it).second && (*it).second->IsAlive())
+                int rnd = rand() % 100 + 1;
+                if (rnd <= 35)
                 {
-                    (*it).second->AddAura(HECHIZO_ANTI_INVISIBLES, (*it).second);
-                    (*it).second->AddAura(HECHIZO_ANTI_SANADORES, (*it).second);
-                    (*it).second->AddAura(HECHIZO_LENGUAJE_BINARIO, (*it).second);
-                    vivos++;
+                    obj_Centro->SummonGameObject(OBJETO_COFRE, it->second.GetPositionX(), it->second.GetPositionY(), it->second.GetPositionZ(), it->second.GetOrientation(), 0, 0, 0, 0, 60);
+                    chestCount++;
                 }
             }
-            for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
+        }
+        if (HayJugadores())
+        {
+            if (estadoActual == ESTADO_BATALLA_EN_CURSO)
             {
-                Chat((*it).second).PSendSysMessage("|cff4CFF00BattleRoyale::|r ¡Efectos de Zona aplicados! Jugadores vivos: |cff4CFF00%u|r, y espectadores: |cff4CFF00%u|r.", vivos, list_Jugadores.size() - vivos);
+                int vivos = 0;
+                for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
+                {
+                    if ((*it).second && (*it).second->IsAlive())
+                    {
+                        (*it).second->AddAura(HECHIZO_ANTI_INVISIBLES, (*it).second);
+                        (*it).second->AddAura(HECHIZO_ANTI_SANADORES, (*it).second);
+                        (*it).second->AddAura(HECHIZO_LENGUAJE_BINARIO, (*it).second);
+                        vivos++;
+                    }
+                }
+                for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
+                {
+                    Chat((*it).second).PSendSysMessage("|cff4CFF00BattleRoyale::|r ¡Efectos de Zona aplicados! Jugadores vivos: |cff4CFF00%u|r, y espectadores: |cff4CFF00%u|r.", vivos, list_Jugadores.size() - vivos);
+                }
+            }
+            if (chestCount)
+            {
+                for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
+                {
+                    Chat((*it).second).PSendSysMessage("|cff4CFF00BattleRoyale::|r|cff00ff00Ha%s aparecido %i cofre%s con recompensas aleatorias.|r", (chestCount > 1 ? "n" : ""), chestCount, (chestCount > 1 ? "s" : ""));
+                }
             }
         }
     };
@@ -432,6 +456,9 @@ private:
     BR_ListaDePersonajes list_DarAlas;
     BR_ListaDePersonajes list_QuitarAlas;
 
+    BR_ContenedorMapas list_Mapas;
+    BR_ContenedorMapas::iterator mapaActual;
+
     GameObject* obj_Zona;
     GameObject* obj_Centro;
     GameObject* obj_Nave;
@@ -442,7 +469,7 @@ private:
     int tiempoRestanteNave;
     int tiempoRestanteFinal;
     int indiceDeVariacion;
-    int indiceDelMapa;
+
     int indiceDeZona;
     int indicadorDeSegundos;
     bool estaZonaAnunciada5s;

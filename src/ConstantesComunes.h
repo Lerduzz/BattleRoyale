@@ -31,8 +31,12 @@ enum BR_Hechizos
 
 enum BR_ObjetosMundo
 {
+    // OBJETO_NULO                             = 0,
     OBJETO_NAVE                             = 194675,
     OBJETO_COFRE                            = 499999,
+    // OBJETO_BUFF_VELOCIDAD                   = 179871, TODO: Funcionan con AreaTrigger.
+    // OBJETO_BUFF_REGENERACION                = 179904,
+    // OBJETO_BUFF_RABIA                       = 179905,
     OBJETO_CENTRO_DEL_MAPA                  = 500000,
     OBJETO_ZONA_SEGURA_INICIAL              = 500001,
 };
@@ -52,31 +56,16 @@ const float BR_VariacionesDePosicion[CANTIDAD_DE_VARIACIONES][2] =
     { -4.5f, -4.5f }, { -3.0f, -4.5f }, { -1.5f, -4.5f }, {  0.0f, -4.5f }, {  1.5f, -4.5f }, {  3.0f, -4.5f }, {  4.5f, -4.5f }
 };
 
-const int CANTIDAD_DE_MAPAS = 4;
-const int BR_IdentificadorDeMapas[CANTIDAD_DE_MAPAS] = { 1, 0, 1, 1 };
-
-const Position BR_CentroDeMapas[CANTIDAD_DE_MAPAS] =
+typedef std::map<uint32, Position> BR_UbicacionZona;
+typedef std::map<uint32, BR_UbicacionZona> BR_Ubicacion;
+struct BR_Mapa
 {
-    { 5261.581055f, -2164.183105f, 1259.483765f },
-    { -14614.625001f, -313.262604f, 0.000001f },
-    { 157.995544f, -1948.086061f, 87.387062f },
-    { -4695.309082f, 3411.214844f, 7.050505f }
+    uint32 idMapa;
+    std::string nombreMapa;
+    Position centroMapa;
+    Position inicioNave;
+    BR_Ubicacion ubicacionesMapa;
 };
-
-const std::string BR_NombreDeMapas[CANTIDAD_DE_MAPAS] =
-{
-    "Kalimdor: Hyjal",
-    "Reinos del Este: Isla Jaguero",
-    "Kalimdor: Las Charcas del Olvido",
-    "Kalimdor: Ruinas de Solarsal"
-};
-
-const float BR_InicioDeLaNave[CANTIDAD_DE_MAPAS][4] =
-{
-    { 2967.581055f, -2164.183105f, 1556.483765f, 0.0f - M_PI / 2.0f },
-    { -12320.625001f, -313.262604f, 297.000001f, 0.0f + M_PI / 2.0f },
-    { -2137.581055f, -1948.086061f, 394.387062f, 0.0f - M_PI / 2.0f },
-    { -2401.309082f, 3411.214844f, 304.050505f, 0.0f + M_PI / 2.0f }
-};
+typedef std::map<uint32, BR_Mapa*> BR_ContenedorMapas;
 
 #endif
