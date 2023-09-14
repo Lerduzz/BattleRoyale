@@ -269,6 +269,15 @@ private:
     };
     void AlReducirseLaZona()
     {
+        // TODO: Invocar objetos al reducir zona.
+        if (indiceDeZona < CANTIDAD_DE_ZONAS && (*mapaActual).second->ubicacionesMapa.find(indiceDeZona) != (*mapaActual).second->ubicacionesMapa.end())
+        {
+            BR_UbicacionZona temp = (*mapaActual).second->ubicacionesMapa[indiceDeZona];
+            for (BR_UbicacionZona::iterator it = temp.begin(); it != temp.end(); ++it)
+            {
+                obj_Centro->SummonGameObject(OBJETO_COFRE, it->second.GetPositionX(), it->second.GetPositionY(), it->second.GetPositionZ(), it->second.GetOrientation(), 0, 0, 0, 0, 50);
+            }
+        }
         if (estadoActual == ESTADO_BATALLA_EN_CURSO && HayJugadores())
         {
             int vivos = 0;
