@@ -269,37 +269,46 @@ private:
     };
     void AlReducirseLaZona()
     {
-        // TODO: Invocar objetos al reducir zona.
+        int chestCount = 0;
         if (indiceDeZona < CANTIDAD_DE_ZONAS && (*mapaActual).second->ubicacionesMapa.find(indiceDeZona) != (*mapaActual).second->ubicacionesMapa.end())
         {
             BR_UbicacionZona temp = (*mapaActual).second->ubicacionesMapa[indiceDeZona];
             for (BR_UbicacionZona::iterator it = temp.begin(); it != temp.end(); ++it)
             {
-                int rnd = rand() % 5 + 1;
-                BR_ObjetosMundo entry = OBJETO_NULO;
-                if (rnd == 1) entry = OBJETO_COFRE;
-                else if (rnd == 2) entry = OBJETO_BUFF_VELOCIDAD;
-                else if (rnd == 3) entry = OBJETO_BUFF_REGENERACION;
-                else if (rnd == 4) entry = OBJETO_BUFF_RABIA;
-                if (entry != OBJETO_NULO) obj_Centro->SummonGameObject(entry, it->second.GetPositionX(), it->second.GetPositionY(), it->second.GetPositionZ(), it->second.GetOrientation(), 0, 0, 0, 0, 50);
-            }
-        }
-        if (estadoActual == ESTADO_BATALLA_EN_CURSO && HayJugadores())
-        {
-            int vivos = 0;
-            for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
-            {
-                if ((*it).second && (*it).second->IsAlive())
+                int rnd = rand() % 100 + 1;
+                if (rnd <= 35)
                 {
-                    (*it).second->AddAura(HECHIZO_ANTI_INVISIBLES, (*it).second);
-                    (*it).second->AddAura(HECHIZO_ANTI_SANADORES, (*it).second);
-                    (*it).second->AddAura(HECHIZO_LENGUAJE_BINARIO, (*it).second);
-                    vivos++;
+                    obj_Centro->SummonGameObject(OBJETO_COFRE, it->second.GetPositionX(), it->second.GetPositionY(), it->second.GetPositionZ(), it->second.GetOrientation(), 0, 0, 0, 0, 90);
+                    chestCount++;
                 }
             }
-            for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
+        }
+        if (HayJugadores())
+        {
+            if (estadoActual == ESTADO_BATALLA_EN_CURSO)
             {
-                Chat((*it).second).PSendSysMessage("|cff4CFF00BattleRoyale::|r ¡Efectos de Zona aplicados! Jugadores vivos: |cff4CFF00%u|r, y espectadores: |cff4CFF00%u|r.", vivos, list_Jugadores.size() - vivos);
+                int vivos = 0;
+                for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
+                {
+                    if ((*it).second && (*it).second->IsAlive())
+                    {
+                        (*it).second->AddAura(HECHIZO_ANTI_INVISIBLES, (*it).second);
+                        (*it).second->AddAura(HECHIZO_ANTI_SANADORES, (*it).second);
+                        (*it).second->AddAura(HECHIZO_LENGUAJE_BINARIO, (*it).second);
+                        vivos++;
+                    }
+                }
+                for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
+                {
+                    Chat((*it).second).PSendSysMessage("|cff4CFF00BattleRoyale::|r ¡Efectos de Zona aplicados! Jugadores vivos: |cff4CFF00%u|r, y espectadores: |cff4CFF00%u|r.", vivos, list_Jugadores.size() - vivos);
+                }
+            }
+            if (chestCount)
+            {
+                for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
+                {
+                    Chat((*it).second).PSendSysMessage("|cff4CFF00BattleRoyale::|r|cff00ff00Ha%s aparecido %i cofre%s con recompensas aleatorias.|r", (chestCount > 1 ? "n" : ""), chestCount, (chestCount > 1 ? "s" : ""));
+                }
             }
         }
     };

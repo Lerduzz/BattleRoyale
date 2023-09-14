@@ -31,12 +31,12 @@ enum BR_Hechizos
 
 enum BR_ObjetosMundo
 {
-    OBJETO_NULO                             = 0,
+    // OBJETO_NULO                             = 0,
     OBJETO_NAVE                             = 194675,
     OBJETO_COFRE                            = 499999,
-    OBJETO_BUFF_VELOCIDAD                   = 179871,
-    OBJETO_BUFF_REGENERACION                = 179904,
-    OBJETO_BUFF_RABIA                       = 179905,
+    // OBJETO_BUFF_VELOCIDAD                   = 179871, TODO: Funcionan con AreaTrigger.
+    // OBJETO_BUFF_REGENERACION                = 179904,
+    // OBJETO_BUFF_RABIA                       = 179905,
     OBJETO_CENTRO_DEL_MAPA                  = 500000,
     OBJETO_ZONA_SEGURA_INICIAL              = 500001,
 };
