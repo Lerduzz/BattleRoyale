@@ -278,7 +278,7 @@ private:
                 int rnd = rand() % 100 + 1;
                 if (rnd <= 35)
                 {
-                    obj_Centro->SummonGameObject(OBJETO_COFRE, it->second.GetPositionX(), it->second.GetPositionY(), it->second.GetPositionZ(), it->second.GetOrientation(), 0, 0, 0, 0, 90);
+                    obj_Centro->SummonGameObject(OBJETO_COFRE, it->second.GetPositionX(), it->second.GetPositionY(), it->second.GetPositionZ(), it->second.GetOrientation(), 0, 0, 0, 0, 60);
                     chestCount++;
                 }
             }
