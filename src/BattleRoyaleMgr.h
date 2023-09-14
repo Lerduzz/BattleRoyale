@@ -275,7 +275,13 @@ private:
             BR_UbicacionZona temp = (*mapaActual).second->ubicacionesMapa[indiceDeZona];
             for (BR_UbicacionZona::iterator it = temp.begin(); it != temp.end(); ++it)
             {
-                obj_Centro->SummonGameObject(OBJETO_COFRE, it->second.GetPositionX(), it->second.GetPositionY(), it->second.GetPositionZ(), it->second.GetOrientation(), 0, 0, 0, 0, 50);
+                int rnd = rand() % 5 + 1;
+                BR_ObjetosMundo entry = OBJETO_NULO;
+                if (rnd == 1) entry = OBJETO_COFRE;
+                else if (rnd == 2) entry = OBJETO_BUFF_VELOCIDAD;
+                else if (rnd == 3) entry = OBJETO_BUFF_REGENERACION;
+                else if (rnd == 4) entry = OBJETO_BUFF_RABIA;
+                if (entry != OBJETO_NULO) obj_Centro->SummonGameObject(entry, it->second.GetPositionX(), it->second.GetPositionY(), it->second.GetPositionZ(), it->second.GetOrientation(), 0, 0, 0, 0, 50);
             }
         }
         if (estadoActual == ESTADO_BATALLA_EN_CURSO && HayJugadores())
