@@ -198,6 +198,14 @@ private:
             {
                 (*it).second->GetSession()->SendNotification("|cff00ff00¡La zona segura se reducirá en |cffDA70D6%u|cff00ff00 segundos!", delay);
             }
+            if (delay > 5)
+            {
+                sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_ZONA_TIEMPO1, list_Jugadores);
+            }
+            else
+            {
+                sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_ZONA_TIEMPO2, list_Jugadores);
+            }
         }
     };
     void NotificarMuerteJcJ(std::string killer, std::string killed, int kills)
