@@ -225,6 +225,12 @@ private:
         msg << "|cff4CFF00BattleRoyale::|r Ronda finalizada, ganador: " << Chat(winner).GetNameLink(winner) << ", víctimas: |cff4CFF00" << kills << "|r.";
         sWorld->SendServerMessage(SERVER_MSG_STRING, msg.str().c_str());
     }
+    void NotificarTablasAlMundo()
+    {
+        std::ostringstream msg;
+        msg << "|cff4CFF00BattleRoyale::|r Ronda finalizada, no hubo ganador|r.";
+        sWorld->SendServerMessage(SERVER_MSG_STRING, msg.str().c_str());
+    }
     void DesaparecerTodosLosObjetos()
     {
         DesaparecerZona();

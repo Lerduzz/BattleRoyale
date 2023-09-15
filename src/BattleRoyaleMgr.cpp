@@ -636,6 +636,10 @@ void BattleRoyaleMgr::FinalizarRonda(bool announce, Player* winner /* = nullptr*
         sBRTitulosMgr->Ascender(winner);
         NotificarGanadorAlMundo(winner, list_Datos[winner->GetGUID().GetCounter()].kills);
     }
+    else
+    {
+        NotificarTablasAlMundo();
+    }
     DesaparecerTodosLosObjetos();
     while (HayJugadores()) SalirDelEvento((*list_Jugadores.begin()).first);
     tiempoRestanteFinal = 10;
