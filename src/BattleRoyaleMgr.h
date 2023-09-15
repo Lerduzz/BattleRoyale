@@ -158,11 +158,25 @@ private:
                     }
                 }
             }
+            switch (delay)
+            {
+                case 0:
+                {
+                    sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_RONDA_INICIADA, list_Jugadores);
+                    std::ostringstream msg;
+                    msg << "|cff4CFF00BattleRoyale::|r Ronda iniciada en |cffDA70D6" << (*mapaActual).second->nombreMapa.c_str() << "|r con |cff4CFF00" << list_Jugadores.size() << "|r jugadores.";
+                    sWorld->SendServerMessage(SERVER_MSG_STRING, msg.str().c_str());
+                    break;
+                }
+                case 45:
+                {
+                    sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_NAVE_EN_MOVIMIENTO, list_Jugadores);
+                    break;
+                }
+            }
             if (delay == 0)
             {
-                std::ostringstream msg;
-                msg << "|cff4CFF00BattleRoyale::|r Ronda iniciada en |cffDA70D6" << (*mapaActual).second->nombreMapa.c_str() << "|r con |cff4CFF00" << list_Jugadores.size() << "|r jugadores.";
-                sWorld->SendServerMessage(SERVER_MSG_STRING, msg.str().c_str());
+                
             }
         }
     };

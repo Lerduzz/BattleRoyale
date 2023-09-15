@@ -143,7 +143,9 @@ void BattleRoyaleMgr::GestionarMuerteJcJ(Player* killer, Player* killed)
 {
     if (HayJugadores() && estadoActual == ESTADO_BATALLA_EN_CURSO)
     {
-        if (!killer || !killed || killer == killed || !EstaEnEvento(killer) || !EstaEnEvento(killed)) return;
+        if (!killer || !killed || !EstaEnEvento(killer) || !EstaEnEvento(killed)) return;
+        sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_ALGUIEN_MUERE, list_Jugadores);
+        if (killer == killed) return; // TODO: Tambien anunciar cuando alguien muere de otras formas.
         list_Datos[killer->GetGUID().GetCounter()].kills++;
         TodosLosMuertosEspectarme(killer);
         NotificarMuerteJcJ(Chat(killer).GetNameLink(killer), Chat(killed).GetNameLink(killed), list_Datos[killer->GetGUID().GetCounter()].kills);
@@ -504,6 +506,7 @@ bool BattleRoyaleMgr::InvocarZonaSegura()
                     map->AddToMap(obj_Zona);
                     indiceDeZona++;
                     estaLaZonaActiva = true;
+                    sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_ZONA_REDUCIDA, list_Jugadores);
                     return true;
                 }
                 else
@@ -636,6 +639,14 @@ void BattleRoyaleMgr::FinalizarRonda(bool announce, Player* winner /* = nullptr*
     {
         NotificarGanadorAlMundo(winner, list_Datos[winner->GetGUID().GetCounter()].kills);
         TodosLosMuertosEspectarme(winner);
+        if (winner->GetTeamId() == TEAM_ALLIANCE)
+        {
+            sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_GANADOR_ALIANZA, list_Jugadores);
+        }
+        else
+        {
+            sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_GANADOR_HORDA, list_Jugadores);
+        }
         sBRTitulosMgr->Ascender(winner);
     }
     else
