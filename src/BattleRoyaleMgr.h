@@ -3,6 +3,7 @@
 
 #include "BRConstantes.h"
 #include "BRTitulosMgr.h"
+#include "BRSonidosMgr.h"
 #include "BattleRoyaleData.h"
 #include "Common.h"
 #include "SharedDefines.h"
@@ -488,10 +489,6 @@ private:
     uint32 conf_IntervaloDeZona;
 
 };
-
-// TODO: Sonido de bandera tomada: kill.
-// Sonido de bandera entregada: zona reducida.
-// Sonido de victoria: victoria.
 
 #define sBattleRoyaleMgr BattleRoyaleMgr::instance()
 
