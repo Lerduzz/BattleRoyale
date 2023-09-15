@@ -248,6 +248,7 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
                 indicadorDeSegundos = 1000;
                 if (--tiempoRestanteFinal <= 0)
                 {
+                    while (HayJugadores()) SalirDelEvento((*list_Jugadores.begin()).first);
                     estadoActual = ESTADO_NO_HAY_SUFICIENTES_JUGADORES;
                     if (HaySuficientesEnCola()) IniciarNuevaRonda();
                 }
@@ -641,7 +642,6 @@ void BattleRoyaleMgr::FinalizarRonda(bool announce, Player* winner /* = nullptr*
         NotificarTablasAlMundo();
     }
     DesaparecerTodosLosObjetos();
-    while (HayJugadores()) SalirDelEvento((*list_Jugadores.begin()).first);
     tiempoRestanteFinal = 10;
     SiguienteMapa();
     estadoActual = ESTADO_BATALLA_TERMINADA;
