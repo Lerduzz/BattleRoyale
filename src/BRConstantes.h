@@ -31,14 +31,22 @@ enum BR_Hechizos
 
 enum BR_ObjetosMundo
 {
-    // OBJETO_NULO                             = 0,
     OBJETO_NAVE                             = 194675,
     OBJETO_COFRE                            = 499999,
-    // OBJETO_BUFF_VELOCIDAD                   = 179871, TODO: Funcionan con AreaTrigger.
-    // OBJETO_BUFF_REGENERACION                = 179904,
-    // OBJETO_BUFF_RABIA                       = 179905,
     OBJETO_CENTRO_DEL_MAPA                  = 500000,
     OBJETO_ZONA_SEGURA_INICIAL              = 500001,
+};
+
+enum BR_Sonidos
+{
+    SONIDO_NAVE_EN_MOVIMIENTO               = 8232,
+    SONIDO_NAVE_RETIRADA                    = 8213,
+    SONIDO_RONDA_INICIADA                   = 8173,
+    SONIDO_ZONA_TIEMPO                      = 8192,
+    SONIDO_ZONA_REDUCIDA                    = 8212,
+    SONIDO_ALGUIEN_MUERE                    = 8174,
+    SONIDO_GANADOR_HORDA                    = 8454,
+    SONIDO_GANADOR_ALIANZA                  = 8455,
 };
 
 const int CANTIDAD_DE_ZONAS                 = 10;

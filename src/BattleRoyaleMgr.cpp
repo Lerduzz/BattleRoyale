@@ -143,7 +143,9 @@ void BattleRoyaleMgr::GestionarMuerteJcJ(Player* killer, Player* killed)
 {
     if (HayJugadores() && estadoActual == ESTADO_BATALLA_EN_CURSO)
     {
-        if (!killer || !killed || killer == killed || !EstaEnEvento(killer) || !EstaEnEvento(killed)) return;
+        if (!killer || !killed || !EstaEnEvento(killer) || !EstaEnEvento(killed)) return;
+        sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_ALGUIEN_MUERE, list_Jugadores);
+        if (killer == killed) return; // TODO: Tambien anunciar cuando alguien muere de otras formas.
         list_Datos[killer->GetGUID().GetCounter()].kills++;
         TodosLosMuertosEspectarme(killer);
         NotificarMuerteJcJ(Chat(killer).GetNameLink(killer), Chat(killed).GetNameLink(killed), list_Datos[killer->GetGUID().GetCounter()].kills);
@@ -248,6 +250,7 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
                 indicadorDeSegundos = 1000;
                 if (--tiempoRestanteFinal <= 0)
                 {
+                    while (HayJugadores()) SalirDelEvento((*list_Jugadores.begin()).first);
                     estadoActual = ESTADO_NO_HAY_SUFICIENTES_JUGADORES;
                     if (HaySuficientesEnCola()) IniciarNuevaRonda();
                 }
@@ -503,6 +506,7 @@ bool BattleRoyaleMgr::InvocarZonaSegura()
                     map->AddToMap(obj_Zona);
                     indiceDeZona++;
                     estaLaZonaActiva = true;
+                    sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_ZONA_REDUCIDA, list_Jugadores);
                     return true;
                 }
                 else
@@ -631,9 +635,25 @@ bool BattleRoyaleMgr::CondicionDeVictoria()
 
 void BattleRoyaleMgr::FinalizarRonda(bool announce, Player* winner /* = nullptr*/)
 {
-    if (announce && winner && EstaEnEvento(winner)) NotificarGanadorAlMundo(winner, list_Datos[winner->GetGUID().GetCounter()].kills);
+    if (announce && winner && EstaEnEvento(winner))
+    {
+        NotificarGanadorAlMundo(winner, list_Datos[winner->GetGUID().GetCounter()].kills);
+        TodosLosMuertosEspectarme(winner);
+        if (winner->GetTeamId() == TEAM_ALLIANCE)
+        {
+            sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_GANADOR_ALIANZA, list_Jugadores);
+        }
+        else
+        {
+            sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_GANADOR_HORDA, list_Jugadores);
+        }
+        sBRTitulosMgr->Ascender(winner);
+    }
+    else
+    {
+        NotificarTablasAlMundo();
+    }
     DesaparecerTodosLosObjetos();
-    while (HayJugadores()) SalirDelEvento((*list_Jugadores.begin()).first);
     tiempoRestanteFinal = 10;
     SiguienteMapa();
     estadoActual = ESTADO_BATALLA_TERMINADA;

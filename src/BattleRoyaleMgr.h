@@ -1,7 +1,9 @@
 #ifndef SC_BR_MGR_H
 #define SC_BR_MGR_H
 
-#include "ConstantesComunes.h"
+#include "BRConstantes.h"
+#include "BRTitulosMgr.h"
+#include "BRSonidosMgr.h"
 #include "BattleRoyaleData.h"
 #include "Common.h"
 #include "SharedDefines.h"
@@ -156,11 +158,25 @@ private:
                     }
                 }
             }
+            switch (delay)
+            {
+                case 0:
+                {
+                    sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_RONDA_INICIADA, list_Jugadores);
+                    std::ostringstream msg;
+                    msg << "|cff4CFF00BattleRoyale::|r Ronda iniciada en |cffDA70D6" << (*mapaActual).second->nombreMapa.c_str() << "|r con |cff4CFF00" << list_Jugadores.size() << "|r jugadores.";
+                    sWorld->SendServerMessage(SERVER_MSG_STRING, msg.str().c_str());
+                    break;
+                }
+                case 45:
+                {
+                    sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_NAVE_EN_MOVIMIENTO, list_Jugadores);
+                    break;
+                }
+            }
             if (delay == 0)
             {
-                std::ostringstream msg;
-                msg << "|cff4CFF00BattleRoyale::|r Ronda iniciada en |cffDA70D6" << (*mapaActual).second->nombreMapa.c_str() << "|r con |cff4CFF00" << list_Jugadores.size() << "|r jugadores.";
-                sWorld->SendServerMessage(SERVER_MSG_STRING, msg.str().c_str());
+                
             }
         }
     };
@@ -182,6 +198,7 @@ private:
             {
                 (*it).second->GetSession()->SendNotification("|cff00ff00¡La zona segura se reducirá en |cffDA70D6%u|cff00ff00 segundos!", delay);
             }
+            sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_ZONA_TIEMPO, list_Jugadores);
         }
     };
     void NotificarMuerteJcJ(std::string killer, std::string killed, int kills)
@@ -216,12 +233,19 @@ private:
             {
                 (*it).second->GetSession()->SendNotification("|cff0000ff¡La nave se ha retirado!");
             }
+            sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_NAVE_RETIRADA, list_Jugadores);
         }
     };
     void NotificarGanadorAlMundo(Player* winner, int kills)
     {
         std::ostringstream msg;
         msg << "|cff4CFF00BattleRoyale::|r Ronda finalizada, ganador: " << Chat(winner).GetNameLink(winner) << ", víctimas: |cff4CFF00" << kills << "|r.";
+        sWorld->SendServerMessage(SERVER_MSG_STRING, msg.str().c_str());
+    }
+    void NotificarTablasAlMundo()
+    {
+        std::ostringstream msg;
+        msg << "|cff4CFF00BattleRoyale::|r Ronda finalizada, no hubo ganador|r.";
         sWorld->SendServerMessage(SERVER_MSG_STRING, msg.str().c_str());
     }
     void DesaparecerTodosLosObjetos()
