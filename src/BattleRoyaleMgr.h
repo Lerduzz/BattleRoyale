@@ -1,9 +1,9 @@
 #ifndef SC_BR_MGR_H
 #define SC_BR_MGR_H
 
-#include "ConstantesComunes.h"
-#include "BattleRoyaleData.h"
+#include "BRConstantes.h"
 #include "BRTitulosMgr.h"
+#include "BattleRoyaleData.h"
 #include "Common.h"
 #include "SharedDefines.h"
 #include "ScriptMgr.h"
