@@ -635,6 +635,7 @@ void BattleRoyaleMgr::FinalizarRonda(bool announce, Player* winner /* = nullptr*
     if (announce && winner && EstaEnEvento(winner))
     {
         NotificarGanadorAlMundo(winner, list_Datos[winner->GetGUID().GetCounter()].kills);
+        TodosLosMuertosEspectarme(winner);
         sBRTitulosMgr->Ascender(winner);
     }
     else
