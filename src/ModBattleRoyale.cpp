@@ -21,7 +21,8 @@
 #include "SpellScript.h"
 #include "SpellAuraEffects.h"
 
-class ModBattleRoyalePlayer : public PlayerScript{
+class ModBattleRoyalePlayer : public PlayerScript
+{
 public:
 
     ModBattleRoyalePlayer() : PlayerScript("ModBattleRoyalePlayer") { }
