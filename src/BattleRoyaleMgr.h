@@ -489,6 +489,10 @@ private:
 
 };
 
+// TODO: Sonido de bandera tomada: kill.
+// Sonido de bandera entregada: zona reducida.
+// Sonido de victoria: victoria.
+
 #define sBattleRoyaleMgr BattleRoyaleMgr::instance()
 
 #endif
