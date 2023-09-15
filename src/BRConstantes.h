@@ -40,9 +40,9 @@ enum BR_ObjetosMundo
 enum BR_Sonidos
 {
     SONIDO_NAVE_EN_MOVIMIENTO               = 8232,
+    SONIDO_NAVE_RETIRADA                    = 8213,
     SONIDO_RONDA_INICIADA                   = 8173,
-    SONIDO_ZONA_TIEMPO1                     = 8192,
-    SONIDO_ZONA_TIEMPO2                     = 8213,
+    SONIDO_ZONA_TIEMPO                      = 8192,
     SONIDO_ZONA_REDUCIDA                    = 8212,
     SONIDO_ALGUIEN_MUERE                    = 8174,
     SONIDO_GANADOR_HORDA                    = 8454,
