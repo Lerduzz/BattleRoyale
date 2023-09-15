@@ -633,8 +633,8 @@ void BattleRoyaleMgr::FinalizarRonda(bool announce, Player* winner /* = nullptr*
 {
     if (announce && winner && EstaEnEvento(winner))
     {
-        sBRTitulosMgr->Ascender(winner);
         NotificarGanadorAlMundo(winner, list_Datos[winner->GetGUID().GetCounter()].kills);
+        sBRTitulosMgr->Ascender(winner);
     }
     else
     {
