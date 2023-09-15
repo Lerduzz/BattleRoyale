@@ -3,6 +3,7 @@
 
 #include "ConstantesComunes.h"
 #include "BattleRoyaleData.h"
+#include "BRTitulosMgr.h"
 #include "Common.h"
 #include "SharedDefines.h"
 #include "ScriptMgr.h"
