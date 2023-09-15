@@ -31,7 +31,11 @@ public:
             {
                 if (player->HasTitle(titleInfo))
                 {
-                    if (titleId == last) return;
+                    if (titleId == last)
+                    {
+                        player->SetUInt32Value(PLAYER_CHOSEN_TITLE, titleInfo->bit_index);
+                        return;
+                    }
                     player->SetTitle(titleInfo, true);
                     CharTitlesEntry const* newTitleInfo = sCharTitlesStore.LookupEntry(titleId + 1);
                     if (newTitleInfo)
