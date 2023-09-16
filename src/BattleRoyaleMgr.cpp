@@ -562,12 +562,12 @@ void BattleRoyaleMgr::EfectoFueraDeZona()
             {
                 float distance = (*it).second->GetExactDist(obj_Centro);
                 if (!estaLaZonaActiva || (indiceDeZona > 0 && distance > BR_EscalasDeZonaSegura[indiceDeZona - 1] * 66.0f)) {
-                    list_Datos[(*it).first].dmg_tick++;
-                    uint32 damage = (*it).second->GetMaxHealth() * (2 * sqrt(list_Datos[(*it).first].dmg_tick) + indiceDeZona) / 100;
-                    (*it).second->GetSession()->SendNotification("|cffff0000¡Has recibido |cffDA70D6%u|cffff0000 de daño, adéntrate en la zona segura!", damage);
-                    Unit::DealDamage(nullptr, (*it).second, damage, nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false, true);
+                    list_Datos[it->first].dmg_tick++;
+                    uint32 damage = it->second->GetMaxHealth() * (2 * sqrt(list_Datos[it->first].dmg_tick) + indiceDeZona) / 100;
+                    it->second->GetSession()->SendNotification("|cffff0000¡Has recibido |cffDA70D6%u|cffff0000 de daño, adéntrate en la zona segura!", damage); // TODO: Mover al sistema de mensajes.
+                    Unit::DealDamage(it->second, it->second, damage, nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false, true);
                 } else {
-                    list_Datos[(*it).first].dmg_tick = 0;
+                    list_Datos[it->first].dmg_tick = 0;
                 }
             }
         }
