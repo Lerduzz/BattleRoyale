@@ -2,8 +2,9 @@
 #define SC_BR_MGR_H
 
 #include "BRConstantes.h"
-#include "BRTitulosMgr.h"
+#include "BRChatMgr.h"
 #include "BRSonidosMgr.h"
+#include "BRTitulosMgr.h"
 #include "BattleRoyaleData.h"
 #include "Common.h"
 #include "SharedDefines.h"
@@ -107,75 +108,6 @@ private:
                 player->RemoveAurasByType(SPELL_AURA_MOUNTED);
                 player->SetSpeed(MOVE_RUN, 1, true);
                 player->SetSpeed(MOVE_FLIGHT, 1, true);
-            }
-        }
-    };
-    void NotificarTiempoParaIniciar(uint32 delay)
-    {
-        if (HayJugadores())
-        {
-            for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it) {
-                switch (delay)
-                {
-                    case 0:
-                    {
-                        (*it).second->GetSession()->SendNotification("|cff00ff00¡Que comience la batalla de |cffDA70D6%s|cff00ff00!", (*mapaActual).second->nombreMapa.c_str());
-                        break;
-                    }
-                    case 5:
-                    case 10:
-                    case 15:
-                    {
-                        (*it).second->GetSession()->SendNotification("|cff00ff00En |cffDA70D6%u|cff00ff00 segundos... |cffff0000¡PODRÁN ATACARSE!", delay);
-                        break;
-                    }
-                    case 20:
-                    {
-                        (*it).second->GetSession()->SendNotification("|cff00ff00¡YA PUEDES SALTAR CUANDO QUIERAS! |cffff0000¡REVISA TUS ALAS!");
-                        break;
-                    }                
-                    case 25:
-                    case 30:
-                    case 35:
-                    case 40:
-                    {
-                        (*it).second->GetSession()->SendNotification("|cff00ff00Faltan |cffDA70D6%u|cff00ff00 segundos para llegar. |cffff0000¡EQUIPA TUS ALAS!", delay - 20);
-                        break;
-                    }
-                    case 45:
-                    {
-                        (*it).second->GetSession()->SendNotification("|cff00ff00La nave se mueve. |cffff0000¡QUÉDATE EN ELLA HASTA LLEGAR!");
-                        break;
-                    }
-                    default:
-                    {
-                        if (delay > 45 && delay <= 75)
-                        {
-                            (*it).second->GetSession()->SendNotification("|cff00ff00Faltan |cffDA70D6%u|cff00ff00 segundos para encender motores. |cffff0000¡NO TE TIRES!", delay - 45);
-                        }
-                        break;
-                    }
-                }
-            }
-            switch (delay)
-            {
-                case 0:
-                {
-                    sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_RONDA_INICIADA, list_Jugadores);
-                    std::ostringstream msg;
-                    msg << "|cff4CFF00BattleRoyale::|r Ronda iniciada en |cffDA70D6" << (*mapaActual).second->nombreMapa.c_str() << "|r con |cff4CFF00" << list_Jugadores.size() << "|r jugadores.";
-                    sWorld->SendServerMessage(SERVER_MSG_STRING, msg.str().c_str());
-                    break;
-                }
-                case 45:
-                {
-                    sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_NAVE_EN_MOVIMIENTO, list_Jugadores);
-                    break;
-                }
-            }
-            if (delay == 0)
-            {
-                
             }
         }
     };

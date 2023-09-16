@@ -164,13 +164,18 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
                 indicadorDeSegundos = 1000;
                 if (tiempoRestanteInicio <= 0) {
                     estadoActual = ESTADO_BATALLA_EN_CURSO;
-                    NotificarTiempoParaIniciar(0);
+                    sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_RONDA_INICIADA, list_Jugadores);
+                    sBRChatMgr->NotificarTiempoInicial(0, list_Jugadores, mapaActual->second->nombreMapa);
                     tiempoRestanteZona = conf_IntervaloDeZona;
                     tiempoRestanteNave = 15;
                 } else {
                     if (tiempoRestanteInicio % 5 == 0) {
                         if (estadoActual == ESTADO_NAVE_EN_MOVIMIENTO) VerificarJugadoresEnNave();
-                        NotificarTiempoParaIniciar(tiempoRestanteInicio);
+                        if (tiempoRestanteInicio == 45)
+                        {
+                            sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_NAVE_EN_MOVIMIENTO, list_Jugadores);
+                        }
+                        sBRChatMgr->NotificarTiempoInicial(tiempoRestanteInicio, list_Jugadores);
                     }
                     if (estadoActual == ESTADO_INVOCANDO_JUGADORES) DarAlasProgramado();
                     if (estadoActual == ESTADO_INVOCANDO_JUGADORES && tiempoRestanteInicio <= 45 && obj_Nave)
