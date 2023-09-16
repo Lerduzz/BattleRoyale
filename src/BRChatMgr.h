@@ -194,7 +194,7 @@ public:
         {
             for (BR_ListaChat::iterator it = lista.begin(); it != lista.end(); ++it)
             {
-                Chat(it->second).PSendSysMessage("|cff4CFF00BattleRoyale::|r |cff1c7500Ha%s aparecido %i cofre%s con recompensas aleatorias.|r", (cofres > 1 ? "n" : ""), cofres, (cofres > 1 ? "s" : ""));
+                Chat(it->second).PSendSysMessage("|cff4CFF00BattleRoyale::|r Ha%s aparecido %i cofre%s con recompensas aleatorias.", (cofres > 1 ? "n" : ""), cofres, (cofres > 1 ? "s" : ""));
             }
         }
     };
