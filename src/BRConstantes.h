@@ -42,18 +42,6 @@ enum BR_ObjetosMundo
     OBJETO_ZONA_SEGURA_INICIAL              = 500001,
 };
 
-enum BR_Sonidos
-{
-    SONIDO_NAVE_EN_MOVIMIENTO               = 8232,
-    SONIDO_NAVE_RETIRADA                    = 8213,
-    SONIDO_RONDA_INICIADA                   = 8173,
-    SONIDO_ZONA_TIEMPO                      = 8192,
-    SONIDO_ZONA_REDUCIDA                    = 8212,
-    SONIDO_ALGUIEN_MUERE                    = 8174,
-    SONIDO_GANADOR_HORDA                    = 8454,
-    SONIDO_GANADOR_ALIANZA                  = 8455,
-};
-
 const int CANTIDAD_DE_ZONAS                 = 10;
 const float BR_EscalasDeZonaSegura[CANTIDAD_DE_ZONAS] = { 5.0f, 4.5f, 4.0f, 3.5f, 3.0f, 2.5f, 2.0f, 1.5f, 1.0f, 0.5f };
 
