@@ -128,7 +128,7 @@ public:
                 it->second->GetSession()->SendNotification("|cff0000ff¡La nave se ha retirado!");
             }
         }
-    };
+    };  
     void AnunciarGanador(Player* winner, int kills)
     {
         std::ostringstream msg;
@@ -141,6 +141,16 @@ public:
         msg << "|cff4CFF00BattleRoyale::|r Ronda finalizada, no hubo ganador|r.";
         sWorld->SendServerMessage(SERVER_MSG_STRING, msg.str().c_str());
     };
+    void AnunciarEfectoZona(BR_ListaChat lista, int vivos)
+    {
+        if (lista.size())
+        {
+            for (BR_ListaChat::iterator it = lista.begin(); it != lista.end(); ++it)
+            {
+                Chat(it->second).PSendSysMessage("|cff4CFF00BattleRoyale::|r ¡Efectos de Zona aplicados! Jugadores vivos: |cff4CFF00%u|r, y espectadores: |cff4CFF00%u|r.", vivos, lista.size() - vivos);
+            }
+        }
+    }
 
 private:
     ChatHandler Chat(Player* player) { return ChatHandler(player->GetSession()); };

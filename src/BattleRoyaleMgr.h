@@ -185,10 +185,7 @@ private:
                         vivos++;
                     }
                 }
-                for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
-                {
-                    Chat((*it).second).PSendSysMessage("|cff4CFF00BattleRoyale::|r ¡Efectos de Zona aplicados! Jugadores vivos: |cff4CFF00%u|r, y espectadores: |cff4CFF00%u|r.", vivos, list_Jugadores.size() - vivos);
-                }
+                sBRChatMgr->AnunciarEfectoZona(list_Jugadores, vivos);
             }
             if (chestCount)
             {
