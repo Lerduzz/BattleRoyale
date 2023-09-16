@@ -194,7 +194,7 @@ public:
         {
             for (BR_ListaChat::iterator it = lista.begin(); it != lista.end(); ++it)
             {
-                Chat(it->second).PSendSysMessage("|cff4CFF00BattleRoyale::|r|cff00ff00Ha%s aparecido %i cofre%s con recompensas aleatorias.|r", (cofres > 1 ? "n" : ""), cofres, (cofres > 1 ? "s" : ""));
+                Chat(it->second).PSendSysMessage("|cff4CFF00BattleRoyale::|r |cff1c7500Ha%s aparecido %i cofre%s con recompensas aleatorias.|r", (cofres > 1 ? "n" : ""), cofres, (cofres > 1 ? "s" : ""));
             }
         }
     };
@@ -202,11 +202,11 @@ public:
     {
         ChatHandler h = Chat(player);
         h.SendSysMessage("|-----> |cff4CFF00BattleRoyale|r ----->");
-        h.SendSysMessage("|-> Bienvenido a este nuevo modo de juego.");
-        h.SendSysMessage("|-> Se te han otorgado tus alas, están en tu ochila.");
-        h.SendSysMessage("|-> Puedes arrastrarla a la barra de acción para facilitar su uso.");
-        h.SendSysMessage("|-> Recuerda permanecer en la nave hasta que se anuncie que puedes saltar.");
-        h.SendSysMessage("|-> |cffff0000La batalla es individual, se castigará a quien incumpla.|r");
+        h.SendSysMessage("|-> Bienvenido a este nuevo modo de juego |cffff5733todos contra todos|r.");
+        h.SendSysMessage("|-> Se te han otorgado tus alas, están en tu mochila. |cffff0000¡EQUÍPALAS!|r");
+        h.SendSysMessage("|-> Puedes arrastrarlas a la barra de acción para facilitar su uso.");
+        h.SendSysMessage("|-> Recuerda |cffff5733permanecer en la nave|r hasta que se anuncie que puedes saltar.");
+        h.SendSysMessage("|-> |cffff0000La batalla es individual, se castigará a quien incumpla esta regla.|r");
         h.SendSysMessage("|-----> |cff4CFF00¡Que te diviertas!|r ----->");
     };
     void AnunciarErrorAlas(Player* player, int noSpace = false)
