@@ -88,7 +88,7 @@ public:
             }
             for (BR_ListaChat::iterator it = lista.begin(); it != lista.end(); ++it)
             {
-                it->second->GetSession()->SendNotification(notificacion.str().c_str());
+                it->second->GetSession()->SendNotification("%s", notificacion.str().c_str());
             }
         }
     };
@@ -264,7 +264,7 @@ public:
             default:
             {
                 break;
-            }            
+            }
         }
     };
 
