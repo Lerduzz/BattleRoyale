@@ -230,7 +230,8 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
                     RestablecerTodoElEvento();
                     return;
                 }
-                NotificarZonaReducida();
+                sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_ZONA_REDUCIDA, list_Jugadores);
+                sBRChatMgr->NotificarZonaReducida(list_Jugadores);
                 tiempoRestanteZona = conf_IntervaloDeZona;
                 estaZonaAnunciada5s = false;
                 estaZonaAnunciada10s = false;
@@ -511,7 +512,6 @@ bool BattleRoyaleMgr::InvocarZonaSegura()
                     map->AddToMap(obj_Zona);
                     indiceDeZona++;
                     estaLaZonaActiva = true;
-                    sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_ZONA_REDUCIDA, list_Jugadores);
                     return true;
                 }
                 else

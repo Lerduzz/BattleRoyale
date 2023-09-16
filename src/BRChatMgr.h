@@ -75,6 +75,16 @@ public:
             }
         }
     };
+    void NotificarZonaReducida(BR_ListaChat lista)
+    {
+        if (lista.size())
+        {
+            for (BR_ListaChat::iterator it = lista.begin(); it != lista.end(); ++it)
+            {
+                it->second->GetSession()->SendNotification("|cffff0000¡La zona segura se ha actualizado!");
+            }
+        }
+    };
 
 private:
     ChatHandler Chat(Player* player) { return ChatHandler(player->GetSession()); };

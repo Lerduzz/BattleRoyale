@@ -111,16 +111,6 @@ private:
             }
         }
     };
-    void NotificarZonaReducida()
-    {
-        if (HayJugadores())
-        {
-            for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
-            {
-                (*it).second->GetSession()->SendNotification("|cffff0000¡ALERTA: La zona segura se ha actualizado!");
-            }
-        }
-    };
     void NotificarAdvertenciaDeZona(uint32 delay)
     {
         if (HayJugadores())
