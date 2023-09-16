@@ -4,6 +4,23 @@
 #include "Chat.h"
 #include "Player.h"
 
+enum BR_TipoMensaje
+{
+    MENSAJE_ERROR_MAZMORRA = 0,
+    MENSAJE_ERROR_BG,
+    MENSAJE_ERROR_EN_COLA,
+    MENSAJE_ERROR_EN_EVENTO,
+    MENSAJE_ERROR_EN_VUELO,
+    MENSAJE_ERROR_EN_COMBATE,
+};
+
+enum BR_TipoMensajeEstado
+{
+    MENSAJE_ESTADO_EVENTO_OK = 0,
+    MENSAJE_ESTADO_EVENTO_EN_CURSO,
+    MENSAJE_ESTADO_EVENTO_LLENO,
+};
+
 typedef std::map<uint32, Player*> BR_ListaChat;
 
 class BRChatMgr
@@ -18,16 +35,36 @@ public:
         return instance;
     }
 
-    void NotificarJugadoresEnCola(Player* player, uint32 minimo, BR_ListaChat lista)
+    void NotificarJugadoresEnCola(Player* player, uint32 minimo, BR_ListaChat lista, BR_TipoMensajeEstado estado = MENSAJE_ESTADO_EVENTO_OK)
     {
         if (lista.size())
         {
+            std::string mensajeEstado;
+            switch (estado)
+            {
+                case MENSAJE_ESTADO_EVENTO_LLENO:
+                {
+                    mensajeEstado = " Evento lleno, espera a que termine la ronda.";
+                    break;
+                }
+                case MENSAJE_ESTADO_EVENTO_EN_CURSO:
+                {
+                    mensajeEstado = " Evento en curso, espera a que termine la ronda.";
+                    break;
+                }
+                default:
+                {
+                    mensajeEstado = "";
+                    break;
+                }
+            }
+            Chat(player).PSendSysMessage("|cff4CFF00BattleRoyale::|r Te has unido a la cola del evento. Jugadores en cola: |cff4CFF00%u|r/|cff4CFF00%u|r.%s", lista.size(), minimo, mensajeEstado.c_str());
             for (BR_ListaChat::iterator it = lista.begin(); it != lista.end(); ++it)
             {
                 if (it->second != player)
                 {
                     ChatHandler h = Chat(it->second);
-                    h.PSendSysMessage("|cff4CFF00BattleRoyale::|r %s se ha unido a la cola. Jugadores en cola: |cff4CFF00%u|r/|cff4CFF00%u|r.", h.GetNameLink(player), lista.size(), minimo);
+                    h.PSendSysMessage("|cff4CFF00BattleRoyale::|r %s se ha unido a la cola. Jugadores en cola: |cff4CFF00%u|r/|cff4CFF00%u|r.%s", h.GetNameLink(player), lista.size(), minimo, mensajeEstado.c_str());
                 }
             }
         }
@@ -181,6 +218,46 @@ public:
         else
         {
             Chat(player).PSendSysMessage("|cff4CFF00BattleRoyale::|r ¡No has obtenido las alas porque no se ha podido crear el objeto! |cffff0000¡Descansa en paz! :(|r");
+        }
+    };
+    void AnunciarMensajeEntrada(Player* player, BR_TipoMensaje tipo)
+    {
+        switch (tipo)
+        {
+            case MENSAJE_ERROR_MAZMORRA:
+            {
+                Chat(player).SendSysMessage("|cff4CFF00BattleRoyale::|r ¡No puedes participar mientras utilizas el buscador de mazmorras!");
+                break;
+            }
+            case MENSAJE_ERROR_BG:
+            {
+                Chat(player).SendSysMessage("|cff4CFF00BattleRoyale::|r ¡No puedes participar mientras estás en cola para Campos de Batalla o Arenas!");
+                break;
+            }
+            case MENSAJE_ERROR_EN_COLA:
+            {
+                Chat(player).SendSysMessage("|cff4CFF00BattleRoyale::|r ¡Ya estas en cola para el evento!");
+                break;
+            }
+            case MENSAJE_ERROR_EN_EVENTO:
+            {
+                Chat(player).SendSysMessage("|cff4CFF00BattleRoyale::|r ¡Ya estas dentro del evento!");
+                break;
+            }
+            case MENSAJE_ERROR_EN_VUELO:
+            {
+                Chat(player).SendSysMessage("|cff4CFF00BattleRoyale::|r ¡No has podido entrar al evento porque vas en ruta de vuelo! ¡Se te ha quitado de la cola!");
+                break;
+            }
+            case MENSAJE_ERROR_EN_COMBATE:
+            {
+                Chat(player).SendSysMessage("|cff4CFF00BattleRoyale::|r ¡No has podido entrar al evento porque estás en combate! ¡Se te ha quitado de la cola!");
+                break;
+            }
+            default:
+            {
+                break;
+            }            
         }
     };
 

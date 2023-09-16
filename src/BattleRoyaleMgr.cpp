@@ -67,22 +67,22 @@ void BattleRoyaleMgr::GestionarJugadorEntrando(Player* player)
     if (!player) return;
     if (player->isUsingLfg())
     {
-        Chat(player).PSendSysMessage("|cff4CFF00BattleRoyale::|r ¡No puedes participar mientras utilizas el buscador de mazmorras!");
+        sBRChatMgr->AnunciarMensajeEntrada(player, MENSAJE_ERROR_MAZMORRA);
         return;
     }
     if (player->InBattlegroundQueue())
     {
-        Chat(player).PSendSysMessage("|cff4CFF00BattleRoyale::|r ¡No puedes participar mientras estás en cola para Campos de Batalla o Arenas!");
+        sBRChatMgr->AnunciarMensajeEntrada(player, MENSAJE_ERROR_BG);
         return;
     }
     if (EstaEnCola(player))
     {
-        Chat(player).PSendSysMessage("|cff4CFF00BattleRoyale::|r ¡Ya estas en cola para el evento!");
+        sBRChatMgr->AnunciarMensajeEntrada(player, MENSAJE_ERROR_EN_COLA);
         return;
     }
     if (EstaEnEvento(player))
     {
-        Chat(player).PSendSysMessage("|cff4CFF00BattleRoyale::|r ¡Ya estas dentro del evento!");
+        sBRChatMgr->AnunciarMensajeEntrada(player, MENSAJE_ERROR_EN_EVENTO);
         return;
     }
     switch (estadoActual)
@@ -95,8 +95,7 @@ void BattleRoyaleMgr::GestionarJugadorEntrando(Player* player)
             }
             else
             {
-                Chat(player).PSendSysMessage("|cff4CFF00BattleRoyale::|r Te has unido a la cola del evento. Jugadores en cola: |cff4CFF00%u|r/|cff4CFF00%u|r.", list_Cola.size(), conf_JugadoresMinimo);
-                sBRChatMgr->NotificarJugadoresEnCola(player, list_Cola, conf_JugadoresMinimo);
+                sBRChatMgr->NotificarJugadoresEnCola(player, conf_JugadoresMinimo, list_Cola);
             }
             break;
         }
@@ -104,8 +103,7 @@ void BattleRoyaleMgr::GestionarJugadorEntrando(Player* player)
         {
             if (EstaLlenoElEvento()) {
                 list_Cola[player->GetGUID().GetCounter()] = player;
-                Chat(player).PSendSysMessage("|cff4CFF00BattleRoyale::|r Te has unido a la cola del evento. Jugadores en cola: |cff4CFF00%u|r/|cff4CFF00%u|r. Evento lleno, espera a que termine la ronda.", list_Cola.size(), conf_JugadoresMinimo);
-                sBRChatMgr->NotificarJugadoresEnCola(player, list_Cola, conf_JugadoresMinimo);
+                sBRChatMgr->NotificarJugadoresEnCola(player, conf_JugadoresMinimo, list_Cola, MENSAJE_ESTADO_EVENTO_LLENO);
             }
             else
             {
@@ -118,8 +116,7 @@ void BattleRoyaleMgr::GestionarJugadorEntrando(Player* player)
                 else
                 {
                     list_Cola[player->GetGUID().GetCounter()] = player;
-                    Chat(player).PSendSysMessage("|cff4CFF00BattleRoyale::|r Te has unido a la cola del evento. Jugadores en cola: |cff4CFF00%u|r/|cff4CFF00%u|r. Evento en curso, espera a que termine la ronda.", list_Cola.size(), conf_JugadoresMinimo);
-                    sBRChatMgr->NotificarJugadoresEnCola(player, list_Cola, conf_JugadoresMinimo);
+                    sBRChatMgr->NotificarJugadoresEnCola(player, conf_JugadoresMinimo, list_Cola, MENSAJE_ESTADO_EVENTO_EN_CURSO);
                 }
             }
             break;
@@ -127,8 +124,7 @@ void BattleRoyaleMgr::GestionarJugadorEntrando(Player* player)
         default:
         {
             list_Cola[player->GetGUID().GetCounter()] = player;
-            Chat(player).PSendSysMessage("|cff4CFF00BattleRoyale::|r Te has unido a la cola del evento. Jugadores en cola: |cff4CFF00%u|r/|cff4CFF00%u|r. Evento en curso, espera a que termine la ronda.", list_Cola.size(), conf_JugadoresMinimo);
-            sBRChatMgr->NotificarJugadoresEnCola(player, list_Cola, conf_JugadoresMinimo);
+            sBRChatMgr->NotificarJugadoresEnCola(player, conf_JugadoresMinimo, list_Cola, MENSAJE_ESTADO_EVENTO_EN_CURSO);
             break;
         }
     }
@@ -327,7 +323,11 @@ void BattleRoyaleMgr::IniciarNuevaRonda()
             uint32 guid = (*list_Cola.begin()).first;
             if (list_Cola[guid]->IsInFlight())
             {
-                Chat(list_Cola[guid]).SendSysMessage("|cff4CFF00BattleRoyale::|r ¡No has podido entrar al evento porque vas en ruta de vuelo! ¡Se te ha quitado de la cola!");
+                sBRChatMgr->AnunciarMensajeEntrada(list_Cola[guid], MENSAJE_ERROR_EN_VUELO);
+            }
+            else if (list_Cola[guid]->IsInCombat())
+            {
+                sBRChatMgr->AnunciarMensajeEntrada(list_Cola[guid], MENSAJE_ERROR_EN_COMBATE);
             }
             else
             {
