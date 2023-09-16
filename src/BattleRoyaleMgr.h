@@ -58,7 +58,7 @@ public:
         if (estadoActual != ESTADO_BATALLA_EN_CURSO || !HayJugadores() || !EstaEnEvento(player)) return false;
         return !EstaEnLaNave(player);
     };
-    void QuitarAlas(Player* player) { player->DestroyItemCount(17, 9999, true); };
+    void QuitarAlas(Player* player) { player->DestroyItemCount(INVENTARIO_CAMISA_ALAS, 9999, true); };
 
 private:
     void RestablecerTodoElEvento();
@@ -246,24 +246,22 @@ private:
     {
         QuitarAlas(player);
         ItemPosCountVec dest;
-        InventoryResult msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, 17, 1);
+        InventoryResult msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, INVENTARIO_CAMISA_ALAS, 1);
         if (msg == EQUIP_ERR_OK)
         {
-            if (Item* item = player->StoreNewItem(dest, 17, true))
+            if (Item* item = player->StoreNewItem(dest, INVENTARIO_CAMISA_ALAS, true))
             {
                 player->SendNewItem(item, 1, true, false);
-                Chat(player).PSendSysMessage("|cff4CFF00BattleRoyale::|r Bienvenido a este modo de juego, se te han otorgado tus alas, con ellas podrás descender de manera segura durante la partida.");
-                Chat(player).PSendSysMessage("|cff4CFF00BattleRoyale::|r Encuéntra la camisa en tu mochila y equípala. Puedes arrastrarla a la barra de acción para facilitar su uso o activarla con clic derecho en el inventario.");
-                Chat(player).PSendSysMessage("|cff4CFF00BattleRoyale::|r |cffff0000Recuerda permanecer en la NAVE hasta que se anuncie que puedes saltar o serás descalificado y expulsado.|r");
+                sBRChatMgr->AnunciarMensajeBienvenida(player);
             }
             else
             {
-                Chat(player).PSendSysMessage("|cff4CFF00BattleRoyale::|r ¡No has obtenido las alas porque no se ha podido crear el objeto! |cffff0000¡Descansa en paz! :(|r");
+                sBRChatMgr->AnunciarErrorAlas(player);
             }
         }
         else
         {
-            Chat(player).PSendSysMessage("|cff4CFF00BattleRoyale::|r ¡No has obtenido las alas porque no tienes espacio disponible! |cffff0000¡Descansa en paz! :(|r");
+            sBRChatMgr->AnunciarErrorAlas(player, true);
         }
     };
     void DarAlasProgramado()

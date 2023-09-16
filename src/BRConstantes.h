@@ -29,6 +29,11 @@ enum BR_Hechizos
     HECHIZO_ANTI_INVISIBLES                 = 34709,
 };
 
+enum BR_Objetos
+{
+    INVENTARIO_CAMISA_ALAS                  = 17,
+};
+
 enum BR_ObjetosMundo
 {
     OBJETO_NAVE                             = 194675,
