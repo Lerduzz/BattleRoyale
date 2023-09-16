@@ -8,8 +8,8 @@ typedef std::map<uint32, Player*> BR_ListaChat;
 
 class BRChatMgr
 {
-    BRTitulosMgr(){};
-    ~BRTitulosMgr(){};
+    BRChatMgr(){};
+    ~BRChatMgr(){};
 
 public:
     static BRChatMgr *instance()
