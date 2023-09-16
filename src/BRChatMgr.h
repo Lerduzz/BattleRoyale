@@ -150,7 +150,17 @@ public:
                 Chat(it->second).PSendSysMessage("|cff4CFF00BattleRoyale::|r ¡Efectos de Zona aplicados! Jugadores vivos: |cff4CFF00%u|r, y espectadores: |cff4CFF00%u|r.", vivos, lista.size() - vivos);
             }
         }
-    }
+    };
+    void AnunciarConteoCofres(int cofres, BR_ListaChat lista)
+    {
+        if (lista.size())
+        {
+            for (BR_ListaChat::iterator it = lista.begin(); it != lista.end(); ++it)
+            {
+                Chat(it->second).PSendSysMessage("|cff4CFF00BattleRoyale::|r|cff00ff00Ha%s aparecido %i cofre%s con recompensas aleatorias.|r", (cofres > 1 ? "n" : ""), cofres, (cofres > 1 ? "s" : ""));
+            }
+        }
+    };
 
 private:
     ChatHandler Chat(Player* player) { return ChatHandler(player->GetSession()); };

@@ -187,13 +187,7 @@ private:
                 }
                 sBRChatMgr->AnunciarEfectoZona(list_Jugadores, vivos);
             }
-            if (chestCount)
-            {
-                for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
-                {
-                    Chat((*it).second).PSendSysMessage("|cff4CFF00BattleRoyale::|r|cff00ff00Ha%s aparecido %i cofre%s con recompensas aleatorias.|r", (chestCount > 1 ? "n" : ""), chestCount, (chestCount > 1 ? "s" : ""));
-                }
-            }
+            if (chestCount) sBRChatMgr->AnunciarConteoCofres(chestCount, list_Jugadores);
         }
     };
     void VerificarEspectadores()
