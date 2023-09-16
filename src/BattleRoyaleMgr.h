@@ -111,17 +111,6 @@ private:
             }
         }
     };
-    void NotificarAdvertenciaDeZona(uint32 delay)
-    {
-        if (HayJugadores())
-        {
-            for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
-            {
-                (*it).second->GetSession()->SendNotification("|cff00ff00¡La zona segura se reducirá en |cffDA70D6%u|cff00ff00 segundos!", delay);
-            }
-            sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_ZONA_TIEMPO, list_Jugadores);
-        }
-    };
     void NotificarMuerteJcJ(std::string killer, std::string killed, int kills)
     {
         if (HayJugadores())

@@ -75,6 +75,16 @@ public:
             }
         }
     };
+    void NotificarAdvertenciaDeZona(uint32 tiempo, BR_ListaChat lista)
+    {
+        if (lista.size())
+        {
+            for (BR_ListaChat::iterator it = lista.begin(); it != lista.end(); ++it)
+            {
+                it->second->GetSession()->SendNotification("|cff00ff00¡La zona segura se reducirá en |cffDA70D6%u|cff00ff00 segundos!", tiempo);
+            }
+        }
+    };
     void NotificarZonaReducida(BR_ListaChat lista)
     {
         if (lista.size())

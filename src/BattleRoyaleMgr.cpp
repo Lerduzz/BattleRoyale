@@ -237,11 +237,13 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
                 estaZonaAnunciada10s = false;
             } else {
                 if (!estaZonaAnunciada5s && tiempoRestanteZona <= 5000) {
-                    NotificarAdvertenciaDeZona(5);
+                    sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_ZONA_TIEMPO, list_Jugadores);
+                    sBRChatMgr->NotificarAdvertenciaDeZona(5, list_Jugadores);
                     estaZonaAnunciada5s = true;
                 }
                 if (!estaZonaAnunciada10s && tiempoRestanteZona <= 10000) {
-                    NotificarAdvertenciaDeZona(10);
+                    sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_ZONA_TIEMPO, list_Jugadores);
+                    sBRChatMgr->NotificarAdvertenciaDeZona(10, list_Jugadores);
                     estaZonaAnunciada10s = true;
                 }
                 if (indiceDeZona <= CANTIDAD_DE_ZONAS) {
