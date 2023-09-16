@@ -3,20 +3,20 @@
 
 #include "Player.h"
 
+enum BR_EstadosEvento
+{
+    ESTADO_NO_HAY_SUFICIENTES_JUGADORES = 0,
+    ESTADO_INVOCANDO_JUGADORES,
+    ESTADO_NAVE_EN_MOVIMIENTO,
+    ESTADO_NAVE_CERCA_DEL_CENTRO,
+    ESTADO_BATALLA_EN_CURSO,
+    ESTADO_BATALLA_TERMINADA,
+};
+
 enum BR_Dimensiones
 {
     DIMENSION_NORMAL                        = 0x00000001,
     DIMENSION_EVENTO                        = 0x00000002,
-};
-
-enum BR_EstadosEvento
-{
-    ESTADO_NO_HAY_SUFICIENTES_JUGADORES     = 0,
-    ESTADO_INVOCANDO_JUGADORES              = 1,
-    ESTADO_NAVE_EN_MOVIMIENTO               = 2,
-    ESTADO_NAVE_CERCA_DEL_CENTRO            = 3,
-    ESTADO_BATALLA_EN_CURSO                 = 4,
-    ESTADO_BATALLA_TERMINADA                = 5,
 };
 
 enum BR_Hechizos
@@ -27,6 +27,11 @@ enum BR_Hechizos
     HECHIZO_LENGUAJE_BINARIO                = 50246,
     HECHIZO_ANTI_SANADORES                  = 55593,
     HECHIZO_ANTI_INVISIBLES                 = 34709,
+};
+
+enum BR_Objetos
+{
+    INVENTARIO_CAMISA_ALAS                  = 17,
 };
 
 enum BR_ObjetosMundo

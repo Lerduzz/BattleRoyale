@@ -67,22 +67,22 @@ void BattleRoyaleMgr::GestionarJugadorEntrando(Player* player)
     if (!player) return;
     if (player->isUsingLfg())
     {
-        Chat(player).PSendSysMessage("|cff4CFF00BattleRoyale::|r ¡No puedes participar mientras utilizas el buscador de mazmorras!");
+        sBRChatMgr->AnunciarMensajeEntrada(player, MENSAJE_ERROR_MAZMORRA);
         return;
     }
     if (player->InBattlegroundQueue())
     {
-        Chat(player).PSendSysMessage("|cff4CFF00BattleRoyale::|r ¡No puedes participar mientras estás en cola para Campos de Batalla o Arenas!");
+        sBRChatMgr->AnunciarMensajeEntrada(player, MENSAJE_ERROR_BG);
         return;
     }
     if (EstaEnCola(player))
     {
-        Chat(player).PSendSysMessage("|cff4CFF00BattleRoyale::|r ¡Ya estas en cola para el evento!");
+        sBRChatMgr->AnunciarMensajeEntrada(player, MENSAJE_ERROR_EN_COLA);
         return;
     }
     if (EstaEnEvento(player))
     {
-        Chat(player).PSendSysMessage("|cff4CFF00BattleRoyale::|r ¡Ya estas dentro del evento!");
+        sBRChatMgr->AnunciarMensajeEntrada(player, MENSAJE_ERROR_EN_EVENTO);
         return;
     }
     switch (estadoActual)
@@ -95,8 +95,7 @@ void BattleRoyaleMgr::GestionarJugadorEntrando(Player* player)
             }
             else
             {
-                Chat(player).PSendSysMessage("|cff4CFF00BattleRoyale::|r Te has unido a la cola del evento. Jugadores en cola: |cff4CFF00%u|r/|cff4CFF00%u|r.", list_Cola.size(), conf_JugadoresMinimo);
-                NotificarJugadoresEnCola(player);
+                sBRChatMgr->AnunciarJugadoresEnCola(player, conf_JugadoresMinimo, list_Cola);
             }
             break;
         }
@@ -104,8 +103,7 @@ void BattleRoyaleMgr::GestionarJugadorEntrando(Player* player)
         {
             if (EstaLlenoElEvento()) {
                 list_Cola[player->GetGUID().GetCounter()] = player;
-                Chat(player).PSendSysMessage("|cff4CFF00BattleRoyale::|r Te has unido a la cola del evento. Jugadores en cola: |cff4CFF00%u|r/|cff4CFF00%u|r. Evento lleno, espera a que termine la ronda.", list_Cola.size(), conf_JugadoresMinimo);
-                NotificarJugadoresEnCola(player);
+                sBRChatMgr->AnunciarJugadoresEnCola(player, conf_JugadoresMinimo, list_Cola, MENSAJE_ESTADO_EVENTO_LLENO);
             }
             else
             {
@@ -118,8 +116,7 @@ void BattleRoyaleMgr::GestionarJugadorEntrando(Player* player)
                 else
                 {
                     list_Cola[player->GetGUID().GetCounter()] = player;
-                    Chat(player).PSendSysMessage("|cff4CFF00BattleRoyale::|r Te has unido a la cola del evento. Jugadores en cola: |cff4CFF00%u|r/|cff4CFF00%u|r. Evento en curso, espera a que termine la ronda.", list_Cola.size(), conf_JugadoresMinimo);
-                    NotificarJugadoresEnCola(player);
+                    sBRChatMgr->AnunciarJugadoresEnCola(player, conf_JugadoresMinimo, list_Cola, MENSAJE_ESTADO_EVENTO_EN_CURSO);
                 }
             }
             break;
@@ -127,8 +124,7 @@ void BattleRoyaleMgr::GestionarJugadorEntrando(Player* player)
         default:
         {
             list_Cola[player->GetGUID().GetCounter()] = player;
-            Chat(player).PSendSysMessage("|cff4CFF00BattleRoyale::|r Te has unido a la cola del evento. Jugadores en cola: |cff4CFF00%u|r/|cff4CFF00%u|r. Evento en curso, espera a que termine la ronda.", list_Cola.size(), conf_JugadoresMinimo);
-            NotificarJugadoresEnCola(player);
+            sBRChatMgr->AnunciarJugadoresEnCola(player, conf_JugadoresMinimo, list_Cola, MENSAJE_ESTADO_EVENTO_EN_CURSO);
             break;
         }
     }
@@ -145,10 +141,14 @@ void BattleRoyaleMgr::GestionarMuerteJcJ(Player* killer, Player* killed)
     {
         if (!killer || !killed || !EstaEnEvento(killer) || !EstaEnEvento(killed)) return;
         sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_ALGUIEN_MUERE, list_Jugadores);
-        if (killer == killed) return; // TODO: Tambien anunciar cuando alguien muere de otras formas.
+        if (killer == killed)
+        {
+            sBRChatMgr->AnunciarMuerteJcJ(killer, killed, 0, list_Jugadores);
+            return;
+        }
         list_Datos[killer->GetGUID().GetCounter()].kills++;
+        sBRChatMgr->AnunciarMuerteJcJ(killer, killed, list_Datos[killer->GetGUID().GetCounter()].kills, list_Jugadores);
         TodosLosMuertosEspectarme(killer);
-        NotificarMuerteJcJ(Chat(killer).GetNameLink(killer), Chat(killed).GetNameLink(killed), list_Datos[killer->GetGUID().GetCounter()].kills);
     }
 }
 
@@ -164,13 +164,18 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
                 indicadorDeSegundos = 1000;
                 if (tiempoRestanteInicio <= 0) {
                     estadoActual = ESTADO_BATALLA_EN_CURSO;
-                    NotificarTiempoParaIniciar(0);
+                    sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_RONDA_INICIADA, list_Jugadores);
+                    sBRChatMgr->NotificarTiempoInicial(0, list_Jugadores, mapaActual->second->nombreMapa);
                     tiempoRestanteZona = conf_IntervaloDeZona;
                     tiempoRestanteNave = 15;
                 } else {
                     if (tiempoRestanteInicio % 5 == 0) {
                         if (estadoActual == ESTADO_NAVE_EN_MOVIMIENTO) VerificarJugadoresEnNave();
-                        NotificarTiempoParaIniciar(tiempoRestanteInicio);
+                        if (tiempoRestanteInicio == 45)
+                        {
+                            sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_NAVE_EN_MOVIMIENTO, list_Jugadores);
+                        }
+                        sBRChatMgr->NotificarTiempoInicial(tiempoRestanteInicio, list_Jugadores);
                     }
                     if (estadoActual == ESTADO_INVOCANDO_JUGADORES) DarAlasProgramado();
                     if (estadoActual == ESTADO_INVOCANDO_JUGADORES && tiempoRestanteInicio <= 45 && obj_Nave)
@@ -217,7 +222,14 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
                     ActivarJcJTcT();
                     VerificarEspectadores();
                 }
-                if (--tiempoRestanteNave <= 0) if (DesaparecerNave()) NotificarNaveRetirada();
+                if (--tiempoRestanteNave <= 0)
+                {
+                    if (DesaparecerNave())
+                    {
+                        sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_NAVE_RETIRADA, list_Jugadores);
+                        sBRChatMgr->NotificarNaveRetirada(list_Jugadores);
+                    }
+                }
                 QuitarAlasProgramado();
             } else indicadorDeSegundos -= diff;
             if (tiempoRestanteZona <= 0) {
@@ -225,17 +237,20 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
                     RestablecerTodoElEvento();
                     return;
                 }
-                NotificarZonaReducida();
+                sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_ZONA_REDUCIDA, list_Jugadores);
+                sBRChatMgr->NotificarZonaReducida(list_Jugadores);
                 tiempoRestanteZona = conf_IntervaloDeZona;
                 estaZonaAnunciada5s = false;
                 estaZonaAnunciada10s = false;
             } else {
                 if (!estaZonaAnunciada5s && tiempoRestanteZona <= 5000) {
-                    NotificarAdvertenciaDeZona(5);
+                    sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_ZONA_TIEMPO, list_Jugadores);
+                    sBRChatMgr->NotificarAdvertenciaDeZona(5, list_Jugadores);
                     estaZonaAnunciada5s = true;
                 }
                 if (!estaZonaAnunciada10s && tiempoRestanteZona <= 10000) {
-                    NotificarAdvertenciaDeZona(10);
+                    sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_ZONA_TIEMPO, list_Jugadores);
+                    sBRChatMgr->NotificarAdvertenciaDeZona(10, list_Jugadores);
                     estaZonaAnunciada10s = true;
                 }
                 if (indiceDeZona <= CANTIDAD_DE_ZONAS) {
@@ -312,7 +327,11 @@ void BattleRoyaleMgr::IniciarNuevaRonda()
             uint32 guid = (*list_Cola.begin()).first;
             if (list_Cola[guid]->IsInFlight())
             {
-                Chat(list_Cola[guid]).SendSysMessage("|cff4CFF00BattleRoyale::|r ¡No has podido entrar al evento porque vas en ruta de vuelo! ¡Se te ha quitado de la cola!");
+                sBRChatMgr->AnunciarMensajeEntrada(list_Cola[guid], MENSAJE_ERROR_EN_VUELO);
+            }
+            else if (list_Cola[guid]->IsInCombat())
+            {
+                sBRChatMgr->AnunciarMensajeEntrada(list_Cola[guid], MENSAJE_ERROR_EN_COMBATE);
             }
             else
             {
@@ -506,7 +525,6 @@ bool BattleRoyaleMgr::InvocarZonaSegura()
                     map->AddToMap(obj_Zona);
                     indiceDeZona++;
                     estaLaZonaActiva = true;
-                    sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_ZONA_REDUCIDA, list_Jugadores);
                     return true;
                 }
                 else
@@ -637,8 +655,6 @@ void BattleRoyaleMgr::FinalizarRonda(bool announce, Player* winner /* = nullptr*
 {
     if (announce && winner && EstaEnEvento(winner))
     {
-        NotificarGanadorAlMundo(winner, list_Datos[winner->GetGUID().GetCounter()].kills);
-        TodosLosMuertosEspectarme(winner);
         if (winner->GetTeamId() == TEAM_ALLIANCE)
         {
             sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_GANADOR_ALIANZA, list_Jugadores);
@@ -647,11 +663,13 @@ void BattleRoyaleMgr::FinalizarRonda(bool announce, Player* winner /* = nullptr*
         {
             sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_GANADOR_HORDA, list_Jugadores);
         }
+        sBRChatMgr->AnunciarGanador(winner, list_Datos[winner->GetGUID().GetCounter()].kills);
+        TodosLosMuertosEspectarme(winner);
         sBRTitulosMgr->Ascender(winner);
     }
     else
     {
-        NotificarTablasAlMundo();
+        sBRChatMgr->AnunciarEmpate();
     }
     DesaparecerTodosLosObjetos();
     tiempoRestanteFinal = 10;
