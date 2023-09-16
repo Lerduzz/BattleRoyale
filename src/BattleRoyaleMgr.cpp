@@ -96,7 +96,7 @@ void BattleRoyaleMgr::GestionarJugadorEntrando(Player* player)
             else
             {
                 Chat(player).PSendSysMessage("|cff4CFF00BattleRoyale::|r Te has unido a la cola del evento. Jugadores en cola: |cff4CFF00%u|r/|cff4CFF00%u|r.", list_Cola.size(), conf_JugadoresMinimo);
-                NotificarJugadoresEnCola(player);
+                sBRChatMgr->NotificarJugadoresEnCola(player, list_Cola, conf_JugadoresMinimo);
             }
             break;
         }
@@ -105,7 +105,7 @@ void BattleRoyaleMgr::GestionarJugadorEntrando(Player* player)
             if (EstaLlenoElEvento()) {
                 list_Cola[player->GetGUID().GetCounter()] = player;
                 Chat(player).PSendSysMessage("|cff4CFF00BattleRoyale::|r Te has unido a la cola del evento. Jugadores en cola: |cff4CFF00%u|r/|cff4CFF00%u|r. Evento lleno, espera a que termine la ronda.", list_Cola.size(), conf_JugadoresMinimo);
-                NotificarJugadoresEnCola(player);
+                sBRChatMgr->NotificarJugadoresEnCola(player, list_Cola, conf_JugadoresMinimo);
             }
             else
             {
@@ -119,7 +119,7 @@ void BattleRoyaleMgr::GestionarJugadorEntrando(Player* player)
                 {
                     list_Cola[player->GetGUID().GetCounter()] = player;
                     Chat(player).PSendSysMessage("|cff4CFF00BattleRoyale::|r Te has unido a la cola del evento. Jugadores en cola: |cff4CFF00%u|r/|cff4CFF00%u|r. Evento en curso, espera a que termine la ronda.", list_Cola.size(), conf_JugadoresMinimo);
-                    NotificarJugadoresEnCola(player);
+                    sBRChatMgr->NotificarJugadoresEnCola(player, list_Cola, conf_JugadoresMinimo);
                 }
             }
             break;
@@ -128,7 +128,7 @@ void BattleRoyaleMgr::GestionarJugadorEntrando(Player* player)
         {
             list_Cola[player->GetGUID().GetCounter()] = player;
             Chat(player).PSendSysMessage("|cff4CFF00BattleRoyale::|r Te has unido a la cola del evento. Jugadores en cola: |cff4CFF00%u|r/|cff4CFF00%u|r. Evento en curso, espera a que termine la ronda.", list_Cola.size(), conf_JugadoresMinimo);
-            NotificarJugadoresEnCola(player);
+            sBRChatMgr->NotificarJugadoresEnCola(player, list_Cola, conf_JugadoresMinimo);
             break;
         }
     }
@@ -148,7 +148,7 @@ void BattleRoyaleMgr::GestionarMuerteJcJ(Player* killer, Player* killed)
         if (killer == killed) return; // TODO: Tambien anunciar cuando alguien muere de otras formas.
         list_Datos[killer->GetGUID().GetCounter()].kills++;
         TodosLosMuertosEspectarme(killer);
-        NotificarMuerteJcJ(Chat(killer).GetNameLink(killer), Chat(killed).GetNameLink(killed), list_Datos[killer->GetGUID().GetCounter()].kills);
+        sBRChatMgr->NotificarMuerteJcJ(killer, killed, list_Datos[killer->GetGUID().GetCounter()].kills, list_Jugadores);
     }
 }
 
@@ -222,7 +222,14 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
                     ActivarJcJTcT();
                     VerificarEspectadores();
                 }
-                if (--tiempoRestanteNave <= 0) if (DesaparecerNave()) NotificarNaveRetirada();
+                if (--tiempoRestanteNave <= 0)
+                {
+                    if (DesaparecerNave())
+                    {
+                        sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_NAVE_RETIRADA, list_Jugadores);
+                        sBRChatMgr->NotificarNaveRetirada(list_Jugadores);
+                    }
+                }
                 QuitarAlasProgramado();
             } else indicadorDeSegundos -= diff;
             if (tiempoRestanteZona <= 0) {
@@ -644,8 +651,6 @@ void BattleRoyaleMgr::FinalizarRonda(bool announce, Player* winner /* = nullptr*
 {
     if (announce && winner && EstaEnEvento(winner))
     {
-        NotificarGanadorAlMundo(winner, list_Datos[winner->GetGUID().GetCounter()].kills);
-        TodosLosMuertosEspectarme(winner);
         if (winner->GetTeamId() == TEAM_ALLIANCE)
         {
             sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_GANADOR_ALIANZA, list_Jugadores);
@@ -654,11 +659,13 @@ void BattleRoyaleMgr::FinalizarRonda(bool announce, Player* winner /* = nullptr*
         {
             sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_GANADOR_HORDA, list_Jugadores);
         }
+        sBRChatMgr->AnunciarGanador(winner, list_Datos[winner->GetGUID().GetCounter()].kills);
+        TodosLosMuertosEspectarme(winner);
         sBRTitulosMgr->Ascender(winner);
     }
     else
     {
-        NotificarTablasAlMundo();
+        sBRChatMgr->AnunciarEmpate();
     }
     DesaparecerTodosLosObjetos();
     tiempoRestanteFinal = 10;

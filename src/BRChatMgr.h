@@ -18,6 +18,20 @@ public:
         return instance;
     }
 
+    void NotificarJugadoresEnCola(Player* player, uint32 minimo, BR_ListaChat lista)
+    {
+        if (lista.size())
+        {
+            for (BR_ListaChat::iterator it = lista.begin(); it != lista.end(); ++it)
+            {
+                if (it->second != player)
+                {
+                    ChatHandler h = Chat(it->second);
+                    h.PSendSysMessage("|cff4CFF00BattleRoyale::|r %s se ha unido a la cola. Jugadores en cola: |cff4CFF00%u|r/|cff4CFF00%u|r.", h.GetNameLink(player), lista.size(), minimo);
+                }
+            }
+        }
+    };
     void NotificarTiempoInicial(uint32 tiempo, BR_ListaChat lista, std::string mapa = "Lugar: Desconocido")
     {
         if (lista.size())
@@ -94,6 +108,38 @@ public:
                 it->second->GetSession()->SendNotification("|cffff0000¡La zona segura se ha actualizado!");
             }
         }
+    };
+    void NotificarMuerteJcJ(Player* killer, Player* killed, int kills, BR_ListaChat lista)
+    {
+        if (lista.size())
+        {
+            for (BR_ListaChat::iterator it = lista.begin(); it != lista.end(); ++it)
+            {
+                Chat(it->second).PSendSysMessage("|cff4CFF00BattleRoyale::|r ¡%s ha eliminado a %s!, racha: |cff4CFF00%i|r.", Chat(killer).GetNameLink(killer), Chat(killed).GetNameLink(killed), kills);
+            }
+        }
+    };
+    void NotificarNaveRetirada(BR_ListaChat lista)
+    {
+        if (lista.size())
+        {
+            for (BR_ListaChat::iterator it = lista.begin(); it != lista.end(); ++it)
+            {
+                it->second->GetSession()->SendNotification("|cff0000ff¡La nave se ha retirado!");
+            }
+        }
+    };
+    void AnunciarGanador(Player* winner, int kills)
+    {
+        std::ostringstream msg;
+        msg << "|cff4CFF00BattleRoyale::|r Ronda finalizada, ganador: " << Chat(winner).GetNameLink(winner) << ", víctimas: |cff4CFF00" << kills << "|r.";
+        sWorld->SendServerMessage(SERVER_MSG_STRING, msg.str().c_str());
+    };
+    void AnunciarEmpate()
+    {
+        std::ostringstream msg;
+        msg << "|cff4CFF00BattleRoyale::|r Ronda finalizada, no hubo ganador|r.";
+        sWorld->SendServerMessage(SERVER_MSG_STRING, msg.str().c_str());
     };
 
 private:

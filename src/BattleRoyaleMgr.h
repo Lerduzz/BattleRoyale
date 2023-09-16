@@ -111,53 +111,6 @@ private:
             }
         }
     };
-    void NotificarMuerteJcJ(std::string killer, std::string killed, int kills)
-    {
-        if (HayJugadores())
-        {
-            for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
-            {
-                Chat((*it).second).PSendSysMessage("|cff4CFF00BattleRoyale::|r ¡%s ha eliminado a %s!, racha: |cff4CFF00%i|r.", killer, killed, kills);
-            }
-        }
-    };
-    void NotificarJugadoresEnCola(Player* player)
-    {
-        if (HayCola())
-        {
-            for (BR_ListaDePersonajes::iterator it = list_Cola.begin(); it != list_Cola.end(); ++it)
-            {
-                if ((*it).second != player)
-                {
-                    ChatHandler h = Chat((*it).second);
-                    h.PSendSysMessage("|cff4CFF00BattleRoyale::|r %s se ha unido a la cola. Jugadores en cola: |cff4CFF00%u|r/|cff4CFF00%u|r.", h.GetNameLink(player), list_Cola.size(), conf_JugadoresMinimo);
-                }
-            }
-        }
-    };
-    void NotificarNaveRetirada()
-    {
-        if (HayJugadores())
-        {
-            for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
-            {
-                (*it).second->GetSession()->SendNotification("|cff0000ff¡La nave se ha retirado!");
-            }
-            sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_NAVE_RETIRADA, list_Jugadores);
-        }
-    };
-    void NotificarGanadorAlMundo(Player* winner, int kills)
-    {
-        std::ostringstream msg;
-        msg << "|cff4CFF00BattleRoyale::|r Ronda finalizada, ganador: " << Chat(winner).GetNameLink(winner) << ", víctimas: |cff4CFF00" << kills << "|r.";
-        sWorld->SendServerMessage(SERVER_MSG_STRING, msg.str().c_str());
-    }
-    void NotificarTablasAlMundo()
-    {
-        std::ostringstream msg;
-        msg << "|cff4CFF00BattleRoyale::|r Ronda finalizada, no hubo ganador|r.";
-        sWorld->SendServerMessage(SERVER_MSG_STRING, msg.str().c_str());
-    }
     void DesaparecerTodosLosObjetos()
     {
         DesaparecerZona();
