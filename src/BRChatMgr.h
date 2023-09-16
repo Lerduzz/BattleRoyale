@@ -35,40 +35,6 @@ public:
         return instance;
     }
 
-    void NotificarJugadoresEnCola(Player* player, uint32 minimo, BR_ListaChat lista, BR_TipoMensajeEstado estado = MENSAJE_ESTADO_EVENTO_OK)
-    {
-        if (lista.size())
-        {
-            std::string mensajeEstado;
-            switch (estado)
-            {
-                case MENSAJE_ESTADO_EVENTO_LLENO:
-                {
-                    mensajeEstado = " Evento lleno, espera a que termine la ronda.";
-                    break;
-                }
-                case MENSAJE_ESTADO_EVENTO_EN_CURSO:
-                {
-                    mensajeEstado = " Evento en curso, espera a que termine la ronda.";
-                    break;
-                }
-                default:
-                {
-                    mensajeEstado = "";
-                    break;
-                }
-            }
-            Chat(player).PSendSysMessage("|cff4CFF00BattleRoyale::|r Te has unido a la cola del evento. Jugadores en cola: |cff4CFF00%u|r/|cff4CFF00%u|r.%s", lista.size(), minimo, mensajeEstado.c_str());
-            for (BR_ListaChat::iterator it = lista.begin(); it != lista.end(); ++it)
-            {
-                if (it->second != player)
-                {
-                    ChatHandler h = Chat(it->second);
-                    h.PSendSysMessage("|cff4CFF00BattleRoyale::|r %s se ha unido a la cola. Jugadores en cola: |cff4CFF00%u|r/|cff4CFF00%u|r.%s", h.GetNameLink(player), lista.size(), minimo, mensajeEstado.c_str());
-                }
-            }
-        }
-    };
     void NotificarTiempoInicial(uint32 tiempo, BR_ListaChat lista, std::string mapa = "Lugar: Desconocido")
     {
         if (lista.size())
@@ -146,16 +112,6 @@ public:
             }
         }
     };
-    void NotificarMuerteJcJ(Player* killer, Player* killed, int kills, BR_ListaChat lista)
-    {
-        if (lista.size())
-        {
-            for (BR_ListaChat::iterator it = lista.begin(); it != lista.end(); ++it)
-            {
-                Chat(it->second).PSendSysMessage("|cff4CFF00BattleRoyale::|r ¡%s ha eliminado a %s!, racha: |cff4CFF00%i|r.", Chat(killer).GetNameLink(killer), Chat(killed).GetNameLink(killed), kills);
-            }
-        }
-    };
     void NotificarNaveRetirada(BR_ListaChat lista)
     {
         if (lista.size())
@@ -166,6 +122,57 @@ public:
             }
         }
     };  
+    void AnunciarJugadoresEnCola(Player* player, uint32 minimo, BR_ListaChat lista, BR_TipoMensajeEstado estado = MENSAJE_ESTADO_EVENTO_OK)
+    {
+        if (lista.size())
+        {
+            std::string mensajeEstado;
+            switch (estado)
+            {
+                case MENSAJE_ESTADO_EVENTO_LLENO:
+                {
+                    mensajeEstado = " Evento lleno, espera a que termine la ronda.";
+                    break;
+                }
+                case MENSAJE_ESTADO_EVENTO_EN_CURSO:
+                {
+                    mensajeEstado = " Evento en curso, espera a que termine la ronda.";
+                    break;
+                }
+                default:
+                {
+                    mensajeEstado = "";
+                    break;
+                }
+            }
+            Chat(player).PSendSysMessage("|cff4CFF00BattleRoyale::|r Te has unido a la cola del evento. Jugadores en cola: |cff4CFF00%u|r/|cff4CFF00%u|r.%s", lista.size(), minimo, mensajeEstado.c_str());
+            for (BR_ListaChat::iterator it = lista.begin(); it != lista.end(); ++it)
+            {
+                if (it->second != player)
+                {
+                    ChatHandler h = Chat(it->second);
+                    h.PSendSysMessage("|cff4CFF00BattleRoyale::|r %s se ha unido a la cola. Jugadores en cola: |cff4CFF00%u|r/|cff4CFF00%u|r.%s", h.GetNameLink(player), lista.size(), minimo, mensajeEstado.c_str());
+                }
+            }
+        }
+    };
+    void AnunciarMuerteJcJ(Player* killer, Player* killed, int kills, BR_ListaChat lista)
+    {
+        if (lista.size())
+        {
+            for (BR_ListaChat::iterator it = lista.begin(); it != lista.end(); ++it)
+            {
+                if (killer == killed)
+                {
+                    Chat(it->second).PSendSysMessage("|cff4CFF00BattleRoyale::|r ¡%s ha muerto!.", Chat(killed).GetNameLink(killed));
+                }
+                else
+                {
+                    Chat(it->second).PSendSysMessage("|cff4CFF00BattleRoyale::|r ¡%s ha sido eliminado por %s!, racha: |cff4CFF00%i|r.", Chat(killed).GetNameLink(killed), Chat(killer).GetNameLink(killer), kills);
+                }
+            }
+        }
+    };
     void AnunciarGanador(Player* winner, int kills)
     {
         std::ostringstream msg;

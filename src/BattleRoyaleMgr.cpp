@@ -95,7 +95,7 @@ void BattleRoyaleMgr::GestionarJugadorEntrando(Player* player)
             }
             else
             {
-                sBRChatMgr->NotificarJugadoresEnCola(player, conf_JugadoresMinimo, list_Cola);
+                sBRChatMgr->AnunciarJugadoresEnCola(player, conf_JugadoresMinimo, list_Cola);
             }
             break;
         }
@@ -103,7 +103,7 @@ void BattleRoyaleMgr::GestionarJugadorEntrando(Player* player)
         {
             if (EstaLlenoElEvento()) {
                 list_Cola[player->GetGUID().GetCounter()] = player;
-                sBRChatMgr->NotificarJugadoresEnCola(player, conf_JugadoresMinimo, list_Cola, MENSAJE_ESTADO_EVENTO_LLENO);
+                sBRChatMgr->AnunciarJugadoresEnCola(player, conf_JugadoresMinimo, list_Cola, MENSAJE_ESTADO_EVENTO_LLENO);
             }
             else
             {
@@ -116,7 +116,7 @@ void BattleRoyaleMgr::GestionarJugadorEntrando(Player* player)
                 else
                 {
                     list_Cola[player->GetGUID().GetCounter()] = player;
-                    sBRChatMgr->NotificarJugadoresEnCola(player, conf_JugadoresMinimo, list_Cola, MENSAJE_ESTADO_EVENTO_EN_CURSO);
+                    sBRChatMgr->AnunciarJugadoresEnCola(player, conf_JugadoresMinimo, list_Cola, MENSAJE_ESTADO_EVENTO_EN_CURSO);
                 }
             }
             break;
@@ -124,7 +124,7 @@ void BattleRoyaleMgr::GestionarJugadorEntrando(Player* player)
         default:
         {
             list_Cola[player->GetGUID().GetCounter()] = player;
-            sBRChatMgr->NotificarJugadoresEnCola(player, conf_JugadoresMinimo, list_Cola, MENSAJE_ESTADO_EVENTO_EN_CURSO);
+            sBRChatMgr->AnunciarJugadoresEnCola(player, conf_JugadoresMinimo, list_Cola, MENSAJE_ESTADO_EVENTO_EN_CURSO);
             break;
         }
     }
@@ -141,10 +141,14 @@ void BattleRoyaleMgr::GestionarMuerteJcJ(Player* killer, Player* killed)
     {
         if (!killer || !killed || !EstaEnEvento(killer) || !EstaEnEvento(killed)) return;
         sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_ALGUIEN_MUERE, list_Jugadores);
-        if (killer == killed) return; // TODO: Tambien anunciar cuando alguien muere de otras formas.
+        if (killer == killed)
+        {
+            sBRChatMgr->AnunciarMuerteJcJ(killer, killed, 0, list_Jugadores);
+            return;
+        }
         list_Datos[killer->GetGUID().GetCounter()].kills++;
+        sBRChatMgr->AnunciarMuerteJcJ(killer, killed, list_Datos[killer->GetGUID().GetCounter()].kills, list_Jugadores);
         TodosLosMuertosEspectarme(killer);
-        sBRChatMgr->NotificarMuerteJcJ(killer, killed, list_Datos[killer->GetGUID().GetCounter()].kills, list_Jugadores);
     }
 }
 
