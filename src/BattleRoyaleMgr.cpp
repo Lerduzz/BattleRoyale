@@ -558,9 +558,9 @@ void BattleRoyaleMgr::EfectoFueraDeZona()
     {
         for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
         {
-            if (obj_Centro && (*it).second && (*it).second->IsAlive())
+            if (obj_Centro && it->second && it->second->IsAlive())
             {
-                float distance = (*it).second->GetExactDist(obj_Centro);
+                float distance = it->second->GetExactDist(obj_Centro);
                 if (!estaLaZonaActiva || (indiceDeZona > 0 && distance > BR_EscalasDeZonaSegura[indiceDeZona - 1] * 66.0f)) {
                     list_Datos[it->first].dmg_tick++;
                     uint32 damage = it->second->GetMaxHealth() * (2 * sqrt(list_Datos[it->first].dmg_tick) + indiceDeZona) / 100;
@@ -580,9 +580,9 @@ void BattleRoyaleMgr::ActivarJcJTcT()
     {
         for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
         {
-            if ((*it).second && (*it).second->IsAlive() && DebeForzarJcJTcT((*it).second) && !((*it).second->HasByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP)))
+            if (it->second && it->second->IsAlive() && DebeForzarJcJTcT(it->second) && !(it->second->HasByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP)))
             {
-                (*it).second->SetByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
+                it->second->SetByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
             }
         }
     }
@@ -595,15 +595,15 @@ void BattleRoyaleMgr::ControlDeReglas()
         BR_ListaDePersonajes::iterator it = list_Jugadores.begin();
         while (it != list_Jugadores.end())
         {
-            if ((*it).second && (*it).second->IsAlive())
+            if (it->second && it->second->IsAlive())
             {
                 if
                 (
-                    ((*it).second->HasAura(31700)) ||
-                    (obj_Centro && (*it).second->GetExactDist(obj_Centro) > 1147.0f)
+                    (it->second->HasAura(31700)) ||
+                    (obj_Centro && it->second->GetExactDist(obj_Centro) > 1147.0f)
                 )
                 {
-                    uint32 guid = (*it).first;
+                    uint32 guid = it->first;
                     ++it;
                     SalirDelEvento(guid);
                 }
@@ -630,10 +630,10 @@ bool BattleRoyaleMgr::CondicionDeVictoria()
             Player* vivo = nullptr;
             for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
             {
-                if ((*it).second && (*it).second->IsAlive())
+                if (it->second && it->second->IsAlive())
                 {
                     cantidadVivos++;
-                    vivo = (*it).second;
+                    vivo = it->second;
                 }
             }
             if (cantidadVivos <= 1)

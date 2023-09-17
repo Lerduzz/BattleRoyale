@@ -157,9 +157,9 @@ private:
     void AlReducirseLaZona()
     {
         int chestCount = 0;
-        if (indiceDeZona < CANTIDAD_DE_ZONAS && (*mapaActual).second->ubicacionesMapa.find(indiceDeZona) != (*mapaActual).second->ubicacionesMapa.end())
+        if (indiceDeZona < CANTIDAD_DE_ZONAS && mapaActual->second->ubicacionesMapa.find(indiceDeZona) != mapaActual->second->ubicacionesMapa.end())
         {
-            BR_UbicacionZona temp = (*mapaActual).second->ubicacionesMapa[indiceDeZona];
+            BR_UbicacionZona temp = mapaActual->second->ubicacionesMapa[indiceDeZona];
             for (BR_UbicacionZona::iterator it = temp.begin(); it != temp.end(); ++it)
             {
                 int rnd = rand() % 100 + 1;
@@ -177,11 +177,11 @@ private:
                 int vivos = 0;
                 for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
                 {
-                    if ((*it).second && (*it).second->IsAlive())
+                    if (it->second && it->second->IsAlive())
                     {
-                        (*it).second->AddAura(HECHIZO_ANTI_INVISIBLES, (*it).second);
-                        (*it).second->AddAura(HECHIZO_ANTI_SANADORES, (*it).second);
-                        (*it).second->AddAura(HECHIZO_LENGUAJE_BINARIO, (*it).second);
+                        it->second->AddAura(HECHIZO_ANTI_INVISIBLES, it->second);
+                        it->second->AddAura(HECHIZO_ANTI_SANADORES, it->second);
+                        it->second->AddAura(HECHIZO_LENGUAJE_BINARIO, it->second);
                         vivos++;
                     }
                 }
@@ -196,9 +196,9 @@ private:
         {
             for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
             {
-                if ((*it).second && (*it).second->IsAlive())
+                if (it->second && it->second->IsAlive())
                 {
-                    TodosLosMuertosEspectarme((*it).second);
+                    TodosLosMuertosEspectarme(it->second);
                 }
             }
         }
@@ -210,9 +210,9 @@ private:
             BR_ListaDePersonajes::iterator it = list_Jugadores.begin();
             while (it != list_Jugadores.end())
             {
-                if (!EstaEnLaNave((*it).second) || !(*it).second->IsAlive())
+                if (!EstaEnLaNave(it->second) || !it->second->IsAlive())
                 {
-                    uint32 guid = (*it).first;
+                    uint32 guid = it->first;
                     ++it;
                     SalirDelEvento(guid);
                 }
@@ -230,7 +230,7 @@ private:
         {
             for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
             {
-                if ((*it).second && (*it).second != player && !(*it).second->IsAlive() && !EstaEspectando((*it).second)) EspectarJugador((*it).second , player);
+                if (it->second && it->second != player && !it->second->IsAlive() && !EstaEspectando(it->second)) EspectarJugador(it->second , player);
             }
         }
     };
@@ -271,12 +271,12 @@ private:
             BR_ListaDePersonajes::iterator it = list_DarAlas.begin();
             while (it != list_DarAlas.end())
             {
-                if ((*it).second && (*it).second->IsAlive())
+                if (it->second && it->second->IsAlive())
                 {
-                    if ((*it).second->IsInWorld() && !(*it).second->IsBeingTeleported() && EstaEnLaNave((*it).second))
+                    if (it->second->IsInWorld() && !it->second->IsBeingTeleported() && EstaEnLaNave(it->second))
                     {
-                        uint32 guid = (*it).first;
-                        Player* player = (*it).second;
+                        uint32 guid = it->first;
+                        Player* player = it->second;
                         ++it;
                         DarAlas(player);
                         player->GetMotionMaster()->MoveFall();
@@ -301,12 +301,12 @@ private:
             BR_ListaDePersonajes::iterator it = list_QuitarAlas.begin();
             while (it != list_QuitarAlas.end())
             {
-                if ((*it).second && (*it).second->IsAlive())
+                if (it->second && it->second->IsAlive())
                 {
-                    if ((*it).second->IsInWorld() && !(*it).second->IsBeingTeleported())
+                    if (it->second->IsInWorld() && !it->second->IsBeingTeleported())
                     {
-                        uint32 guid = (*it).first;
-                        Player* player = (*it).second;
+                        uint32 guid = it->first;
+                        Player* player = it->second;
                         ++it;
                         QuitarAlas(player);
                         list_QuitarAlas.erase(guid);
