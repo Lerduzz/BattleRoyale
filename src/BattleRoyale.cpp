@@ -298,7 +298,7 @@ public:
     }
 };
 
-void AddModBattleRoyaleScripts() {
+void AddBattleRoyaleScripts() {
     new BattleRoyalePlayer();
     new BattleRoyaleCreature();
     new BattleRoyaleWorld();
