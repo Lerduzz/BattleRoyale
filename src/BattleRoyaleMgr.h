@@ -3,6 +3,7 @@
 
 #include "BRConstantes.h"
 #include "BRChatMgr.h"
+#include "BRListaNegraMgr.h"
 #include "BRSonidosMgr.h"
 #include "BRTitulosMgr.h"
 #include "BattleRoyaleData.h"

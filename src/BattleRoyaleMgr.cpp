@@ -66,9 +66,11 @@ void BattleRoyaleMgr::GestionarJugadorEntrando(Player* player)
 {
     if (!player) return;
     uint32 guid = player->GetGUID().GetCounter();
-    if (guid == 168128 || guid == 19993 || guid == 138508)
+    std::string blr = sBRListaNegraMgr->EstaBloqueado(guid);
+    if (blr)
     {
-        ChatHandler(player->GetSession()).SendSysMessage("|cff4CFF00BattleRoyale::|r Usted ha incumplido la única regla de jugar de manera individual. Este personaje jamás volverá a entrar a este modo de juego.");
+        // TODO: Mover mensaje a sBRChat.
+        ChatHandler(player->GetSession()).PSendSysMessage("|cff4CFF00BattleRoyale::|r Su personaje ha sido bloqueado de este modo de juego. Motivo: |cffff0000%s|r.", blr.c_str());
         return;
     }
     if (player->isUsingLfg())
