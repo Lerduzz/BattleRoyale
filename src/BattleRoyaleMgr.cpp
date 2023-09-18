@@ -67,7 +67,7 @@ void BattleRoyaleMgr::GestionarJugadorEntrando(Player* player)
     if (!player) return;
     uint32 guid = player->GetGUID().GetCounter();
     std::string blr = sBRListaNegraMgr->EstaBloqueado(guid);
-    if (blr)
+    if (blr != "")
     {
         // TODO: Mover mensaje a sBRChat.
         ChatHandler(player->GetSession()).PSendSysMessage("|cff4CFF00BattleRoyale::|r Su personaje ha sido bloqueado de este modo de juego. Motivo: |cffff0000%s|r.", blr.c_str());

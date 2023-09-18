@@ -29,7 +29,7 @@ public:
         {
             return list_Negra[guid];
         }
-        return nullptr;
+        return ""; // TODO: Devolver un struct que tenga la veracidad y la causa.
     };
     void RecargarLista()
     {
