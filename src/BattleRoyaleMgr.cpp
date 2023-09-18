@@ -65,6 +65,14 @@ BattleRoyaleMgr::~BattleRoyaleMgr()
 void BattleRoyaleMgr::GestionarJugadorEntrando(Player* player)
 {
     if (!player) return;
+    uint32 guid = player->GetGUID().GetCounter();
+    std::string blr = sBRListaNegraMgr->EstaBloqueado(guid);
+    if (blr != "")
+    {
+        // TODO: Mover mensaje a sBRChat.
+        ChatHandler(player->GetSession()).PSendSysMessage("|cff4CFF00BattleRoyale::|r No puedes utilizar este modo de juego. Motivo: |cffff0000%s|r.", blr.c_str());
+        return;
+    }
     if (player->isUsingLfg())
     {
         sBRChatMgr->AnunciarMensajeEntrada(player, MENSAJE_ERROR_MAZMORRA);
@@ -89,7 +97,7 @@ void BattleRoyaleMgr::GestionarJugadorEntrando(Player* player)
     {
         case ESTADO_NO_HAY_SUFICIENTES_JUGADORES:
         {
-            list_Cola[player->GetGUID().GetCounter()] = player;
+            list_Cola[guid] = player;
             if (HaySuficientesEnCola()) {
                 IniciarNuevaRonda();
             }
@@ -102,20 +110,20 @@ void BattleRoyaleMgr::GestionarJugadorEntrando(Player* player)
         case ESTADO_INVOCANDO_JUGADORES:
         {
             if (EstaLlenoElEvento()) {
-                list_Cola[player->GetGUID().GetCounter()] = player;
+                list_Cola[guid] = player;
                 sBRChatMgr->AnunciarJugadoresEnCola(player, conf_JugadoresMinimo, list_Cola, MENSAJE_ESTADO_EVENTO_LLENO);
             }
             else
             {
                 if (tiempoRestanteInicio >= 60)
                 {
-                    list_Jugadores[player->GetGUID().GetCounter()] = player;
-                    AlmacenarPosicionInicial(player->GetGUID().GetCounter());
-                    LlamarDentroDeNave(player->GetGUID().GetCounter());
+                    list_Jugadores[guid] = player;
+                    AlmacenarPosicionInicial(guid);
+                    LlamarDentroDeNave(guid);
                 }
                 else
                 {
-                    list_Cola[player->GetGUID().GetCounter()] = player;
+                    list_Cola[guid] = player;
                     sBRChatMgr->AnunciarJugadoresEnCola(player, conf_JugadoresMinimo, list_Cola, MENSAJE_ESTADO_EVENTO_EN_CURSO);
                 }
             }
@@ -123,7 +131,7 @@ void BattleRoyaleMgr::GestionarJugadorEntrando(Player* player)
         }
         default:
         {
-            list_Cola[player->GetGUID().GetCounter()] = player;
+            list_Cola[guid] = player;
             sBRChatMgr->AnunciarJugadoresEnCola(player, conf_JugadoresMinimo, list_Cola, MENSAJE_ESTADO_EVENTO_EN_CURSO);
             break;
         }

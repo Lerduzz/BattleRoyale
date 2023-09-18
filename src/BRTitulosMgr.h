@@ -57,6 +57,27 @@ public:
             }
         }
     };
+
+    void Quitar(Player* player)
+    {
+        if (!player) return;
+        TeamId pteam = TEAM_ALLIANCE;
+        if (pteam != TEAM_ALLIANCE && pteam != TEAM_HORDE) return;
+        uint32 first = player->GetTeamId() == TEAM_ALLIANCE ? 1 : 15;
+        uint32 last = first + 13;
+        for (uint32 titleId = last; titleId >= first; --titleId)
+        {
+            CharTitlesEntry const* titleInfo = sCharTitlesStore.LookupEntry(titleId);
+            if (titleInfo)
+            {
+                if (player->HasTitle(titleInfo))
+                {
+                    player->SetTitle(titleInfo, true);
+                    if (!player->HasTitle(player->GetInt32Value(PLAYER_CHOSEN_TITLE))) player->SetUInt32Value(PLAYER_CHOSEN_TITLE, 0);
+                }
+            }
+        }
+    };
 };
 
 #define sBRTitulosMgr BRTitulosMgr::instance()

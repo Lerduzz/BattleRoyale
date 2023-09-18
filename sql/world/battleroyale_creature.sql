@@ -15,7 +15,7 @@ SET
 @TypeFlags 	:= 0,
 @FlagsExtra := 2,
 @AIName		:= "SmartAI",
-@Script 	:= "npc_battleroyale";
+@Script 	:= "BattleRoyaleCreature";
 
 -- NPC
 DELETE FROM creature_template WHERE entry = @Entry;

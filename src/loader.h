@@ -1,1 +1,1 @@
-void AddModBattleRoyaleScripts();
+void AddBattleRoyaleScripts();

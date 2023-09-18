@@ -21,20 +21,21 @@
 #include "SpellScript.h"
 #include "SpellAuraEffects.h"
 
-class ModBattleRoyalePlayer : public PlayerScript
+class BattleRoyalePlayer : public PlayerScript
 {
 public:
 
-    ModBattleRoyalePlayer() : PlayerScript("ModBattleRoyalePlayer") { }
+    BattleRoyalePlayer() : PlayerScript("BattleRoyalePlayer") { }
 
     void OnLogin(Player* player) override {
         if (sConfigMgr->GetOption<bool>("BattleRoyale.Enabled", true))
         {
             if (sConfigMgr->GetOption<bool>("BattleRoyale.Announce", true))
             {
-                ChatHandler(player->GetSession()).SendSysMessage("El modulo |cff4CFF00BattleRoyale|r ha sido activado.");
+                ChatHandler(player->GetSession()).SendSysMessage("El modo |cff4CFF00BattleRoyale|r ha sido activado.");
             }
             sBattleRoyaleMgr->QuitarAlas(player);
+            if (sBRListaNegraMgr->EstaBloqueado(player->GetGUID().GetCounter()) != "") sBRTitulosMgr->Quitar(player);
         }
     }
     
@@ -151,12 +152,12 @@ public:
     }
 };
 
-class npc_battleroyale : public CreatureScript
+class BattleRoyaleCreature : public CreatureScript
 {
 
 public:
 
-    npc_battleroyale() : CreatureScript("npc_battleroyale") { }
+    BattleRoyaleCreature() : CreatureScript("BattleRoyaleCreature") { }
 
     bool OnGossipHello(Player* player, Creature* creature)
     {
@@ -209,11 +210,11 @@ public:
     }
 };
 
-class BattleRoyaleWorldScript : public WorldScript
+class BattleRoyaleWorld : public WorldScript
 {
 public:
-	BattleRoyaleWorldScript()
-		: WorldScript("BattleRoyaleWorldScript")
+	BattleRoyaleWorld()
+		: WorldScript("BattleRoyaleWorld")
 	{
 	}
 	void OnUpdate(uint32 diff) override
@@ -222,10 +223,10 @@ public:
 	}
 };
 
-class BattleRoyaleItemAlas : public ItemScript
+class BattleRoyaleItem : public ItemScript
 {
 public:
-    BattleRoyaleItemAlas() : ItemScript("BattleRoyaleItemAlas") { }
+    BattleRoyaleItem() : ItemScript("BattleRoyaleItem") { }
 
     bool OnUse(Player* player, Item* /*item*/, const SpellCastTargets &) override
     {
@@ -257,9 +258,50 @@ public:
     }
 };
 
-void AddModBattleRoyaleScripts() {
-    new ModBattleRoyalePlayer();
-    new npc_battleroyale();
-    new BattleRoyaleWorldScript();
-    new BattleRoyaleItemAlas();
+class BattleRoyaleCommand : public CommandScript
+{
+public:
+    BattleRoyaleCommand() : CommandScript("BattleRoyaleCommand") {}
+
+    Acore::ChatCommands::ChatCommandTable GetCommands() const override
+    {
+        static Acore::ChatCommands::ChatCommandTable commandTable = {
+            {"", HandleBRCommand, SEC_PLAYER, Acore::ChatCommands::Console::No}, 
+            {"recargar", HandleReloadCommand, 5, Acore::ChatCommands::Console::Yes}
+        };
+
+        static Acore::ChatCommands::ChatCommandTable baseTable = {
+            {"br", commandTable}
+        };
+
+        return baseTable;
+    }
+
+    static bool HandleBRCommand(ChatHandler *handler)
+    {
+        if (sConfigMgr->GetOption<bool>("BattleRoyale.Enabled", true))
+        {
+            handler->SendSysMessage("El modo |cff4CFF00BattleRoyale|r se encuentra |cff00ff00activado|r.");
+        }
+        else
+        {
+            handler->SendSysMessage("El modo |cff4CFF00BattleRoyale|r se encuentra |cffff0000desactivado|r.");
+        }
+        return true;
+    }
+
+    static bool HandleReloadCommand(ChatHandler *handler)
+    {
+        sBRListaNegraMgr->RecargarLista();
+        handler->SendSysMessage("Se ha recargado la lista negra del modo Battle Royale.");
+        return true;
+    }
+};
+
+void AddBattleRoyaleScripts() {
+    new BattleRoyalePlayer();
+    new BattleRoyaleCreature();
+    new BattleRoyaleWorld();
+    new BattleRoyaleItem();
+    new BattleRoyaleCommand();
 }
