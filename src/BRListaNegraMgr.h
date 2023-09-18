@@ -9,18 +9,7 @@ class BRListaNegraMgr
 {
     BRListaNegraMgr()
     {
-        list_Negra.clear();
-        QueryResult result = WorldDatabase.Query("SELECT `guid`, `reason` FROM `battleroyale_blacklist`;");
-        if (result)
-        {
-            do
-            {
-                Field* fields      = result->Fetch();
-                uint32 guid        = fields[0].Get<uint32>();
-                std::string reason = fields[1].Get<std::string>();
-                list_Negra[guid]   = reason;
-            } while (result->NextRow());
-        }
+        RecargarLista();
     };
     ~BRListaNegraMgr()
     {
@@ -42,12 +31,19 @@ public:
         }
         return nullptr;
     };
-    void Bloquear(uint32 guid, std::string reason)
+    void RecargarLista()
     {
-        if (list_Negra.find(guid) == list_Negra.end())
+        list_Negra.clear();
+        QueryResult result = WorldDatabase.Query("SELECT `guid`, `reason` FROM `battleroyale_blacklist`;");
+        if (result)
         {
-            list_Negra[guid] = reason;
-            // TODO: Actualizar en la base de datos.
+            do
+            {
+                Field* fields      = result->Fetch();
+                uint32 guid        = fields[0].Get<uint32>();
+                std::string reason = fields[1].Get<std::string>();
+                list_Negra[guid]   = reason;
+            } while (result->NextRow());
         }
     };
 
