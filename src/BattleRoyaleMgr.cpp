@@ -70,7 +70,7 @@ void BattleRoyaleMgr::GestionarJugadorEntrando(Player* player)
     if (blr != "")
     {
         // TODO: Mover mensaje a sBRChat.
-        ChatHandler(player->GetSession()).PSendSysMessage("|cff4CFF00BattleRoyale::|r Su personaje ha sido bloqueado de este modo de juego. Motivo: |cffff0000%s|r.", blr.c_str());
+        ChatHandler(player->GetSession()).PSendSysMessage("|cff4CFF00BattleRoyale::|r No puedes utilizar este modo de juego. Motivo: |cffff0000%s|r.", blr.c_str());
         return;
     }
     if (player->isUsingLfg())

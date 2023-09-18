@@ -267,7 +267,7 @@ public:
     {
         static Acore::ChatCommands::ChatCommandTable commandTable = {
             {"", HandleBRCommand, SEC_PLAYER, Acore::ChatCommands::Console::No}, 
-            {"reload", HandleReloadCommand, 5, Acore::ChatCommands::Console::Yes}
+            {"recargar", HandleReloadCommand, 5, Acore::ChatCommands::Console::Yes}
         };
 
         static Acore::ChatCommands::ChatCommandTable baseTable = {
@@ -293,7 +293,7 @@ public:
     static bool HandleReloadCommand(ChatHandler *handler)
     {
         sBRListaNegraMgr->RecargarLista();
-        handler->SendSysMessage("|cff4CFF00BattleRoyale::|r Se ha recargado la lista negra.");
+        handler->SendSysMessage("Se ha recargado la lista negra del modo Battle Royale.");
         return true;
     }
 };
