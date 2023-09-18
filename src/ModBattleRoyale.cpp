@@ -21,11 +21,11 @@
 #include "SpellScript.h"
 #include "SpellAuraEffects.h"
 
-class ModBattleRoyalePlayer : public PlayerScript
+class BattleRoyalePlayer : public PlayerScript
 {
 public:
 
-    ModBattleRoyalePlayer() : PlayerScript("ModBattleRoyalePlayer") { }
+    BattleRoyalePlayer() : PlayerScript("BattleRoyalePlayer") { }
 
     void OnLogin(Player* player) override {
         if (sConfigMgr->GetOption<bool>("BattleRoyale.Enabled", true))
@@ -152,12 +152,12 @@ public:
     }
 };
 
-class npc_battleroyale : public CreatureScript
+class BattleRoyaleCreature : public CreatureScript
 {
 
 public:
 
-    npc_battleroyale() : CreatureScript("npc_battleroyale") { }
+    BattleRoyaleCreature() : CreatureScript("BattleRoyaleCreature") { }
 
     bool OnGossipHello(Player* player, Creature* creature)
     {
@@ -210,11 +210,11 @@ public:
     }
 };
 
-class BattleRoyaleWorldScript : public WorldScript
+class BattleRoyaleWorld : public WorldScript
 {
 public:
-	BattleRoyaleWorldScript()
-		: WorldScript("BattleRoyaleWorldScript")
+	BattleRoyaleWorld()
+		: WorldScript("BattleRoyaleWorld")
 	{
 	}
 	void OnUpdate(uint32 diff) override
@@ -223,10 +223,10 @@ public:
 	}
 };
 
-class BattleRoyaleItemAlas : public ItemScript
+class BattleRoyaleItem : public ItemScript
 {
 public:
-    BattleRoyaleItemAlas() : ItemScript("BattleRoyaleItemAlas") { }
+    BattleRoyaleItem() : ItemScript("BattleRoyaleItem") { }
 
     bool OnUse(Player* player, Item* /*item*/, const SpellCastTargets &) override
     {
@@ -258,10 +258,10 @@ public:
     }
 };
 
-class BattleRoyaleCommands : public CommandScript
+class BattleRoyaleCommand : public CommandScript
 {
 public:
-    BattleRoyaleCommands() : CommandScript("BattleRoyaleCommands") {}
+    BattleRoyaleCommand() : CommandScript("BattleRoyaleCommand") {}
 
     Acore::ChatCommands::ChatCommandTable GetCommands() const override
     {
@@ -299,9 +299,9 @@ public:
 };
 
 void AddModBattleRoyaleScripts() {
-    new ModBattleRoyalePlayer();
-    new npc_battleroyale();
-    new BattleRoyaleWorldScript();
-    new BattleRoyaleItemAlas();
-    new BattleRoyaleCommands();
+    new BattleRoyalePlayer();
+    new BattleRoyaleCreature();
+    new BattleRoyaleWorld();
+    new BattleRoyaleItem();
+    new BattleRoyaleCommand();
 }

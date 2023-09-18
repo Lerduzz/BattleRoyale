@@ -16,7 +16,7 @@ SET
 @Duration      := 900,
 @Flags         := 128,
 @FlagsCustom   := 1,
-@Script        := 'BattleRoyaleItemAlas';
+@Script        := 'BattleRoyaleItem';
 
 DELETE FROM `item_template` WHERE `entry` = @Entry;
 DELETE FROM `item_template_locale` WHERE `ID` = @Entry;
