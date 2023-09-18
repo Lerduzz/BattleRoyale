@@ -32,7 +32,7 @@ public:
         {
             if (sConfigMgr->GetOption<bool>("BattleRoyale.Announce", true))
             {
-                ChatHandler(player->GetSession()).SendSysMessage("El modulo |cff4CFF00BattleRoyale|r ha sido activado.");
+                ChatHandler(player->GetSession()).SendSysMessage("El modo |cff4CFF00BattleRoyale|r ha sido activado.");
             }
             sBattleRoyaleMgr->QuitarAlas(player);
             if (sBRListaNegraMgr->EstaBloqueado(player->GetGUID().GetCounter())) sBRTitulosMgr->Quitar(player);
@@ -258,9 +258,50 @@ public:
     }
 };
 
+class BattleRoyaleCommands : public CommandScript
+{
+public:
+    BattleRoyaleCommands() : CommandScript("BattleRoyaleCommands") {}
+
+    Acore::ChatCommands::ChatCommandTable GetCommands() const override
+    {
+        static Acore::ChatCommands::ChatCommandTable commandTable = {
+            {"", HandleBRCommand, SEC_PLAYER, Acore::ChatCommands::Console::No}, 
+            {"reload", HandleReloadCommand, 5, Acore::ChatCommands::Console::Yes}
+        };
+
+        static Acore::ChatCommands::ChatCommandTable baseTable = {
+            {"br", commandTable}
+        };
+
+        return baseTable;
+    }
+
+    static bool HandleBRCommand(ChatHandler *handler)
+    {
+        if (sConfigMgr->GetOption<bool>("BattleRoyale.Enabled", true))
+        {
+            handler.SendSysMessage("El modo |cff4CFF00BattleRoyale|r se encuentra |cff00ff00activado|r.");
+        }
+        else
+        {
+            handler.SendSysMessage("El modo |cff4CFF00BattleRoyale|r se encuentra |cffff0000desactivado|r.");
+        }
+        return true;
+    }
+
+    static bool HandleReloadCommand(ChatHandler *handler)
+    {
+        sBRListaNegraMgr->RecargarLista();
+        handler.SendSysMessage("|cff4CFF00BattleRoyale::|r Se ha recargado la lista negra.");
+        return true;
+    }
+};
+
 void AddModBattleRoyaleScripts() {
     new ModBattleRoyalePlayer();
     new npc_battleroyale();
     new BattleRoyaleWorldScript();
     new BattleRoyaleItemAlas();
+    new BattleRoyaleCommands();
 }
