@@ -395,8 +395,8 @@ void BattleRoyaleMgr::SalirDelEvento(uint32 guid, bool logout /* = false*/)
     if (EstaEnCola(guid)) list_Cola.erase(guid);
     if (EstaEnEvento(guid))
     {
-        CambiarDimension_Salir(guid);
         Player* player = list_Jugadores[guid];
+        player->SetPhaseMask(DIMENSION_NORMAL, true);
         if (player->IsAlive())
         {
             if (player->HasAura(HECHIZO_ALAS_MAGICAS)) player->RemoveAurasDueToSpell(HECHIZO_ALAS_MAGICAS);
