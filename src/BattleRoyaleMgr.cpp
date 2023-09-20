@@ -321,7 +321,7 @@ void BattleRoyaleMgr::RestablecerTodoElEvento()
     list_Cola.clear();
 	list_Jugadores.clear();
     list_Datos.clear();
-    mapaActual = list_Mapas.begin();
+    SiguienteMapa();
     indicadorDeSegundos = 1000;
     indiceDeVariacion = 0;
     sBRObjetosMgr->DesaparecerTodosLosObjetos();
@@ -482,11 +482,7 @@ void BattleRoyaleMgr::ControlDeReglas()
         {
             if (it->second && it->second->IsAlive())
             {
-                if
-                (
-                    (it->second->HasAura(31700)) ||
-                    (sBRObjetosMgr->DistanciaDelCentro(it->second) > 1147.0f)
-                )
+                if (sBRObjetosMgr->DistanciaDelCentro(it->second) > 1147.0f)
                 {
                     uint32 guid = it->first;
                     ++it;

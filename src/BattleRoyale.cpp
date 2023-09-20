@@ -18,6 +18,7 @@
 #include "DBCStructure.h"
 #include "DBCStores.h"
 #include "ObjectMgr.h"
+#include "Spell.h"
 #include "SpellScript.h"
 #include "SpellAuraEffects.h"
 
@@ -298,10 +299,34 @@ public:
     }
 };
 
+class BattleRoyaleSpell : public SpellSC
+{
+public:
+
+    BattleRoyaleSpell() : SpellSC("BattleRoyaleSpell") {}
+
+    void OnSpellCheckCast(Spell* spell, bool /*strict*/, SpellCastResult& res) override
+    {
+        if (spell)
+        {
+            Unit* uCaster = spell->GetCaster();
+            Player* pCaster = uCaster && uCaster->GetTypeId() == TYPEID_PLAYER ? uCaster->ToPlayer() : nullptr;
+            if (pCaster && sBattleRoyaleMgr->EstaEnEvento(pCaster))
+            {
+                if (const SpellInfo* spInf = spell->GetSpellInfo())
+                {
+                    if (spInf->HasAura(SPELL_AURA_FLY) || spInf->HasAura(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED)) res = SPELL_FAILED_NOT_HERE;
+                }
+            }
+        }
+    }
+};
+
 void AddBattleRoyaleScripts() {
     new BattleRoyalePlayer();
     new BattleRoyaleCreature();
     new BattleRoyaleWorld();
     new BattleRoyaleItem();
     new BattleRoyaleCommand();
+    new BattleRoyaleSpell();
 }
