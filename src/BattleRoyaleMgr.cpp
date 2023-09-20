@@ -210,6 +210,10 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
                             RestablecerTodoElEvento();
                             return;
                         }
+                        else
+                        {
+                            AlReducirseLaZona();
+                        }
                     }
                     tiempoRestanteInicio--;
                 }
@@ -245,6 +249,10 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
                 {
                     RestablecerTodoElEvento();
                     return;
+                }
+                else
+                {
+                    AlReducirseLaZona();
                 }
                 sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_ZONA_REDUCIDA, list_Jugadores);
                 sBRChatMgr->NotificarZonaReducida(list_Jugadores);
