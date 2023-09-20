@@ -25,6 +25,50 @@ public:
         return instance;
     }
 
+    void DesaparecerTodosLosObjetos()
+    {
+        DesaparecerZona();
+        DesaparecerCentro();
+        DesaparecerNave();
+    };
+    bool DesaparecerZona()
+    {
+        if (obj_Zona) {
+            obj_Zona->CleanupsBeforeDelete();
+            delete obj_Zona;
+            obj_Zona = nullptr;
+            return true;
+        }
+        return false;
+    };
+    bool DesaparecerCentro()
+    {
+        if (obj_Centro) {
+            obj_Centro->CleanupsBeforeDelete();
+            delete obj_Centro;
+            obj_Centro = nullptr;
+            return true;
+        }
+        return false;
+    };
+    bool DesaparecerNave()
+    {
+        if (obj_Nave) {
+            if(Transport* tp = obj_Nave->ToTransport())
+            {
+                tp->CleanupsBeforeDelete();
+            }
+            else
+            {
+                obj_Nave->CleanupsBeforeDelete();
+            }
+            delete obj_Nave;
+            obj_Nave = nullptr;
+            return true;
+        }
+        return false;
+    };
+    
     bool InvocarNave(Position pos)
     {
         int mapID = (*mapaActual).second->idMapa;
@@ -143,50 +187,6 @@ public:
         }
         return false;
     };
-    void DesaparecerTodosLosObjetos()
-    {
-        DesaparecerZona();
-        DesaparecerCentro();
-        DesaparecerNave();
-    };
-    bool DesaparecerZona()
-    {
-        if (obj_Zona) {
-            obj_Zona->CleanupsBeforeDelete();
-            delete obj_Zona;
-            obj_Zona = nullptr;
-            return true;
-        }
-        return false;
-    };
-    bool DesaparecerCentro()
-    {
-        if (obj_Centro) {
-            obj_Centro->CleanupsBeforeDelete();
-            delete obj_Centro;
-            obj_Centro = nullptr;
-            return true;
-        }
-        return false;
-    };
-    bool DesaparecerNave()
-    {
-        if (obj_Nave) {
-            if(Transport* tp = obj_Nave->ToTransport())
-            {
-                tp->CleanupsBeforeDelete();
-            }
-            else
-            {
-                obj_Nave->CleanupsBeforeDelete();
-            }
-            delete obj_Nave;
-            obj_Nave = nullptr;
-            return true;
-        }
-        return false;
-    };
-
 
 private:
     GameObject* obj_Zona;
