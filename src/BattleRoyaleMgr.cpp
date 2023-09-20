@@ -203,7 +203,7 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
                             RestablecerTodoElEvento();
                             return;
                         }
-                        if (!InvocarZonaSegura())
+                        if (!HayJugadores() || !sBRObjetosMgr->InvocarZonaSegura(mapaActual->second->idMapa, mapaActual->second->centroMapa, indiceDeZona))
                         {
                             RestablecerTodoElEvento();
                             return;
@@ -239,7 +239,8 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
                 QuitarAlasProgramado();
             } else indicadorDeSegundos -= diff;
             if (tiempoRestanteZona <= 0) {
-                if (!InvocarZonaSegura()) {
+                if (!HayJugadores() || !sBRObjetosMgr->InvocarZonaSegura(mapaActual->second->idMapa, mapaActual->second->centroMapa, indiceDeZona))
+                {
                     RestablecerTodoElEvento();
                     return;
                 }
@@ -313,7 +314,6 @@ void BattleRoyaleMgr::RestablecerTodoElEvento()
     mapaActual = list_Mapas.begin();
     indicadorDeSegundos = 1000;
     indiceDeVariacion = 0;
-    estaLaZonaActiva = false;
     sBRObjetosMgr->DesaparecerTodosLosObjetos();
     estadoActual = ESTADO_NO_HAY_SUFICIENTES_JUGADORES;
 }
@@ -436,7 +436,7 @@ void BattleRoyaleMgr::EfectoFueraDeZona()
             if (obj_Centro && it->second && it->second->IsAlive())
             {
                 float distance = it->second->GetExactDist(obj_Centro);
-                if (!estaLaZonaActiva || (indiceDeZona > 0 && distance > BR_EscalasDeZonaSegura[indiceDeZona - 1] * 66.0f)) {
+                if (!sBRObjetosMgr->EstaLaZonaActiva() || (indiceDeZona > 0 && distance > BR_EscalasDeZonaSegura[indiceDeZona - 1] * 66.0f)) {
                     list_Datos[it->first].dmg_tick++;
                     uint32 damage = it->second->GetMaxHealth() * (2 * sqrt(list_Datos[it->first].dmg_tick) + indiceDeZona) / 100;
                     it->second->GetSession()->SendNotification("|cffff0000¡Has recibido |cffDA70D6%u|cffff0000 de daño, adéntrate en la zona segura!", damage); // TODO: Mover al sistema de mensajes.

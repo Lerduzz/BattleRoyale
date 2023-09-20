@@ -19,6 +19,9 @@ enum BR_ObjetosMundo
     OBJETO_ZONA_SEGURA_INICIAL              = 500001,
 };
 
+const int CANTIDAD_DE_ZONAS                 = 10;
+const float BR_EscalasDeZonaSegura[CANTIDAD_DE_ZONAS] = { 5.0f, 4.5f, 4.0f, 3.5f, 3.0f, 2.5f, 2.0f, 1.5f, 1.0f, 0.5f };
+
 class BRObjetosMgr
 {
     BRObjetosMgr()
@@ -26,6 +29,7 @@ class BRObjetosMgr
         obj_Zona = nullptr;
         obj_Centro = nullptr;
         obj_Nave = nullptr;
+        zonaActiva = false;    
     };
     ~BRObjetosMgr(){};
 
@@ -134,61 +138,52 @@ public:
         }
         return false;
     };
-    bool InvocarZonaSegura()
+    bool InvocarZonaSegura(uint32 mapID, Position pos, int& index)
     {
-        if (HayJugadores())
+        Map* map = sMapMgr->FindBaseNonInstanceMap(mapID);
+        if (map)
         {
-            int mapID = (*mapaActual).second->idMapa;
-            Map* map = sMapMgr->FindBaseNonInstanceMap(mapID);
-            if (map)
+            // AlReducirseLaZona();
+            DesaparecerZona();
+            if (index < CANTIDAD_DE_ZONAS)
             {
-                AlReducirseLaZona();
-                DesaparecerZona();
-                if (indiceDeZona < CANTIDAD_DE_ZONAS)
+                float x = pos.GetPositionX();
+                float y = pos.GetPositionY();
+                float z = pos.GetPositionZ() + BR_EscalasDeZonaSegura[index] * 66.0f;
+                float o = pos.GetOrientation();
+                map->LoadGrid(x, y);
+                obj_Zona = new GameObject();
+                if (obj_Zona->Create(map->GenerateLowGuid<HighGuid::GameObject>(), OBJETO_ZONA_SEGURA_INICIAL + index, map, DIMENSION_EVENTO, x, y, z, o, G3D::Quat(), 100, GO_STATE_READY))
                 {
-                    float x = (*mapaActual).second->centroMapa.GetPositionX();
-                    float y = (*mapaActual).second->centroMapa.GetPositionY();
-                    float z = (*mapaActual).second->centroMapa.GetPositionZ() + BR_EscalasDeZonaSegura[indiceDeZona] * 66.0f;
-                    float o = (*mapaActual).second->centroMapa.GetOrientation();
-                    map->LoadGrid(x, y);
-                    obj_Zona = new GameObject();
-                    if (obj_Zona->Create(map->GenerateLowGuid<HighGuid::GameObject>(), OBJETO_ZONA_SEGURA_INICIAL + indiceDeZona, map, DIMENSION_EVENTO, x, y, z, o, G3D::Quat(), 100, GO_STATE_READY))
-                    {
-                        obj_Zona->SetVisibilityDistanceOverride(VisibilityDistanceType::Infinite);
-                        map->AddToMap(obj_Zona);
-                        indiceDeZona++;
-                        estaLaZonaActiva = true;
-                        return true;
-                    }
-                    else
-                    {
-                        LOG_ERROR("br.nave", "BattleRoyaleMgr::InvocarZonaSegura: No se ha podido invocar la zona (OBJETO = {})!", OBJETO_ZONA_SEGURA_INICIAL + indiceDeZona);
-                        delete obj_Zona;
-                        obj_Zona = nullptr;
-                    }
+                    obj_Zona->SetVisibilityDistanceOverride(VisibilityDistanceType::Infinite);
+                    map->AddToMap(obj_Zona);
+                    index++;
+                    zonaActiva = true;
+                    return true;
                 }
                 else
                 {
-                    estaLaZonaActiva = false;
-                    return true;
+                    delete obj_Zona;
+                    obj_Zona = nullptr;
                 }
             }
             else
             {
-                LOG_ERROR("br.nave", "BattleRoyaleMgr::InvocarZonaSegura: No se ha podido obtener el mapa para la zona (MAPA: {})!", mapID);
+                zonaActiva = false;
+                return true;
             }
-        }
-        else
-        {
-            LOG_ERROR("br.nave", "BattleRoyaleMgr::InvocarZonaSegura: No se ha invocado la zona (OBJETO = {}) porque no hay jugadores!", OBJETO_ZONA_SEGURA_INICIAL + indiceDeZona);
         }
         return false;
     };
+
+    bool EstaLaZonaActiva() { return zonaActiva; };
 
 private:
     GameObject* obj_Zona;
     GameObject* obj_Centro;
     GameObject* obj_Nave;
+
+    bool zonaActiva;
 
 };
 

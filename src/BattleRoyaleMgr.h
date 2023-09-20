@@ -299,7 +299,6 @@ private:
     int indicadorDeSegundos;
     bool estaZonaAnunciada5s;
     bool estaZonaAnunciada10s;
-    bool estaLaZonaActiva;
 
     uint32 conf_JugadoresMinimo;
     uint32 conf_JugadoresMaximo;
