@@ -378,9 +378,9 @@ void BattleRoyaleMgr::LlamarDentroDeNave(uint32 guid)
     }
     player->SetPhaseMask(DIMENSION_EVENTO, true);
     DejarGrupo(player);
+    Desmontar(player);
     float ox = BR_VariacionesDePosicion[indiceDeVariacion][0];
     float oy = BR_VariacionesDePosicion[indiceDeVariacion][1];
-    Desmontar(player);
     player->TeleportTo((*mapaActual).second->idMapa, (*mapaActual).second->inicioNave.GetPositionX() + ox, (*mapaActual).second->inicioNave.GetPositionY() + oy, (*mapaActual).second->inicioNave.GetPositionZ() + 2.5f, (*mapaActual).second->inicioNave.GetOrientation() + M_PI / 2.0f);
     player->SetPvP(false);
     player->AddAura(HECHIZO_LENGUAJE_BINARIO, player);
