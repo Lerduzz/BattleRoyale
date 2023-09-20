@@ -198,11 +198,13 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
                         estaZonaAnunciada10s = false;
                         obj_Centro = nullptr;
                         obj_Zona = nullptr;
-                        if (!InvocarCentroDelMapa()) {
+                        if (!HayJugadores() || !sBRObjetosMgr->InvocarCentroDelMapa(mapaActual->second->idMapa, mapaActual->second->centroMapa))
+                        {
                             RestablecerTodoElEvento();
                             return;
                         }
-                        if (!InvocarZonaSegura()) {
+                        if (!InvocarZonaSegura())
+                        {
                             RestablecerTodoElEvento();
                             return;
                         }
@@ -321,7 +323,7 @@ void BattleRoyaleMgr::IniciarNuevaRonda()
     if (estadoActual == ESTADO_NO_HAY_SUFICIENTES_JUGADORES)
     {
         tiempoRestanteInicio = 75;
-        if (!HayCola() || !sBRObjetosMgr->InvocarNave(mapaActual->second->inicioNave))
+        if (!HayCola() || !sBRObjetosMgr->InvocarNave(mapaActual->second->idMapa, mapaActual->second->inicioNave))
         {
             RestablecerTodoElEvento();
             return;

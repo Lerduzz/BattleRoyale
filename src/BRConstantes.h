@@ -13,12 +13,6 @@ enum BR_EstadosEvento
     ESTADO_BATALLA_TERMINADA,
 };
 
-enum BR_Dimensiones
-{
-    DIMENSION_NORMAL                        = 0x00000001,
-    DIMENSION_EVENTO                        = 0x00000002,
-};
-
 enum BR_Hechizos
 {
     HECHIZO_PARACAIDAS                      = 45472,
