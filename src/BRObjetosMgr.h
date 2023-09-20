@@ -1,5 +1,5 @@
-#ifndef SC_BR_SOUNDS_MGR_H
-#define SC_BR_SOUNDS_MGR_H
+#ifndef SC_BR_OBJ_MGR_H
+#define SC_BR_OBJ_MGR_H
 
 #include "GameObject.h"
 #include "MapMgr.h"

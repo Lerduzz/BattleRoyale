@@ -232,7 +232,7 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
                 }
                 if (--tiempoRestanteNave <= 0)
                 {
-                    if (DesaparecerNave())
+                    if (sBRObjetosMgr->DesaparecerNave())
                     {
                         sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_NAVE_RETIRADA, list_Jugadores);
                         sBRChatMgr->NotificarNaveRetirada(list_Jugadores);
@@ -548,7 +548,7 @@ void BattleRoyaleMgr::FinalizarRonda(bool announce, Player* winner /* = nullptr*
     {
         sBRChatMgr->AnunciarEmpate();
     }
-    DesaparecerTodosLosObjetos();
+    sBRObjetosMgr->DesaparecerTodosLosObjetos();
     tiempoRestanteFinal = 10;
     SiguienteMapa();
     estadoActual = ESTADO_BATALLA_TERMINADA;
