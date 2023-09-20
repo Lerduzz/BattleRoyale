@@ -73,8 +73,23 @@ private:
             && EstaEnEvento(list_Datos[player->GetGUID().GetCounter()].spect) && list_Jugadores[list_Datos[player->GetGUID().GetCounter()].spect]->IsAlive();
     };
     bool HaySuficientesEnCola() { return list_Cola.size() >= conf_JugadoresMinimo; };
-    void SiguienteMapa() { if (++mapaActual == list_Mapas.end()) mapaActual = list_Mapas.begin(); };
     void SiguientePosicion() { if (++indiceDeVariacion >= CANTIDAD_DE_VARIACIONES) indiceDeVariacion = 0; };
+    void SiguienteMapa()
+    {
+        // if (++mapaActual == list_Mapas.end()) mapaActual = list_Mapas.begin();
+        int num = list_Mapas.size();
+        if (num <= 1)
+        {
+            mapaActual = list_Mapas.begin();
+        }
+        else
+        {
+            int rnd = rand() % num;
+            mapaActual = list_Mapas.begin();
+            int temp = 0;
+            while (++temp <= rnd) mapaActual++;
+        }
+    };
     void DejarGrupo(Player* player)
     { 
         player->RemoveFromGroup(); 

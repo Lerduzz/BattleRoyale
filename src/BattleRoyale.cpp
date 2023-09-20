@@ -25,10 +25,9 @@
 // virtual void OnSpellCast(Player* /*player*/, Spell* /*spell*/, bool /*skipCheck*/) { }
 // virtual void OnBeingCharmed(Player* /*player*/, Unit* /*charmer*/, uint32 /*oldFactionId*/, uint32 /*newFactionId*/) { }
 // virtual void OnLootItem(Player* /*player*/, Item* /*item*/, uint32 /*count*/, ObjectGuid /*lootguid*/) { }
-// virtual void OnIsFFAPvP(Player* /*player*/, bool& /*result*/) { }
-// virtual void OnIsPvP(Player* /*player*/, bool& /*result*/) { }
-// virtual void OnPlayerResurrect(Player* /*player*/, float /*restore_percent*/, bool /*applySickness*/) { }
-// SpellSC:: virtual void OnSpellCheckCast(Spell* /*spell*/, bool /*strict*/, SpellCastResult& /*res*/) { }
+// Para todos contra todos mejor: virtual void OnIsFFAPvP(Player* /*player*/, bool& /*result*/) { }
+// Para evitar que se fajen en el avion: virtual void OnIsPvP(Player* /*player*/, bool& /*result*/) { }
+// Para el espectar: virtual void OnPlayerResurrect(Player* /*player*/, float /*restore_percent*/, bool /*applySickness*/) { }
 
 class BattleRoyalePlayer : public PlayerScript
 {

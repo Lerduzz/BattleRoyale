@@ -321,7 +321,8 @@ void BattleRoyaleMgr::RestablecerTodoElEvento()
     list_Cola.clear();
 	list_Jugadores.clear();
     list_Datos.clear();
-    mapaActual = list_Mapas.begin();
+    // mapaActual = list_Mapas.begin();
+    SiguienteMapa();
     indicadorDeSegundos = 1000;
     indiceDeVariacion = 0;
     sBRObjetosMgr->DesaparecerTodosLosObjetos();
