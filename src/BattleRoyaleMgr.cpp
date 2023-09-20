@@ -182,12 +182,16 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
                         sBRChatMgr->NotificarTiempoInicial(tiempoRestanteInicio, list_Jugadores);
                     }
                     if (estadoActual == ESTADO_INVOCANDO_JUGADORES) DarAlasProgramado();
-                    if (estadoActual == ESTADO_INVOCANDO_JUGADORES && tiempoRestanteInicio <= 45 && obj_Nave)
+                    if (estadoActual == ESTADO_INVOCANDO_JUGADORES && tiempoRestanteInicio <= 45)
                     {
-                        estadoActual = ESTADO_NAVE_EN_MOVIMIENTO;
-                        uint32_t const autoCloseTime = obj_Nave->GetGOInfo()->GetAutoCloseTime() ? 10000u : 0u;
-                        obj_Nave->SetLootState(GO_READY);
-                        obj_Nave->UseDoorOrButton(autoCloseTime, false, nullptr);
+                        if (sBRObjetosMgr->EncenderNave())
+                        {
+                            estadoActual = ESTADO_NAVE_EN_MOVIMIENTO;
+                        }
+                        else
+                        {
+                            RestablecerTodoElEvento();
+                        }
                     }
                     if (estadoActual == ESTADO_NAVE_EN_MOVIMIENTO && tiempoRestanteInicio <= 20)
                     {
@@ -431,7 +435,7 @@ void BattleRoyaleMgr::EfectoFueraDeZona()
     {
         for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
         {
-            if (it->second && it->second->IsAlive())
+            if (it->second && it->second->IsAlive() && sBRObjetosMgr->HayCentro())
             {
                 float distance = sBRObjetosMgr->DistanciaDelCentro(it->second);
                 if (!sBRObjetosMgr->EstaLaZonaActiva() || (indiceDeZona > 0 && distance > BR_EscalasDeZonaSegura[indiceDeZona - 1] * 66.0f)) {

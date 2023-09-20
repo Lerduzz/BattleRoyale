@@ -113,6 +113,17 @@ public:
         }
         return false;
     };
+    bool EncenderNave()
+    {
+        if (obj_Nave)
+        {
+            uint32_t const autoCloseTime = obj_Nave->GetGOInfo()->GetAutoCloseTime() ? 10000u : 0u;
+            obj_Nave->SetLootState(GO_READY);
+            obj_Nave->UseDoorOrButton(autoCloseTime, false, nullptr);
+            return true;
+        }
+        return false;
+    };
     bool InvocarCentroDelMapa(uint32 mapID, Position pos)
     {
         Map* map = sMapMgr->FindBaseNonInstanceMap(mapID);
@@ -205,6 +216,10 @@ public:
 
     float DistanciaDelCentro(Player* player) { return obj_Centro ? player->GetExactDist(obj_Centro): 0.0f; };
     bool EstaLaZonaActiva() { return zonaActiva; };
+
+    bool HayZona() { return obj_Zona ? true : false; };
+    bool HayCentro() { return obj_Centro ? true : false; };
+    bool HayNave() { return obj_Nave ? true : false; };
 
 private:
     GameObject* obj_Zona;
