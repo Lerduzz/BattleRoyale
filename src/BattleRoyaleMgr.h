@@ -38,25 +38,11 @@ public:
     bool DebeRestringirFunciones(Player* player) { return estadoActual > ESTADO_NO_HAY_SUFICIENTES_JUGADORES && HayJugadores() && EstaEnEvento(player); };
     bool EstaEnCola(Player* player) { return EstaEnCola(player->GetGUID().GetCounter()); };
     bool EstaEnEvento(Player* player) { return EstaEnEvento(player->GetGUID().GetCounter()); };
-    bool EstaEnLaNave(Player* player)
-    {
-        if (player && obj_Nave)
-        {
-            if (Transport* tp = obj_Nave->ToTransport())
-            {
-                if (Transport* playertp = player->GetTransport())
-                {
-                    if (tp == playertp) return true;
-                }
-            }
-        }
-        return false;
-    };
     bool DebeForzarJcJTcT(Player* player) 
     {
         if (!player) return false;
         if (estadoActual != ESTADO_BATALLA_EN_CURSO || !HayJugadores() || !EstaEnEvento(player)) return false;
-        return !EstaEnLaNave(player);
+        return !sBRObjetosMgr->EstaEnLaNave(player);
     };
     void QuitarAlas(Player* player) { player->DestroyItemCount(INVENTARIO_CAMISA_ALAS, 9999, true); };
 
@@ -118,8 +104,10 @@ private:
                 int rnd = rand() % 100 + 1;
                 if (rnd <= 35)
                 {
-                    obj_Centro->SummonGameObject(OBJETO_COFRE, it->second.GetPositionX(), it->second.GetPositionY(), it->second.GetPositionZ(), it->second.GetOrientation(), 0, 0, 0, 0, 60);
-                    chestCount++;
+                    if (sBRObjetosMgr->InvocarCofre(it->second))
+                    {
+                        chestCount++;
+                    }
                 }
             }
         }
@@ -163,7 +151,7 @@ private:
             BR_ListaDePersonajes::iterator it = list_Jugadores.begin();
             while (it != list_Jugadores.end())
             {
-                if (!EstaEnLaNave(it->second) || !it->second->IsAlive())
+                if (!sBRObjetosMgr->EstaEnLaNave(it->second) || !it->second->IsAlive())
                 {
                     uint32 guid = it->first;
                     ++it;
@@ -226,7 +214,7 @@ private:
             {
                 if (it->second && it->second->IsAlive())
                 {
-                    if (it->second->IsInWorld() && !it->second->IsBeingTeleported() && EstaEnLaNave(it->second))
+                    if (it->second->IsInWorld() && !it->second->IsBeingTeleported() && sBRObjetosMgr->EstaEnLaNave(it->second))
                     {
                         uint32 guid = it->first;
                         Player* player = it->second;

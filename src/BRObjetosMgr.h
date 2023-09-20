@@ -3,6 +3,7 @@
 
 #include "GameObject.h"
 #include "MapMgr.h"
+#include "Player.h"
 #include "Transport.h"
 
 enum BR_Dimensiones
@@ -175,7 +176,34 @@ public:
         }
         return false;
     };
+    bool InvocarCofre(Position pos)
+    {
+        if (obj_Centro)
+        {
+            if (obj_Centro->SummonGameObject(OBJETO_COFRE, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation(), 0, 0, 0, 0, 60))
+            {
+                return true;
+            }
+        }
+        return false;
+    }; 
 
+    bool EstaEnLaNave(Player* player)
+    {
+        if (player && obj_Nave)
+        {
+            if (Transport* tp = obj_Nave->ToTransport())
+            {
+                if (Transport* playertp = player->GetTransport())
+                {
+                    if (tp == playertp) return true;
+                }
+            }
+        }
+        return false;
+    };
+
+    float DistanciaDelCentro(Player* player) { return obj_Centro ? player->GetExactDist(obj_Centro): 0.0f; };
     bool EstaLaZonaActiva() { return zonaActiva; };
 
 private:

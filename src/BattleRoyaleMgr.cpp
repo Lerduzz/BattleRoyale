@@ -196,8 +196,6 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
                         tiempoRestanteZona = 0;
                         estaZonaAnunciada5s = false;
                         estaZonaAnunciada10s = false;
-                        obj_Centro = nullptr;
-                        obj_Zona = nullptr;
                         if (!HayJugadores() || !sBRObjetosMgr->InvocarCentroDelMapa(mapaActual->second->idMapa, mapaActual->second->centroMapa))
                         {
                             RestablecerTodoElEvento();
@@ -433,9 +431,9 @@ void BattleRoyaleMgr::EfectoFueraDeZona()
     {
         for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
         {
-            if (obj_Centro && it->second && it->second->IsAlive())
+            if (it->second && it->second->IsAlive())
             {
-                float distance = it->second->GetExactDist(obj_Centro);
+                float distance = sBRObjetosMgr->DistanciaDelCentro(it->second);
                 if (!sBRObjetosMgr->EstaLaZonaActiva() || (indiceDeZona > 0 && distance > BR_EscalasDeZonaSegura[indiceDeZona - 1] * 66.0f)) {
                     list_Datos[it->first].dmg_tick++;
                     uint32 damage = it->second->GetMaxHealth() * (2 * sqrt(list_Datos[it->first].dmg_tick) + indiceDeZona) / 100;
@@ -475,7 +473,7 @@ void BattleRoyaleMgr::ControlDeReglas()
                 if
                 (
                     (it->second->HasAura(31700)) ||
-                    (obj_Centro && it->second->GetExactDist(obj_Centro) > 1147.0f)
+                    (sBRObjetosMgr->DistanciaDelCentro(it->second) > 1147.0f)
                 )
                 {
                     uint32 guid = it->first;
