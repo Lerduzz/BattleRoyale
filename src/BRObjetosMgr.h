@@ -15,7 +15,12 @@ enum BR_ObjetosMundo
 
 class BRObjetosMgr
 {
-    BRObjetosMgr(){};
+    BRObjetosMgr()
+    {
+        obj_Zona = nullptr;
+        obj_Centro = nullptr;
+        obj_Nave = nullptr;
+    };
     ~BRObjetosMgr(){};
 
 public:

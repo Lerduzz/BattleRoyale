@@ -49,9 +49,6 @@ BattleRoyaleMgr::BattleRoyaleMgr()
             list_Mapas[id] = mapa;
         } while (result->NextRow());
     }
-    obj_Zona = nullptr;
-    obj_Centro = nullptr;
-    obj_Nave = nullptr;
     RestablecerTodoElEvento();
 }
 
@@ -315,7 +312,7 @@ void BattleRoyaleMgr::RestablecerTodoElEvento()
     indicadorDeSegundos = 1000;
     indiceDeVariacion = 0;
     estaLaZonaActiva = false;
-    DesaparecerTodosLosObjetos();
+    sBRObjetosMgr->DesaparecerTodosLosObjetos();
     estadoActual = ESTADO_NO_HAY_SUFICIENTES_JUGADORES;
 }
 
