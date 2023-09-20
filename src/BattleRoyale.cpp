@@ -18,8 +18,17 @@
 #include "DBCStructure.h"
 #include "DBCStores.h"
 #include "ObjectMgr.h"
+#include "Spell.h"
 #include "SpellScript.h"
 #include "SpellAuraEffects.h"
+
+// virtual void OnSpellCast(Player* /*player*/, Spell* /*spell*/, bool /*skipCheck*/) { }
+// virtual void OnBeingCharmed(Player* /*player*/, Unit* /*charmer*/, uint32 /*oldFactionId*/, uint32 /*newFactionId*/) { }
+// virtual void OnLootItem(Player* /*player*/, Item* /*item*/, uint32 /*count*/, ObjectGuid /*lootguid*/) { }
+// virtual void OnIsFFAPvP(Player* /*player*/, bool& /*result*/) { }
+// virtual void OnIsPvP(Player* /*player*/, bool& /*result*/) { }
+// virtual void OnPlayerResurrect(Player* /*player*/, float /*restore_percent*/, bool /*applySickness*/) { }
+// SpellSC:: virtual void OnSpellCheckCast(Spell* /*spell*/, bool /*strict*/, SpellCastResult& /*res*/) { }
 
 class BattleRoyalePlayer : public PlayerScript
 {
@@ -298,10 +307,34 @@ public:
     }
 };
 
+class BattleRoyaleSpell : public SpellSC
+{
+public:
+
+    BattleRoyaleSpell() : SpellSC("BattleRoyaleSpell") {}
+
+    void OnSpellCheckCast(Spell* spell, bool /*strict*/, SpellCastResult& res) override
+    {
+        if (spell)
+        {
+            Unit* uCaster = spell->GetCaster();
+            Player* pCaster = uCaster && uCaster->GetTypeId() == TYPEID_PLAYER ? uCaster->ToPlayer() : nullptr;
+            if (pCaster && sBattleRoyaleMgr->EstaEnEvento(pCaster))
+            {
+                if (const SpellInfo* spInf = spell->GetSpellInfo())
+                {
+                    if (spInf->HasAura(SPELL_AURA_FLY) || spInf->HasAura(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED)) res = SPELL_FAILED_NOT_HERE;
+                }
+            }
+        }
+    }
+};
+
 void AddBattleRoyaleScripts() {
     new BattleRoyalePlayer();
     new BattleRoyaleCreature();
     new BattleRoyaleWorld();
     new BattleRoyaleItem();
     new BattleRoyaleCommand();
+    new BattleRoyaleSpell();
 }
