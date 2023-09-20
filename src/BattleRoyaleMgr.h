@@ -4,6 +4,7 @@
 #include "BRConstantes.h"
 #include "BRChatMgr.h"
 #include "BRListaNegraMgr.h"
+#include "BRObjetosMgr.h"
 #include "BRSonidosMgr.h"
 #include "BRTitulosMgr.h"
 #include "BattleRoyaleData.h"
@@ -11,8 +12,6 @@
 #include "SharedDefines.h"
 #include "ScriptMgr.h"
 #include "Chat.h"
-#include "GameObject.h"
-#include "Transport.h"
 
 class BattleRoyaleData;
 typedef std::map<uint32, Player*> BR_ListaDePersonajes;
@@ -39,25 +38,11 @@ public:
     bool DebeRestringirFunciones(Player* player) { return estadoActual > ESTADO_NO_HAY_SUFICIENTES_JUGADORES && HayJugadores() && EstaEnEvento(player); };
     bool EstaEnCola(Player* player) { return EstaEnCola(player->GetGUID().GetCounter()); };
     bool EstaEnEvento(Player* player) { return EstaEnEvento(player->GetGUID().GetCounter()); };
-    bool EstaEnLaNave(Player* player)
-    {
-        if (player && obj_Nave)
-        {
-            if (Transport* tp = obj_Nave->ToTransport())
-            {
-                if (Transport* playertp = player->GetTransport())
-                {
-                    if (tp == playertp) return true;
-                }
-            }
-        }
-        return false;
-    };
     bool DebeForzarJcJTcT(Player* player) 
     {
         if (!player) return false;
         if (estadoActual != ESTADO_BATALLA_EN_CURSO || !HayJugadores() || !EstaEnEvento(player)) return false;
-        return !EstaEnLaNave(player);
+        return !sBRObjetosMgr->EstaEnLaNave(player);
     };
     void QuitarAlas(Player* player) { player->DestroyItemCount(INVENTARIO_CAMISA_ALAS, 9999, true); };
 
@@ -68,9 +53,6 @@ private:
     void LlamarDentroDeNave(uint32 guid);
     void SalirDelEvento(uint32 guid, bool logout = false);
     void RevivirJugador(Player *player);
-    bool InvocarNave();
-    bool InvocarCentroDelMapa();
-    bool InvocarZonaSegura();
     void EfectoFueraDeZona();
     void ActivarJcJTcT();
     void ControlDeReglas();
@@ -111,49 +93,6 @@ private:
             }
         }
     };
-    void DesaparecerTodosLosObjetos()
-    {
-        DesaparecerZona();
-        DesaparecerCentro();
-        DesaparecerNave();
-    };
-    bool DesaparecerZona()
-    {
-        if (obj_Zona) {
-            obj_Zona->CleanupsBeforeDelete();
-            delete obj_Zona;
-            obj_Zona = nullptr;
-            return true;
-        }
-        return false;
-    };
-    bool DesaparecerCentro()
-    {
-        if (obj_Centro) {
-            obj_Centro->CleanupsBeforeDelete();
-            delete obj_Centro;
-            obj_Centro = nullptr;
-            return true;
-        }
-        return false;
-    };
-    bool DesaparecerNave()
-    {
-        if (obj_Nave) {
-            if(Transport* tp = obj_Nave->ToTransport())
-            {
-                tp->CleanupsBeforeDelete();
-            }
-            else
-            {
-                obj_Nave->CleanupsBeforeDelete();
-            }
-            delete obj_Nave;
-            obj_Nave = nullptr;
-            return true;
-        }
-        return false;
-    };
     void AlReducirseLaZona()
     {
         int chestCount = 0;
@@ -165,8 +104,10 @@ private:
                 int rnd = rand() % 100 + 1;
                 if (rnd <= 35)
                 {
-                    obj_Centro->SummonGameObject(OBJETO_COFRE, it->second.GetPositionX(), it->second.GetPositionY(), it->second.GetPositionZ(), it->second.GetOrientation(), 0, 0, 0, 0, 60);
-                    chestCount++;
+                    if (sBRObjetosMgr->InvocarCofre(it->second))
+                    {
+                        chestCount++;
+                    }
                 }
             }
         }
@@ -210,7 +151,7 @@ private:
             BR_ListaDePersonajes::iterator it = list_Jugadores.begin();
             while (it != list_Jugadores.end())
             {
-                if (!EstaEnLaNave(it->second) || !it->second->IsAlive())
+                if (!sBRObjetosMgr->EstaEnLaNave(it->second) || !it->second->IsAlive())
                 {
                     uint32 guid = it->first;
                     ++it;
@@ -273,7 +214,7 @@ private:
             {
                 if (it->second && it->second->IsAlive())
                 {
-                    if (it->second->IsInWorld() && !it->second->IsBeingTeleported() && EstaEnLaNave(it->second))
+                    if (it->second->IsInWorld() && !it->second->IsBeingTeleported() && sBRObjetosMgr->EstaEnLaNave(it->second))
                     {
                         uint32 guid = it->first;
                         Player* player = it->second;
@@ -335,10 +276,6 @@ private:
     BR_ContenedorMapas list_Mapas;
     BR_ContenedorMapas::iterator mapaActual;
 
-    GameObject* obj_Zona;
-    GameObject* obj_Centro;
-    GameObject* obj_Nave;
-
     int estadoActual;
     int tiempoRestanteInicio;
     int tiempoRestanteZona;
@@ -350,7 +287,6 @@ private:
     int indicadorDeSegundos;
     bool estaZonaAnunciada5s;
     bool estaZonaAnunciada10s;
-    bool estaLaZonaActiva;
 
     uint32 conf_JugadoresMinimo;
     uint32 conf_JugadoresMaximo;

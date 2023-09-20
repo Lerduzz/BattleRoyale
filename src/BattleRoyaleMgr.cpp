@@ -1,6 +1,5 @@
 #include "BattleRoyaleMgr.h"
 #include "Config.h"
-#include "MapMgr.h"
 
 BattleRoyaleMgr::BattleRoyaleMgr()
 {
@@ -50,9 +49,6 @@ BattleRoyaleMgr::BattleRoyaleMgr()
             list_Mapas[id] = mapa;
         } while (result->NextRow());
     }
-    obj_Zona = nullptr;
-    obj_Centro = nullptr;
-    obj_Nave = nullptr;
     RestablecerTodoElEvento();
 }
 
@@ -186,12 +182,16 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
                         sBRChatMgr->NotificarTiempoInicial(tiempoRestanteInicio, list_Jugadores);
                     }
                     if (estadoActual == ESTADO_INVOCANDO_JUGADORES) DarAlasProgramado();
-                    if (estadoActual == ESTADO_INVOCANDO_JUGADORES && tiempoRestanteInicio <= 45 && obj_Nave)
+                    if (estadoActual == ESTADO_INVOCANDO_JUGADORES && tiempoRestanteInicio <= 45)
                     {
-                        estadoActual = ESTADO_NAVE_EN_MOVIMIENTO;
-                        uint32_t const autoCloseTime = obj_Nave->GetGOInfo()->GetAutoCloseTime() ? 10000u : 0u;
-                        obj_Nave->SetLootState(GO_READY);
-                        obj_Nave->UseDoorOrButton(autoCloseTime, false, nullptr);
+                        if (sBRObjetosMgr->EncenderNave())
+                        {
+                            estadoActual = ESTADO_NAVE_EN_MOVIMIENTO;
+                        }
+                        else
+                        {
+                            RestablecerTodoElEvento();
+                        }
                     }
                     if (estadoActual == ESTADO_NAVE_EN_MOVIMIENTO && tiempoRestanteInicio <= 20)
                     {
@@ -200,15 +200,19 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
                         tiempoRestanteZona = 0;
                         estaZonaAnunciada5s = false;
                         estaZonaAnunciada10s = false;
-                        obj_Centro = nullptr;
-                        obj_Zona = nullptr;
-                        if (!InvocarCentroDelMapa()) {
+                        if (!HayJugadores() || !sBRObjetosMgr->InvocarCentroDelMapa(mapaActual->second->idMapa, mapaActual->second->centroMapa))
+                        {
                             RestablecerTodoElEvento();
                             return;
                         }
-                        if (!InvocarZonaSegura()) {
+                        if (!HayJugadores() || !sBRObjetosMgr->InvocarZonaSegura(mapaActual->second->idMapa, mapaActual->second->centroMapa, indiceDeZona))
+                        {
                             RestablecerTodoElEvento();
                             return;
+                        }
+                        else
+                        {
+                            AlReducirseLaZona();
                         }
                     }
                     tiempoRestanteInicio--;
@@ -232,7 +236,7 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
                 }
                 if (--tiempoRestanteNave <= 0)
                 {
-                    if (DesaparecerNave())
+                    if (sBRObjetosMgr->DesaparecerNave())
                     {
                         sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_NAVE_RETIRADA, list_Jugadores);
                         sBRChatMgr->NotificarNaveRetirada(list_Jugadores);
@@ -241,9 +245,14 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
                 QuitarAlasProgramado();
             } else indicadorDeSegundos -= diff;
             if (tiempoRestanteZona <= 0) {
-                if (!InvocarZonaSegura()) {
+                if (!HayJugadores() || !sBRObjetosMgr->InvocarZonaSegura(mapaActual->second->idMapa, mapaActual->second->centroMapa, indiceDeZona))
+                {
                     RestablecerTodoElEvento();
                     return;
+                }
+                else
+                {
+                    AlReducirseLaZona();
                 }
                 sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_ZONA_REDUCIDA, list_Jugadores);
                 sBRChatMgr->NotificarZonaReducida(list_Jugadores);
@@ -315,8 +324,7 @@ void BattleRoyaleMgr::RestablecerTodoElEvento()
     mapaActual = list_Mapas.begin();
     indicadorDeSegundos = 1000;
     indiceDeVariacion = 0;
-    estaLaZonaActiva = false;
-    DesaparecerTodosLosObjetos();
+    sBRObjetosMgr->DesaparecerTodosLosObjetos();
     estadoActual = ESTADO_NO_HAY_SUFICIENTES_JUGADORES;
 }
 
@@ -325,7 +333,8 @@ void BattleRoyaleMgr::IniciarNuevaRonda()
     if (estadoActual == ESTADO_NO_HAY_SUFICIENTES_JUGADORES)
     {
         tiempoRestanteInicio = 75;
-        if (!InvocarNave()) {
+        if (!HayCola() || !sBRObjetosMgr->InvocarNave(mapaActual->second->idMapa, mapaActual->second->inicioNave))
+        {
             RestablecerTodoElEvento();
             return;
         }
@@ -428,150 +437,16 @@ void BattleRoyaleMgr::RevivirJugador(Player* player)
     player->SaveToDB(false, false);
 }
 
-bool BattleRoyaleMgr::InvocarNave()
-{
-    if (HayCola())
-    {
-        int mapID = (*mapaActual).second->idMapa;
-        Map* map = sMapMgr->FindBaseNonInstanceMap(mapID);
-        if (map)
-        {
-            DesaparecerNave();
-            float x = (*mapaActual).second->inicioNave.GetPositionX();
-            float y = (*mapaActual).second->inicioNave.GetPositionY();
-            float z = (*mapaActual).second->inicioNave.GetPositionZ();
-            float o = (*mapaActual).second->inicioNave.GetOrientation();
-            float rot2 = std::sin(o / 2);
-            float rot3 = cos(o / 2);
-            map->LoadGrid(x, y);
-            obj_Nave = new StaticTransport();
-            if (obj_Nave->Create(map->GenerateLowGuid<HighGuid::GameObject>(), OBJETO_NAVE, map, DIMENSION_EVENTO, x, y, z, o, G3D::Quat(0, 0, rot2, rot3), 100, GO_STATE_READY))
-            {
-                obj_Nave->SetVisibilityDistanceOverride(VisibilityDistanceType::Infinite);
-                map->AddToMap(obj_Nave);
-                LOG_ERROR("br.nave", "BattleRoyaleMgr::InvocarNave: Nave invocada en M: {}, X: {}, Y: {}, Z: {}!", mapID, x, y, z);
-                return true;
-            }
-            else
-            {
-                LOG_ERROR("br.nave", "BattleRoyaleMgr::InvocarNave: No se ha podido invocar la nave (OBJETO = {})!", OBJETO_NAVE);
-                delete obj_Nave;
-                obj_Nave = nullptr;
-            }
-        }
-        else
-        {
-            LOG_ERROR("br.nave", "BattleRoyaleMgr::InvocarNave: No se ha podido obtener el mapa para la nave (MAPA: {})!", mapID);
-        }
-    }
-    else
-    {
-        LOG_ERROR("br.nave", "BattleRoyaleMgr::InvocarNave: No se ha invocado la nave (OBJETO = {}) porque no hay jugadores!", OBJETO_NAVE);
-    }
-    return false;
-}
-
-bool BattleRoyaleMgr::InvocarCentroDelMapa()
-{
-    if (HayJugadores())
-    {
-        int mapID = (*mapaActual).second->idMapa;
-        Map* map = sMapMgr->FindBaseNonInstanceMap(mapID);
-        if (map)
-        {
-            DesaparecerCentro();
-            float x = (*mapaActual).second->centroMapa.GetPositionX();
-            float y = (*mapaActual).second->centroMapa.GetPositionY();
-            float z = (*mapaActual).second->centroMapa.GetPositionZ();
-            float o = (*mapaActual).second->centroMapa.GetOrientation();
-            map->LoadGrid(x, y);
-            obj_Centro = new GameObject();
-            if (obj_Centro->Create(map->GenerateLowGuid<HighGuid::GameObject>(), OBJETO_CENTRO_DEL_MAPA, map, DIMENSION_EVENTO, x, y, z, o, G3D::Quat(), 100, GO_STATE_READY))
-            {
-                obj_Centro->SetVisibilityDistanceOverride(VisibilityDistanceType::Infinite);
-                map->AddToMap(obj_Centro);
-                return true;
-            }
-            else
-            {
-                LOG_ERROR("br.nave", "BattleRoyaleMgr::InvocarCentroDelMapa: No se ha podido invocar el centro (OBJETO = {})!", OBJETO_CENTRO_DEL_MAPA);
-                delete obj_Centro;
-                obj_Centro = nullptr;
-            }
-        }
-        else
-        {
-            LOG_ERROR("br.nave", "BattleRoyaleMgr::InvocarCentroDelMapa: No se ha podido obtener el mapa para el centro (MAPA: {})!", mapID);
-        }
-    }
-    else
-    {
-        LOG_ERROR("br.nave", "BattleRoyaleMgr::InvocarCentroDelMapa: No se ha invocado el centro (OBJETO = {}) porque no hay jugadores!", OBJETO_CENTRO_DEL_MAPA);
-    }
-    return false;
-}
-
-bool BattleRoyaleMgr::InvocarZonaSegura()
-{
-    if (HayJugadores())
-    {
-        int mapID = (*mapaActual).second->idMapa;
-        Map* map = sMapMgr->FindBaseNonInstanceMap(mapID);
-        if (map)
-        {
-            AlReducirseLaZona();
-            DesaparecerZona();
-            if (indiceDeZona < CANTIDAD_DE_ZONAS)
-            {
-                float x = (*mapaActual).second->centroMapa.GetPositionX();
-                float y = (*mapaActual).second->centroMapa.GetPositionY();
-                float z = (*mapaActual).second->centroMapa.GetPositionZ() + BR_EscalasDeZonaSegura[indiceDeZona] * 66.0f;
-                float o = (*mapaActual).second->centroMapa.GetOrientation();
-                map->LoadGrid(x, y);
-                obj_Zona = new GameObject();
-                if (obj_Zona->Create(map->GenerateLowGuid<HighGuid::GameObject>(), OBJETO_ZONA_SEGURA_INICIAL + indiceDeZona, map, DIMENSION_EVENTO, x, y, z, o, G3D::Quat(), 100, GO_STATE_READY))
-                {
-                    obj_Zona->SetVisibilityDistanceOverride(VisibilityDistanceType::Infinite);
-                    map->AddToMap(obj_Zona);
-                    indiceDeZona++;
-                    estaLaZonaActiva = true;
-                    return true;
-                }
-                else
-                {
-                    LOG_ERROR("br.nave", "BattleRoyaleMgr::InvocarZonaSegura: No se ha podido invocar la zona (OBJETO = {})!", OBJETO_ZONA_SEGURA_INICIAL + indiceDeZona);
-                    delete obj_Zona;
-                    obj_Zona = nullptr;
-                }
-            }
-            else
-            {
-                estaLaZonaActiva = false;
-                return true;
-            }
-        }
-        else
-        {
-            LOG_ERROR("br.nave", "BattleRoyaleMgr::InvocarZonaSegura: No se ha podido obtener el mapa para la zona (MAPA: {})!", mapID);
-        }
-    }
-    else
-    {
-        LOG_ERROR("br.nave", "BattleRoyaleMgr::InvocarZonaSegura: No se ha invocado la zona (OBJETO = {}) porque no hay jugadores!", OBJETO_ZONA_SEGURA_INICIAL + indiceDeZona);
-    }
-    return false;
-}
-
 void BattleRoyaleMgr::EfectoFueraDeZona()
 {
     if (HayJugadores())
     {
         for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
         {
-            if (obj_Centro && it->second && it->second->IsAlive())
+            if (it->second && it->second->IsAlive() && sBRObjetosMgr->HayCentro())
             {
-                float distance = it->second->GetExactDist(obj_Centro);
-                if (!estaLaZonaActiva || (indiceDeZona > 0 && distance > BR_EscalasDeZonaSegura[indiceDeZona - 1] * 66.0f)) {
+                float distance = sBRObjetosMgr->DistanciaDelCentro(it->second);
+                if (!sBRObjetosMgr->EstaLaZonaActiva() || (indiceDeZona > 0 && distance > BR_EscalasDeZonaSegura[indiceDeZona - 1] * 66.0f)) {
                     list_Datos[it->first].dmg_tick++;
                     uint32 damage = it->second->GetMaxHealth() * (2 * sqrt(list_Datos[it->first].dmg_tick) + indiceDeZona) / 100;
                     it->second->GetSession()->SendNotification("|cffff0000¡Has recibido |cffDA70D6%u|cffff0000 de daño, adéntrate en la zona segura!", damage); // TODO: Mover al sistema de mensajes.
@@ -610,7 +485,7 @@ void BattleRoyaleMgr::ControlDeReglas()
                 if
                 (
                     (it->second->HasAura(31700)) ||
-                    (obj_Centro && it->second->GetExactDist(obj_Centro) > 1147.0f)
+                    (sBRObjetosMgr->DistanciaDelCentro(it->second) > 1147.0f)
                 )
                 {
                     uint32 guid = it->first;
@@ -681,7 +556,7 @@ void BattleRoyaleMgr::FinalizarRonda(bool announce, Player* winner /* = nullptr*
     {
         sBRChatMgr->AnunciarEmpate();
     }
-    DesaparecerTodosLosObjetos();
+    sBRObjetosMgr->DesaparecerTodosLosObjetos();
     tiempoRestanteFinal = 10;
     SiguienteMapa();
     estadoActual = ESTADO_BATALLA_TERMINADA;
