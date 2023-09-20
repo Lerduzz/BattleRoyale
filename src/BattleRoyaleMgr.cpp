@@ -376,14 +376,16 @@ void BattleRoyaleMgr::LlamarDentroDeNave(uint32 guid)
     {
         RevivirJugador(player);
     }
-    player->SetPhaseMask(DIMENSION_EVENTO, true);
     DejarGrupo(player);
     Desmontar(player);
     float ox = BR_VariacionesDePosicion[indiceDeVariacion][0];
     float oy = BR_VariacionesDePosicion[indiceDeVariacion][1];
-    player->TeleportTo((*mapaActual).second->idMapa, (*mapaActual).second->inicioNave.GetPositionX() + ox, (*mapaActual).second->inicioNave.GetPositionY() + oy, (*mapaActual).second->inicioNave.GetPositionZ() + 2.5f, (*mapaActual).second->inicioNave.GetOrientation() + M_PI / 2.0f);
+    BR_Mapa* brM = mapaActual->second;
+    Position iN = brM->inicioNave;
+    player->SetPhaseMask(DIMENSION_EVENTO, true);
+    player->TeleportTo(brM->idMapa, iN.GetPositionX() + ox, iN.GetPositionY() + oy, iN.GetPositionZ() + 2.5f, iN.GetOrientation() + M_PI / 2.0f);
     player->SetPvP(false);
-    player->AddAura(HECHIZO_LENGUAJE_BINARIO, player);
+    // TODO: Analizar si esto es factible: player->AddAura(HECHIZO_LENGUAJE_BINARIO, player);
     player->SaveToDB(false, false);
     list_DarAlas[guid] = player;
     SiguientePosicion();
@@ -400,7 +402,7 @@ void BattleRoyaleMgr::SalirDelEvento(uint32 guid, bool logout /* = false*/)
         if (player->IsAlive())
         {
             if (player->HasAura(HECHIZO_ALAS_MAGICAS)) player->RemoveAurasDueToSpell(HECHIZO_ALAS_MAGICAS);
-            if (player->HasAura(HECHIZO_LENGUAJE_BINARIO)) player->RemoveAurasDueToSpell(HECHIZO_LENGUAJE_BINARIO);
+            // TODO: Analizar si esto es factible: if (player->HasAura(HECHIZO_LENGUAJE_BINARIO)) player->RemoveAurasDueToSpell(HECHIZO_LENGUAJE_BINARIO);
             if (player->HasAura(HECHIZO_ANTI_INVISIBLES)) player->RemoveAurasDueToSpell(HECHIZO_ANTI_INVISIBLES);
             if (player->HasAura(HECHIZO_ANTI_SANADORES)) player->RemoveAurasDueToSpell(HECHIZO_ANTI_SANADORES);
         }
