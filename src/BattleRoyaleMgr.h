@@ -12,8 +12,6 @@
 #include "SharedDefines.h"
 #include "ScriptMgr.h"
 #include "Chat.h"
-#include "GameObject.h"
-#include "Transport.h"
 
 class BattleRoyaleData;
 typedef std::map<uint32, Player*> BR_ListaDePersonajes;
@@ -69,9 +67,6 @@ private:
     void LlamarDentroDeNave(uint32 guid);
     void SalirDelEvento(uint32 guid, bool logout = false);
     void RevivirJugador(Player *player);
-    bool InvocarNave();
-    bool InvocarCentroDelMapa();
-    bool InvocarZonaSegura();
     void EfectoFueraDeZona();
     void ActivarJcJTcT();
     void ControlDeReglas();
@@ -111,49 +106,6 @@ private:
                 player->SetSpeed(MOVE_FLIGHT, 1, true);
             }
         }
-    };
-    void DesaparecerTodosLosObjetos()
-    {
-        DesaparecerZona();
-        DesaparecerCentro();
-        DesaparecerNave();
-    };
-    bool DesaparecerZona()
-    {
-        if (obj_Zona) {
-            obj_Zona->CleanupsBeforeDelete();
-            delete obj_Zona;
-            obj_Zona = nullptr;
-            return true;
-        }
-        return false;
-    };
-    bool DesaparecerCentro()
-    {
-        if (obj_Centro) {
-            obj_Centro->CleanupsBeforeDelete();
-            delete obj_Centro;
-            obj_Centro = nullptr;
-            return true;
-        }
-        return false;
-    };
-    bool DesaparecerNave()
-    {
-        if (obj_Nave) {
-            if(Transport* tp = obj_Nave->ToTransport())
-            {
-                tp->CleanupsBeforeDelete();
-            }
-            else
-            {
-                obj_Nave->CleanupsBeforeDelete();
-            }
-            delete obj_Nave;
-            obj_Nave = nullptr;
-            return true;
-        }
-        return false;
     };
     void AlReducirseLaZona()
     {
@@ -335,10 +287,6 @@ private:
 
     BR_ContenedorMapas list_Mapas;
     BR_ContenedorMapas::iterator mapaActual;
-
-    GameObject* obj_Zona;
-    GameObject* obj_Centro;
-    GameObject* obj_Nave;
 
     int estadoActual;
     int tiempoRestanteInicio;

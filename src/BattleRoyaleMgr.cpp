@@ -1,6 +1,5 @@
 #include "BattleRoyaleMgr.h"
 #include "Config.h"
-#include "MapMgr.h"
 
 BattleRoyaleMgr::BattleRoyaleMgr()
 {
@@ -325,7 +324,8 @@ void BattleRoyaleMgr::IniciarNuevaRonda()
     if (estadoActual == ESTADO_NO_HAY_SUFICIENTES_JUGADORES)
     {
         tiempoRestanteInicio = 75;
-        if (!InvocarNave()) {
+        if (!HayCola() || !sBRObjetosMgr->InvocarNave(mapaActual->second->inicioNave))
+        {
             RestablecerTodoElEvento();
             return;
         }
@@ -426,140 +426,6 @@ void BattleRoyaleMgr::RevivirJugador(Player* player)
 	player->ResurrectPlayer(1.0f);
     player->SpawnCorpseBones();
     player->SaveToDB(false, false);
-}
-
-bool BattleRoyaleMgr::InvocarNave()
-{
-    if (HayCola())
-    {
-        int mapID = (*mapaActual).second->idMapa;
-        Map* map = sMapMgr->FindBaseNonInstanceMap(mapID);
-        if (map)
-        {
-            DesaparecerNave();
-            float x = (*mapaActual).second->inicioNave.GetPositionX();
-            float y = (*mapaActual).second->inicioNave.GetPositionY();
-            float z = (*mapaActual).second->inicioNave.GetPositionZ();
-            float o = (*mapaActual).second->inicioNave.GetOrientation();
-            float rot2 = std::sin(o / 2);
-            float rot3 = cos(o / 2);
-            map->LoadGrid(x, y);
-            obj_Nave = new StaticTransport();
-            if (obj_Nave->Create(map->GenerateLowGuid<HighGuid::GameObject>(), OBJETO_NAVE, map, DIMENSION_EVENTO, x, y, z, o, G3D::Quat(0, 0, rot2, rot3), 100, GO_STATE_READY))
-            {
-                obj_Nave->SetVisibilityDistanceOverride(VisibilityDistanceType::Infinite);
-                map->AddToMap(obj_Nave);
-                LOG_ERROR("br.nave", "BattleRoyaleMgr::InvocarNave: Nave invocada en M: {}, X: {}, Y: {}, Z: {}!", mapID, x, y, z);
-                return true;
-            }
-            else
-            {
-                LOG_ERROR("br.nave", "BattleRoyaleMgr::InvocarNave: No se ha podido invocar la nave (OBJETO = {})!", OBJETO_NAVE);
-                delete obj_Nave;
-                obj_Nave = nullptr;
-            }
-        }
-        else
-        {
-            LOG_ERROR("br.nave", "BattleRoyaleMgr::InvocarNave: No se ha podido obtener el mapa para la nave (MAPA: {})!", mapID);
-        }
-    }
-    else
-    {
-        LOG_ERROR("br.nave", "BattleRoyaleMgr::InvocarNave: No se ha invocado la nave (OBJETO = {}) porque no hay jugadores!", OBJETO_NAVE);
-    }
-    return false;
-}
-
-bool BattleRoyaleMgr::InvocarCentroDelMapa()
-{
-    if (HayJugadores())
-    {
-        int mapID = (*mapaActual).second->idMapa;
-        Map* map = sMapMgr->FindBaseNonInstanceMap(mapID);
-        if (map)
-        {
-            DesaparecerCentro();
-            float x = (*mapaActual).second->centroMapa.GetPositionX();
-            float y = (*mapaActual).second->centroMapa.GetPositionY();
-            float z = (*mapaActual).second->centroMapa.GetPositionZ();
-            float o = (*mapaActual).second->centroMapa.GetOrientation();
-            map->LoadGrid(x, y);
-            obj_Centro = new GameObject();
-            if (obj_Centro->Create(map->GenerateLowGuid<HighGuid::GameObject>(), OBJETO_CENTRO_DEL_MAPA, map, DIMENSION_EVENTO, x, y, z, o, G3D::Quat(), 100, GO_STATE_READY))
-            {
-                obj_Centro->SetVisibilityDistanceOverride(VisibilityDistanceType::Infinite);
-                map->AddToMap(obj_Centro);
-                return true;
-            }
-            else
-            {
-                LOG_ERROR("br.nave", "BattleRoyaleMgr::InvocarCentroDelMapa: No se ha podido invocar el centro (OBJETO = {})!", OBJETO_CENTRO_DEL_MAPA);
-                delete obj_Centro;
-                obj_Centro = nullptr;
-            }
-        }
-        else
-        {
-            LOG_ERROR("br.nave", "BattleRoyaleMgr::InvocarCentroDelMapa: No se ha podido obtener el mapa para el centro (MAPA: {})!", mapID);
-        }
-    }
-    else
-    {
-        LOG_ERROR("br.nave", "BattleRoyaleMgr::InvocarCentroDelMapa: No se ha invocado el centro (OBJETO = {}) porque no hay jugadores!", OBJETO_CENTRO_DEL_MAPA);
-    }
-    return false;
-}
-
-bool BattleRoyaleMgr::InvocarZonaSegura()
-{
-    if (HayJugadores())
-    {
-        int mapID = (*mapaActual).second->idMapa;
-        Map* map = sMapMgr->FindBaseNonInstanceMap(mapID);
-        if (map)
-        {
-            AlReducirseLaZona();
-            DesaparecerZona();
-            if (indiceDeZona < CANTIDAD_DE_ZONAS)
-            {
-                float x = (*mapaActual).second->centroMapa.GetPositionX();
-                float y = (*mapaActual).second->centroMapa.GetPositionY();
-                float z = (*mapaActual).second->centroMapa.GetPositionZ() + BR_EscalasDeZonaSegura[indiceDeZona] * 66.0f;
-                float o = (*mapaActual).second->centroMapa.GetOrientation();
-                map->LoadGrid(x, y);
-                obj_Zona = new GameObject();
-                if (obj_Zona->Create(map->GenerateLowGuid<HighGuid::GameObject>(), OBJETO_ZONA_SEGURA_INICIAL + indiceDeZona, map, DIMENSION_EVENTO, x, y, z, o, G3D::Quat(), 100, GO_STATE_READY))
-                {
-                    obj_Zona->SetVisibilityDistanceOverride(VisibilityDistanceType::Infinite);
-                    map->AddToMap(obj_Zona);
-                    indiceDeZona++;
-                    estaLaZonaActiva = true;
-                    return true;
-                }
-                else
-                {
-                    LOG_ERROR("br.nave", "BattleRoyaleMgr::InvocarZonaSegura: No se ha podido invocar la zona (OBJETO = {})!", OBJETO_ZONA_SEGURA_INICIAL + indiceDeZona);
-                    delete obj_Zona;
-                    obj_Zona = nullptr;
-                }
-            }
-            else
-            {
-                estaLaZonaActiva = false;
-                return true;
-            }
-        }
-        else
-        {
-            LOG_ERROR("br.nave", "BattleRoyaleMgr::InvocarZonaSegura: No se ha podido obtener el mapa para la zona (MAPA: {})!", mapID);
-        }
-    }
-    else
-    {
-        LOG_ERROR("br.nave", "BattleRoyaleMgr::InvocarZonaSegura: No se ha invocado la zona (OBJETO = {}) porque no hay jugadores!", OBJETO_ZONA_SEGURA_INICIAL + indiceDeZona);
-    }
-    return false;
 }
 
 void BattleRoyaleMgr::EfectoFueraDeZona()
