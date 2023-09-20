@@ -22,13 +22,6 @@
 #include "SpellScript.h"
 #include "SpellAuraEffects.h"
 
-// virtual void OnSpellCast(Player* /*player*/, Spell* /*spell*/, bool /*skipCheck*/) { }
-// virtual void OnBeingCharmed(Player* /*player*/, Unit* /*charmer*/, uint32 /*oldFactionId*/, uint32 /*newFactionId*/) { }
-// virtual void OnLootItem(Player* /*player*/, Item* /*item*/, uint32 /*count*/, ObjectGuid /*lootguid*/) { }
-// Para todos contra todos mejor: virtual void OnIsFFAPvP(Player* /*player*/, bool& /*result*/) { }
-// Para evitar que se fajen en el avion: virtual void OnIsPvP(Player* /*player*/, bool& /*result*/) { }
-// Para el espectar: virtual void OnPlayerResurrect(Player* /*player*/, float /*restore_percent*/, bool /*applySickness*/) { }
-
 class BattleRoyalePlayer : public PlayerScript
 {
 public:

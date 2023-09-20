@@ -76,7 +76,6 @@ private:
     void SiguientePosicion() { if (++indiceDeVariacion >= CANTIDAD_DE_VARIACIONES) indiceDeVariacion = 0; };
     void SiguienteMapa()
     {
-        // if (++mapaActual == list_Mapas.end()) mapaActual = list_Mapas.begin();
         int num = list_Mapas.size();
         if (num <= 1)
         {
