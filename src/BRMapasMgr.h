@@ -98,7 +98,9 @@ public:
                 list_Mapas[id] = mapa;
             } while (result->NextRow());
         }
-    }
+    };
+    bool TieneZonasParaCofres(int zona) { return mapaActual->second->ubicacionesMapa.find(zona) != mapaActual->second->ubicacionesMapa.end(); };
+    BR_UbicacionZona ObtenerZonasParaCofres(int zona) { return TieneZonasParaCofres(zona) ? mapaActual->second->ubicacionesMapa[zona] : BR_UbicacionZona(); };
 
 private:
     BR_ContenedorMapas list_Mapas;

@@ -97,17 +97,20 @@ private:
     void AlReducirseLaZona()
     {
         int chestCount = 0;
-        if (indiceDeZona < CANTIDAD_DE_ZONAS && mapaActual->second->ubicacionesMapa.find(indiceDeZona) != mapaActual->second->ubicacionesMapa.end())
+        if (indiceDeZona < CANTIDAD_DE_ZONAS && sBRMapasMgr->TieneZonasParaCofres(indiceDeZona))
         {
-            BR_UbicacionZona temp = mapaActual->second->ubicacionesMapa[indiceDeZona];
-            for (BR_UbicacionZona::iterator it = temp.begin(); it != temp.end(); ++it)
+            BR_UbicacionZona temp = sBRMapasMgr->ObtenerZonasParaCofres(indiceDeZona);
+            if (temp.size())
             {
-                int rnd = rand() % 100 + 1;
-                if (rnd <= 35)
+                for (BR_UbicacionZona::iterator it = temp.begin(); it != temp.end(); ++it)
                 {
-                    if (sBRObjetosMgr->InvocarCofre(it->second))
+                    int rnd = rand() % 100 + 1;
+                    if (rnd <= 35)
                     {
-                        chestCount++;
+                        if (sBRObjetosMgr->InvocarCofre(it->second))
+                        {
+                            chestCount++;
+                        }
                     }
                 }
             }
