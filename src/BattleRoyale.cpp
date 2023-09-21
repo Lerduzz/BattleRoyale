@@ -162,18 +162,34 @@ public:
 
     bool OnGossipHello(Player* player, Creature* creature)
     {
-        AddGossipItemFor(player, GOSSIP_ICON_TALK, "Quiero participar en el evento.", 0, 1);
-        AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Quiero salir de la cola del evento.", 0, 2);
+        AddGossipItemFor(player, GOSSIP_ICON_CHAT, "¿Cuales son las recompensas?", 0, 1);
+        if (!sBattleRoyaleMgr->EstaEnCola(player))
+        {
+            AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "Quiero unirme a la cola.", 0, 2);
+            if (player->IsGameMaster())
+            {
+                AddGossipItemFor(player, GOSSIP_ICON_TAXI, "<MJ> Quiero elegir el siguiente mapa.", 0, 3);
+            }
+        }
+        else
+        {
+            AddGossipItemFor(player, GOSSIP_ICON_TALK, "Quiero salir de la cola.", 0, 4);
+        }
         SendGossipMenuFor(player, 200000, creature->GetGUID());
         return true;
     }
 
-    bool OnGossipSelect(Player* player, Creature* /*creature*/, uint32 /*sender*/, uint32 action)
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 sender, uint32 action)
     {
         player->PlayerTalkClass->ClearMenus();
         switch (action)
         {
             case 1:
+            {
+                CloseGossipMenuFor(player);
+                break;
+            }
+            case 2:
             {
                 if (sConfigMgr->GetOption<bool>("BattleRoyale.Enabled", true))
                 {
@@ -183,9 +199,36 @@ public:
                 {
                     ChatHandler(player->GetSession()).PSendSysMessage("|cff4CFF00BattleRoyale::|r ¡Este modo de juego se encuentra actualmente desactivado!");
                 }
+                CloseGossipMenuFor(player);
                 break;
             }   
-            case 2:
+            case 3:
+            {
+                if (sConfigMgr->GetOption<bool>("BattleRoyale.Enabled", true))
+                {           
+                    if (player->IsGameMaster())
+                    {
+                        uint32 start = 5;
+                        BR_ContenedorMapas mapas = sBattleRoyaleMgr->ObtenerMapas();
+                        for (BR_ContenedorMapas::iterator it = mapas.begin(); it != mapas.end(); ++it)
+                        {
+                            AddGossipItemFor(player, GOSSIP_ICON_BATTLE, it->second->nombreMapa, it->first, start++);
+                        }
+                        SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
+                    }
+                    else
+                    {
+                        CloseGossipMenuFor(player);
+                    }   
+                }
+                else
+                {
+                    ChatHandler(player->GetSession()).PSendSysMessage("|cff4CFF00BattleRoyale::|r ¡Este modo de juego se encuentra actualmente desactivado!");
+                    CloseGossipMenuFor(player);
+                }
+                break;
+            }
+            case 4:
             {
                 if (sConfigMgr->GetOption<bool>("BattleRoyale.Enabled", true))
                 {
@@ -203,10 +246,27 @@ public:
                 {
                     ChatHandler(player->GetSession()).PSendSysMessage("|cff4CFF00BattleRoyale::|r ¡Este modo de juego se encuentra actualmente desactivado!");
                 }
+                CloseGossipMenuFor(player);
+                break;
+            }            
+            default:
+            {
+                if (sConfigMgr->GetOption<bool>("BattleRoyale.Enabled", true))
+                {
+                    if (player->IsGameMaster())
+                    {
+                        sBattleRoyaleMgr->EstablecerMapa(sender);
+                    }
+                    sBattleRoyaleMgr->GestionarJugadorEntrando(player);
+                }
+                else
+                {
+                    ChatHandler(player->GetSession()).PSendSysMessage("|cff4CFF00BattleRoyale::|r ¡Este modo de juego se encuentra actualmente desactivado!");
+                }
+                CloseGossipMenuFor(player);
                 break;
             }
-        }        
-        CloseGossipMenuFor(player);
+        }
         return true;
     }
 };

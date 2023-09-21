@@ -45,6 +45,12 @@ public:
         return !sBRObjetosMgr->EstaEnLaNave(player);
     };
     void QuitarAlas(Player* player) { player->DestroyItemCount(INVENTARIO_CAMISA_ALAS, 9999, true); };
+    BR_ContenedorMapas ObtenerMapas() { return list_Mapas; };
+    void EstablecerMapa(uint32 id)
+    {
+        BR_ContenedorMapas::iterator tmp = list_Mapas.find(id);
+        if (tmp != list_Mapas.end()) mapaActual = tmp;
+    };
 
 private:
     void RestablecerTodoElEvento();
