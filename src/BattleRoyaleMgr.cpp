@@ -170,6 +170,10 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
                     estadoActual = ESTADO_BATALLA_EN_CURSO;
                     sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_RONDA_INICIADA, list_Jugadores);
                     sBRChatMgr->NotificarTiempoInicial(0, list_Jugadores, mapaActual->second->nombreMapa);
+                    // TODO: Crear un fichero para gestionar el tema de las condiciones de las miciones (Parche temporal) ---.
+                    for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
+                        if (it->second && it->second->HasQuest(100000) && it->second->GetQuestStatus(100000) == QUEST_STATUS_INCOMPLETE) it->second->KilledMonsterCredit(200002); // Mision 1: Participar en el evento (10 rondas).
+                    // ---.
                     tiempoRestanteZona = conf_IntervaloDeZona;
                     tiempoRestanteNave = 15;
                 } else {

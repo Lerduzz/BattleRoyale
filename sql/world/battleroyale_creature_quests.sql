@@ -47,7 +47,7 @@ DELETE FROM `quest_offer_reward` WHERE `ID` = @QuestID;
 DELETE FROM `quest_request_items` WHERE `ID` = @QuestID;
 DELETE FROM `quest_template_addon` WHERE `ID` = @QuestID;
 INSERT INTO `quest_template` (`ID`, `QuestLevel`, `MinLevel`, `QuestSortID`, `RewardMoney`, `RewardHonor`, `Flags`, `RewardItem1`, `RewardAmount1`, `LogTitle`, `LogDescription`, `QuestDescription`, `QuestCompletionLog`, `RequiredNpcOrGo1`, `RequiredNpcOrGoCount1`, `ObjectiveText1`, `ObjectiveText2`, `ObjectiveText3`, `ObjectiveText4`) VALUES
-(@QuestID, -1, 80, -22, 5000000, 5000, 4096, 47241, 10, 'Mantener la costumbre', 'Participa en 10 rondas del modo Battle Royale.', 'El modo Battle Royale está pensado para que todos ganen. Esta es una prueba de ello. Solo debes participar en algunas rondas y ya estarás ganando recompensas.', 'QuestCompletion log test.', @Entry + 2, 10, 'Rondas de Battle Royale jugadas', '', '', ''); 
+(@QuestID, -1, 80, -22, 1000000, 5000, 4096, 47241, 10, 'Mantener la costumbre', 'Participa en 10 rondas del modo Battle Royale.', 'El modo Battle Royale está pensado para que todos ganen. Esta es una prueba de ello. Solo debes participar en algunas rondas y ya estarás ganando recompensas.', 'QuestCompletion log test.', @Entry + 2, 10, 'Rondas de Battle Royale jugadas', '', '', ''); 
 
 INSERT INTO `quest_offer_reward` (`ID`, `Emote1`, `RewardText`) VALUES
 (@QuestID, 1, '¡Felicitaciones! Regresa mañana para repetir la misión y ganar más recompensas.'); 
