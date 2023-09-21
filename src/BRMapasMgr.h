@@ -18,8 +18,15 @@ typedef std::map<uint32, BR_Mapa*> BR_ContenedorMapas;
 
 class BRMapasMgr
 {
-    BRMapasMgr(){};
-    ~BRMapasMgr(){};
+    BRMapasMgr()
+    {
+        CargarMapasDesdeBD();
+        usarVotos = false;
+    };
+    ~BRMapasMgr()
+    {
+        list_Mapas.clear();
+    };
 
 public:
     static BRMapasMgr *instance()
@@ -108,6 +115,8 @@ public:
 private:
     BR_ContenedorMapas list_Mapas;
     BR_ContenedorMapas::iterator mapaActual;
+
+    bool usarVotos;
 
 };
 
