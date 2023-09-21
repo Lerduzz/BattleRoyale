@@ -27,7 +27,7 @@ public:
         return instance;
     }
 
-    BR_Mapa* MapaActual() { return sBRMapasMgr->MapaActual(); };
+    BR_Mapa* MapaActual() { return mapaActual->second; };
     BR_ContenedorMapas ObtenerMapas() { return list_Mapas; };
     void EstablecerMapa(uint32 id)
     {
@@ -100,8 +100,8 @@ public:
             } while (result->NextRow());
         }
     };
-    bool TieneZonasParaCofres(int zona) { return sBRMapasMgr->MapaActual()->ubicacionesMapa.find(zona) != sBRMapasMgr->MapaActual()->ubicacionesMapa.end(); };
-    BR_UbicacionZona ObtenerZonasParaCofres(int zona) { return TieneZonasParaCofres(zona) ? sBRMapasMgr->MapaActual()->ubicacionesMapa[zona] : BR_UbicacionZona(); };
+    bool TieneZonasParaCofres(int zona) { return MapaActual()->ubicacionesMapa.find(zona) != MapaActual()->ubicacionesMapa.end(); };
+    BR_UbicacionZona ObtenerZonasParaCofres(int zona) { return TieneZonasParaCofres(zona) ? MapaActual()->ubicacionesMapa[zona] : BR_UbicacionZona(); };
 
 private:
     BR_ContenedorMapas list_Mapas;
