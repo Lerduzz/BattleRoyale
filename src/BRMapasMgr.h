@@ -102,6 +102,8 @@ public:
     bool TieneZonasParaCofres(int zona) { return mapaActual->second->ubicacionesMapa.find(zona) != mapaActual->second->ubicacionesMapa.end(); };
     BR_UbicacionZona ObtenerZonasParaCofres(int zona) { return TieneZonasParaCofres(zona) ? mapaActual->second->ubicacionesMapa[zona] : BR_UbicacionZona(); };
 
+    BR_Mapa* MapaActual() { return mapaActual->second; };
+
 private:
     BR_ContenedorMapas list_Mapas;
     BR_ContenedorMapas::iterator mapaActual;
