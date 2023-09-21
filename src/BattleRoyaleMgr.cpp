@@ -291,6 +291,7 @@ void BattleRoyaleMgr::IniciarNuevaRonda()
 {
     if (estadoActual == ESTADO_NO_HAY_SUFICIENTES_JUGADORES)
     {
+        sBRMapasMgr->EstablecerMasVotado();
         tiempoRestanteInicio = 75;
         if (!HayCola() || !sBRObjetosMgr->InvocarNave(sBRMapasMgr->MapaActual()->idMapa, sBRMapasMgr->MapaActual()->inicioNave))
         {

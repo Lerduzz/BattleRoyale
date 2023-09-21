@@ -37,7 +37,16 @@ public:
 
     BR_Mapa* MapaActual() { return mapaActual->second; };
     BR_ContenedorMapas ObtenerMapas() { return list_Mapas; };
-    void EstablecerMapa(uint32 id)
+    void VotarPorMapa(uint32 id)
+    {
+        BR_ContenedorMapas::iterator tmp = list_Mapas.find(id);
+        if (tmp != list_Mapas.end())
+        {
+            tmp->second->votos++;
+            if (!usarVotos) usarVotos = true;
+        }
+    };
+    /*void EstablecerMapa(uint32 id)
     {
         BR_ContenedorMapas::iterator tmp = list_Mapas.find(id);
         if (tmp != list_Mapas.end())
@@ -47,6 +56,26 @@ public:
         else
         {
             SiguienteMapa();
+        }
+    };*/
+    void EstablecerMasVotado()
+    {
+        if (usarVotos && list_Mapas.size())
+        {
+            BR_ContenedorMapas::iterator tmpMap = list_Mapas.begin();
+            int tmpVote = -1;
+            for (BR_ContenedorMapas::iterator it = list_Mapas.begin(); it != list_Mapas.end(); ++it)
+            {
+                if (it->second && it->second->votos >= tmpVote) // >= (Cuando hay empate usar el ultimo mapa del empate), > (Cuando hay empate usar el primer mapa del empate).
+                {
+                    tmpVote = it->second->votos;
+                    tmpMap = it;
+                }
+            }
+            if (tmpMap != list_Mapas.end())
+            {
+                mapaActual = tmpMap;
+            }
         }
     };
     void SiguienteMapa()
@@ -60,6 +89,7 @@ public:
             int temp = 0;
             while (++temp <= rnd) mapaActual++;
         }
+        RestablecerVotos();
     };
     void CargarMapasDesdeBD()
     {
@@ -113,6 +143,18 @@ public:
     BR_UbicacionZona ObtenerZonasParaCofres(int zona) { return TieneZonasParaCofres(zona) ? MapaActual()->ubicacionesMapa[zona] : BR_UbicacionZona(); };
 
 private:
+    void RestablecerVotos()
+    {
+        if (list_Mapas.size())
+        {
+            for (BR_ContenedorMapas::iterator it = list_Mapas.begin(); it != list_Mapas.end(); ++it)
+            {
+                if (it->second) it->second->votos = 0;
+            }
+        }
+        if (usarVotos) usarVotos = false;
+    };
+
     BR_ContenedorMapas list_Mapas;
     BR_ContenedorMapas::iterator mapaActual;
 

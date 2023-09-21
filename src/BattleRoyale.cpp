@@ -166,10 +166,7 @@ public:
         if (!sBattleRoyaleMgr->EstaEnCola(player))
         {
             AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "Quiero unirme a la cola.", 0, 2);
-            if (player->IsGameMaster())
-            {
-                AddGossipItemFor(player, GOSSIP_ICON_TAXI, "<MJ> Quiero elegir el siguiente mapa.", 0, 3);
-            }
+            AddGossipItemFor(player, GOSSIP_ICON_TAXI, "<NUEVO> Votar para elegir mapa.", 0, 3);
         }
         else
         {
@@ -207,20 +204,13 @@ public:
             {
                 if (sConfigMgr->GetOption<bool>("BattleRoyale.Enabled", true))
                 {           
-                    if (player->IsGameMaster())
+                    uint32 start = 5;
+                    BR_ContenedorMapas mapas = sBRMapasMgr->ObtenerMapas();
+                    for (BR_ContenedorMapas::iterator it = mapas.begin(); it != mapas.end(); ++it)
                     {
-                        uint32 start = 5;
-                        BR_ContenedorMapas mapas = sBRMapasMgr->ObtenerMapas();
-                        for (BR_ContenedorMapas::iterator it = mapas.begin(); it != mapas.end(); ++it)
-                        {
-                            AddGossipItemFor(player, GOSSIP_ICON_BATTLE, it->second->nombreMapa, it->first, start++);
-                        }
-                        SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
+                        AddGossipItemFor(player, GOSSIP_ICON_BATTLE, it->second->nombreMapa, it->first, start++);
                     }
-                    else
-                    {
-                        CloseGossipMenuFor(player);
-                    }   
+                    SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
                 }
                 else
                 {
@@ -254,10 +244,7 @@ public:
             {
                 if (sConfigMgr->GetOption<bool>("BattleRoyale.Enabled", true))
                 {
-                    if (player->IsGameMaster())
-                    {
-                        sBRMapasMgr->EstablecerMapa(sender);
-                    }
+                    sBRMapasMgr->VotarPorMapa(sender); // TODO: Hacer que cada jugador solo pueda votar una ves por mapa en cada ronda.
                     sBattleRoyaleMgr->GestionarJugadorEntrando(player);
                 }
                 else
