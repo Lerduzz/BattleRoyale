@@ -12,6 +12,7 @@ struct BR_Mapa
     Position centroMapa;
     Position inicioNave;
     BR_Ubicacion ubicacionesMapa;
+    int votos;
 };
 typedef std::map<uint32, BR_Mapa*> BR_ContenedorMapas;
 
@@ -96,6 +97,7 @@ public:
                         } while (result_spawn->NextRow());
                     }
                 }
+                mapa->votos = 0;
                 list_Mapas[id] = mapa;
             } while (result->NextRow());
         }
