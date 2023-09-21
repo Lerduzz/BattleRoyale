@@ -4,6 +4,7 @@
 #include "BRConstantes.h"
 #include "BRChatMgr.h"
 #include "BRListaNegraMgr.h"
+#include "BRMapasMgr.h"
 #include "BRMisionesMgr.h"
 #include "BRObjetosMgr.h"
 #include "BRSonidosMgr.h"
@@ -46,12 +47,6 @@ public:
         return !sBRObjetosMgr->EstaEnLaNave(player);
     };
     void QuitarAlas(Player* player) { player->DestroyItemCount(INVENTARIO_CAMISA_ALAS, 9999, true); };
-    BR_ContenedorMapas ObtenerMapas() { return list_Mapas; };
-    void EstablecerMapa(uint32 id)
-    {
-        BR_ContenedorMapas::iterator tmp = list_Mapas.find(id);
-        if (tmp != list_Mapas.end()) mapaActual = tmp;
-    };
 
 private:
     void RestablecerTodoElEvento();
@@ -81,21 +76,6 @@ private:
     };
     bool HaySuficientesEnCola() { return list_Cola.size() >= conf_JugadoresMinimo; };
     void SiguientePosicion() { if (++indiceDeVariacion >= CANTIDAD_DE_VARIACIONES) indiceDeVariacion = 0; };
-    void SiguienteMapa()
-    {
-        int num = list_Mapas.size();
-        if (num <= 1)
-        {
-            mapaActual = list_Mapas.begin();
-        }
-        else
-        {
-            int rnd = rand() % num;
-            mapaActual = list_Mapas.begin();
-            int temp = 0;
-            while (++temp <= rnd) mapaActual++;
-        }
-    };
     void DejarGrupo(Player* player)
     { 
         player->RemoveFromGroup(); 
@@ -293,9 +273,6 @@ private:
 
     BR_ListaDePersonajes list_DarAlas;
     BR_ListaDePersonajes list_QuitarAlas;
-
-    BR_ContenedorMapas list_Mapas;
-    BR_ContenedorMapas::iterator mapaActual;
 
     int estadoActual;
     int tiempoRestanteInicio;
