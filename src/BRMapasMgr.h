@@ -46,18 +46,6 @@ public:
             if (!usarVotos) usarVotos = true;
         }
     };
-    /*void EstablecerMapa(uint32 id)
-    {
-        BR_ContenedorMapas::iterator tmp = list_Mapas.find(id);
-        if (tmp != list_Mapas.end())
-        {
-            mapaActual = tmp;
-        }
-        else
-        {
-            SiguienteMapa();
-        }
-    };*/
     void EstablecerMasVotado()
     {
         if (usarVotos && list_Mapas.size())
@@ -75,6 +63,7 @@ public:
             if (tmpMap != list_Mapas.end())
             {
                 mapaActual = tmpMap;
+                RestablecerVotos();
             }
         }
     };
@@ -89,7 +78,6 @@ public:
             int temp = 0;
             while (++temp <= rnd) mapaActual++;
         }
-        RestablecerVotos();
     };
     void CargarMapasDesdeBD()
     {
