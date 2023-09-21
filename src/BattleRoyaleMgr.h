@@ -4,6 +4,7 @@
 #include "BRConstantes.h"
 #include "BRChatMgr.h"
 #include "BRListaNegraMgr.h"
+#include "BRMisionesMgr.h"
 #include "BRObjetosMgr.h"
 #include "BRSonidosMgr.h"
 #include "BRTitulosMgr.h"

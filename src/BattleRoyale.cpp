@@ -186,6 +186,7 @@ public:
         {
             case 1:
             {
+                ChatHandler(player->GetSession()).PSendSysMessage("El modo |cff4CFF00Battle Royale::|r se encuentra en desarrollo (Versión Beta v0.9.5). Los ganadores obtienen un título JcJ exclusivo que va mejorando cuanto más ganes. Además en algunos mapas aparecen cofres con recompensas aleatorias (Pociones, Emblemas de triunfo, Emblemas de escarcha y Puntos de honor).");
                 CloseGossipMenuFor(player);
                 break;
             }
