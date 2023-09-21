@@ -280,7 +280,7 @@ void BattleRoyaleMgr::RestablecerTodoElEvento()
     list_Cola.clear();
 	list_Jugadores.clear();
     list_Datos.clear();
-    SiguienteMapa();
+    sBRMapasMgr->SiguienteMapa();
     indicadorDeSegundos = 1000;
     indiceDeVariacion = 0;
     sBRObjetosMgr->DesaparecerTodosLosObjetos();
@@ -513,6 +513,6 @@ void BattleRoyaleMgr::FinalizarRonda(bool announce, Player* winner /* = nullptr*
     }
     sBRObjetosMgr->DesaparecerTodosLosObjetos();
     tiempoRestanteFinal = 10;
-    SiguienteMapa();
+    sBRMapasMgr->SiguienteMapa();
     estadoActual = ESTADO_BATALLA_TERMINADA;
 }

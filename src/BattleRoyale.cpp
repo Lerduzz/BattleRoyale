@@ -210,7 +210,7 @@ public:
                     if (player->IsGameMaster())
                     {
                         uint32 start = 5;
-                        BR_ContenedorMapas mapas = sBattleRoyaleMgr->ObtenerMapas();
+                        BR_ContenedorMapas mapas = sBRMapasMgr->ObtenerMapas();
                         for (BR_ContenedorMapas::iterator it = mapas.begin(); it != mapas.end(); ++it)
                         {
                             AddGossipItemFor(player, GOSSIP_ICON_BATTLE, it->second->nombreMapa, it->first, start++);
@@ -256,7 +256,7 @@ public:
                 {
                     if (player->IsGameMaster())
                     {
-                        sBattleRoyaleMgr->EstablecerMapa(sender);
+                        sBRMapasMgr->EstablecerMapa(sender);
                     }
                     sBattleRoyaleMgr->GestionarJugadorEntrando(player);
                 }
