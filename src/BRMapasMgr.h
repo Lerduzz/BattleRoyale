@@ -1,7 +1,7 @@
 #ifndef SC_BR_MAPS_MGR_H
 #define SC_BR_MAPS_MGR_H
 
-#include "Object.h"
+#include "BRConstantes.h"
 
 typedef std::map<uint32, Position> BR_UbicacionZona;
 typedef std::map<uint32, BR_UbicacionZona> BR_Ubicacion;
