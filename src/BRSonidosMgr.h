@@ -33,9 +33,15 @@ public:
 
     void ReproducirSonidoParaTodos(uint32 soundID, BR_ListaSonido playerList)
     {
-        for (BR_ListaSonido::iterator it = playerList.begin(); it != playerList.end(); ++it)
+        if (playerList.size())
         {
-            if (it->second) it->second->GetSession()->SendPacket(WorldPackets::Misc::Playsound(soundID).Write());
+            for (BR_ListaSonido::iterator it = playerList.begin(); it != playerList.end(); ++it)
+            {
+                if (it->second)
+                {
+                    it->second->GetSession()->SendPacket(WorldPackets::Misc::Playsound(soundID).Write());
+                }
+            }
         }
     };
 

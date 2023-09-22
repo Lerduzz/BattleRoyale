@@ -40,16 +40,7 @@ const float BR_VariacionesDePosicion[CANTIDAD_DE_VARIACIONES][2] =
     { -4.5f, -4.5f }, { -3.0f, -4.5f }, { -1.5f, -4.5f }, {  0.0f, -4.5f }, {  1.5f, -4.5f }, {  3.0f, -4.5f }, {  4.5f, -4.5f }
 };
 
-typedef std::map<uint32, Position> BR_UbicacionZona;
-typedef std::map<uint32, BR_UbicacionZona> BR_Ubicacion;
-struct BR_Mapa
-{
-    uint32 idMapa;
-    std::string nombreMapa;
-    Position centroMapa;
-    Position inicioNave;
-    BR_Ubicacion ubicacionesMapa;
-};
-typedef std::map<uint32, BR_Mapa*> BR_ContenedorMapas;
+const int CANTIDAD_DE_ZONAS                 = 10;
+const float BR_EscalasDeZonaSegura[CANTIDAD_DE_ZONAS] = { 5.0f, 4.5f, 4.0f, 3.5f, 3.0f, 2.5f, 2.0f, 1.5f, 1.0f, 0.5f };
 
 #endif

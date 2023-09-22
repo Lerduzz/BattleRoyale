@@ -4,6 +4,8 @@
 #include "BRConstantes.h"
 #include "BRChatMgr.h"
 #include "BRListaNegraMgr.h"
+#include "BRMapasMgr.h"
+#include "BRMisionesMgr.h"
 #include "BRObjetosMgr.h"
 #include "BRSonidosMgr.h"
 #include "BRTitulosMgr.h"
@@ -45,12 +47,7 @@ public:
         return !sBRObjetosMgr->EstaEnLaNave(player);
     };
     void QuitarAlas(Player* player) { player->DestroyItemCount(INVENTARIO_CAMISA_ALAS, 9999, true); };
-    BR_ContenedorMapas ObtenerMapas() { return list_Mapas; };
-    void EstablecerMapa(uint32 id)
-    {
-        BR_ContenedorMapas::iterator tmp = list_Mapas.find(id);
-        if (tmp != list_Mapas.end()) mapaActual = tmp;
-    };
+    BR_EstadosEvento EstadoActual() { return estadoActual; };
 
 private:
     void RestablecerTodoElEvento();
@@ -80,21 +77,6 @@ private:
     };
     bool HaySuficientesEnCola() { return list_Cola.size() >= conf_JugadoresMinimo; };
     void SiguientePosicion() { if (++indiceDeVariacion >= CANTIDAD_DE_VARIACIONES) indiceDeVariacion = 0; };
-    void SiguienteMapa()
-    {
-        int num = list_Mapas.size();
-        if (num <= 1)
-        {
-            mapaActual = list_Mapas.begin();
-        }
-        else
-        {
-            int rnd = rand() % num;
-            mapaActual = list_Mapas.begin();
-            int temp = 0;
-            while (++temp <= rnd) mapaActual++;
-        }
-    };
     void DejarGrupo(Player* player)
     { 
         player->RemoveFromGroup(); 
@@ -116,17 +98,20 @@ private:
     void AlReducirseLaZona()
     {
         int chestCount = 0;
-        if (indiceDeZona < CANTIDAD_DE_ZONAS && mapaActual->second->ubicacionesMapa.find(indiceDeZona) != mapaActual->second->ubicacionesMapa.end())
+        if (indiceDeZona < CANTIDAD_DE_ZONAS && sBRMapasMgr->TieneZonasParaCofres(indiceDeZona))
         {
-            BR_UbicacionZona temp = mapaActual->second->ubicacionesMapa[indiceDeZona];
-            for (BR_UbicacionZona::iterator it = temp.begin(); it != temp.end(); ++it)
+            BR_UbicacionZona temp = sBRMapasMgr->ObtenerZonasParaCofres(indiceDeZona);
+            if (temp.size())
             {
-                int rnd = rand() % 100 + 1;
-                if (rnd <= 35)
+                for (BR_UbicacionZona::iterator it = temp.begin(); it != temp.end(); ++it)
                 {
-                    if (sBRObjetosMgr->InvocarCofre(it->second))
+                    int rnd = rand() % 100 + 1;
+                    if (rnd <= 35)
                     {
-                        chestCount++;
+                        if (sBRObjetosMgr->InvocarCofre(it->second))
+                        {
+                            chestCount++;
+                        }
                     }
                 }
             }
@@ -293,10 +278,8 @@ private:
     BR_ListaDePersonajes list_DarAlas;
     BR_ListaDePersonajes list_QuitarAlas;
 
-    BR_ContenedorMapas list_Mapas;
-    BR_ContenedorMapas::iterator mapaActual;
+    BR_EstadosEvento estadoActual;
 
-    int estadoActual;
     int tiempoRestanteInicio;
     int tiempoRestanteZona;
     int tiempoRestanteNave;

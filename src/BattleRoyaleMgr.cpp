@@ -6,49 +6,7 @@ BattleRoyaleMgr::BattleRoyaleMgr()
     conf_JugadoresMinimo = sConfigMgr->GetOption<uint32>("BattleRoyale.MinPlayers", 25);
     conf_JugadoresMaximo = sConfigMgr->GetOption<uint32>("BattleRoyale.MaxPlayers", 50);
     conf_IntervaloDeZona = sConfigMgr->GetOption<uint32>("BattleRoyale.SecureZoneInterval", 60000);
-    QueryResult result = WorldDatabase.Query("SELECT `id`, `map_id`, `map_name`, `center_x`, `center_y`, `center_z`, `center_o`, `ship_x`, `ship_y`, `ship_z`, `ship_o` FROM `battleroyale_maps`;");
-    if (result)
-    {
-        do
-        {
-            Field* fields    = result->Fetch();
-            BR_Mapa* mapa    = new BR_Mapa();
-            uint32 id        = fields[0].Get<uint32>();
-            mapa->idMapa     = fields[1].Get<uint32>();
-            mapa->nombreMapa = fields[2].Get<std::string>();
-            mapa->centroMapa = { 
-                fields[3].Get<float>(),
-                fields[4].Get<float>(),
-                fields[5].Get<float>(),
-                fields[6].Get<float>()
-            };
-            mapa->inicioNave = { 
-                fields[7].Get<float>(),
-                fields[8].Get<float>(),
-                fields[9].Get<float>(),
-                fields[10].Get<float>()
-            };
-            for (uint32 i = 0; i < CANTIDAD_DE_ZONAS; ++i)
-            {
-                QueryResult result_spawn = WorldDatabase.Query("SELECT `id`, `pos_x`, `pos_y`, `pos_z`, `pos_o` FROM `battleroyale_maps_spawns` WHERE `zone` = {} AND `map` = {};", i, id);
-                if (result_spawn)
-                {
-                    do
-                    {
-                        Field* fields_spawn    = result_spawn->Fetch();
-                        uint32 id_spawn    = fields_spawn[0].Get<uint32>();
-                        mapa->ubicacionesMapa[i][id_spawn] = {
-                            fields_spawn[1].Get<float>(),
-                            fields_spawn[2].Get<float>(),
-                            fields_spawn[3].Get<float>(),
-                            fields_spawn[4].Get<float>()
-                        };
-                    } while (result_spawn->NextRow());
-                }
-            }
-            list_Mapas[id] = mapa;
-        } while (result->NextRow());
-    }
+    sBRMapasMgr->CargarMapasDesdeBD();
     RestablecerTodoElEvento();
 }
 
@@ -169,7 +127,8 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
                 if (tiempoRestanteInicio <= 0) {
                     estadoActual = ESTADO_BATALLA_EN_CURSO;
                     sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_RONDA_INICIADA, list_Jugadores);
-                    sBRChatMgr->NotificarTiempoInicial(0, list_Jugadores, mapaActual->second->nombreMapa);
+                    sBRChatMgr->NotificarTiempoInicial(0, list_Jugadores, sBRMapasMgr->MapaActual()->nombreMapa);
+                    sBRMisionesMgr->CompletarRequerimiento(MISION_DIARIA_1, MISION_DIARIA_1_REQ_1, list_Jugadores);
                     tiempoRestanteZona = conf_IntervaloDeZona;
                     tiempoRestanteNave = 15;
                 } else {
@@ -200,12 +159,12 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
                         tiempoRestanteZona = 0;
                         estaZonaAnunciada5s = false;
                         estaZonaAnunciada10s = false;
-                        if (!HayJugadores() || !sBRObjetosMgr->InvocarCentroDelMapa(mapaActual->second->idMapa, mapaActual->second->centroMapa))
+                        if (!HayJugadores() || !sBRObjetosMgr->InvocarCentroDelMapa(sBRMapasMgr->MapaActual()->idMapa, sBRMapasMgr->MapaActual()->centroMapa))
                         {
                             RestablecerTodoElEvento();
                             return;
                         }
-                        if (!HayJugadores() || !sBRObjetosMgr->InvocarZonaSegura(mapaActual->second->idMapa, mapaActual->second->centroMapa, indiceDeZona))
+                        if (!HayJugadores() || !sBRObjetosMgr->InvocarZonaSegura(sBRMapasMgr->MapaActual()->idMapa, sBRMapasMgr->MapaActual()->centroMapa, indiceDeZona))
                         {
                             RestablecerTodoElEvento();
                             return;
@@ -245,7 +204,7 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
                 QuitarAlasProgramado();
             } else indicadorDeSegundos -= diff;
             if (tiempoRestanteZona <= 0) {
-                if (!HayJugadores() || !sBRObjetosMgr->InvocarZonaSegura(mapaActual->second->idMapa, mapaActual->second->centroMapa, indiceDeZona))
+                if (!HayJugadores() || !sBRObjetosMgr->InvocarZonaSegura(sBRMapasMgr->MapaActual()->idMapa, sBRMapasMgr->MapaActual()->centroMapa, indiceDeZona))
                 {
                     RestablecerTodoElEvento();
                     return;
@@ -321,7 +280,7 @@ void BattleRoyaleMgr::RestablecerTodoElEvento()
     list_Cola.clear();
 	list_Jugadores.clear();
     list_Datos.clear();
-    SiguienteMapa();
+    sBRMapasMgr->SiguienteMapa();
     indicadorDeSegundos = 1000;
     indiceDeVariacion = 0;
     sBRObjetosMgr->DesaparecerTodosLosObjetos();
@@ -332,8 +291,9 @@ void BattleRoyaleMgr::IniciarNuevaRonda()
 {
     if (estadoActual == ESTADO_NO_HAY_SUFICIENTES_JUGADORES)
     {
+        sBRMapasMgr->EstablecerMasVotado();
         tiempoRestanteInicio = 75;
-        if (!HayCola() || !sBRObjetosMgr->InvocarNave(mapaActual->second->idMapa, mapaActual->second->inicioNave))
+        if (!HayCola() || !sBRObjetosMgr->InvocarNave(sBRMapasMgr->MapaActual()->idMapa, sBRMapasMgr->MapaActual()->inicioNave))
         {
             RestablecerTodoElEvento();
             return;
@@ -389,7 +349,7 @@ void BattleRoyaleMgr::LlamarDentroDeNave(uint32 guid)
     Desmontar(player);
     float ox = BR_VariacionesDePosicion[indiceDeVariacion][0];
     float oy = BR_VariacionesDePosicion[indiceDeVariacion][1];
-    BR_Mapa* brM = mapaActual->second;
+    BR_Mapa* brM = sBRMapasMgr->MapaActual();
     Position iN = brM->inicioNave;
     player->SetPhaseMask(DIMENSION_EVENTO, true);
     player->TeleportTo(brM->idMapa, iN.GetPositionX() + ox, iN.GetPositionY() + oy, iN.GetPositionZ() + 2.5f, iN.GetOrientation() + M_PI / 2.0f);
@@ -403,7 +363,12 @@ void BattleRoyaleMgr::LlamarDentroDeNave(uint32 guid)
 void BattleRoyaleMgr::SalirDelEvento(uint32 guid, bool logout /* = false*/)
 {
     if (EstaEnListaDarAlas(guid)) list_DarAlas.erase(guid);
-    if (EstaEnCola(guid)) list_Cola.erase(guid);
+    if (EstaEnCola(guid))
+    {
+        list_Cola.erase(guid);
+        sBRMapasMgr->RemoverVoto(guid);
+    }
+    sBRMapasMgr->LimpiarVoto(guid);
     if (EstaEnEvento(guid))
     {
         Player* player = list_Jugadores[guid];
@@ -554,6 +519,6 @@ void BattleRoyaleMgr::FinalizarRonda(bool announce, Player* winner /* = nullptr*
     }
     sBRObjetosMgr->DesaparecerTodosLosObjetos();
     tiempoRestanteFinal = 10;
-    SiguienteMapa();
+    sBRMapasMgr->SiguienteMapa();
     estadoActual = ESTADO_BATALLA_TERMINADA;
 }
