@@ -319,7 +319,8 @@ public:
     {
         static Acore::ChatCommands::ChatCommandTable commandTable = {
             {"", HandleBRCommand, SEC_PLAYER, Acore::ChatCommands::Console::No}, 
-            {"recargar", HandleReloadCommand, 5, Acore::ChatCommands::Console::Yes}
+            {"recargar", HandleReloadCommand, 5, Acore::ChatCommands::Console::Yes},
+            {"iniciar", HandleStartCommand, 5, Acore::ChatCommands::Console::Yes}
         };
 
         static Acore::ChatCommands::ChatCommandTable baseTable = {
@@ -346,6 +347,27 @@ public:
     {
         sBRListaNegraMgr->RecargarLista();
         handler->SendSysMessage("Se ha recargado la lista negra del modo Battle Royale.");
+        return true;
+    }
+
+    static bool HandleStartCommand(ChatHandler *handler)
+    {
+        if (sBattleRoyaleMgr->EstadoActual() == ESTADO_NO_HAY_SUFICIENTES_JUGADORES)
+        {
+            sBattleRoyaleMgr->ForzarIniciarNuevaRonda();
+            if (sBattleRoyaleMgr->EstadoActual() != ESTADO_NO_HAY_SUFICIENTES_JUGADORES)
+            {
+                handler->SendSysMessage("Se ha forzado el inicio de la ronda de Battle Royale sin haber suficientes jugadores.");
+            }
+            else
+            {
+                handler->SendSysMessage("No se ha podido forzar el inicio de la ronda de Battle Royale. No funciona si no hay nadie en cola.");
+            }
+        }
+        else
+        {
+            handler->SendSysMessage("Solo se puede forzar el inicio de una ronda de Battle Royale cuando no hay suficientes jugadores.");
+        }
         return true;
     }
 };

@@ -301,7 +301,7 @@ void BattleRoyaleMgr::IniciarNuevaRonda()
         estadoActual = ESTADO_INVOCANDO_JUGADORES;
         while (HayCola() && !EstaLlenoElEvento() && tiempoRestanteInicio >= 60)
         {
-            uint32 guid = (*list_Cola.begin()).first;
+            uint32 guid = list_Cola.begin()->first;
             if (list_Cola[guid]->IsInFlight())
             {
                 sBRChatMgr->AnunciarMensajeEntrada(list_Cola[guid], MENSAJE_ERROR_EN_VUELO);

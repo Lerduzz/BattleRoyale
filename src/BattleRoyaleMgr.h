@@ -48,6 +48,7 @@ public:
     };
     void QuitarAlas(Player* player) { player->DestroyItemCount(INVENTARIO_CAMISA_ALAS, 9999, true); };
     BR_EstadosEvento EstadoActual() { return estadoActual; };
+    void ForzarIniciarNuevaRonda() { if (HayCola()) IniciarNuevaRonda(); };
 
 private:
     void RestablecerTodoElEvento();
