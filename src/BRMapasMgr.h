@@ -82,8 +82,8 @@ public:
             if (tmpMap != list_Mapas.end() && tmpVote > 0)
             {
                 mapaActual = tmpMap;
-                RestablecerVotos();
             }
+            RestablecerVotos();
         }
     };
     void SiguienteMapa()
