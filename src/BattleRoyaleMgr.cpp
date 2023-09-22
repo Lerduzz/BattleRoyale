@@ -363,7 +363,12 @@ void BattleRoyaleMgr::LlamarDentroDeNave(uint32 guid)
 void BattleRoyaleMgr::SalirDelEvento(uint32 guid, bool logout /* = false*/)
 {
     if (EstaEnListaDarAlas(guid)) list_DarAlas.erase(guid);
-    if (EstaEnCola(guid)) list_Cola.erase(guid);
+    if (EstaEnCola(guid))
+    {
+        list_Cola.erase(guid);
+        sBRMapasMgr->RemoverVoto(guid);
+    }
+    sBRMapasMgr->LimpiarVoto(guid);
     if (EstaEnEvento(guid))
     {
         Player* player = list_Jugadores[guid];

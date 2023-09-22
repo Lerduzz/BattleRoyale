@@ -18,7 +18,6 @@ public:
     int dmg_tick;
     int kills;
     uint32 spect;
-    uint32 mapVote;
 
 private:
     int start_map;

@@ -3,6 +3,8 @@
 
 #include "BRConstantes.h"
 
+typedef std::map<uint32, uint32> BR_ListVotos;
+
 typedef std::map<uint32, Position> BR_UbicacionZona;
 typedef std::map<uint32, BR_UbicacionZona> BR_Ubicacion;
 struct BR_Mapa
@@ -25,6 +27,7 @@ class BRMapasMgr
     };
     ~BRMapasMgr()
     {
+        list_Votos.clear();
         list_Mapas.clear();
     };
 
@@ -37,15 +40,31 @@ public:
 
     BR_Mapa* MapaActual() { return mapaActual->second; };
     BR_ContenedorMapas ObtenerMapas() { return list_Mapas; };
-    void VotarPorMapa(uint32 id)
+    void VotarPorMapa(uint32 guid, uint32 id)
     {
+        RemoverVoto(guid);
         BR_ContenedorMapas::iterator tmp = list_Mapas.find(id);
         if (tmp != list_Mapas.end())
         {
             tmp->second->votos++;
+            list_Votos[guid] = id;
             if (!usarVotos) usarVotos = true;
         }
     };
+    void RemoverVoto(uint32 guid)
+    {
+        if (usarVotos && list_Votos.find(guid) != list_Votos.end())
+        {
+            uint32 id = list_Votos[id];
+            BR_ContenedorMapas::iterator tmp = list_Mapas.find(id);
+            if (tmp != list_Mapas.end())
+            {
+                if (tmp->second->votos > 0) tmp->second->votos--;
+            }
+            LimpiarVoto(guid);
+        }
+    };
+    void LimpiarVoto(uint32 guid) { if (list_Votos.find(guid) != list_Votos.end()) list_Votos.erase(guid); };
     void EstablecerMasVotado()
     {
         if (usarVotos && list_Mapas.size())
@@ -81,6 +100,7 @@ public:
     };
     void CargarMapasDesdeBD()
     {
+        list_Votos.clear();
         list_Mapas.clear();
         QueryResult result = WorldDatabase.Query("SELECT `id`, `map_id`, `map_name`, `center_x`, `center_y`, `center_z`, `center_o`, `ship_x`, `ship_y`, `ship_z`, `ship_o` FROM `battleroyale_maps` ORDER BY `id` ASC;");
         if (result)
@@ -133,6 +153,7 @@ public:
 private:
     void RestablecerVotos()
     {
+        list_Votos.clear();
         if (list_Mapas.size())
         {
             for (BR_ContenedorMapas::iterator it = list_Mapas.begin(); it != list_Mapas.end(); ++it)
@@ -143,6 +164,7 @@ private:
         if (usarVotos) usarVotos = false;
     };
 
+    BR_ListVotos list_Votos;
     BR_ContenedorMapas list_Mapas;
     BR_ContenedorMapas::iterator mapaActual;
 

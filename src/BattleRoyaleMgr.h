@@ -47,6 +47,7 @@ public:
         return !sBRObjetosMgr->EstaEnLaNave(player);
     };
     void QuitarAlas(Player* player) { player->DestroyItemCount(INVENTARIO_CAMISA_ALAS, 9999, true); };
+    BR_EstadosEvento EstadoActual() { return estadoActual; };
 
 private:
     void RestablecerTodoElEvento();
@@ -277,7 +278,8 @@ private:
     BR_ListaDePersonajes list_DarAlas;
     BR_ListaDePersonajes list_QuitarAlas;
 
-    int estadoActual;
+    BR_EstadosEvento estadoActual;
+
     int tiempoRestanteInicio;
     int tiempoRestanteZona;
     int tiempoRestanteNave;

@@ -244,8 +244,11 @@ public:
             {
                 if (sConfigMgr->GetOption<bool>("BattleRoyale.Enabled", true))
                 {
-                    sBRMapasMgr->VotarPorMapa(sender); // TODO: Hacer que cada jugador solo pueda votar una ves por mapa en cada ronda.
                     sBattleRoyaleMgr->GestionarJugadorEntrando(player);
+                    if (sBattleRoyaleMgr->EstaEnCola(player))
+                    {
+                        sBRMapasMgr->VotarPorMapa(player->GetGUID().GetCounter(), sender);
+                    }
                 }
                 else
                 {
