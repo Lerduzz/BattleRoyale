@@ -183,7 +183,7 @@ public:
         {
             case 1:
             {
-                ChatHandler(player->GetSession()).PSendSysMessage("|cff4CFF00BattleRoyale::|r Este modo de juego se encuentra en desarrollo (Versión Beta Actual v0.9.6). Los ganadores obtienen un título JcJ exclusivo que va mejorando cuanto más ganes. Además en algunos mapas aparecen cofres con recompensas aleatorias (Pociones, Emblemas y Honor). Por otro lado ya hay una misión diaria de participación, aunque se espera tener más misiones tanto diarias como semanales proximamente.");
+                ChatHandler(player->GetSession()).PSendSysMessage("|cff4CFF00BattleRoyale::|r Este modo de juego se encuentra en desarrollo (Versión Beta Actual v0.9.7). Los ganadores obtienen un título JcJ exclusivo que va mejorando cuanto más ganes. Además en algunos mapas aparecen cofres con recompensas aleatorias (Pociones, Emblemas y Honor). Por otro lado ya hay una misión diaria de participación, aunque se espera tener más misiones tanto diarias como semanales proximamente. Ahora puedes utilizar el comando '.br' para unirse al evento desde dónde estés o para salir de la cola.");
                 CloseGossipMenuFor(player);
                 break;
             }
