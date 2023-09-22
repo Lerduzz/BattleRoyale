@@ -162,11 +162,11 @@ public:
 
     bool OnGossipHello(Player* player, Creature* creature)
     {
-        AddGossipItemFor(player, GOSSIP_ICON_CHAT, "¿Cuales son las recompensas?", 0, 1);
+        AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Quiero saber más.", 0, 1);
         if (!sBattleRoyaleMgr->EstaEnCola(player))
         {
             AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "Quiero unirme a la cola.", 0, 2);
-            AddGossipItemFor(player, GOSSIP_ICON_TAXI, "<NUEVO> Votar para elegir mapa.", 0, 3);
+            AddGossipItemFor(player, GOSSIP_ICON_TAXI, "Votar para elegir mapa.", 0, 3);
         }
         else
         {
