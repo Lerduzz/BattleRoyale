@@ -319,6 +319,8 @@ public:
     {
         static Acore::ChatCommands::ChatCommandTable commandTable = {
             {"", HandleBRCommand, SEC_PLAYER, Acore::ChatCommands::Console::No}, 
+            {"unirme", HandleJoinCommand, SEC_PLAYER, Acore::ChatCommands::Console::No}, 
+            {"salir", HandleLeaveCommand, SEC_PLAYER, Acore::ChatCommands::Console::No}, 
             {"recargar", HandleReloadCommand, 5, Acore::ChatCommands::Console::Yes},
             {"iniciar", HandleStartCommand, 5, Acore::ChatCommands::Console::Yes}
         };
@@ -335,6 +337,46 @@ public:
         if (sConfigMgr->GetOption<bool>("BattleRoyale.Enabled", true))
         {
             handler->SendSysMessage("El modo |cff4CFF00BattleRoyale|r se encuentra |cff00ff00activado|r.");
+            handler->SendSysMessage("Puedes unirte a la cola mediante el comando '.br unirme'.");
+            handler->SendSysMessage("Puedes salir de la cola mediante el comando '.br salir'.");
+        }
+        else
+        {
+            handler->SendSysMessage("El modo |cff4CFF00BattleRoyale|r se encuentra |cffff0000desactivado|r.");
+        }
+        return true;
+    }
+
+    static bool HandleJoinCommand(ChatHandler *handler)
+    {
+        if (sConfigMgr->GetOption<bool>("BattleRoyale.Enabled", true))
+        {
+            Player* me = handler->GetSession()->GetPlayer();
+            if (!me) return false;
+            sBattleRoyaleMgr->GestionarJugadorEntrando(me);
+        }
+        else
+        {
+            handler->SendSysMessage("El modo |cff4CFF00BattleRoyale|r se encuentra |cffff0000desactivado|r.");
+        }
+        return true;
+    }
+
+    static bool HandleLeaveCommand(ChatHandler *handler)
+    {
+        if (sConfigMgr->GetOption<bool>("BattleRoyale.Enabled", true))
+        {
+            Player* me = handler->GetSession()->GetPlayer();
+            if (!me) return false;
+            if (sBattleRoyaleMgr->EstaEnCola(me))
+            {
+                sBattleRoyaleMgr->GestionarJugadorDesconectar(me);
+                handler->SendSysMessage("|cff4CFF00BattleRoyale::|r Ya no estas en cola para el evento.");
+            }
+            else
+            {
+                handler->SendSysMessage("|cff4CFF00BattleRoyale::|r ¡No estas en cola para el evento!");
+            }
         }
         else
         {
