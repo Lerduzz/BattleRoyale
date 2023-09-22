@@ -79,7 +79,7 @@ public:
                     tmpMap = it;
                 }
             }
-            if (tmpMap != list_Mapas.end())
+            if (tmpMap != list_Mapas.end() && tmpVote > 0)
             {
                 mapaActual = tmpMap;
                 RestablecerVotos();
