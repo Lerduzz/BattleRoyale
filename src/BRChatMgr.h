@@ -216,16 +216,9 @@ public:
         h.SendSysMessage("|-> |cffff0000La batalla es individual, se castigará a quien incumpla esta regla.|r");
         h.SendSysMessage("|-----> |cff4CFF00¡Que te diviertas!|r ----->");
     };
-    void AnunciarErrorAlas(Player* player, int noSpace = false)
+    void AnunciarErrorAlas(Player* player)
     {
-        if (noSpace)
-        {
-            Chat(player).PSendSysMessage("|cff4CFF00BattleRoyale::|r ¡No has obtenido las alas porque no tienes espacio disponible! |cffff0000¡Descansa en paz! :(|r");
-        }
-        else
-        {
-            Chat(player).PSendSysMessage("|cff4CFF00BattleRoyale::|r ¡No has obtenido las alas porque no se ha podido crear el objeto! |cffff0000¡Descansa en paz! :(|r");
-        }
+        Chat(player).PSendSysMessage("|cff4CFF00BattleRoyale::|r ¡No has obtenido las alas porque no tienes espacio disponible! |cffff0000¡Descansa en paz! :(|r");
     };
     void AnunciarMensajeEntrada(Player* player, BR_TipoMensaje tipo)
     {

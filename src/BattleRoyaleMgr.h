@@ -47,7 +47,6 @@ public:
         if (estadoActual != ESTADO_BATALLA_EN_CURSO || !HayJugadores() || !EstaEnEvento(player)) return false;
         return !sBRObjetosMgr->EstaEnLaNave(player);
     };
-    void QuitarAlas(Player* player) { player->DestroyItemCount(EQUIPAMIENTO_CAMISA_ALAS, 9999, true); };
     BR_EstadosEvento EstadoActual() { return estadoActual; };
     void ForzarIniciarNuevaRonda() { if (HayCola()) IniciarNuevaRonda(); };
 
@@ -190,28 +189,6 @@ private:
             player->CastSpell(target, 6277, true);
         }
     };
-    void DarAlas(Player* player)
-    {
-        QuitarAlas(player);
-        ItemPosCountVec dest;
-        InventoryResult msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, EQUIPAMIENTO_CAMISA_ALAS, 1);
-        if (msg == EQUIP_ERR_OK)
-        {
-            if (Item* item = player->StoreNewItem(dest, EQUIPAMIENTO_CAMISA_ALAS, true))
-            {
-                player->SendNewItem(item, 1, true, false);
-                sBRChatMgr->AnunciarMensajeBienvenida(player);
-            }
-            else
-            {
-                sBRChatMgr->AnunciarErrorAlas(player);
-            }
-        }
-        else
-        {
-            sBRChatMgr->AnunciarErrorAlas(player, true);
-        }
-    };
     void DarAlasProgramado()
     {
         if (list_DarAlas.size())
@@ -226,7 +203,14 @@ private:
                         uint32 guid = it->first;
                         Player* player = it->second;
                         ++it;
-                        DarAlas(player);
+                        if (sBREquipamientoMgr->EntregarAlas(player))
+                        {
+                            sBRChatMgr->AnunciarMensajeBienvenida(player);
+                        }
+                        else
+                        {
+                            sBRChatMgr->AnunciarErrorAlas(player);
+                        }
                         player->GetMotionMaster()->MoveFall();
                         list_DarAlas.erase(guid);
                     }
@@ -256,7 +240,7 @@ private:
                         uint32 guid = it->first;
                         Player* player = it->second;
                         ++it;
-                        QuitarAlas(player);
+                        sBREquipamientoMgr->QuitarAlas(player);
                         list_QuitarAlas.erase(guid);
                     }
                     else
