@@ -38,7 +38,7 @@ public:
             sBattleRoyaleMgr->QuitarAlas(player);
         }
     }
-    
+
     void OnLogout(Player* player) override {
         if (sConfigMgr->GetOption<bool>("BattleRoyale.Enabled", true))
         {
