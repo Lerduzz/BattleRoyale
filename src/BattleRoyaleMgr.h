@@ -2,6 +2,7 @@
 #define SC_BR_MGR_H
 
 #include "BRConstantes.h"
+#include "BREquipamientoMgr.h"
 #include "BRChatMgr.h"
 #include "BRListaNegraMgr.h"
 #include "BRMapasMgr.h"
@@ -46,7 +47,7 @@ public:
         if (estadoActual != ESTADO_BATALLA_EN_CURSO || !HayJugadores() || !EstaEnEvento(player)) return false;
         return !sBRObjetosMgr->EstaEnLaNave(player);
     };
-    void QuitarAlas(Player* player) { player->DestroyItemCount(INVENTARIO_CAMISA_ALAS, 9999, true); };
+    void QuitarAlas(Player* player) { player->DestroyItemCount(EQUIPAMIENTO_CAMISA_ALAS, 9999, true); };
     BR_EstadosEvento EstadoActual() { return estadoActual; };
     void ForzarIniciarNuevaRonda() { if (HayCola()) IniciarNuevaRonda(); };
 
@@ -193,10 +194,10 @@ private:
     {
         QuitarAlas(player);
         ItemPosCountVec dest;
-        InventoryResult msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, INVENTARIO_CAMISA_ALAS, 1);
+        InventoryResult msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, EQUIPAMIENTO_CAMISA_ALAS, 1);
         if (msg == EQUIP_ERR_OK)
         {
-            if (Item* item = player->StoreNewItem(dest, INVENTARIO_CAMISA_ALAS, true))
+            if (Item* item = player->StoreNewItem(dest, EQUIPAMIENTO_CAMISA_ALAS, true))
             {
                 player->SendNewItem(item, 1, true, false);
                 sBRChatMgr->AnunciarMensajeBienvenida(player);

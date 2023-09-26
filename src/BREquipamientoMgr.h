@@ -1,6 +1,11 @@
 #ifndef SC_BR_ITEM_MGR_H
 #define SC_BR_ITEM_MGR_H
 
+enum BR_Equipamiento
+{
+    EQUIPAMIENTO_CAMISA_ALAS                  = 17,
+};
+
 class BREquipamientoMgr
 {
     BREquipamientoMgr(){};

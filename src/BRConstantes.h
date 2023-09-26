@@ -23,11 +23,6 @@ enum BR_Hechizos
     HECHIZO_ANTI_INVISIBLES                 = 34709,
 };
 
-enum BR_Objetos
-{
-    INVENTARIO_CAMISA_ALAS                  = 17,
-};
-
 const int CANTIDAD_DE_VARIACIONES = 49;
 const float BR_VariacionesDePosicion[CANTIDAD_DE_VARIACIONES][2] = 
 {
