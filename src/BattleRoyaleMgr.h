@@ -203,7 +203,6 @@ private:
                         uint32 guid = it->first;
                         Player* player = it->second;
                         ++it;
-                        // TODO: Test! Desnudar!
                         sBREquipamientoMgr->Desnudar(player);
                         if (sBREquipamientoMgr->EntregarAlas(player))
                         {

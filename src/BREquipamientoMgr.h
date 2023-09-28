@@ -33,9 +33,30 @@ public:
 
     void Desnudar(Player* player)
     {
-        LOG_ERROR("br", "TODO: Crear la funcion que permita desnudar completamente a un personaje.");
-        // TODO: Se debe mover sus objetos al inventario, y en caso de no tener suficiente espacio se le deben enviar por correo como cuando te bajas de nivel y logueas.
-        
+        for (uint8 i = EQUIPMENT_SLOT_START; i < EQUIPMENT_SLOT_END; ++i)
+        {
+            if (Item* pItem = player->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+            {
+                ItemPosCountVec dest;
+                uint8 msg = player->CanStoreItem(NULL_BAG, NULL_SLOT, dest, pItem, false);
+                if (msg == EQUIP_ERR_OK)
+                {
+                    player->RemoveItem(INVENTORY_SLOT_BAG_0, i, true);
+                    player->StoreItem(dest, pItem, true);
+                }
+                else
+                {
+                    player->MoveItemFromInventory(INVENTORY_SLOT_BAG_0, i, true);
+                    CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
+                    pItem->DeleteFromInventoryDB(trans);
+                    pItem->SaveToDB(trans);
+                    std::string subject = "Battle Royale: Guardian de Equipamiento";
+                    std::string body = "¡Hubo un problema al desequipar uno de tus objetos! En el Battle Royale solo se permite utilizar el equipamiento preparado para este modo de juego.";
+                    MailDraft(subject, body).AddItem(pItem).SendMailTo(trans, player, MailSender(player, MAIL_STATIONERY_GM), MAIL_CHECK_MASK_COPIED);
+                    CharacterDatabase.CommitTransaction(trans);
+                }
+            }
+        }
     };
 
 private:
