@@ -23,12 +23,14 @@ public:
 
     bool DarObjetosIniciales(Player* player)
     {
+        DarEquipamiento(player, EQUIPAMIENTO_PIERNAS_BASE);
         return DarEquipamiento(player, EQUIPAMIENTO_CAMISA_ALAS);
     };
 
-    bool QuitarTodosLosObjetos(Player* player)
+    void QuitarTodosLosObjetos(Player* player)
     {
-        return QuitarEquipamiento(player, EQUIPAMIENTO_CAMISA_ALAS);
+        QuitarEquipamiento(player, EQUIPAMIENTO_PIERNAS_BASE);
+        QuitarEquipamiento(player, EQUIPAMIENTO_CAMISA_ALAS);
     };
 
     void Desnudar(Player* player)
