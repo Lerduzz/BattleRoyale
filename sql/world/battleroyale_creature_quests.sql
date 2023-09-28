@@ -25,16 +25,49 @@ INSERT INTO `creature_template` (`entry`, `modelid1`, `name`, `subname`, `IconNa
 DELETE FROM `npc_text` WHERE `ID` = @Entry;
 INSERT INTO `npc_text` (`ID`, `text0_0`) VALUES (@Entry, 'Saludos $N, como creador del evento Battle Royale de S King Inc me encargo de gestionar la cola de los participantes.\r\n\r\n¿De que va esto?\r\nEl evento tiene lugar en una zona aleatoria del mundo preparada previamente, los jugadores lucharan por adentrarse en la zona segura mientras intentan sobrevivir en una batalla todos contra todos.\r\n\r\nPara más información visita mi canal de YouTube:\r\nhttps://www.youtube.com/@lerduzz');
 
+
 -- NPC vendedor de armas --
 SET
 @Model2     := 23334,
 @Name2      := "Alythess la Bruja Suprema",
-@Title2     := "Proporciona las armas de Battle Royale",
+@Title2     := "Vendedora de armas de Battle Royale",
 @NPCFlag2   := 4224,
 @Scale2     := 0.7;
 INSERT INTO `creature_template` (`entry`, `modelid1`, `name`, `subname`, `IconName`, `gossip_menu_id`, `minlevel`, `maxlevel`, `faction`, `npcflag`, `speed_walk`, `speed_run`, `scale`, `rank`, `unit_class`, `unit_flags`, `type`, `type_flags`, `RegenHealth`, `flags_extra`, `AiName`, `ScriptName`) VALUES
 (@Entry + 1, @Model2, @Name2, @Title2, '', @GossipMenu, @MinLevel, @MaxLevel, @Faction, @NPCFlag2, 1, 1.14286, @Scale2, @Rank, 1, 2, 7, @TypeFlags, 1, @FlagsExtra, '', '');
 
+DELETE FROM `npc_vendor` WHERE `entry` = @Entry + 1;
+INSERT INTO `npc_vendor` (`entry`, `item`) VALUES
+(@Entry + 1, 34985),
+(@Entry + 1, 34987),
+(@Entry + 1, 34988),
+(@Entry + 1, 34989),
+(@Entry + 1, 34995),
+(@Entry + 1, 34996),
+(@Entry + 1, 34997),
+(@Entry + 1, 35014),
+(@Entry + 1, 35015),
+(@Entry + 1, 35017),
+(@Entry + 1, 35018),
+(@Entry + 1, 35037),
+(@Entry + 1, 35038),
+(@Entry + 1, 35047),
+(@Entry + 1, 35058),
+(@Entry + 1, 35064),
+(@Entry + 1, 35065),
+(@Entry + 1, 35071),
+(@Entry + 1, 35072),
+(@Entry + 1, 35075),
+(@Entry + 1, 35076),
+(@Entry + 1, 35082),
+(@Entry + 1, 35093),
+(@Entry + 1, 35095),
+(@Entry + 1, 35101),
+(@Entry + 1, 35102),
+(@Entry + 1, 35103),
+(@Entry + 1, 35107),
+(@Entry + 1, 35108),
+(@Entry + 1, 35109);
 
 -- NPC de las misiones --
 SET
