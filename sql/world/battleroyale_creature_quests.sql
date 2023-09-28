@@ -47,7 +47,7 @@ INSERT INTO `creature_template` (`entry`, `modelid1`, `name`, `subname`, `IconNa
 (@Entry + 2, @Model3, @Name3, @Title3, '', @GossipMenu, @MinLevel, @MaxLevel, @Faction, @NPCFlag3, 1, 1.14286, @Scale3, @Rank, 1, 2, @Type, @TypeFlags, 1, @FlagsExtra, '', ''),
 (@Entry + 3, 134, 'Mision 1 Credit 1', 'Battle Royale', '', 0, @MinLevel, @MaxLevel, @Faction, 0, 1, 1.14286, 1, 0, 1, 2, @Type, @TypeFlags, 1, 0, '', '');
 
-DELETE FROM `quest_greeting` WHERE `ID` = @Entry + 2;
+DELETE FROM `quest_greeting` WHERE `ID` IN (@Entry + 1, @Entry + 2);
 INSERT INTO `quest_greeting` (`ID`, `GreetEmoteType`, `Greeting`) VALUES (@Entry + 2, 1, 'Yo me encargo de entregar y recompensar todas las misiones relacionadas con el modo Battle Royale.'); 
 
 SET
@@ -68,11 +68,11 @@ INSERT INTO `quest_request_items` (`ID`, `EmoteOnComplete`, `EmoteOnIncomplete`,
 INSERT INTO `quest_template_addon` (`ID`, `SpecialFlags`) VALUES
 (@QuestID, 1);
 
-DELETE FROM `creature_queststarter` WHERE `id` = @Entry + 2;
+DELETE FROM `creature_queststarter` WHERE `id` IN (@Entry + 1, @Entry + 2);
 INSERT INTO `creature_queststarter` (`id`, `quest`) VALUES
 (@Entry + 2, @QuestID);
 
-DELETE FROM `creature_questender` WHERE `id` = @Entry + 2;
+DELETE FROM `creature_questender` WHERE `id` IN (@Entry + 1, @Entry + 2);
 INSERT INTO `creature_questender` (`id`, `quest`) VALUES
 (@Entry + 2, @QuestID);
 
