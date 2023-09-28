@@ -10,7 +10,7 @@ enum BR_Mision
 
 enum BR_MisionRequiere
 {
-    MISION_DIARIA_1_REQ_1                   = 200002,
+    MISION_DIARIA_1_REQ_1                   = 200003,
 };
 
 typedef std::map<uint32, Player*> BR_ListaMision;
