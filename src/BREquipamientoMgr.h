@@ -21,12 +21,12 @@ public:
         return instance;
     }
 
-    bool EntregarAlas(Player* player)
+    bool DarObjetosIniciales(Player* player)
     {
         return DarEquipamiento(player, EQUIPAMIENTO_CAMISA_ALAS);
     };
 
-    bool QuitarAlas(Player* player)
+    bool QuitarTodosLosObjetos(Player* player)
     {
         return QuitarEquipamiento(player, EQUIPAMIENTO_CAMISA_ALAS);
     };

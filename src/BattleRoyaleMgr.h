@@ -67,9 +67,9 @@ private:
     bool EstaEnCola(uint32 guid) { return list_Cola.find(guid) != list_Cola.end(); };
     bool EstaEnEvento(uint32 guid) { return list_Jugadores.find(guid) != list_Jugadores.end(); };
     bool EstaEnListaDeAlas(Player* player) { return EstaEnListaDeAlas(player->GetGUID().GetCounter()); };
-    bool EstaEnListaDeAlas(uint32 guid) { return EstaEnListaDarAlas(guid) || EstaEnListaQuitarAlas(guid); };
-    bool EstaEnListaDarAlas(uint32 guid) { return list_DarAlas.find(guid) != list_DarAlas.end(); };
-    bool EstaEnListaQuitarAlas(uint32 guid) { return list_QuitarAlas.find(guid) != list_QuitarAlas.end(); };
+    bool EstaEnListaDeAlas(uint32 guid) { return EstaEnListaDarObjetosIniciales(guid) || EstaEnListaQuitarTodosLosObjetos(guid); };
+    bool EstaEnListaDarObjetosIniciales(uint32 guid) { return list_DarObjetosIniciales.find(guid) != list_DarObjetosIniciales.end(); };
+    bool EstaEnListaQuitarTodosLosObjetos(uint32 guid) { return list_QuitarTodosLosObjetos.find(guid) != list_QuitarTodosLosObjetos.end(); };
     bool EstaLlenoElEvento() { return list_Jugadores.size() >= conf_JugadoresMaximo; };
     bool EstaEspectando(Player* player)
     { 
@@ -189,12 +189,12 @@ private:
             player->CastSpell(target, 6277, true);
         }
     };
-    void DarAlasProgramado()
+    void DarObjetosInicialesProgramado()
     {
-        if (list_DarAlas.size())
+        if (list_DarObjetosIniciales.size())
         {
-            BR_ListaDePersonajes::iterator it = list_DarAlas.begin();
-            while (it != list_DarAlas.end())
+            BR_ListaDePersonajes::iterator it = list_DarObjetosIniciales.begin();
+            while (it != list_DarObjetosIniciales.end())
             {
                 if (it->second && it->second->IsAlive())
                 {
@@ -204,7 +204,7 @@ private:
                         Player* player = it->second;
                         ++it;
                         sBREquipamientoMgr->Desnudar(player);
-                        if (sBREquipamientoMgr->EntregarAlas(player))
+                        if (sBREquipamientoMgr->DarObjetosIniciales(player))
                         {
                             sBRChatMgr->AnunciarMensajeBienvenida(player);
                         }
@@ -213,7 +213,7 @@ private:
                             sBRChatMgr->AnunciarErrorAlas(player);
                         }
                         player->GetMotionMaster()->MoveFall();
-                        list_DarAlas.erase(guid);
+                        list_DarObjetosIniciales.erase(guid);
                     }
                     else
                     {
@@ -227,12 +227,12 @@ private:
             }
         }
     }
-    void QuitarAlasProgramado()
+    void QuitarTodosLosObjetosProgramado()
     {
-        if (list_QuitarAlas.size())
+        if (list_QuitarTodosLosObjetos.size())
         {
-            BR_ListaDePersonajes::iterator it = list_QuitarAlas.begin();
-            while (it != list_QuitarAlas.end())
+            BR_ListaDePersonajes::iterator it = list_QuitarTodosLosObjetos.begin();
+            while (it != list_QuitarTodosLosObjetos.end())
             {
                 if (it->second && it->second->IsAlive())
                 {
@@ -241,8 +241,8 @@ private:
                         uint32 guid = it->first;
                         Player* player = it->second;
                         ++it;
-                        sBREquipamientoMgr->QuitarAlas(player);
-                        list_QuitarAlas.erase(guid);
+                        sBREquipamientoMgr->QuitarTodosLosObjetos(player);
+                        list_QuitarTodosLosObjetos.erase(guid);
                     }
                     else
                     {
@@ -262,8 +262,8 @@ private:
     BR_ListaDePersonajes list_Jugadores;
     BR_DatosDePersonajes list_Datos;
 
-    BR_ListaDePersonajes list_DarAlas;
-    BR_ListaDePersonajes list_QuitarAlas;
+    BR_ListaDePersonajes list_DarObjetosIniciales;
+    BR_ListaDePersonajes list_QuitarTodosLosObjetos;
 
     BR_EstadosEvento estadoActual;
 

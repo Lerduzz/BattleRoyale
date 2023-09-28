@@ -140,7 +140,7 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
                         }
                         sBRChatMgr->NotificarTiempoInicial(tiempoRestanteInicio, list_Jugadores);
                     }
-                    if (estadoActual == ESTADO_INVOCANDO_JUGADORES) DarAlasProgramado();
+                    if (estadoActual == ESTADO_INVOCANDO_JUGADORES) DarObjetosInicialesProgramado();
                     if (estadoActual == ESTADO_INVOCANDO_JUGADORES && tiempoRestanteInicio <= 45)
                     {
                         if (sBRObjetosMgr->EncenderNave())
@@ -176,7 +176,7 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
                     }
                     tiempoRestanteInicio--;
                 }
-                QuitarAlasProgramado();
+                QuitarTodosLosObjetosProgramado();
             } else {
                 indicadorDeSegundos -= diff;
             }
@@ -201,7 +201,7 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
                         sBRChatMgr->NotificarNaveRetirada(list_Jugadores);
                     }
                 }
-                QuitarAlasProgramado();
+                QuitarTodosLosObjetosProgramado();
             } else indicadorDeSegundos -= diff;
             if (tiempoRestanteZona <= 0) {
                 if (!HayJugadores() || !sBRObjetosMgr->InvocarZonaSegura(sBRMapasMgr->MapaActual()->idMapa, sBRMapasMgr->MapaActual()->centroMapa, indiceDeZona))
@@ -245,7 +245,7 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
                     estadoActual = ESTADO_NO_HAY_SUFICIENTES_JUGADORES;
                     if (HaySuficientesEnCola()) IniciarNuevaRonda();
                 }
-                QuitarAlasProgramado();
+                QuitarTodosLosObjetosProgramado();
             } else indicadorDeSegundos -= diff;
             break;
         }
@@ -253,7 +253,7 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
         {
             if (indicadorDeSegundos <= 0) {
                 indicadorDeSegundos = 1000;
-                QuitarAlasProgramado();
+                QuitarTodosLosObjetosProgramado();
             } else indicadorDeSegundos -= diff;
             break;
         }
@@ -356,13 +356,13 @@ void BattleRoyaleMgr::LlamarDentroDeNave(uint32 guid)
     player->SetPvP(false);
     // TODO: Analizar si esto es factible: player->AddAura(HECHIZO_LENGUAJE_BINARIO, player);
     player->SaveToDB(false, false);
-    list_DarAlas[guid] = player;
+    list_DarObjetosIniciales[guid] = player;
     SiguientePosicion();
 }
 
 void BattleRoyaleMgr::SalirDelEvento(uint32 guid, bool logout /* = false*/)
 {
-    if (EstaEnListaDarAlas(guid)) list_DarAlas.erase(guid);
+    if (EstaEnListaDarObjetosIniciales(guid)) list_DarObjetosIniciales.erase(guid);
     if (EstaEnCola(guid))
     {
         list_Cola.erase(guid);
@@ -384,7 +384,7 @@ void BattleRoyaleMgr::SalirDelEvento(uint32 guid, bool logout /* = false*/)
         {
             if (!player->IsAlive()) RevivirJugador(player);
             if (!player->isPossessing()) player->StopCastingBindSight();
-            list_QuitarAlas[guid] = player;
+            list_QuitarTodosLosObjetos[guid] = player;
             player->AddAura(HECHIZO_PARACAIDAS, player);
             player->TeleportTo(list_Datos[guid].GetMap(), list_Datos[guid].GetX(), list_Datos[guid].GetY(), list_Datos[guid].GetZ(), list_Datos[guid].GetO());
             player->SaveToDB(false, false);
@@ -392,7 +392,7 @@ void BattleRoyaleMgr::SalirDelEvento(uint32 guid, bool logout /* = false*/)
         list_Jugadores.erase(guid);
         list_Datos.erase(guid);
     }
-    if (logout && EstaEnListaQuitarAlas(guid)) list_QuitarAlas.erase(guid);
+    if (logout && EstaEnListaQuitarTodosLosObjetos(guid)) list_QuitarTodosLosObjetos.erase(guid);
 }
 
 void BattleRoyaleMgr::RevivirJugador(Player* player)

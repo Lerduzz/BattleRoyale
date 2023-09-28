@@ -35,7 +35,7 @@ public:
             {
                 ChatHandler(player->GetSession()).SendSysMessage("El modo |cff4CFF00BattleRoyale|r ha sido activado.");
             }
-            sBREquipamientoMgr->QuitarAlas(player);
+            sBREquipamientoMgr->QuitarTodosLosObjetos(player);
         }
     }
 
