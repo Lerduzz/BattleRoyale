@@ -34,6 +34,10 @@ public:
     {
         QuitarEquipamiento(player, EQUIPAMIENTO_PIERNAS_BASE);
         QuitarEquipamiento(player, EQUIPAMIENTO_CAMISA_ALAS);
+        for (uint32 i = 0; i < CANTIDAD_ARMAS; ++i)
+        {
+            QuitarEquipamiento(player, BR_Armas[i]);
+        }
         player->UpdateTitansGrip();
     };
 
@@ -77,7 +81,7 @@ public:
     };
 
 private:
-    bool QuitarEquipamiento(Player* player, BR_Equipamiento item)
+    bool QuitarEquipamiento(Player* player, uint32 item)
     {
         uint32 count = player->GetItemCount(item, true);
         if (count > 0)
@@ -88,7 +92,7 @@ private:
         return false;
     };
 
-    bool DarEquipamiento(Player* player, BR_Equipamiento item)
+    bool DarEquipamiento(Player* player, uint32 item)
     {
         QuitarEquipamiento(player, item);
         return player->StoreNewItemInBestSlots(item, 1);
