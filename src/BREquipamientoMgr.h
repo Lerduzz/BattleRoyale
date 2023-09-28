@@ -31,6 +31,7 @@ public:
     {
         QuitarEquipamiento(player, EQUIPAMIENTO_PIERNAS_BASE);
         QuitarEquipamiento(player, EQUIPAMIENTO_CAMISA_ALAS);
+        player->UpdateTitansGrip();
     };
 
     bool EsEquipamientoDeBR(uint32 item)
@@ -64,6 +65,7 @@ public:
                 }
             }
         }
+        player->UpdateTitansGrip();
     };
 
 private:
