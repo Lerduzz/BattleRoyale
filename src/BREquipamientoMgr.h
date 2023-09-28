@@ -9,6 +9,9 @@ enum BR_Equipamiento
     EQUIPAMIENTO_PIERNAS_BASE                 = 20902,
 };
 
+const uint32 CANTIDAD_ARMAS = 30;
+const uint32 BR_Armas[CANTIDAD_ARMAS] = { 34985, 34987, 34988, 34989, 34995, 34996, 34997, 35014, 35015, 35017, 35018, 35037, 35038, 35047, 35058, 35064, 35065, 35071, 35072, 35075, 35076, 35082, 35093, 35095, 35101, 35102, 35103, 35107, 35108, 35109 };
+
 class BREquipamientoMgr
 {
     BREquipamientoMgr(){};
@@ -36,7 +39,12 @@ public:
 
     bool EsEquipamientoDeBR(uint32 item)
     {
-        return item == EQUIPAMIENTO_CAMISA_ALAS || item == EQUIPAMIENTO_PIERNAS_BASE;
+        if (item == EQUIPAMIENTO_CAMISA_ALAS || item == EQUIPAMIENTO_PIERNAS_BASE) return true;
+        for (uint32 i = 0; i < CANTIDAD_ARMAS; ++i)
+        {
+            if (item == BR_Armas[i]) return true;
+        }
+        return false;
     };
 
     void Desnudar(Player* player)
