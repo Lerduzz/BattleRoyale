@@ -31,6 +31,13 @@ public:
         return QuitarEquipamiento(player, EQUIPAMIENTO_CAMISA_ALAS);
     };
 
+    void Desnudar(Player* player)
+    {
+        LOG_ERROR("br", "TODO: Crear la funcion que permita desnudar completamente a un personaje.");
+        // TODO: Se debe mover sus objetos al inventario, y en caso de no tener suficiente espacio se le deben enviar por correo como cuando te bajas de nivel y logueas.
+        
+    };
+
 private:
     bool QuitarEquipamiento(Player* player, BR_Equipamiento item)
     {
