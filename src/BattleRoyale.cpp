@@ -54,6 +54,22 @@ public:
         }
     }
 
+    bool CanEquipItem(Player* player, uint8 /*slot*/, uint16& /*dest*/, Item* pItem, bool /*swap*/, bool /*not_loading*/) override
+    {
+        if (player && pItem)
+        {
+            if (sBattleRoyaleMgr->EstadoActual() > ESTADO_NO_HAY_SUFICIENTES_JUGADORES && sBattleRoyaleMgr->EstaEnEvento(player))
+            {
+                return sBREquipamientoMgr->EsEquipamientoDeBR(pItem->GetEntry());
+            }
+            else
+            {
+                return !sBREquipamientoMgr->EsEquipamientoDeBR(pItem->GetEntry());
+            }
+        }
+        return true;
+    }
+
     bool CanRepopAtGraveyard(Player *player) override
 	{
         if (sConfigMgr->GetOption<bool>("BattleRoyale.Enabled", true))

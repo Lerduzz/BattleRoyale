@@ -33,6 +33,11 @@ public:
         QuitarEquipamiento(player, EQUIPAMIENTO_CAMISA_ALAS);
     };
 
+    bool EsEquipamientoDeBR(uint32 item)
+    {
+        return item == EQUIPAMIENTO_CAMISA_ALAS || item == EQUIPAMIENTO_PIERNAS_BASE;
+    };
+
     void Desnudar(Player* player)
     {
         for (uint8 i = EQUIPMENT_SLOT_START; i < EQUIPMENT_SLOT_END; ++i)
