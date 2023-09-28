@@ -33,8 +33,7 @@ class BRObjetosMgr
         obj_Centro = nullptr;
         obj_Nave = nullptr;
         npc_Vendedor = nullptr;
-        zonaActiva = false;
-        vendedorInvocado = false;
+        zonaActiva = false;    
     };
     ~BRObjetosMgr(){};
 
@@ -78,7 +77,6 @@ public:
             npc_Vendedor->CleanupsBeforeDelete();
             delete npc_Vendedor;
             npc_Vendedor = nullptr;
-            vendedorInvocado = false;
         }
         if (HayNave()) {
             if(Transport* tp = obj_Nave->ToTransport())
@@ -114,38 +112,29 @@ public:
             {
                 obj_Nave->SetVisibilityDistanceOverride(VisibilityDistanceType::Infinite);
                 map->AddToMap(obj_Nave);
+                if (Transport* transport = obj_Nave->ToTransport())
+                {
+                    float vX = 0.0f;
+                    float vY = 23.5f;
+                    float vZ = 0.0f;
+                    float vO = - M_PI_2;
+                    transport->CalculatePassengerPosition(*(&vX), *(&vY), *(&vZ), &vO);
+                    if (npc_Vendedor = transport->SummonCreature(CRIATURA_VENDEDOR_ARMAS, vX, vY, vZ, vO, TEMPSUMMON_MANUAL_DESPAWN))
+                    {
+                        transport->AddPassenger(npc_Vendedor, true);
+                    }
+                    else
+                    {
+                        delete npc_Vendedor;
+                        npc_Vendedor = nullptr;
+                    }
+                }
                 return true;
             }
             else
             {
                 delete obj_Nave;
                 obj_Nave = nullptr;
-            }
-        }
-        return false;
-    };
-    bool InvocarVendedorNave()
-    {
-        if (vendedorInvocado) return false;
-        if (!npc_Vendedor && obj_Nave)
-        {
-            if (Transport* transport = obj_Nave->ToTransport())
-            {
-                float vX = 0.0f;
-                float vY = 23.5f;
-                float vZ = 0.0f;
-                float vO = - M_PI_2;
-                transport->CalculatePassengerPosition(*(&vX), *(&vY), *(&vZ), &vO);
-                if (npc_Vendedor = transport->SummonCreature(CRIATURA_VENDEDOR_ARMAS, vX, vY, vZ, vO, TEMPSUMMON_MANUAL_DESPAWN))
-                {
-                    transport->AddPassenger(npc_Vendedor, true);
-                    vendedorInvocado = true;
-                }
-                else
-                {
-                    delete npc_Vendedor;
-                    npc_Vendedor = nullptr;
-                }
             }
         }
         return false;
@@ -264,7 +253,6 @@ private:
     Creature* npc_Vendedor;
 
     bool zonaActiva;
-    bool vendedorInvocado;
 
 };
 

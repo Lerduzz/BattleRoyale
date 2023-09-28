@@ -206,7 +206,6 @@ private:
                         sBREquipamientoMgr->Desnudar(player);
                         if (sBREquipamientoMgr->DarObjetosIniciales(player))
                         {
-                            sBRObjetosMgr->InvocarVendedorNave();
                             sBRChatMgr->AnunciarMensajeBienvenida(player);
                         }
                         else
