@@ -21,6 +21,8 @@ enum BR_TipoMensajeEstado
     MENSAJE_ESTADO_EVENTO_LLENO,
 };
 
+const std::string TEXTO_NOMBRE = "|cffff6633[Battle Royale]|r";
+
 typedef std::map<uint32, Player*> BR_ListaChat;
 
 class BRChatMgr
@@ -145,13 +147,13 @@ public:
                     break;
                 }
             }
-            Chat(player).PSendSysMessage("|cff4CFF00BattleRoyale::|r Te has unido a la cola del evento. Jugadores en cola: |cff4CFF00%u|r/|cff4CFF00%u|r.%s", lista.size(), minimo, mensajeEstado.c_str());
+            Chat(player).PSendSysMessage("%s: Te has unido a la cola del evento. Jugadores en cola: |cff4CFF00%u|r/|cff4CFF00%u|r.%s", TEXTO_NOMBRE.c_str(), lista.size(), minimo, mensajeEstado.c_str());
             for (BR_ListaChat::iterator it = lista.begin(); it != lista.end(); ++it)
             {
                 if (it->second != player)
                 {
                     ChatHandler h = Chat(it->second);
-                    h.PSendSysMessage("|cff4CFF00BattleRoyale::|r %s se ha unido a la cola. Jugadores en cola: |cff4CFF00%u|r/|cff4CFF00%u|r.%s", h.GetNameLink(player), lista.size(), minimo, mensajeEstado.c_str());
+                    h.PSendSysMessage("%s: %s se ha unido a la cola. Jugadores en cola: |cff4CFF00%u|r/|cff4CFF00%u|r.%s", TEXTO_NOMBRE.c_str(), h.GetNameLink(player), lista.size(), minimo, mensajeEstado.c_str());
                 }
             }
         }
