@@ -93,7 +93,7 @@ public:
         }
         return false;
     };
-    
+
     bool InvocarNave(uint32 mapID, Position pos)
     {
         Map* map = sMapMgr->FindBaseNonInstanceMap(mapID);
@@ -119,7 +119,7 @@ public:
                     float vZ = 0.0f;
                     float vO = - M_PI_2;
                     transport->CalculatePassengerPosition(*(&vX), *(&vY), *(&vZ), &vO);
-                    if (npc_Vendedor = transport->SummonCreature(CRIATURA_VENDEDOR_ARMAS, vX, vY, vZ, vO, TEMPSUMMON_MANUAL_DESPAWN))
+                    if ((npc_Vendedor = transport->SummonCreature(CRIATURA_VENDEDOR_ARMAS, vX, vY, vZ, vO, TEMPSUMMON_MANUAL_DESPAWN)))
                     {
                         transport->AddPassenger(npc_Vendedor, true);
                     }
