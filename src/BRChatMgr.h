@@ -21,7 +21,7 @@ enum BR_TipoMensajeEstado
     MENSAJE_ESTADO_EVENTO_LLENO,
 };
 
-const std::string TEXTO_NOMBRE = "|cffff6633[Battle Royale]|r";
+const std::string TEXTO_NOMBRE = "|cffff6633[|cffff0000B|cffff3300attle |cffff0000R|cffff3300oyale|cffff6633]:|r";
 
 typedef std::map<uint32, Player*> BR_ListaChat;
 
@@ -166,11 +166,11 @@ public:
             {
                 if (killer == killed)
                 {
-                    Chat(it->second).PSendSysMessage("|cff4CFF00BattleRoyale::|r ¡%s ha muerto!.", Chat(killed).GetNameLink(killed));
+                    Chat(it->second).PSendSysMessage("%s ¡%s ha muerto!.", TEXTO_NOMBRE.c_str(), Chat(killed).GetNameLink(killed));
                 }
                 else
                 {
-                    Chat(it->second).PSendSysMessage("|cff4CFF00BattleRoyale::|r ¡%s ha sido eliminado por %s!, racha: |cff4CFF00%i|r.", Chat(killed).GetNameLink(killed), Chat(killer).GetNameLink(killer), kills);
+                    Chat(it->second).PSendSysMessage("%s ¡%s ha sido eliminado por %s!, racha: |cff4CFF00%i|r.", TEXTO_NOMBRE.c_str(), Chat(killed).GetNameLink(killed), Chat(killer).GetNameLink(killer), kills);
                 }
             }
         }
@@ -178,13 +178,13 @@ public:
     void AnunciarGanador(Player* winner, int kills)
     {
         std::ostringstream msg;
-        msg << "|cff4CFF00BattleRoyale::|r Ronda finalizada, ganador: " << Chat(winner).GetNameLink(winner) << ", víctimas: |cff4CFF00" << kills << "|r.";
+        msg << TEXTO_NOMBRE << " Ronda finalizada, ganador: " << Chat(winner).GetNameLink(winner) << ", víctimas: |cff4CFF00" << kills << "|r.";
         sWorld->SendServerMessage(SERVER_MSG_STRING, msg.str().c_str());
     };
     void AnunciarEmpate()
     {
         std::ostringstream msg;
-        msg << "|cff4CFF00BattleRoyale::|r Ronda finalizada, no hubo ganador|r.";
+        msg << TEXTO_NOMBRE << " Ronda finalizada, no hubo ganador|r.";
         sWorld->SendServerMessage(SERVER_MSG_STRING, msg.str().c_str());
     };
     void AnunciarEfectoZona(BR_ListaChat lista, int vivos)
@@ -193,7 +193,7 @@ public:
         {
             for (BR_ListaChat::iterator it = lista.begin(); it != lista.end(); ++it)
             {
-                Chat(it->second).PSendSysMessage("|cff4CFF00BattleRoyale::|r ¡Efectos de Zona aplicados! Jugadores vivos: |cff4CFF00%u|r, y espectadores: |cff4CFF00%u|r.", vivos, lista.size() - vivos);
+                Chat(it->second).PSendSysMessage("%s ¡Efectos de Zona aplicados! Jugadores vivos: |cff4CFF00%u|r, y espectadores: |cff4CFF00%u|r.", TEXTO_NOMBRE.c_str(), vivos, lista.size() - vivos);
             }
         }
     };
@@ -203,14 +203,14 @@ public:
         {
             for (BR_ListaChat::iterator it = lista.begin(); it != lista.end(); ++it)
             {
-                Chat(it->second).PSendSysMessage("|cff4CFF00BattleRoyale::|r Ha%s aparecido %i cofre%s con recompensas aleatorias.", (cofres > 1 ? "n" : ""), cofres, (cofres > 1 ? "s" : ""));
+                Chat(it->second).PSendSysMessage("%s Ha%s aparecido %i cofre%s con recompensas aleatorias.", TEXTO_NOMBRE.c_str(), (cofres > 1 ? "n" : ""), cofres, (cofres > 1 ? "s" : ""));
             }
         }
     };
     void AnunciarMensajeBienvenida(Player* player)
     {
         ChatHandler h = Chat(player);
-        h.SendSysMessage("|-----> |cff4CFF00BattleRoyale|r ----->");
+        h.PSendSysMessage("|-----> %s ----->", TEXTO_NOMBRE.c_str());
         h.SendSysMessage("|-> Bienvenido a este nuevo modo de juego |cffff5733todos contra todos|r.");
         h.SendSysMessage("|-> Se te han otorgado tus alas, están en tu mochila. |cffff0000¡EQUÍPALAS!|r");
         h.SendSysMessage("|-> Puedes arrastrarlas a la barra de acción para facilitar su uso.");
@@ -220,7 +220,7 @@ public:
     };
     void AnunciarErrorAlas(Player* player)
     {
-        Chat(player).PSendSysMessage("|cff4CFF00BattleRoyale::|r ¡No has obtenido las alas porque no tienes espacio disponible! |cffff0000¡Descansa en paz! :(|r");
+        Chat(player).PSendSysMessage("%s ¡No has obtenido las alas porque no tienes espacio disponible! |cffff0000¡Descansa en paz! :(|r", TEXTO_NOMBRE.c_str());
     };
     void AnunciarMensajeEntrada(Player* player, BR_TipoMensaje tipo)
     {
@@ -228,32 +228,32 @@ public:
         {
             case MENSAJE_ERROR_MAZMORRA:
             {
-                Chat(player).SendSysMessage("|cff4CFF00BattleRoyale::|r ¡No puedes participar mientras utilizas el buscador de mazmorras!");
+                Chat(player).PSendSysMessage("%s ¡No puedes participar mientras utilizas el buscador de mazmorras!", TEXTO_NOMBRE.c_str());
                 break;
             }
             case MENSAJE_ERROR_BG:
             {
-                Chat(player).SendSysMessage("|cff4CFF00BattleRoyale::|r ¡No puedes participar mientras estás en cola para Campos de Batalla o Arenas!");
+                Chat(player).PSendSysMessage("%s ¡No puedes participar mientras estás en cola para Campos de Batalla o Arenas!", TEXTO_NOMBRE.c_str());
                 break;
             }
             case MENSAJE_ERROR_EN_COLA:
             {
-                Chat(player).SendSysMessage("|cff4CFF00BattleRoyale::|r ¡Ya estas en cola para el evento!");
+                Chat(player).PSendSysMessage("%s ¡Ya estas en cola para el evento!", TEXTO_NOMBRE.c_str());
                 break;
             }
             case MENSAJE_ERROR_EN_EVENTO:
             {
-                Chat(player).SendSysMessage("|cff4CFF00BattleRoyale::|r ¡Ya estas dentro del evento!");
+                Chat(player).PSendSysMessage("%s ¡Ya estas dentro del evento!", TEXTO_NOMBRE.c_str());
                 break;
             }
             case MENSAJE_ERROR_EN_VUELO:
             {
-                Chat(player).SendSysMessage("|cff4CFF00BattleRoyale::|r ¡No has podido entrar al evento porque vas en ruta de vuelo! ¡Se te ha quitado de la cola!");
+                Chat(player).PSendSysMessage("%s ¡No has podido entrar al evento porque vas en ruta de vuelo! ¡Se te ha quitado de la cola!", TEXTO_NOMBRE.c_str());
                 break;
             }
             case MENSAJE_ERROR_EN_COMBATE:
             {
-                Chat(player).SendSysMessage("|cff4CFF00BattleRoyale::|r ¡No has podido entrar al evento porque estás en combate! ¡Se te ha quitado de la cola!");
+                Chat(player).PSendSysMessage("%s ¡No has podido entrar al evento porque estás en combate! ¡Se te ha quitado de la cola!", TEXTO_NOMBRE.c_str());
                 break;
             }
             default:
@@ -268,7 +268,7 @@ private:
     void AnunciarRondaIniciada(std::string mapa, uint32 cantidad)
     {
         std::ostringstream msg;
-        msg << "|cff4CFF00BattleRoyale::|r Ronda iniciada en |cffDA70D6" << mapa.c_str() << "|r con |cff4CFF00" << cantidad << "|r jugadores.";
+        msg << TEXTO_NOMBRE << " Ronda iniciada en |cffDA70D6" << mapa.c_str() << "|r con |cff4CFF00" << cantidad << "|r jugadores.";
         sWorld->SendServerMessage(SERVER_MSG_STRING, msg.str().c_str());
     };
 };
