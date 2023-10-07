@@ -268,6 +268,7 @@ private:
 
     BR_EstadosEvento estadoActual;
 
+    int tiempoRestanteSinJugadores;
     int tiempoRestanteInicio;
     int tiempoRestanteZona;
     int tiempoRestanteNave;
@@ -282,6 +283,7 @@ private:
 
     uint32 conf_JugadoresMinimo;
     uint32 conf_JugadoresMaximo;
+    uint32 conf_IntervaloSinJugadores;
     uint32 conf_IntervaloDeZona;
 
 };

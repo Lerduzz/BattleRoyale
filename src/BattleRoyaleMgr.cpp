@@ -5,6 +5,7 @@ BattleRoyaleMgr::BattleRoyaleMgr()
 {
     conf_JugadoresMinimo = sConfigMgr->GetOption<uint32>("BattleRoyale.MinJugadores", 25);
     conf_JugadoresMaximo = sConfigMgr->GetOption<uint32>("BattleRoyale.MaxJugadores", 50);
+    conf_IntervaloSinJugadores = sConfigMgr->GetOption<uint32>("BattleRoyale.Intervalo.SinJugadores", 1800);
     conf_IntervaloDeZona = sConfigMgr->GetOption<uint32>("BattleRoyale.SecureZoneInterval", 60000);
     sBRMapasMgr->CargarMapasDesdeBD();
     RestablecerTodoElEvento();
@@ -116,14 +117,30 @@ void BattleRoyaleMgr::GestionarMuerteJcJ(Player* killer, Player* killed)
 
 void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
 {
-    switch(estadoActual)
-    {
-        case ESTADO_INVOCANDO_JUGADORES:
-        case ESTADO_NAVE_EN_MOVIMIENTO:
-        case ESTADO_NAVE_CERCA_DEL_CENTRO:
+    if (indicadorDeSegundos <= 0) {
+        indicadorDeSegundos = 1000;
+        QuitarTodosLosObjetosProgramado();
+        switch (estadoActual)
         {
-            if (indicadorDeSegundos <= 0) {
-                indicadorDeSegundos = 1000;
+            case ESTADO_NO_HAY_SUFICIENTES_JUGADORES:
+            {
+                // TODO: Anunciar antes del tiempo que se iniciará la ronda automaticamente con los que haya anotados.
+                if (--tiempoRestanteSinJugadores <= 0)
+                {
+                    tiempoRestanteSinJugadores = conf_IntervaloSinJugadores;
+                    sBattleRoyaleMgr->ForzarIniciarNuevaRonda();
+                    // TODO: Anunciar si se ha iniciado la ronda o no y el motivo y cantidad de jugadores.
+                }
+                break;
+            }
+            case ESTADO_INVOCANDO_JUGADORES:
+            case ESTADO_NAVE_EN_MOVIMIENTO:
+            case ESTADO_NAVE_CERCA_DEL_CENTRO:
+            {
+                if (estadoActual == ESTADO_INVOCANDO_JUGADORES)
+                {
+                    DarObjetosInicialesProgramado();
+                }
                 if (tiempoRestanteInicio <= 0) {
                     estadoActual = ESTADO_BATALLA_EN_CURSO;
                     sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_RONDA_INICIADA, list_Jugadores);
@@ -140,7 +157,7 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
                         }
                         sBRChatMgr->NotificarTiempoInicial(tiempoRestanteInicio, list_Jugadores);
                     }
-                    if (estadoActual == ESTADO_INVOCANDO_JUGADORES) DarObjetosInicialesProgramado();
+                    // if (estadoActual == ESTADO_INVOCANDO_JUGADORES) 
                     if (estadoActual == ESTADO_INVOCANDO_JUGADORES && tiempoRestanteInicio <= 45)
                     {
                         if (sBRObjetosMgr->EncenderNave())
@@ -176,11 +193,26 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
                     }
                     tiempoRestanteInicio--;
                 }
-                QuitarTodosLosObjetosProgramado();
-            } else {
-                indicadorDeSegundos -= diff;
+                break;
             }
-            break;
+            default:
+            {
+                break;
+            }
+        }
+    }
+    else
+    {
+        indicadorDeSegundos -= diff;
+    }
+    // ----------------------------------------------------------------------------------------------------------------
+    switch(estadoActual)
+    {
+        case ESTADO_INVOCANDO_JUGADORES:
+        case ESTADO_NAVE_EN_MOVIMIENTO:
+        case ESTADO_NAVE_CERCA_DEL_CENTRO:
+        {
+            
         }
         case ESTADO_BATALLA_EN_CURSO:
         {
@@ -242,6 +274,7 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
                 if (--tiempoRestanteFinal <= 0)
                 {
                     while (HayJugadores()) SalirDelEvento((*list_Jugadores.begin()).first);
+                    tiempoRestanteSinJugadores = conf_IntervaloSinJugadores;
                     estadoActual = ESTADO_NO_HAY_SUFICIENTES_JUGADORES;
                     if (HaySuficientesEnCola()) IniciarNuevaRonda();
                 }
@@ -284,6 +317,7 @@ void BattleRoyaleMgr::RestablecerTodoElEvento()
     indicadorDeSegundos = 1000;
     indiceDeVariacion = 0;
     sBRObjetosMgr->DesaparecerTodosLosObjetos();
+    tiempoRestanteSinJugadores = conf_IntervaloSinJugadores;
     estadoActual = ESTADO_NO_HAY_SUFICIENTES_JUGADORES;
 }
 

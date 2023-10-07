@@ -286,7 +286,10 @@ public:
 	}
 	void OnUpdate(uint32 diff) override
 	{
-		sBattleRoyaleMgr->GestionarActualizacionMundo(diff);
+        if (sConfigMgr->GetOption<bool>("BattleRoyale.Activado", true))
+        {
+            sBattleRoyaleMgr->GestionarActualizacionMundo(diff);
+        }
 	}
 };
 
