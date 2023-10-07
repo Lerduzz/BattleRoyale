@@ -3,8 +3,8 @@
 
 BattleRoyaleMgr::BattleRoyaleMgr()
 {
-    conf_JugadoresMinimo = sConfigMgr->GetOption<uint32>("BattleRoyale.MinPlayers", 25);
-    conf_JugadoresMaximo = sConfigMgr->GetOption<uint32>("BattleRoyale.MaxPlayers", 50);
+    conf_JugadoresMinimo = sConfigMgr->GetOption<uint32>("BattleRoyale.MinJugadores", 25);
+    conf_JugadoresMaximo = sConfigMgr->GetOption<uint32>("BattleRoyale.MaxJugadores", 50);
     conf_IntervaloDeZona = sConfigMgr->GetOption<uint32>("BattleRoyale.SecureZoneInterval", 60000);
     sBRMapasMgr->CargarMapasDesdeBD();
     RestablecerTodoElEvento();
