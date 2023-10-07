@@ -146,6 +146,7 @@ private:
                 if (it->second && it->second->IsAlive())
                 {
                     TodosLosMuertosEspectarme(it->second);
+                    break;
                 }
             }
         }
