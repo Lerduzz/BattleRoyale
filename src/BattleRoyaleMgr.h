@@ -272,9 +272,10 @@ private:
     int tiempoRestanteZona;
     int tiempoRestanteNave;
     int tiempoRestanteFinal;
-    int indiceDeVariacion;
 
+    int indiceDeVariacion;
     int indiceDeZona;
+
     int indicadorDeSegundos;
     bool estaZonaAnunciada5s;
     bool estaZonaAnunciada10s;
