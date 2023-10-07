@@ -6,7 +6,7 @@ BattleRoyaleMgr::BattleRoyaleMgr()
     conf_JugadoresMinimo = sConfigMgr->GetOption<uint32>("BattleRoyale.MinJugadores", 25);
     conf_JugadoresMaximo = sConfigMgr->GetOption<uint32>("BattleRoyale.MaxJugadores", 50);
     conf_IntervaloSinJugadores = sConfigMgr->GetOption<uint32>("BattleRoyale.Intervalo.SinJugadores", 1800);
-    conf_IntervaloDeZona = sConfigMgr->GetOption<uint32>("BattleRoyale.SecureZoneInterval", 60000);
+    conf_IntervaloZonaSegura = sConfigMgr->GetOption<uint32>("BattleRoyale.Intervalo.ZonaSegura", 60);
     sBRMapasMgr->CargarMapasDesdeBD();
     RestablecerTodoElEvento();
 }
@@ -157,7 +157,7 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
                     sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_RONDA_INICIADA, list_Jugadores);
                     sBRChatMgr->NotificarTiempoInicial(0, list_Jugadores, sBRMapasMgr->MapaActual()->nombreMapa);
                     sBRMisionesMgr->CompletarRequerimiento(MISION_DIARIA_1, MISION_DIARIA_1_REQ_1, list_Jugadores);
-                    tiempoRestanteZona = conf_IntervaloDeZona;
+                    tiempoRestanteZona = conf_IntervaloZonaSegura;
                     tiempoRestanteNave = 15;
                 } else {
                     if (tiempoRestanteInicio % 5 == 0) {
@@ -205,29 +205,8 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
                 }
                 break;
             }
-            default:
+            case ESTADO_BATALLA_EN_CURSO:
             {
-                break;
-            }
-        }
-    }
-    else
-    {
-        indicadorDeSegundos -= diff;
-    }
-    // ----------------------------------------------------------------------------------------------------------------
-    switch(estadoActual)
-    {
-        case ESTADO_INVOCANDO_JUGADORES:
-        case ESTADO_NAVE_EN_MOVIMIENTO:
-        case ESTADO_NAVE_CERCA_DEL_CENTRO:
-        {
-            
-        }
-        case ESTADO_BATALLA_EN_CURSO:
-        {
-            if (indicadorDeSegundos <= 0) {
-                indicadorDeSegundos = 1000;
                 ControlDeReglas();
                 if (!CondicionDeVictoria())
                 {
@@ -242,41 +221,49 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
                         sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_NAVE_RETIRADA, list_Jugadores);
                         sBRChatMgr->NotificarNaveRetirada(list_Jugadores);
                     }
-                }
-                QuitarTodosLosObjetosProgramado();
-            } else indicadorDeSegundos -= diff;
-            if (tiempoRestanteZona <= 0) {
-                if (!HayJugadores() || !sBRObjetosMgr->InvocarZonaSegura(sBRMapasMgr->MapaActual()->idMapa, sBRMapasMgr->MapaActual()->centroMapa, indiceDeZona))
+                }            
+                if (tiempoRestanteZona <= 0)
                 {
-                    RestablecerTodoElEvento();
-                    return;
+                    if (!HayJugadores() || !sBRObjetosMgr->InvocarZonaSegura(sBRMapasMgr->MapaActual()->idMapa, sBRMapasMgr->MapaActual()->centroMapa, indiceDeZona))
+                    {
+                        RestablecerTodoElEvento();
+                        return;
+                    }
+                    else
+                    {
+                        AlReducirseLaZona();
+                    }
+                    sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_ZONA_REDUCIDA, list_Jugadores);
+                    sBRChatMgr->NotificarZonaReducida(list_Jugadores);
+                    tiempoRestanteZona = conf_IntervaloZonaSegura;
+                    estaZonaAnunciada5s = false;
+                    estaZonaAnunciada10s = false;
+                } else {
+                    if (!estaZonaAnunciada5s && tiempoRestanteZona <= 5) {
+                        sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_ZONA_TIEMPO, list_Jugadores);
+                        sBRChatMgr->NotificarAdvertenciaDeZona(5, list_Jugadores);
+                        estaZonaAnunciada5s = true;
+                    }
+                    if (!estaZonaAnunciada10s && tiempoRestanteZona <= 10) {
+                        sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_ZONA_TIEMPO, list_Jugadores);
+                        sBRChatMgr->NotificarAdvertenciaDeZona(10, list_Jugadores);
+                        estaZonaAnunciada10s = true;
+                    }
+                    if (indiceDeZona <= CANTIDAD_DE_ZONAS) {
+                        tiempoRestanteZona--;
+                    }
                 }
-                else
-                {
-                    AlReducirseLaZona();
-                }
-                sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_ZONA_REDUCIDA, list_Jugadores);
-                sBRChatMgr->NotificarZonaReducida(list_Jugadores);
-                tiempoRestanteZona = conf_IntervaloDeZona;
-                estaZonaAnunciada5s = false;
-                estaZonaAnunciada10s = false;
-            } else {
-                if (!estaZonaAnunciada5s && tiempoRestanteZona <= 5000) {
-                    sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_ZONA_TIEMPO, list_Jugadores);
-                    sBRChatMgr->NotificarAdvertenciaDeZona(5, list_Jugadores);
-                    estaZonaAnunciada5s = true;
-                }
-                if (!estaZonaAnunciada10s && tiempoRestanteZona <= 10000) {
-                    sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_ZONA_TIEMPO, list_Jugadores);
-                    sBRChatMgr->NotificarAdvertenciaDeZona(10, list_Jugadores);
-                    estaZonaAnunciada10s = true;
-                }
-                if (indiceDeZona <= CANTIDAD_DE_ZONAS) {
-                    tiempoRestanteZona -= diff;
-                }
+                break;
             }
-            break;
         }
+    }
+    else
+    {
+        indicadorDeSegundos -= diff;
+    }
+    // ----------------------------------------------------------------------------------------------------------------
+    switch(estadoActual)
+    {
         case ESTADO_BATALLA_TERMINADA:
         {
             if (indicadorDeSegundos <= 0) {
@@ -289,14 +276,6 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
                     estadoActual = ESTADO_NO_HAY_SUFICIENTES_JUGADORES;
                     if (HaySuficientesEnCola()) IniciarNuevaRonda();
                 }
-                QuitarTodosLosObjetosProgramado();
-            } else indicadorDeSegundos -= diff;
-            break;
-        }
-        default:
-        {
-            if (indicadorDeSegundos <= 0) {
-                indicadorDeSegundos = 1000;
                 QuitarTodosLosObjetosProgramado();
             } else indicadorDeSegundos -= diff;
             break;

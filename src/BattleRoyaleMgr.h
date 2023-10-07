@@ -293,7 +293,7 @@ private:
     uint32 conf_JugadoresMinimo;
     uint32 conf_JugadoresMaximo;
     uint32 conf_IntervaloSinJugadores;
-    uint32 conf_IntervaloDeZona;
+    uint32 conf_IntervaloZonaSegura;
 
 };
 

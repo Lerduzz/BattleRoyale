@@ -40,15 +40,3 @@ BattleRoyale.Intervalo.SinJugadores = 1800
 BattleRoyale.Intervalo.NaveEnEspera = 30
 BattleRoyale.Intervalo.ZonaSegura = 60
 BattleRoyale.Intervalo.FinalDeRonda = 10
-
-
-
-
-
-
-
-
-#############################################################################
-# Intervalo de zona en milisegundos (Obsoleto, trabajarlo en segundos)
-# ... TODO ... Quitar!
-BattleRoyale.SecureZoneInterval = 60000
