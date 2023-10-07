@@ -278,6 +278,7 @@ private:
     int indiceDeZona;
 
     int indicadorDeSegundos;
+    bool seHaAnunciadoInicioForzado;
     bool estaZonaAnunciada5s;
     bool estaZonaAnunciada10s;
 

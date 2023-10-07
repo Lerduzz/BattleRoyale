@@ -124,12 +124,16 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
         {
             case ESTADO_NO_HAY_SUFICIENTES_JUGADORES:
             {
-                // TODO: Anunciar antes del tiempo que se iniciará la ronda automaticamente con los que haya anotados.
                 if (--tiempoRestanteSinJugadores <= 0)
                 {
                     tiempoRestanteSinJugadores = conf_IntervaloSinJugadores;
                     sBattleRoyaleMgr->ForzarIniciarNuevaRonda();
                     // TODO: Anunciar si se ha iniciado la ronda o no y el motivo y cantidad de jugadores.
+                }
+                else if (!seHaAnunciadoInicioForzado && tiempoRestanteSinJugadores <= 300)
+                {
+                    seHaAnunciadoInicioForzado = true;
+                    // TODO: MensajeAServidor: Dentro de 5 minutos se iniciará automáticamente la ronda si hay al menos 1 jugador en la cola.
                 }
                 break;
             }
@@ -275,6 +279,7 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
                 {
                     while (HayJugadores()) SalirDelEvento((*list_Jugadores.begin()).first);
                     tiempoRestanteSinJugadores = conf_IntervaloSinJugadores;
+                    seHaAnunciadoInicioForzado = false;
                     estadoActual = ESTADO_NO_HAY_SUFICIENTES_JUGADORES;
                     if (HaySuficientesEnCola()) IniciarNuevaRonda();
                 }
@@ -318,6 +323,7 @@ void BattleRoyaleMgr::RestablecerTodoElEvento()
     indiceDeVariacion = 0;
     sBRObjetosMgr->DesaparecerTodosLosObjetos();
     tiempoRestanteSinJugadores = conf_IntervaloSinJugadores;
+    seHaAnunciadoInicioForzado = false;
     estadoActual = ESTADO_NO_HAY_SUFICIENTES_JUGADORES;
 }
 
