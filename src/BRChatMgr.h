@@ -147,13 +147,13 @@ public:
                     break;
                 }
             }
-            Chat(player).PSendSysMessage("%s: Te has unido a la cola del evento. Jugadores en cola: |cff4CFF00%u|r/|cff4CFF00%u|r.%s", TEXTO_NOMBRE.c_str(), lista.size(), minimo, mensajeEstado.c_str());
+            Chat(player).PSendSysMessage("%s Te has unido a la cola del evento. Jugadores en cola: |cff4CFF00%u|r/|cff4CFF00%u|r.%s", TEXTO_NOMBRE.c_str(), lista.size(), minimo, mensajeEstado.c_str());
             for (BR_ListaChat::iterator it = lista.begin(); it != lista.end(); ++it)
             {
                 if (it->second != player)
                 {
                     ChatHandler h = Chat(it->second);
-                    h.PSendSysMessage("%s: %s se ha unido a la cola. Jugadores en cola: |cff4CFF00%u|r/|cff4CFF00%u|r.%s", TEXTO_NOMBRE.c_str(), h.GetNameLink(player), lista.size(), minimo, mensajeEstado.c_str());
+                    h.PSendSysMessage("%s El jugador %s se ha unido a la cola. Jugadores en cola: |cff4CFF00%u|r/|cff4CFF00%u|r.%s", TEXTO_NOMBRE.c_str(), h.GetNameLink(player), lista.size(), minimo, mensajeEstado.c_str());
                 }
             }
         }
