@@ -127,13 +127,20 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
                 if (--tiempoRestanteSinJugadores <= 0)
                 {
                     tiempoRestanteSinJugadores = conf_IntervaloSinJugadores;
-                    sBattleRoyaleMgr->ForzarIniciarNuevaRonda();
-                    // TODO: Anunciar si se ha iniciado la ronda o no y el motivo y cantidad de jugadores.
+                    seHaAnunciadoInicioForzado = false;
+                    if (sBattleRoyaleMgr->ForzarIniciarNuevaRonda())
+                    {
+                        sBRChatMgr->AnunciarInicioForzado(list_Jugadores.size());
+                    }
+                    else
+                    {
+                        sBRChatMgr->AnunciarErrorInicioForzado();
+                    }
                 }
                 else if (!seHaAnunciadoInicioForzado && tiempoRestanteSinJugadores <= 300)
                 {
                     seHaAnunciadoInicioForzado = true;
-                    // TODO: MensajeAServidor: Dentro de 5 minutos se iniciará automáticamente la ronda si hay al menos 1 jugador en la cola.
+                    sBRChatMgr->AnunciarAvisoInicioForzado();
                 }
                 break;
             }

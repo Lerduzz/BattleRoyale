@@ -48,7 +48,15 @@ public:
         return !sBRObjetosMgr->EstaEnLaNave(player);
     };
     BR_EstadosEvento EstadoActual() { return estadoActual; };
-    void ForzarIniciarNuevaRonda() { if (HayCola()) IniciarNuevaRonda(); };
+    bool ForzarIniciarNuevaRonda()
+    {
+        if (HayCola())
+        {
+            IniciarNuevaRonda();
+            return true;
+        }
+        return false;
+    };
 
 private:
     void RestablecerTodoElEvento();

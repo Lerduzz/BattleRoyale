@@ -262,6 +262,24 @@ public:
             }
         }
     };
+    void AnunciarAvisoInicioForzado()
+    {
+        std::ostringstream msg;
+        msg << TEXTO_NOMBRE << " Dentro de 5 minutos se iniciará automáticamente la ronda si hay al menos un jugador en cola.";
+        sWorld->SendServerMessage(SERVER_MSG_STRING, msg.str().c_str());
+    };
+    void AnunciarErrorInicioForzado()
+    {
+        std::ostringstream msg;
+        msg << TEXTO_NOMBRE << " El inicio automático ha sido pospuesto porque no hay ningún jugador en cola.";
+        sWorld->SendServerMessage(SERVER_MSG_STRING, msg.str().c_str());
+    };
+    void AnunciarInicioForzado(uint32 count)
+    {
+        std::ostringstream msg;
+        msg << TEXTO_NOMBRE << " Se ha iniciado automáticamente la ronda con " << count << " jugador" << (count == 1 ? "" : "es") << ".";
+        sWorld->SendServerMessage(SERVER_MSG_STRING, msg.str().c_str());
+    };
 
 private:
     ChatHandler Chat(Player* player) { return ChatHandler(player->GetSession()); };
