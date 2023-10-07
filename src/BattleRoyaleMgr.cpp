@@ -255,31 +255,23 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
                 }
                 break;
             }
-        }
-    }
-    else
-    {
-        indicadorDeSegundos -= diff;
-    }
-    // ----------------------------------------------------------------------------------------------------------------
-    switch(estadoActual)
-    {
-        case ESTADO_BATALLA_TERMINADA:
-        {
-            if (indicadorDeSegundos <= 0) {
-                indicadorDeSegundos = 1000;
+            case ESTADO_BATALLA_TERMINADA:
+            {
                 if (--tiempoRestanteFinal <= 0)
                 {
-                    while (HayJugadores()) SalirDelEvento((*list_Jugadores.begin()).first);
+                    while (HayJugadores()) SalirDelEvento(list_Jugadores.begin()->first);
                     tiempoRestanteSinJugadores = conf_IntervaloSinJugadores;
                     seHaAnunciadoInicioForzado = false;
                     estadoActual = ESTADO_NO_HAY_SUFICIENTES_JUGADORES;
                     if (HaySuficientesEnCola()) IniciarNuevaRonda();
                 }
-                QuitarTodosLosObjetosProgramado();
-            } else indicadorDeSegundos -= diff;
-            break;
+                break;
+            }
         }
+    }
+    else
+    {
+        indicadorDeSegundos -= diff;
     }
 }
 
