@@ -22,7 +22,7 @@ enum BR_ObjetosMundo
 
 enum BR_CriaturasNave
 {
-    CRIATURA_VENDEDOR_ARMAS                 = 200001, // TODO: Este es un ID de pruebas. Crear la criatura proximamente.
+    CRIATURA_VENDEDOR_ARMAS                 = 200001,
 };
 
 class BRObjetosMgr
