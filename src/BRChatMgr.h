@@ -265,7 +265,7 @@ public:
     void AnunciarAvisoInicioForzado()
     {
         std::ostringstream msg;
-        msg << TEXTO_NOMBRE << " Dentro de 5 minutos se iniciará automáticamente la ronda si hay al menos un jugador en cola.";
+        msg << TEXTO_NOMBRE << " Dentro de 5 minutos se iniciará la ronda si hay al menos un jugador en cola.";
         sWorld->SendServerMessage(SERVER_MSG_STRING, msg.str().c_str());
     };
     void AnunciarErrorInicioForzado()
@@ -277,7 +277,7 @@ public:
     void AnunciarInicioForzado(uint32 count)
     {
         std::ostringstream msg;
-        msg << TEXTO_NOMBRE << " Se ha iniciado automáticamente la ronda con " << count << " jugador" << (count == 1 ? "" : "es") << ".";
+        msg << TEXTO_NOMBRE << " Invocando a " << count << " jugador" << (count == 1 ? "" : "es") << " a la nave.";
         sWorld->SendServerMessage(SERVER_MSG_STRING, msg.str().c_str());
     };
 

@@ -168,7 +168,6 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
                         }
                         sBRChatMgr->NotificarTiempoInicial(tiempoRestanteInicio, list_Jugadores);
                     }
-                    // if (estadoActual == ESTADO_INVOCANDO_JUGADORES) 
                     if (estadoActual == ESTADO_INVOCANDO_JUGADORES && tiempoRestanteInicio <= 45)
                     {
                         if (sBRObjetosMgr->EncenderNave())
