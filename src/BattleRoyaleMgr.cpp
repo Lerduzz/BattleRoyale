@@ -145,13 +145,48 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
                 break;
             }
             case ESTADO_INVOCANDO_JUGADORES:
+            {
+                DarObjetosInicialesProgramado();
+                if (tiempoRestanteInicio <= 45)
+                {
+                    if (sBRObjetosMgr->EncenderNave())
+                    {
+                        estadoActual = ESTADO_NAVE_EN_MOVIMIENTO;
+                    }
+                    else
+                    {
+                        RestablecerTodoElEvento();
+                    }
+                }
+            }
             case ESTADO_NAVE_EN_MOVIMIENTO:
+            {
+                VerificarJugadoresEnNave();
+                if (tiempoRestanteInicio <= 20)
+                {
+                    estadoActual = ESTADO_NAVE_CERCA_DEL_CENTRO;
+                    indiceDeZona = 0;
+                    tiempoRestanteZona = 0;
+                    estaZonaAnunciada5s = false;
+                    estaZonaAnunciada10s = false;
+                    if (!HayJugadores() || !sBRObjetosMgr->InvocarCentroDelMapa(sBRMapasMgr->MapaActual()->idMapa, sBRMapasMgr->MapaActual()->centroMapa))
+                    {
+                        RestablecerTodoElEvento();
+                        return;
+                    }
+                    if (!HayJugadores() || !sBRObjetosMgr->InvocarZonaSegura(sBRMapasMgr->MapaActual()->idMapa, sBRMapasMgr->MapaActual()->centroMapa, indiceDeZona))
+                    {
+                        RestablecerTodoElEvento();
+                        return;
+                    }
+                    else
+                    {
+                        AlReducirseLaZona();
+                    }
+                }
+            }
             case ESTADO_NAVE_CERCA_DEL_CENTRO:
             {
-                if (estadoActual == ESTADO_INVOCANDO_JUGADORES)
-                {
-                    DarObjetosInicialesProgramado();
-                }
                 if (tiempoRestanteInicio <= 0) {
                     estadoActual = ESTADO_BATALLA_EN_CURSO;
                     sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_RONDA_INICIADA, list_Jugadores);
@@ -161,45 +196,11 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
                     tiempoRestanteNave = 15;
                 } else {
                     if (tiempoRestanteInicio % 5 == 0) {
-                        if (estadoActual == ESTADO_NAVE_EN_MOVIMIENTO) VerificarJugadoresEnNave();
                         if (tiempoRestanteInicio == 45)
                         {
                             sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_NAVE_EN_MOVIMIENTO, list_Jugadores);
                         }
                         sBRChatMgr->NotificarTiempoInicial(tiempoRestanteInicio, list_Jugadores);
-                    }
-                    if (estadoActual == ESTADO_INVOCANDO_JUGADORES && tiempoRestanteInicio <= 45)
-                    {
-                        if (sBRObjetosMgr->EncenderNave())
-                        {
-                            estadoActual = ESTADO_NAVE_EN_MOVIMIENTO;
-                        }
-                        else
-                        {
-                            RestablecerTodoElEvento();
-                        }
-                    }
-                    if (estadoActual == ESTADO_NAVE_EN_MOVIMIENTO && tiempoRestanteInicio <= 20)
-                    {
-                        estadoActual = ESTADO_NAVE_CERCA_DEL_CENTRO;
-                        indiceDeZona = 0;
-                        tiempoRestanteZona = 0;
-                        estaZonaAnunciada5s = false;
-                        estaZonaAnunciada10s = false;
-                        if (!HayJugadores() || !sBRObjetosMgr->InvocarCentroDelMapa(sBRMapasMgr->MapaActual()->idMapa, sBRMapasMgr->MapaActual()->centroMapa))
-                        {
-                            RestablecerTodoElEvento();
-                            return;
-                        }
-                        if (!HayJugadores() || !sBRObjetosMgr->InvocarZonaSegura(sBRMapasMgr->MapaActual()->idMapa, sBRMapasMgr->MapaActual()->centroMapa, indiceDeZona))
-                        {
-                            RestablecerTodoElEvento();
-                            return;
-                        }
-                        else
-                        {
-                            AlReducirseLaZona();
-                        }
                     }
                     tiempoRestanteInicio--;
                 }
