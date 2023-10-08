@@ -12,6 +12,7 @@ enum BR_TipoMensaje
     MENSAJE_ERROR_EN_EVENTO,
     MENSAJE_ERROR_EN_VUELO,
     MENSAJE_ERROR_EN_COMBATE,
+    MENSAJE_ERROR_BLOQUEADO,
 };
 
 enum BR_TipoMensajeEstado
@@ -222,7 +223,7 @@ public:
     {
         Chat(player).PSendSysMessage("%s ¡No has obtenido las alas porque no tienes espacio disponible! |cffff0000¡Descansa en paz! :(|r", TEXTO_NOMBRE.c_str());
     };
-    void AnunciarMensajeEntrada(Player* player, BR_TipoMensaje tipo)
+    void AnunciarMensajeEntrada(Player* player, BR_TipoMensaje tipo, std::string extra = "")
     {
         switch (tipo)
         {
@@ -254,6 +255,11 @@ public:
             case MENSAJE_ERROR_EN_COMBATE:
             {
                 Chat(player).PSendSysMessage("%s ¡No has podido entrar al evento porque estás en combate! ¡Se te ha quitado de la cola!", TEXTO_NOMBRE.c_str());
+                break;
+            }
+            case MENSAJE_ERROR_BLOQUEADO:
+            {
+                Chat(player).PSendSysMessage("%s No puedes utilizar este modo de juego. Motivo: |cffff0000%s|r.", TEXTO_NOMBRE.c_str(), extra);
                 break;
             }
             default:

@@ -3,6 +3,12 @@
 
 #include "Player.h"
 
+struct BR_Bloqueado
+{
+    bool estaBloqueado;
+    std::string motivo;
+};
+
 typedef std::map<uint32, std::string> BR_ListaNegra;
 
 class BRListaNegraMgr
@@ -23,13 +29,20 @@ public:
         return instance;
     }
 
-    std::string EstaBloqueado(uint32 guid)
+    BR_Bloqueado* EstaBloqueado(uint32 guid)
     {
+        BR_Bloqueado* resultado = new BR_Bloqueado();
         if (list_Negra.find(guid) != list_Negra.end())
         {
-            return list_Negra[guid];
+            resultado->estaBloqueado = true;
+            resultado->motivo = list_Negra[guid];
         }
-        return ""; // TODO: Devolver un struct que tenga la veracidad y la causa.
+        else
+        {
+            resultado->estaBloqueado = false;
+            resultado->motivo = "";
+        }
+        return resultado;
     };
     void RecargarLista()
     {

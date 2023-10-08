@@ -21,11 +21,10 @@ void BattleRoyaleMgr::GestionarJugadorEntrando(Player* player)
 {
     if (!player) return;
     uint32 guid = player->GetGUID().GetCounter();
-    std::string blr = sBRListaNegraMgr->EstaBloqueado(guid);
-    if (blr != "")
+    BR_Bloqueado* blr = sBRListaNegraMgr->EstaBloqueado(guid);
+    if (blr->estaBloqueado)
     {
-        // TODO: Mover mensaje a sBRChat.
-        ChatHandler(player->GetSession()).PSendSysMessage("|cff4CFF00BattleRoyale::|r No puedes utilizar este modo de juego. Motivo: |cffff0000%s|r.", blr.c_str());
+        sBRChatMgr->AnunciarMensajeEntrada(player, MENSAJE_ERROR_BLOQUEADO, blr->motivo);
         return;
     }
     if (player->isUsingLfg())
