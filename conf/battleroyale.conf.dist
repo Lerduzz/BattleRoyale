@@ -37,6 +37,6 @@ BattleRoyale.MaxJugadores = 50
 # * FinalDeRonda: Tiempo para espectar al ganador antes de salir
 #       Defecto: 10 segundos
 BattleRoyale.Intervalo.SinJugadores = 1800
-BattleRoyale.Intervalo.NaveEnEspera = 30
+BattleRoyale.Intervalo.NaveEnEspera = 30 # TODO: Utilizar este valor.
 BattleRoyale.Intervalo.ZonaSegura = 60
-BattleRoyale.Intervalo.FinalDeRonda = 10
+BattleRoyale.Intervalo.FinalDeRonda = 10 # TODO: Utilizar este valor.

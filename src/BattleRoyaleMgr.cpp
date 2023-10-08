@@ -147,7 +147,7 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
             case ESTADO_INVOCANDO_JUGADORES:
             {
                 DarObjetosInicialesProgramado();
-                if (tiempoRestanteInicio <= 45)
+                if (--tiempoRestanteInicio <= 45)
                 {
                     if (sBRObjetosMgr->EncenderNave())
                     {
@@ -158,11 +158,13 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
                         RestablecerTodoElEvento();
                     }
                 }
+                TODO_MejorarAnuncioEnNave();
+                break;
             }
             case ESTADO_NAVE_EN_MOVIMIENTO:
             {
                 VerificarJugadoresEnNave();
-                if (tiempoRestanteInicio <= 20)
+                if (--tiempoRestanteInicio <= 20)
                 {
                     estadoActual = ESTADO_NAVE_CERCA_DEL_CENTRO;
                     indiceDeZona = 0;
@@ -184,25 +186,22 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
                         AlReducirseLaZona();
                     }
                 }
+                TODO_MejorarAnuncioEnNave();
+                break;
             }
             case ESTADO_NAVE_CERCA_DEL_CENTRO:
             {
-                if (tiempoRestanteInicio <= 0) {
+                if (--tiempoRestanteInicio <= 0) {
                     estadoActual = ESTADO_BATALLA_EN_CURSO;
                     sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_RONDA_INICIADA, list_Jugadores);
                     sBRChatMgr->NotificarTiempoInicial(0, list_Jugadores, sBRMapasMgr->MapaActual()->nombreMapa);
                     sBRMisionesMgr->CompletarRequerimiento(MISION_DIARIA_1, MISION_DIARIA_1_REQ_1, list_Jugadores);
                     tiempoRestanteZona = conf_IntervaloZonaSegura;
                     tiempoRestanteNave = 15;
-                } else {
-                    if (tiempoRestanteInicio % 5 == 0) {
-                        if (tiempoRestanteInicio == 45)
-                        {
-                            sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_NAVE_EN_MOVIMIENTO, list_Jugadores);
-                        }
-                        sBRChatMgr->NotificarTiempoInicial(tiempoRestanteInicio, list_Jugadores);
-                    }
-                    tiempoRestanteInicio--;
+                }
+                else
+                {
+                    TODO_MejorarAnuncioEnNave();
                 }
                 break;
             }

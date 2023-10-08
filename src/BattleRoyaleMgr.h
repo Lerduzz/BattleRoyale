@@ -235,7 +235,7 @@ private:
                 }
             }
         }
-    }
+    };
     void QuitarTodosLosObjetosProgramado()
     {
         if (list_QuitarTodosLosObjetos.size())
@@ -264,7 +264,17 @@ private:
                 }
             }
         }
-    }
+    };
+    void TODO_MejorarAnuncioEnNave()
+    {
+        if (tiempoRestanteInicio % 5 == 0) {
+            if (tiempoRestanteInicio == 45)
+            {
+                sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_NAVE_EN_MOVIMIENTO, list_Jugadores);
+            }
+            sBRChatMgr->NotificarTiempoInicial(tiempoRestanteInicio, list_Jugadores);
+        }
+    };
 
     BR_ListaDePersonajes list_Cola;
 
