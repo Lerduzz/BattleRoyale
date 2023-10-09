@@ -305,6 +305,8 @@ private:
     uint32 conf_JugadoresMaximo;
     uint32 conf_IntervaloSinJugadores;
     uint32 conf_IntervaloZonaSegura;
+    uint32 conf_RequisitoAsesinatosTotales;
+    uint32 conf_RequisitoAsesinatosPropios;
 
 };
 

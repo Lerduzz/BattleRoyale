@@ -49,5 +49,5 @@ BattleRoyale.Intervalo.FinalDeRonda = 10 # TODO: Utilizar este valor.
 #
 # * AsesinatosPropios: Minimo de jugadores eliminados por el ganador
 #       Defecto: 1 (0 = Desactivado)
-BattleRoyale.Requisito.AsesinatosTotales = 5 # TODO: Utilizar este valor.
-BattleRoyale.Requisito.AsesinatosPropios = 1 # TODO: Utilizar este valor.
+BattleRoyale.Requisito.AsesinatosTotales = 5
+BattleRoyale.Requisito.AsesinatosPropios = 1
