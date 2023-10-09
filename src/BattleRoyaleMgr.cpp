@@ -376,7 +376,6 @@ void BattleRoyaleMgr::LlamarDentroDeNave(uint32 guid)
     player->SetPhaseMask(DIMENSION_EVENTO, true);
     player->TeleportTo(brM->idMapa, iN.GetPositionX() + ox, iN.GetPositionY() + oy, iN.GetPositionZ() + 2.5f, iN.GetOrientation() + M_PI / 2.0f);
     player->SetPvP(false);
-    // TODO: Analizar si esto es factible: player->AddAura(HECHIZO_LENGUAJE_BINARIO, player);
     player->SaveToDB(false, false);
     list_DarObjetosIniciales[guid] = player;
     SiguientePosicion();
@@ -398,7 +397,6 @@ void BattleRoyaleMgr::SalirDelEvento(uint32 guid, bool logout /* = false*/)
         if (player->IsAlive())
         {
             if (player->HasAura(HECHIZO_ALAS_MAGICAS)) player->RemoveAurasDueToSpell(HECHIZO_ALAS_MAGICAS);
-            // TODO: Analizar si esto es factible: if (player->HasAura(HECHIZO_LENGUAJE_BINARIO)) player->RemoveAurasDueToSpell(HECHIZO_LENGUAJE_BINARIO);
             if (player->HasAura(HECHIZO_ANTI_INVISIBLES)) player->RemoveAurasDueToSpell(HECHIZO_ANTI_INVISIBLES);
             if (player->HasAura(HECHIZO_ANTI_SANADORES)) player->RemoveAurasDueToSpell(HECHIZO_ANTI_SANADORES);
         }

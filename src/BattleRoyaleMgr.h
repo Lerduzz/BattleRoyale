@@ -136,7 +136,6 @@ private:
                     {
                         it->second->AddAura(HECHIZO_ANTI_INVISIBLES, it->second);
                         it->second->AddAura(HECHIZO_ANTI_SANADORES, it->second);
-                        // TODO: Analizar si esto es factible: it->second->AddAura(HECHIZO_LENGUAJE_BINARIO, it->second);
                         vivos++;
                     }
                 }
