@@ -51,3 +51,32 @@ BattleRoyale.Intervalo.FinalDeRonda = 10
 #       Defecto: 1 (0 = Desactivado)
 BattleRoyale.Requisito.AsesinatosTotales = 5
 BattleRoyale.Requisito.AsesinatosPropios = 1
+
+#############################################################################
+# Recompensa acumulada
+#
+# * Base: Recompensa de participación
+#       Defecto: 400
+#
+# * Victoria: Cuando quedas en primer lugar
+#       Defecto: 600
+#
+# * AlAsesinar: Cuando eliminas a otro jugador
+#       Defecto: 350
+#
+# * AlSerEAsesinado: Cuando otro jugador te elimina
+#       Defecto: 200
+#
+# * AlMorir: Cuando mueres por tu cuenta
+#       Defecto: 100
+#
+# * ZonaReducida: En cada reducción de zona
+#       Defecto: 150
+#
+# Nota: Se dará honor igual a esta cantidad (Y emblemas como 0.5%).
+BattleRoyale.Recompensa.Base = 400
+BattleRoyale.Recompensa.Victoria = 600
+BattleRoyale.Recompensa.AlAsesinar = 350
+BattleRoyale.Recompensa.AlSerEAsesinado = 200
+BattleRoyale.Recompensa.AlMorir = 100
+BattleRoyale.Recompensa.ZonaReducida = 150
