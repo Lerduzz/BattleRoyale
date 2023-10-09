@@ -307,6 +307,7 @@ private:
     uint32 conf_IntervaloFinalDeRonda;
     uint32 conf_RequisitoAsesinatosTotales;
     uint32 conf_RequisitoAsesinatosPropios;
+    BRConf_Recompensa conf_Recompensa;
 
 };
 

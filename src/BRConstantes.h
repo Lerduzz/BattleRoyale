@@ -37,4 +37,14 @@ const float BR_VariacionesDePosicion[CANTIDAD_DE_VARIACIONES][2] =
 const int CANTIDAD_DE_ZONAS                 = 10;
 const float BR_EscalasDeZonaSegura[CANTIDAD_DE_ZONAS] = { 5.0f, 4.5f, 4.0f, 3.5f, 3.0f, 2.5f, 2.0f, 1.5f, 1.0f, 0.5f };
 
+struct BRConf_Recompensa
+{
+    uint32 base;
+    uint32 victoria;
+    uint32 asesinar;
+    uint32 serAsesinado;
+    uint32 morir;
+    uint32 zona;
+};
+
 #endif
