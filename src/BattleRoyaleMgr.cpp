@@ -209,7 +209,7 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
                 if (--tiempoRestanteInicio <= 0)
                 {
                     estadoActual = ESTADO_BATALLA_EN_CURSO;
-                    sBRRecompensaMgr->AcumularRecompensaVivos(conf_Recompensa.base, list_Jugadores, list_Datos);
+                    sBRRecompensaMgr->AcumularRecompensaVivos(conf_Recompensa.base, list_Jugadores, &list_Datos);
                     sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_RONDA_INICIADA, list_Jugadores);
                     sBRChatMgr->NotificarTiempoInicial(0, list_Jugadores, sBRMapasMgr->MapaActual()->nombreMapa);
                     sBRMisionesMgr->CompletarRequerimiento(MISION_DIARIA_1, MISION_DIARIA_1_REQ_1, list_Jugadores);
@@ -247,7 +247,7 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
                         return;
                     }
                     AlReducirseLaZona();
-                    sBRRecompensaMgr->AcumularRecompensaVivos(conf_Recompensa.zona, list_Jugadores, list_Datos);
+                    sBRRecompensaMgr->AcumularRecompensaVivos(conf_Recompensa.zona, list_Jugadores, &list_Datos);
                     sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_ZONA_REDUCIDA, list_Jugadores);
                     sBRChatMgr->NotificarZonaReducida(list_Jugadores);
                     tiempoRestanteZona = conf_IntervaloZonaSegura;

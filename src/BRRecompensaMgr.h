@@ -19,15 +19,16 @@ public:
         return instance;
     }
 
-    void AcumularRecompensaVivos(uint32 rew, BR_ListaRecompensa list, BR_ListaDatos data)
+    void AcumularRecompensaVivos(uint32 rew, BR_ListaRecompensa list, BR_ListaDatos* data)
     {
         if (list.size())
         {
             for (BR_ListaRecompensa::iterator it = list.begin(); it != list.end(); ++it)
             {
-                if (it->second && it->second->IsAlive() && data.find(it->first) != data.end())
+                BR_ListaDatos::iterator dt = data->find(it->first);
+                if (it->second && it->second->IsAlive() && dt != data->end())
                 {
-                    data[it->first].reward += rew;
+                    dt->second.reward += rew;
                 }
             }
         }
