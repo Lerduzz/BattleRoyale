@@ -8,6 +8,7 @@
 #include "BRMapasMgr.h"
 #include "BRMisionesMgr.h"
 #include "BRObjetosMgr.h"
+#include "BRRecompensaMgr.h"
 #include "BRSonidosMgr.h"
 #include "BRTitulosMgr.h"
 #include "BattleRoyaleData.h"
