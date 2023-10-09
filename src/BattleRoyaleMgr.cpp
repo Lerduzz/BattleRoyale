@@ -109,6 +109,7 @@ void BattleRoyaleMgr::GestionarMuerteJcJ(Player* killer, Player* killed)
             return;
         }
         list_Datos[killer->GetGUID().GetCounter()].kills++;
+        totalAsesinatosJcJ++;
         sBRChatMgr->AnunciarMuerteJcJ(killer, killed, list_Datos[killer->GetGUID().GetCounter()].kills, list_Jugadores);
         TodosLosMuertosEspectarme(killer);
     }
@@ -297,6 +298,7 @@ void BattleRoyaleMgr::RestablecerTodoElEvento()
     sBRMapasMgr->SiguienteMapa();
     indicadorDeSegundos = 1000;
     indiceDeVariacion = 0;
+    totalAsesinatosJcJ = 0;
     sBRObjetosMgr->DesaparecerTodosLosObjetos();
     tiempoRestanteSinJugadores = conf_IntervaloSinJugadores;
     seHaAnunciadoInicioForzado = false;
@@ -315,6 +317,7 @@ void BattleRoyaleMgr::IniciarNuevaRonda()
             return;
         }
         estadoActual = ESTADO_INVOCANDO_JUGADORES;
+        totalAsesinatosJcJ = 0;
         while (HayCola() && !EstaLlenoElEvento() && tiempoRestanteInicio >= 60)
         {
             uint32 guid = list_Cola.begin()->first;
