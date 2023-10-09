@@ -3,9 +3,13 @@
 
 BattleRoyaleMgr::BattleRoyaleMgr()
 {
-    conf_JugadoresMinimo = sConfigMgr->GetOption<uint32>("BattleRoyale.MinPlayers", 25);
-    conf_JugadoresMaximo = sConfigMgr->GetOption<uint32>("BattleRoyale.MaxPlayers", 50);
-    conf_IntervaloDeZona = sConfigMgr->GetOption<uint32>("BattleRoyale.SecureZoneInterval", 60000);
+    conf_JugadoresMinimo = sConfigMgr->GetOption<uint32>("BattleRoyale.MinJugadores", 25);
+    conf_JugadoresMaximo = sConfigMgr->GetOption<uint32>("BattleRoyale.MaxJugadores", 50);
+    conf_IntervaloSinJugadores = sConfigMgr->GetOption<uint32>("BattleRoyale.Intervalo.SinJugadores", 1800);
+    conf_IntervaloZonaSegura = sConfigMgr->GetOption<uint32>("BattleRoyale.Intervalo.ZonaSegura", 60);
+    conf_IntervaloFinalDeRonda = sConfigMgr->GetOption<uint32>("BattleRoyale.Intervalo.FinalDeRonda", 10);
+    conf_RequisitoAsesinatosTotales = sConfigMgr->GetOption<uint32>("BattleRoyale.Requisito.AsesinatosTotales", 5);
+    conf_RequisitoAsesinatosPropios = sConfigMgr->GetOption<uint32>("BattleRoyale.Requisito.AsesinatosPropios", 1);
     sBRMapasMgr->CargarMapasDesdeBD();
     RestablecerTodoElEvento();
 }
@@ -20,11 +24,10 @@ void BattleRoyaleMgr::GestionarJugadorEntrando(Player* player)
 {
     if (!player) return;
     uint32 guid = player->GetGUID().GetCounter();
-    std::string blr = sBRListaNegraMgr->EstaBloqueado(guid);
-    if (blr != "")
+    BR_Bloqueado* blr = sBRListaNegraMgr->EstaBloqueado(guid);
+    if (blr->estaBloqueado)
     {
-        // TODO: Mover mensaje a sBRChat.
-        ChatHandler(player->GetSession()).PSendSysMessage("|cff4CFF00BattleRoyale::|r No puedes utilizar este modo de juego. Motivo: |cffff0000%s|r.", blr.c_str());
+        sBRChatMgr->AnunciarMensajeEntrada(player, MENSAJE_ERROR_BLOQUEADO, blr->motivo);
         return;
     }
     if (player->isUsingLfg())
@@ -109,6 +112,7 @@ void BattleRoyaleMgr::GestionarMuerteJcJ(Player* killer, Player* killed)
             return;
         }
         list_Datos[killer->GetGUID().GetCounter()].kills++;
+        totalAsesinatosJcJ++;
         sBRChatMgr->AnunciarMuerteJcJ(killer, killed, list_Datos[killer->GetGUID().GetCounter()].kills, list_Jugadores);
         TodosLosMuertosEspectarme(killer);
     }
@@ -116,76 +120,96 @@ void BattleRoyaleMgr::GestionarMuerteJcJ(Player* killer, Player* killed)
 
 void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
 {
-    switch(estadoActual)
-    {
-        case ESTADO_INVOCANDO_JUGADORES:
-        case ESTADO_NAVE_EN_MOVIMIENTO:
-        case ESTADO_NAVE_CERCA_DEL_CENTRO:
+    if (indicadorDeSegundos <= 0) {
+        indicadorDeSegundos = 1000;
+        QuitarTodosLosObjetosProgramado();
+        switch (estadoActual)
         {
-            if (indicadorDeSegundos <= 0) {
-                indicadorDeSegundos = 1000;
-                if (tiempoRestanteInicio <= 0) {
+            case ESTADO_NO_HAY_SUFICIENTES_JUGADORES:
+            {
+                if (--tiempoRestanteSinJugadores <= 0)
+                {
+                    tiempoRestanteSinJugadores = conf_IntervaloSinJugadores;
+                    seHaAnunciadoInicioForzado = false;
+                    if (sBattleRoyaleMgr->ForzarIniciarNuevaRonda())
+                    {
+                        sBRChatMgr->AnunciarInicioForzado(list_Jugadores.size());
+                    }
+                    else
+                    {
+                        sBRChatMgr->AnunciarErrorInicioForzado();
+                    }
+                }
+                else if (!seHaAnunciadoInicioForzado && tiempoRestanteSinJugadores <= 300)
+                {
+                    seHaAnunciadoInicioForzado = true;
+                    sBRChatMgr->AnunciarAvisoInicioForzado();
+                }
+                break;
+            }
+            case ESTADO_INVOCANDO_JUGADORES:
+            {
+                DarObjetosInicialesProgramado();
+                if (--tiempoRestanteInicio <= 45)
+                {
+                    if (sBRObjetosMgr->EncenderNave())
+                    {
+                        estadoActual = ESTADO_NAVE_EN_MOVIMIENTO;
+                    }
+                    else
+                    {
+                        RestablecerTodoElEvento();
+                    }
+                }
+                TODO_MejorarAnuncioEnNave();
+                break;
+            }
+            case ESTADO_NAVE_EN_MOVIMIENTO:
+            {
+                VerificarJugadoresEnNave();
+                if (--tiempoRestanteInicio <= 20)
+                {
+                    estadoActual = ESTADO_NAVE_CERCA_DEL_CENTRO;
+                    indiceDeZona = 0;
+                    tiempoRestanteZona = 0;
+                    estaZonaAnunciada5s = false;
+                    estaZonaAnunciada10s = false;
+                    if (!HayJugadores() || !sBRObjetosMgr->InvocarCentroDelMapa(sBRMapasMgr->MapaActual()->idMapa, sBRMapasMgr->MapaActual()->centroMapa))
+                    {
+                        RestablecerTodoElEvento();
+                        return;
+                    }
+                    if (!HayJugadores() || !sBRObjetosMgr->InvocarZonaSegura(sBRMapasMgr->MapaActual()->idMapa, sBRMapasMgr->MapaActual()->centroMapa, indiceDeZona))
+                    {
+                        RestablecerTodoElEvento();
+                        return;
+                    }
+                    else
+                    {
+                        AlReducirseLaZona();
+                    }
+                }
+                TODO_MejorarAnuncioEnNave();
+                break;
+            }
+            case ESTADO_NAVE_CERCA_DEL_CENTRO:
+            {
+                if (--tiempoRestanteInicio <= 0) {
                     estadoActual = ESTADO_BATALLA_EN_CURSO;
                     sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_RONDA_INICIADA, list_Jugadores);
                     sBRChatMgr->NotificarTiempoInicial(0, list_Jugadores, sBRMapasMgr->MapaActual()->nombreMapa);
                     sBRMisionesMgr->CompletarRequerimiento(MISION_DIARIA_1, MISION_DIARIA_1_REQ_1, list_Jugadores);
-                    tiempoRestanteZona = conf_IntervaloDeZona;
+                    tiempoRestanteZona = conf_IntervaloZonaSegura;
                     tiempoRestanteNave = 15;
-                } else {
-                    if (tiempoRestanteInicio % 5 == 0) {
-                        if (estadoActual == ESTADO_NAVE_EN_MOVIMIENTO) VerificarJugadoresEnNave();
-                        if (tiempoRestanteInicio == 45)
-                        {
-                            sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_NAVE_EN_MOVIMIENTO, list_Jugadores);
-                        }
-                        sBRChatMgr->NotificarTiempoInicial(tiempoRestanteInicio, list_Jugadores);
-                    }
-                    if (estadoActual == ESTADO_INVOCANDO_JUGADORES) DarObjetosInicialesProgramado();
-                    if (estadoActual == ESTADO_INVOCANDO_JUGADORES && tiempoRestanteInicio <= 45)
-                    {
-                        if (sBRObjetosMgr->EncenderNave())
-                        {
-                            estadoActual = ESTADO_NAVE_EN_MOVIMIENTO;
-                        }
-                        else
-                        {
-                            RestablecerTodoElEvento();
-                        }
-                    }
-                    if (estadoActual == ESTADO_NAVE_EN_MOVIMIENTO && tiempoRestanteInicio <= 20)
-                    {
-                        estadoActual = ESTADO_NAVE_CERCA_DEL_CENTRO;
-                        indiceDeZona = 0;
-                        tiempoRestanteZona = 0;
-                        estaZonaAnunciada5s = false;
-                        estaZonaAnunciada10s = false;
-                        if (!HayJugadores() || !sBRObjetosMgr->InvocarCentroDelMapa(sBRMapasMgr->MapaActual()->idMapa, sBRMapasMgr->MapaActual()->centroMapa))
-                        {
-                            RestablecerTodoElEvento();
-                            return;
-                        }
-                        if (!HayJugadores() || !sBRObjetosMgr->InvocarZonaSegura(sBRMapasMgr->MapaActual()->idMapa, sBRMapasMgr->MapaActual()->centroMapa, indiceDeZona))
-                        {
-                            RestablecerTodoElEvento();
-                            return;
-                        }
-                        else
-                        {
-                            AlReducirseLaZona();
-                        }
-                    }
-                    tiempoRestanteInicio--;
                 }
-                QuitarTodosLosObjetosProgramado();
-            } else {
-                indicadorDeSegundos -= diff;
+                else
+                {
+                    TODO_MejorarAnuncioEnNave();
+                }
+                break;
             }
-            break;
-        }
-        case ESTADO_BATALLA_EN_CURSO:
-        {
-            if (indicadorDeSegundos <= 0) {
-                indicadorDeSegundos = 1000;
+            case ESTADO_BATALLA_EN_CURSO:
+            {
                 ControlDeReglas();
                 if (!CondicionDeVictoria())
                 {
@@ -200,63 +224,57 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
                         sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_NAVE_RETIRADA, list_Jugadores);
                         sBRChatMgr->NotificarNaveRetirada(list_Jugadores);
                     }
-                }
-                QuitarTodosLosObjetosProgramado();
-            } else indicadorDeSegundos -= diff;
-            if (tiempoRestanteZona <= 0) {
-                if (!HayJugadores() || !sBRObjetosMgr->InvocarZonaSegura(sBRMapasMgr->MapaActual()->idMapa, sBRMapasMgr->MapaActual()->centroMapa, indiceDeZona))
+                }            
+                if (tiempoRestanteZona <= 0)
                 {
-                    RestablecerTodoElEvento();
-                    return;
+                    if (!HayJugadores() || !sBRObjetosMgr->InvocarZonaSegura(sBRMapasMgr->MapaActual()->idMapa, sBRMapasMgr->MapaActual()->centroMapa, indiceDeZona))
+                    {
+                        RestablecerTodoElEvento();
+                        return;
+                    }
+                    else
+                    {
+                        AlReducirseLaZona();
+                    }
+                    sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_ZONA_REDUCIDA, list_Jugadores);
+                    sBRChatMgr->NotificarZonaReducida(list_Jugadores);
+                    tiempoRestanteZona = conf_IntervaloZonaSegura;
+                    estaZonaAnunciada5s = false;
+                    estaZonaAnunciada10s = false;
+                } else {
+                    if (!estaZonaAnunciada5s && tiempoRestanteZona <= 5) {
+                        sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_ZONA_TIEMPO, list_Jugadores);
+                        sBRChatMgr->NotificarAdvertenciaDeZona(5, list_Jugadores);
+                        estaZonaAnunciada5s = true;
+                    }
+                    if (!estaZonaAnunciada10s && tiempoRestanteZona <= 10) {
+                        sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_ZONA_TIEMPO, list_Jugadores);
+                        sBRChatMgr->NotificarAdvertenciaDeZona(10, list_Jugadores);
+                        estaZonaAnunciada10s = true;
+                    }
+                    if (indiceDeZona <= CANTIDAD_DE_ZONAS) {
+                        tiempoRestanteZona--;
+                    }
                 }
-                else
-                {
-                    AlReducirseLaZona();
-                }
-                sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_ZONA_REDUCIDA, list_Jugadores);
-                sBRChatMgr->NotificarZonaReducida(list_Jugadores);
-                tiempoRestanteZona = conf_IntervaloDeZona;
-                estaZonaAnunciada5s = false;
-                estaZonaAnunciada10s = false;
-            } else {
-                if (!estaZonaAnunciada5s && tiempoRestanteZona <= 5000) {
-                    sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_ZONA_TIEMPO, list_Jugadores);
-                    sBRChatMgr->NotificarAdvertenciaDeZona(5, list_Jugadores);
-                    estaZonaAnunciada5s = true;
-                }
-                if (!estaZonaAnunciada10s && tiempoRestanteZona <= 10000) {
-                    sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_ZONA_TIEMPO, list_Jugadores);
-                    sBRChatMgr->NotificarAdvertenciaDeZona(10, list_Jugadores);
-                    estaZonaAnunciada10s = true;
-                }
-                if (indiceDeZona <= CANTIDAD_DE_ZONAS) {
-                    tiempoRestanteZona -= diff;
-                }
+                break;
             }
-            break;
-        }
-        case ESTADO_BATALLA_TERMINADA:
-        {
-            if (indicadorDeSegundos <= 0) {
-                indicadorDeSegundos = 1000;
+            case ESTADO_BATALLA_TERMINADA:
+            {
                 if (--tiempoRestanteFinal <= 0)
                 {
-                    while (HayJugadores()) SalirDelEvento((*list_Jugadores.begin()).first);
+                    while (HayJugadores()) SalirDelEvento(list_Jugadores.begin()->first);
+                    tiempoRestanteSinJugadores = conf_IntervaloSinJugadores;
+                    seHaAnunciadoInicioForzado = false;
                     estadoActual = ESTADO_NO_HAY_SUFICIENTES_JUGADORES;
                     if (HaySuficientesEnCola()) IniciarNuevaRonda();
                 }
-                QuitarTodosLosObjetosProgramado();
-            } else indicadorDeSegundos -= diff;
-            break;
+                break;
+            }
         }
-        default:
-        {
-            if (indicadorDeSegundos <= 0) {
-                indicadorDeSegundos = 1000;
-                QuitarTodosLosObjetosProgramado();
-            } else indicadorDeSegundos -= diff;
-            break;
-        }
+    }
+    else
+    {
+        indicadorDeSegundos -= diff;
     }
 }
 
@@ -283,7 +301,10 @@ void BattleRoyaleMgr::RestablecerTodoElEvento()
     sBRMapasMgr->SiguienteMapa();
     indicadorDeSegundos = 1000;
     indiceDeVariacion = 0;
+    totalAsesinatosJcJ = 0;
     sBRObjetosMgr->DesaparecerTodosLosObjetos();
+    tiempoRestanteSinJugadores = conf_IntervaloSinJugadores;
+    seHaAnunciadoInicioForzado = false;
     estadoActual = ESTADO_NO_HAY_SUFICIENTES_JUGADORES;
 }
 
@@ -299,6 +320,7 @@ void BattleRoyaleMgr::IniciarNuevaRonda()
             return;
         }
         estadoActual = ESTADO_INVOCANDO_JUGADORES;
+        totalAsesinatosJcJ = 0;
         while (HayCola() && !EstaLlenoElEvento() && tiempoRestanteInicio >= 60)
         {
             uint32 guid = list_Cola.begin()->first;
@@ -511,14 +533,17 @@ void BattleRoyaleMgr::FinalizarRonda(bool announce, Player* winner /* = nullptr*
         }
         sBRChatMgr->AnunciarGanador(winner, list_Datos[winner->GetGUID().GetCounter()].kills);
         TodosLosMuertosEspectarme(winner);
-        sBRTitulosMgr->Ascender(winner);
+        if (conf_RequisitoAsesinatosTotales <= totalAsesinatosJcJ && conf_RequisitoAsesinatosPropios <= list_Datos[winner->GetGUID().GetCounter()].kills)
+        {
+            sBRTitulosMgr->Ascender(winner);
+        }
     }
     else
     {
         sBRChatMgr->AnunciarEmpate();
     }
     sBRObjetosMgr->DesaparecerTodosLosObjetos();
-    tiempoRestanteFinal = 10;
+    tiempoRestanteFinal = conf_IntervaloFinalDeRonda;
     sBRMapasMgr->SiguienteMapa();
     estadoActual = ESTADO_BATALLA_TERMINADA;
 }

@@ -48,7 +48,15 @@ public:
         return !sBRObjetosMgr->EstaEnLaNave(player);
     };
     BR_EstadosEvento EstadoActual() { return estadoActual; };
-    void ForzarIniciarNuevaRonda() { if (HayCola()) IniciarNuevaRonda(); };
+    bool ForzarIniciarNuevaRonda()
+    {
+        if (HayCola())
+        {
+            IniciarNuevaRonda();
+            return true;
+        }
+        return false;
+    };
 
 private:
     void RestablecerTodoElEvento();
@@ -146,6 +154,7 @@ private:
                 if (it->second && it->second->IsAlive())
                 {
                     TodosLosMuertosEspectarme(it->second);
+                    break;
                 }
             }
         }
@@ -226,7 +235,7 @@ private:
                 }
             }
         }
-    }
+    };
     void QuitarTodosLosObjetosProgramado()
     {
         if (list_QuitarTodosLosObjetos.size())
@@ -255,7 +264,17 @@ private:
                 }
             }
         }
-    }
+    };
+    void TODO_MejorarAnuncioEnNave()
+    {
+        if (tiempoRestanteInicio % 5 == 0) {
+            if (tiempoRestanteInicio == 45)
+            {
+                sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_NAVE_EN_MOVIMIENTO, list_Jugadores);
+            }
+            sBRChatMgr->NotificarTiempoInicial(tiempoRestanteInicio, list_Jugadores);
+        }
+    };
 
     BR_ListaDePersonajes list_Cola;
 
@@ -267,20 +286,28 @@ private:
 
     BR_EstadosEvento estadoActual;
 
+    int tiempoRestanteSinJugadores;
     int tiempoRestanteInicio;
     int tiempoRestanteZona;
     int tiempoRestanteNave;
     int tiempoRestanteFinal;
-    int indiceDeVariacion;
 
+    int indiceDeVariacion;
     int indiceDeZona;
+    int totalAsesinatosJcJ;
+
     int indicadorDeSegundos;
+    bool seHaAnunciadoInicioForzado;
     bool estaZonaAnunciada5s;
     bool estaZonaAnunciada10s;
 
     uint32 conf_JugadoresMinimo;
     uint32 conf_JugadoresMaximo;
-    uint32 conf_IntervaloDeZona;
+    uint32 conf_IntervaloSinJugadores;
+    uint32 conf_IntervaloZonaSegura;
+    uint32 conf_IntervaloFinalDeRonda;
+    uint32 conf_RequisitoAsesinatosTotales;
+    uint32 conf_RequisitoAsesinatosPropios;
 
 };
 
