@@ -294,7 +294,7 @@ private:
 
     int indiceDeVariacion;
     int indiceDeZona;
-    int totalAsesinatosJcJ;
+    uint32 totalAsesinatosJcJ;
 
     int indicadorDeSegundos;
     bool seHaAnunciadoInicioForzado;
