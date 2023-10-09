@@ -40,3 +40,14 @@ BattleRoyale.Intervalo.SinJugadores = 1800
 BattleRoyale.Intervalo.NaveEnEspera = 30 # TODO: Utilizar este valor.
 BattleRoyale.Intervalo.ZonaSegura = 60
 BattleRoyale.Intervalo.FinalDeRonda = 10 # TODO: Utilizar este valor.
+
+#############################################################################
+# Requisitos para premio mayor
+#
+# * AsesinatosTotales: Minimo de jugadores eliminados por cualquier jugador
+#       Defecto: 5 (0 = Desactivado)
+#
+# * AsesinatosPropios: Minimo de jugadores eliminados por el ganador
+#       Defecto: 1 (0 = Desactivado)
+BattleRoyale.Requisito.AsesinatosTotales = 5 # TODO: Utilizar este valor.
+BattleRoyale.Requisito.AsesinatosPropios = 1 # TODO: Utilizar este valor.
