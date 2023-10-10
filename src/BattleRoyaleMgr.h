@@ -149,13 +149,25 @@ private:
     {
         if (HayJugadores())
         {
+            Player* vivo = nullptr;
             for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
             {
                 if (it->second && it->second->IsAlive())
                 {
-                    TodosLosMuertosEspectarme(it->second);
-                    break;
+                    if (!vivo)
+                    {
+                        vivo = it->second;
+                    }
+                    if (EstaEspectando(it->second))
+                    {
+                        it->second->StopCastingBindSight();
+                        list_Datos[it->second->GetGUID().GetCounter()].spect = 0;
+                    }
                 }
+            }
+            if (vivo && vivo->IsAlive())
+            {
+                TodosLosMuertosEspectarme(vivo);
             }
         }
     };

@@ -238,7 +238,7 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
                         sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_NAVE_RETIRADA, list_Jugadores);
                         sBRChatMgr->NotificarNaveRetirada(list_Jugadores);
                     }
-                }            
+                }
                 if (tiempoRestanteZona <= 0)
                 {
                     if (!HayJugadores() || !sBRObjetosMgr->InvocarZonaSegura(sBRMapasMgr->MapaActual()->idMapa, sBRMapasMgr->MapaActual()->centroMapa, indiceDeZona))
