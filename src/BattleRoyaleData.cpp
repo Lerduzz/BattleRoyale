@@ -10,6 +10,7 @@ BattleRoyaleData::BattleRoyaleData()
     dmg_tick = 0;
     kills = 0;
     spect = 0;
+    reward = 0;
 }
 
 BattleRoyaleData::~BattleRoyaleData()

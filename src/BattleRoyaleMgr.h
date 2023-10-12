@@ -8,6 +8,7 @@
 #include "BRMapasMgr.h"
 #include "BRMisionesMgr.h"
 #include "BRObjetosMgr.h"
+#include "BRRecompensaMgr.h"
 #include "BRSonidosMgr.h"
 #include "BRTitulosMgr.h"
 #include "BattleRoyaleData.h"
@@ -136,7 +137,6 @@ private:
                     {
                         it->second->AddAura(HECHIZO_ANTI_INVISIBLES, it->second);
                         it->second->AddAura(HECHIZO_ANTI_SANADORES, it->second);
-                        // TODO: Analizar si esto es factible: it->second->AddAura(HECHIZO_LENGUAJE_BINARIO, it->second);
                         vivos++;
                     }
                 }
@@ -149,13 +149,25 @@ private:
     {
         if (HayJugadores())
         {
+            Player* vivo = nullptr;
             for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
             {
                 if (it->second && it->second->IsAlive())
                 {
-                    TodosLosMuertosEspectarme(it->second);
-                    break;
+                    if (!vivo)
+                    {
+                        vivo = it->second;
+                    }
+                    if (EstaEspectando(it->second))
+                    {
+                        it->second->StopCastingBindSight();
+                        list_Datos[it->second->GetGUID().GetCounter()].spect = 0;
+                    }
                 }
+            }
+            if (vivo && vivo->IsAlive())
+            {
+                TodosLosMuertosEspectarme(vivo);
             }
         }
     };
@@ -308,6 +320,7 @@ private:
     uint32 conf_IntervaloFinalDeRonda;
     uint32 conf_RequisitoAsesinatosTotales;
     uint32 conf_RequisitoAsesinatosPropios;
+    BRConf_Recompensa conf_Recompensa;
 
 };
 

@@ -18,6 +18,7 @@ public:
     int dmg_tick;
     uint32 kills;
     uint32 spect;
+    uint32 reward;
 
 private:
     int start_map;

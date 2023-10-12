@@ -10,6 +10,15 @@ BattleRoyaleMgr::BattleRoyaleMgr()
     conf_IntervaloFinalDeRonda = sConfigMgr->GetOption<uint32>("BattleRoyale.Intervalo.FinalDeRonda", 10);
     conf_RequisitoAsesinatosTotales = sConfigMgr->GetOption<uint32>("BattleRoyale.Requisito.AsesinatosTotales", 5);
     conf_RequisitoAsesinatosPropios = sConfigMgr->GetOption<uint32>("BattleRoyale.Requisito.AsesinatosPropios", 1);
+
+    conf_Recompensa = BRConf_Recompensa();
+    conf_Recompensa.base = sConfigMgr->GetOption<uint32>("BattleRoyale.Recompensa.Base", 400);
+    conf_Recompensa.victoria = sConfigMgr->GetOption<uint32>("BattleRoyale.Recompensa.Victoria", 600);
+    conf_Recompensa.asesinar = sConfigMgr->GetOption<uint32>("BattleRoyale.Recompensa.AlAsesinar", 350);
+    conf_Recompensa.serAsesinado = sConfigMgr->GetOption<uint32>("BattleRoyale.Recompensa.AlSerEAsesinado", 200);
+    conf_Recompensa.morir = sConfigMgr->GetOption<uint32>("BattleRoyale.Recompensa.AlMorir", 100);
+    conf_Recompensa.zona = sConfigMgr->GetOption<uint32>("BattleRoyale.Recompensa.ZonaReducida", 150);
+
     sBRMapasMgr->CargarMapasDesdeBD();
     RestablecerTodoElEvento();
 }
@@ -108,11 +117,14 @@ void BattleRoyaleMgr::GestionarMuerteJcJ(Player* killer, Player* killed)
         sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_ALGUIEN_MUERE, list_Jugadores);
         if (killer == killed)
         {
+            sBRRecompensaMgr->AcumularRecompensa(conf_Recompensa.morir, &(list_Datos[killed->GetGUID().GetCounter()]));
             sBRChatMgr->AnunciarMuerteJcJ(killer, killed, 0, list_Jugadores);
             return;
         }
         list_Datos[killer->GetGUID().GetCounter()].kills++;
         totalAsesinatosJcJ++;
+        sBRRecompensaMgr->AcumularRecompensa(conf_Recompensa.asesinar, &(list_Datos[killer->GetGUID().GetCounter()]));
+        sBRRecompensaMgr->AcumularRecompensa(conf_Recompensa.serAsesinado, &(list_Datos[killed->GetGUID().GetCounter()]));
         sBRChatMgr->AnunciarMuerteJcJ(killer, killed, list_Datos[killer->GetGUID().GetCounter()].kills, list_Jugadores);
         TodosLosMuertosEspectarme(killer);
     }
@@ -194,8 +206,10 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
             }
             case ESTADO_NAVE_CERCA_DEL_CENTRO:
             {
-                if (--tiempoRestanteInicio <= 0) {
+                if (--tiempoRestanteInicio <= 0)
+                {
                     estadoActual = ESTADO_BATALLA_EN_CURSO;
+                    sBRRecompensaMgr->AcumularRecompensaVivos(conf_Recompensa.base, list_Jugadores, &list_Datos);
                     sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_RONDA_INICIADA, list_Jugadores);
                     sBRChatMgr->NotificarTiempoInicial(0, list_Jugadores, sBRMapasMgr->MapaActual()->nombreMapa);
                     sBRMisionesMgr->CompletarRequerimiento(MISION_DIARIA_1, MISION_DIARIA_1_REQ_1, list_Jugadores);
@@ -224,7 +238,7 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
                         sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_NAVE_RETIRADA, list_Jugadores);
                         sBRChatMgr->NotificarNaveRetirada(list_Jugadores);
                     }
-                }            
+                }
                 if (tiempoRestanteZona <= 0)
                 {
                     if (!HayJugadores() || !sBRObjetosMgr->InvocarZonaSegura(sBRMapasMgr->MapaActual()->idMapa, sBRMapasMgr->MapaActual()->centroMapa, indiceDeZona))
@@ -232,10 +246,8 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
                         RestablecerTodoElEvento();
                         return;
                     }
-                    else
-                    {
-                        AlReducirseLaZona();
-                    }
+                    AlReducirseLaZona();
+                    sBRRecompensaMgr->AcumularRecompensaVivos(conf_Recompensa.zona, list_Jugadores, &list_Datos);
                     sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_ZONA_REDUCIDA, list_Jugadores);
                     sBRChatMgr->NotificarZonaReducida(list_Jugadores);
                     tiempoRestanteZona = conf_IntervaloZonaSegura;
@@ -376,7 +388,6 @@ void BattleRoyaleMgr::LlamarDentroDeNave(uint32 guid)
     player->SetPhaseMask(DIMENSION_EVENTO, true);
     player->TeleportTo(brM->idMapa, iN.GetPositionX() + ox, iN.GetPositionY() + oy, iN.GetPositionZ() + 2.5f, iN.GetOrientation() + M_PI / 2.0f);
     player->SetPvP(false);
-    // TODO: Analizar si esto es factible: player->AddAura(HECHIZO_LENGUAJE_BINARIO, player);
     player->SaveToDB(false, false);
     list_DarObjetosIniciales[guid] = player;
     SiguientePosicion();
@@ -398,7 +409,6 @@ void BattleRoyaleMgr::SalirDelEvento(uint32 guid, bool logout /* = false*/)
         if (player->IsAlive())
         {
             if (player->HasAura(HECHIZO_ALAS_MAGICAS)) player->RemoveAurasDueToSpell(HECHIZO_ALAS_MAGICAS);
-            // TODO: Analizar si esto es factible: if (player->HasAura(HECHIZO_LENGUAJE_BINARIO)) player->RemoveAurasDueToSpell(HECHIZO_LENGUAJE_BINARIO);
             if (player->HasAura(HECHIZO_ANTI_INVISIBLES)) player->RemoveAurasDueToSpell(HECHIZO_ANTI_INVISIBLES);
             if (player->HasAura(HECHIZO_ANTI_SANADORES)) player->RemoveAurasDueToSpell(HECHIZO_ANTI_SANADORES);
         }
@@ -411,6 +421,7 @@ void BattleRoyaleMgr::SalirDelEvento(uint32 guid, bool logout /* = false*/)
             player->TeleportTo(list_Datos[guid].GetMap(), list_Datos[guid].GetX(), list_Datos[guid].GetY(), list_Datos[guid].GetZ(), list_Datos[guid].GetO());
             player->SaveToDB(false, false);
         }
+        sBRRecompensaMgr->DarRecompensas(player, list_Datos[guid].reward);
         list_Jugadores.erase(guid);
         list_Datos.erase(guid);
     }
@@ -530,6 +541,10 @@ void BattleRoyaleMgr::FinalizarRonda(bool announce, Player* winner /* = nullptr*
         else
         {
             sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_GANADOR_HORDA, list_Jugadores);
+        }
+        if (list_Datos.find(winner->GetGUID().GetCounter()) != list_Datos.end())
+        {
+            sBRRecompensaMgr->AcumularRecompensa(conf_Recompensa.victoria, &(list_Datos[winner->GetGUID().GetCounter()]));
         }
         sBRChatMgr->AnunciarGanador(winner, list_Datos[winner->GetGUID().GetCounter()].kills);
         TodosLosMuertosEspectarme(winner);
