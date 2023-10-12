@@ -37,7 +37,9 @@ INSERT INTO `battleroyale_maps`(`id`,`map_id`,`map_name`,`center_x`,`center_y`,`
 (7,530,'Marisma de Zangar: Telredor',273.93,5925.29,18.28,0,273.93,8219.29,315.28,3.14159),
 (8,571,'Cementerio de Dragones: Santuario Rubí',3879.86,961.35,55.38,0,3879.86,-1333.35,352.38,0),
 (9,571,'Corona de Hielo: Puerto del Embate',7691.04,4857.42,0,0,5397.04,4857.42,297,-1.5708),
-(10,571,'Cuenca de Sholazar: Pista del Lago',5472.51,4757.34,-199.05,0,5472.51,7051.34,98.05,3.14159);
+(10,571,'Cuenca de Sholazar: Pista del Lago',5472.51,4757.34,-199.05,0,5472.51,7051.34,98.05,3.14159),
+(11,571,'Tundra Boreal: Estación de Bombeo',4008.74,4851.63,-13.01,0,1714.74,4851.63,284.01,-1.5708),
+(12,530,'Valle Sombraluna: La Forja Muerta',-3376.17,1971.08,18.01,0,-1082.17,1971.08,315.01,1.5708);
 
 -- Lista de puntos de aparicion de cofres para los mapas --
 INSERT INTO `battleroyale_maps_spawns`(`zone`,`map`,`pos_x`,`pos_y`,`pos_z`,`pos_o`) VALUES
