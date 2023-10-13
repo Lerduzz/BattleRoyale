@@ -265,6 +265,7 @@ public:
     bool HayZona() { return obj_Zona ? true : false; };
     bool HayCentro() { return obj_Centro ? true : false; };
     bool HayNave() { return obj_Nave ? true : false; };
+    Creature* Guardian() { return npc_Guardian; };
 
 private:
     GameObject* obj_Zona;
