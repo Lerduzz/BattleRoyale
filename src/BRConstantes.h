@@ -20,6 +20,8 @@ enum BR_Hechizos
     HECHIZO_ALAS_MAGICAS                    = 24742,
     HECHIZO_ANTI_SANADORES                  = 55593,
     HECHIZO_ANTI_INVISIBLES                 = 34709,
+    HECHIZO_RAYO_DRAGON                     = 44318,
+    HECHIZO_RAYO_DRAGON_FUERTE              = 46380,
 };
 
 const int CANTIDAD_DE_VARIACIONES = 49;
