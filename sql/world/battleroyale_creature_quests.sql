@@ -114,7 +114,7 @@ INSERT INTO `creature_questender` (`id`, `quest`) VALUES
 -- Mision 4 (Semanal): Gana 3 rondas de Battle Royale --
 -- Mision 5 (Semanal): Gana 1 rondas de Battle Royale eliminando almenos a 3 jugadores --
 
--- NPC de Prueba --
+-- NPC Guardian de Zona --
 SET
 @Model4     := 22965,
 @Name4      := 'Madrigosa la Indomable',
