@@ -66,7 +66,7 @@ public:
 
     bool DesaparecerCentro()
     {
-        if (npc_Guardian)
+        if (HayGuardian())
         {
             npc_Guardian->CleanupsBeforeDelete();
             delete npc_Guardian;
@@ -265,7 +265,16 @@ public:
     bool HayZona() { return obj_Zona ? true : false; };
     bool HayCentro() { return obj_Centro ? true : false; };
     bool HayNave() { return obj_Nave ? true : false; };
-    Creature* Guardian() { return npc_Guardian; };
+    bool HayGuardian() { return npc_Guardian ? true : false; };
+
+    bool HechizoGuardian(uint32 spell, Player* player)
+    {
+        if (HayGuardian() && player && spell > 0)
+        {
+            return npc_Guardian->CastSpell(player, spell, true) == SPELL_CAST_OK;
+        }
+        return false;
+    }
 
 private:
     GameObject* obj_Zona;
