@@ -114,7 +114,6 @@ INSERT INTO `creature_questender` (`id`, `quest`) VALUES
 -- Mision 4 (Semanal): Gana 3 rondas de Battle Royale --
 -- Mision 5 (Semanal): Gana 1 rondas de Battle Royale eliminando almenos a 3 jugadores --
 
-
 -- NPC de Prueba --
 SET
 @Model4     := 22965,
@@ -125,7 +124,7 @@ SET
 @NPCFlag4   := 0,
 @Scale4     := 0.5;
 INSERT INTO `creature_template` (`entry`, `modelid1`, `name`, `subname`, `IconName`, `gossip_menu_id`, `minlevel`, `maxlevel`, `faction`, `npcflag`, `speed_walk`, `speed_run`, `scale`, `rank`, `unit_class`, `unit_flags`, `type`, `type_flags`, `RegenHealth`, `flags_extra`, `AiName`, `ScriptName`, `HealthModifier`, `ManaModifier`) VALUES
-(@Entry - 1, @Model4, @Name4, @Title4, '', @GossipMenu, @Level4, @Level4, @Faction4, @NPCFlag4, 1, 1.14286, @Scale4, 3, 8, 2+4+256+512+4096+131072+2147483648, 2, 4+16, 1, 256+16777216, '', '', 178.5, 158.7);
+(@Entry - 1, @Model4, @Name4, @Title4, '', @GossipMenu, @Level4, @Level4, @Faction4, @NPCFlag4, 1, 1.14286, @Scale4, 3, 8, 2+4+4096+131072+2147483648, 2, 4+16, 1, 256+16777216, '', '', 1780.5, 158.7);
 DELETE FROM `creature_template_addon` WHERE `entry` = @Entry - 1;
 INSERT INTO `creature_template_addon` (`entry`, `visibilityDistanceType`) VALUES (@Entry - 1, 5);
 DELETE FROM `creature_template_movement` WHERE `CreatureId` = @Entry - 1;
