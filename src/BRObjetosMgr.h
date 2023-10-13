@@ -20,9 +20,10 @@ enum BR_ObjetosMundo
     OBJETO_ZONA_SEGURA_INICIAL              = 500001,
 };
 
-enum BR_CriaturasNave
+enum BR_Criaturas
 {
     CRIATURA_VENDEDOR_ARMAS                 = 200001,
+    CRIATURA_DRAGON_GUARDIAN                = 199999,
 };
 
 class BRObjetosMgr
@@ -33,6 +34,7 @@ class BRObjetosMgr
         obj_Centro = nullptr;
         obj_Nave = nullptr;
         npc_Vendedor = nullptr;
+        npc_Guardian = nullptr;
         zonaActiva = false;    
     };
     ~BRObjetosMgr(){};
@@ -49,7 +51,8 @@ public:
         DesaparecerZona();
         DesaparecerCentro();
         DesaparecerNave();
-    };
+    }
+
     bool DesaparecerZona()
     {
         if (HayZona()) {
@@ -59,9 +62,16 @@ public:
             return true;
         }
         return false;
-    };
+    }
+
     bool DesaparecerCentro()
     {
+        if (npc_Guardian)
+        {
+            npc_Guardian->CleanupsBeforeDelete();
+            delete npc_Guardian;
+            npc_Guardian = nullptr;
+        }
         if (HayCentro()) {
             obj_Centro->CleanupsBeforeDelete();
             delete obj_Centro;
@@ -69,7 +79,8 @@ public:
             return true;
         }
         return false;
-    };
+    }
+
     bool DesaparecerNave()
     {
         if (npc_Vendedor)
@@ -92,7 +103,7 @@ public:
             return true;
         }
         return false;
-    };
+    }
 
     bool InvocarNave(uint32 mapID, Position pos)
     {
@@ -138,7 +149,8 @@ public:
             }
         }
         return false;
-    };
+    }
+
     bool EncenderNave()
     {
         if (HayNave())
@@ -149,7 +161,8 @@ public:
             return true;
         }
         return false;
-    };
+    }
+
     bool EstaEnLaNave(Player* player)
     {
         if (player && HayNave())
@@ -163,7 +176,8 @@ public:
             }
         }
         return false;
-    };
+    }
+
     bool InvocarCentroDelMapa(uint32 mapID, Position pos)
     {
         Map* map = sMapMgr->FindBaseNonInstanceMap(mapID);
@@ -180,6 +194,11 @@ public:
             {
                 obj_Centro->SetVisibilityDistanceOverride(VisibilityDistanceType::Infinite);
                 map->AddToMap(obj_Centro);
+                if (!(npc_Guardian = obj_Centro->SummonCreature(CRIATURA_DRAGON_GUARDIAN, x, y, z + 330.0f, o, TEMPSUMMON_MANUAL_DESPAWN)))
+                {
+                    delete npc_Guardian;
+                    npc_Guardian = nullptr;
+                }
                 return true;
             }
             else
@@ -189,7 +208,8 @@ public:
             }
         }
         return false;
-    };
+    }
+
     bool InvocarCofre(Position pos)
     {
         if (HayCentro())
@@ -200,7 +220,8 @@ public:
             }
         }
         return false;
-    };
+    }
+
     bool InvocarZonaSegura(uint32 mapID, Position pos, int& index)
     {
         Map* map = sMapMgr->FindBaseNonInstanceMap(mapID);
@@ -236,7 +257,7 @@ public:
             }
         }
         return false;
-    };    
+    }
 
     float DistanciaDelCentro(Player* player) { return obj_Centro ? player->GetExactDist(obj_Centro): 0.0f; };
     bool EstaLaZonaActiva() { return zonaActiva; };
@@ -251,6 +272,7 @@ private:
     GameObject* obj_Nave;
 
     Creature* npc_Vendedor;
+    Creature* npc_Guardian;
 
     bool zonaActiva;
 
