@@ -28,7 +28,6 @@ BattleRoyaleMgr::~BattleRoyaleMgr()
     RestablecerTodoElEvento();
 }
 
-// --- PUBLICO ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void BattleRoyaleMgr::GestionarJugadorEntrando(Player* player)
 {
     if (!player) return;
@@ -304,7 +303,6 @@ bool BattleRoyaleMgr::PuedeReaparecerEnCementerio(Player *player)
     return true;
 }
 
-// --- PRIVADO ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void BattleRoyaleMgr::RestablecerTodoElEvento()
 {
     list_Cola.clear();
