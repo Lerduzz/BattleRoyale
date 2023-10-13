@@ -448,9 +448,32 @@ void BattleRoyaleMgr::EfectoFueraDeZona()
                 {
                     list_Datos[it->first].dmg_tick++;
                     uint32 damage = it->second->GetMaxHealth() * (2 * sqrt(list_Datos[it->first].dmg_tick) + indiceDeZona) / 100;
-                    it->second->GetSession()->SendNotification("|cffff0000¡Has recibido |cffDA70D6%u|cffff0000 de daño, adéntrate en la zona segura!", damage); // TODO: Mover al sistema de mensajes.
-                    Unit::DealDamage(it->second, it->second, damage, nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false, true);
-                    sBRObjetosMgr->HechizoGuardian(HECHIZO_RAYO_DRAGON, it->second);
+                    if (list_Datos[it->first].dmg_tick < 10 || list_Datos[it->first].dmg_tick >= 30)
+                    {
+                        if (!sBRObjetosMgr->HechizoGuardian(HECHIZO_RAYO_DRAGON, it->second))
+                        {
+                            Unit::DealDamage(it->second, it->second, damage, nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false, true);
+                        }
+                    }
+                    if (list_Datos[it->first].dmg_tick >= 10)
+                    {
+                        if (!sBRObjetosMgr->HechizoGuardian(HECHIZO_RAYO_DRAGON_FUERTE, it->second))
+                        {
+                            Unit::DealDamage(it->second, it->second, damage, nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false, true);
+                        }
+                    }
+                    if (list_Datos[it->first].dmg_tick >= 45)
+                    {
+                        if (!sBRObjetosMgr->HechizoGuardian(HECHIZO_RAYO_DRAGON, it->second))
+                        {
+                            Unit::DealDamage(it->second, it->second, damage, nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false, true);
+                        }
+                        if (!sBRObjetosMgr->HechizoGuardian(HECHIZO_RAYO_DRAGON_FUERTE, it->second))
+                        {
+                            Unit::DealDamage(it->second, it->second, damage, nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false, true);
+                        }
+                    }
+                    it->second->GetSession()->SendNotification("|cffff0000¡Estás fuera de la zona segura, el guardián te ataca!");
                 }
                 else
                 {
