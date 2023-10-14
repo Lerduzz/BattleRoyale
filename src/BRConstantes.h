@@ -22,10 +22,11 @@ enum BR_Hechizos
     HECHIZO_ANTI_INVISIBLES                 = 34709,
     HECHIZO_RAYO_DRAGON                     = 44318,
     HECHIZO_RAYO_DRAGON_FUERTE              = 46380,
+    HECHIZO_BENEFICIO_LIEBRE                = 51442,
 };
 
 const int CANTIDAD_DE_VARIACIONES = 49;
-const float BR_VariacionesDePosicion[CANTIDAD_DE_VARIACIONES][2] = 
+const float BR_VariacionesDePosicion[CANTIDAD_DE_VARIACIONES][2] =
 {
     { -4.5f,  4.5f }, { -3.0f,  4.5f }, { -1.5f,  4.5f }, {  0.0f,  4.5f }, {  1.5f,  4.5f }, {  3.0f,  4.5f }, {  4.5f,  4.5f },
     { -4.5f,  3.0f }, { -3.0f,  3.0f }, { -1.5f,  3.0f }, {  0.0f,  3.0f }, {  1.5f,  3.0f }, {  3.0f,  3.0f }, {  4.5f,  3.0f },

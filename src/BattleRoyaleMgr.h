@@ -32,7 +32,7 @@ public:
         static BattleRoyaleMgr *instance = new BattleRoyaleMgr();
         return instance;
     }
-    
+
     void GestionarJugadorEntrando(Player* player);
     void GestionarJugadorDesconectar(Player* player);
     void GestionarMuerteJcJ(Player* killer, Player* killed);
@@ -42,7 +42,7 @@ public:
     bool DebeRestringirFunciones(Player* player) { return estadoActual > ESTADO_NO_HAY_SUFICIENTES_JUGADORES && HayJugadores() && EstaEnEvento(player); };
     bool EstaEnCola(Player* player) { return EstaEnCola(player->GetGUID().GetCounter()); };
     bool EstaEnEvento(Player* player) { return EstaEnEvento(player->GetGUID().GetCounter()); };
-    bool DebeForzarJcJTcT(Player* player) 
+    bool DebeForzarJcJTcT(Player* player)
     {
         if (!player) return false;
         if (estadoActual != ESTADO_BATALLA_EN_CURSO || !HayJugadores() || !EstaEnEvento(player)) return false;
@@ -81,15 +81,15 @@ private:
     bool EstaEnListaQuitarTodosLosObjetos(uint32 guid) { return list_QuitarTodosLosObjetos.find(guid) != list_QuitarTodosLosObjetos.end(); };
     bool EstaLlenoElEvento() { return list_Jugadores.size() >= conf_JugadoresMaximo; };
     bool EstaEspectando(Player* player)
-    { 
+    {
         return HayJugadores() && EstaEnEvento(player) && list_Datos[player->GetGUID().GetCounter()].spect 
             && EstaEnEvento(list_Datos[player->GetGUID().GetCounter()].spect) && list_Jugadores[list_Datos[player->GetGUID().GetCounter()].spect]->IsAlive();
     };
     bool HaySuficientesEnCola() { return list_Cola.size() >= conf_JugadoresMinimo; };
     void SiguientePosicion() { if (++indiceDeVariacion >= CANTIDAD_DE_VARIACIONES) indiceDeVariacion = 0; };
     void DejarGrupo(Player* player)
-    { 
-        player->RemoveFromGroup(); 
+    {
+        player->RemoveFromGroup();
         player->UninviteFromGroup();
     };
     void Desmontar(Player* player)
@@ -131,12 +131,50 @@ private:
             if (estadoActual == ESTADO_BATALLA_EN_CURSO)
             {
                 int vivos = 0;
+                int rndEfecto = rand() % 10 + 1;
                 for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
                 {
                     if (it->second && it->second->IsAlive())
                     {
-                        it->second->AddAura(HECHIZO_ANTI_INVISIBLES, it->second);
-                        it->second->AddAura(HECHIZO_ANTI_SANADORES, it->second);
+                        switch (rndEfecto)
+                        {
+                            case 1:
+                            case 2:
+                            case 3:
+                            case 4:
+                            {
+                                it->second->AddAura(HECHIZO_ANTI_INVISIBLES, it->second);
+                                break;
+                            }
+                            case 5:
+                            case 6:
+                            case 7:
+                            {
+                                it->second->AddAura(HECHIZO_ANTI_SANADORES, it->second);
+                                break;
+                            }
+                            case 8:
+                            {
+                                if (!sBRObjetosMgr->HechizoGuardian(HECHIZO_RAYO_DRAGON, it->second))
+                                {
+                                    it->second->AddAura(HECHIZO_ANTI_INVISIBLES, it->second);
+                                }
+                                break;
+                            }
+                            case 9:
+                            {
+                                if (!sBRObjetosMgr->HechizoGuardian(HECHIZO_RAYO_DRAGON_FUERTE, it->second))
+                                {
+                                    it->second->AddAura(HECHIZO_ANTI_SANADORES, it->second);
+                                }
+                                break;
+                            }
+                            default:
+                            {
+                                it->second->AddAura(HECHIZO_BENEFICIO_LIEBRE, it->second);
+                                break;
+                            }
+                        }
                         vivos++;
                     }
                 }
