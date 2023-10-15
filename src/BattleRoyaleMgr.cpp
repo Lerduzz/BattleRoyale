@@ -120,6 +120,7 @@ void BattleRoyaleMgr::GestionarMuerteJcJ(Player* killer, Player* killed)
             sBRChatMgr->AnunciarMuerteJcJ(killer, killed, 0, list_Jugadores);
             return;
         }
+        killer->AddAura(HECHIZO_DESGARRO_ASESINO, killer);
         list_Datos[killer->GetGUID().GetCounter()].kills++;
         totalAsesinatosJcJ++;
         sBRRecompensaMgr->AcumularRecompensa(conf_Recompensa.asesinar, &(list_Datos[killer->GetGUID().GetCounter()]));
