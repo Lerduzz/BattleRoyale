@@ -23,6 +23,10 @@ enum BR_Hechizos
     HECHIZO_RAYO_DRAGON                     = 44318,
     HECHIZO_RAYO_DRAGON_FUERTE              = 46380,
     HECHIZO_BENEFICIO_LIEBRE                = 51442,
+    // -------------- NUEVO ------------------------
+    HECHIZO_ACIDO_ZONA                      = 26476,
+    HECHIZO_RASTRILLO_LENTO                 = 22639,
+    HECHIZO_DESGARRO_ASESINO                = 65033,
 };
 
 const int CANTIDAD_DE_VARIACIONES = 49;
