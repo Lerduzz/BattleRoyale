@@ -154,21 +154,19 @@ private:
                                 break;
                             }
                             case 5:
+                            case 6:
                             {
                                 it->second->AddAura(HECHIZO_RASTRILLO_LENTO, it->second);
                                 break;
                             }
-                            case 6:
+                            case 7:
                             {
                                 if (!sBRObjetosMgr->HechizoGuardian(HECHIZO_RAYO_DRAGON, it->second))
                                 {
                                     it->second->AddAura(HECHIZO_DESGARRO_ASESINO, it->second);
-                                    it->second->AddAura(HECHIZO_DESGARRO_ASESINO, it->second);
-                                    it->second->AddAura(HECHIZO_DESGARRO_ASESINO, it->second);
                                 }
                                 break;
                             }
-                            case 7:
                             case 8:
                             case 9:
                             {
