@@ -120,6 +120,7 @@ void BattleRoyaleMgr::GestionarMuerteJcJ(Player* killer, Player* killed)
             sBRChatMgr->AnunciarMuerteJcJ(killer, killed, 0, list_Jugadores);
             return;
         }
+        killer->AddAura(HECHIZO_DESGARRO_ASESINO, killer);
         list_Datos[killer->GetGUID().GetCounter()].kills++;
         totalAsesinatosJcJ++;
         sBRRecompensaMgr->AcumularRecompensa(conf_Recompensa.asesinar, &(list_Datos[killer->GetGUID().GetCounter()]));
@@ -409,6 +410,9 @@ void BattleRoyaleMgr::SalirDelEvento(uint32 guid, bool logout /* = false*/)
             if (player->HasAura(HECHIZO_ALAS_MAGICAS)) player->RemoveAurasDueToSpell(HECHIZO_ALAS_MAGICAS);
             if (player->HasAura(HECHIZO_ANTI_INVISIBLES)) player->RemoveAurasDueToSpell(HECHIZO_ANTI_INVISIBLES);
             if (player->HasAura(HECHIZO_ANTI_SANADORES)) player->RemoveAurasDueToSpell(HECHIZO_ANTI_SANADORES);
+            if (player->HasAura(HECHIZO_RASTRILLO_LENTO)) player->RemoveAurasDueToSpell(HECHIZO_RASTRILLO_LENTO);
+            if (player->HasAura(HECHIZO_DESGARRO_ASESINO)) player->RemoveAurasDueToSpell(HECHIZO_DESGARRO_ASESINO);
+            if (player->HasAura(HECHIZO_ACIDO_ZONA)) player->RemoveAurasDueToSpell(HECHIZO_ACIDO_ZONA);
         }
         if(!logout)
         {
@@ -446,35 +450,19 @@ void BattleRoyaleMgr::EfectoFueraDeZona()
                 {
                     list_Datos[it->first].dmg_tick++;
                     uint32 damage = it->second->GetMaxHealth() * (2 * sqrt(list_Datos[it->first].dmg_tick) + indiceDeZona) / 100;
-                    bool directDamage = false;
-                    if (list_Datos[it->first].dmg_tick < 10 || list_Datos[it->first].dmg_tick >= 30)
+                    if (list_Datos[it->first].dmg_tick <= 15)
                     {
                         if (!sBRObjetosMgr->HechizoGuardian(HECHIZO_RAYO_DRAGON, it->second))
                         {
-                            directDamage = true;
+                            it->second->AddAura(HECHIZO_ACIDO_ZONA, it->second);
                         }
                     }
-                    if (list_Datos[it->first].dmg_tick >= 10)
+                    else
                     {
                         if (!sBRObjetosMgr->HechizoGuardian(HECHIZO_RAYO_DRAGON_FUERTE, it->second))
                         {
-                            directDamage = true;
+                            it->second->AddAura(HECHIZO_ACIDO_ZONA, it->second);
                         }
-                    }
-                    if (list_Datos[it->first].dmg_tick >= 45)
-                    {
-                        if (!sBRObjetosMgr->HechizoGuardian(HECHIZO_RAYO_DRAGON, it->second))
-                        {
-                            directDamage = true;
-                        }
-                        if (!sBRObjetosMgr->HechizoGuardian(HECHIZO_RAYO_DRAGON_FUERTE, it->second))
-                        {
-                            directDamage = true;
-                        }
-                    }
-                    if (directDamage)
-                    {
-                        Unit::DealDamage(it->second, it->second, damage, nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false, true);
                     }
                     it->second->GetSession()->SendNotification("|cffff0000¡Estás fuera de la zona segura, el guardián te ataca!");
                 }

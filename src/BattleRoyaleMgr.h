@@ -140,7 +140,6 @@ private:
                         {
                             case 1:
                             case 2:
-                            case 3:
                             {
                                 if (it->second->CastSpell(it->second, HECHIZO_ANTI_INVISIBLES, true) != SPELL_CAST_OK)
                                 {
@@ -148,30 +147,32 @@ private:
                                 }
                                 break;
                             }
+                            case 3:
                             case 4:
-                            case 5:
                             {
                                 it->second->AddAura(HECHIZO_ANTI_SANADORES, it->second);
                                 break;
                             }
+                            case 5:
                             case 6:
                             {
-                                if (!sBRObjetosMgr->HechizoGuardian(HECHIZO_RAYO_DRAGON, it->second))
-                                {
-                                    if (it->second->CastSpell(it->second, HECHIZO_ANTI_INVISIBLES, true) != SPELL_CAST_OK)
-                                    {
-                                        it->second->AddAura(HECHIZO_ANTI_INVISIBLES, it->second);
-                                    }
-                                }
+                                it->second->AddAura(HECHIZO_RASTRILLO_LENTO, it->second);
                                 break;
                             }
                             case 7:
+                            {
+                                if (!sBRObjetosMgr->HechizoGuardian(HECHIZO_RAYO_DRAGON, it->second))
+                                {
+                                    it->second->AddAura(HECHIZO_DESGARRO_ASESINO, it->second);
+                                }
+                                break;
+                            }
                             case 8:
                             case 9:
                             {
                                 if (!sBRObjetosMgr->HechizoGuardian(HECHIZO_RAYO_DRAGON_FUERTE, it->second))
                                 {
-                                    it->second->AddAura(HECHIZO_ANTI_SANADORES, it->second);
+                                    it->second->AddAura(HECHIZO_RASTRILLO_LENTO, it->second);                                    
                                 }
                                 break;
                             }
