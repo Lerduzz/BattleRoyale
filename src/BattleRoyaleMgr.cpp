@@ -449,7 +449,6 @@ void BattleRoyaleMgr::EfectoFueraDeZona()
                 if (!sBRObjetosMgr->EstaLaZonaActiva() || (indiceDeZona > 0 && distance > BR_EscalasDeZonaSegura[indiceDeZona - 1] * 66.0f))
                 {
                     list_Datos[it->first].dmg_tick++;
-                    uint32 damage = it->second->GetMaxHealth() * (2 * sqrt(list_Datos[it->first].dmg_tick) + indiceDeZona) / 100;
                     if (list_Datos[it->first].dmg_tick <= 15)
                     {
                         if (!sBRObjetosMgr->HechizoGuardian(HECHIZO_RAYO_DRAGON, it->second))
