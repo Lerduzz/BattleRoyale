@@ -410,6 +410,9 @@ void BattleRoyaleMgr::SalirDelEvento(uint32 guid, bool logout /* = false*/)
             if (player->HasAura(HECHIZO_ALAS_MAGICAS)) player->RemoveAurasDueToSpell(HECHIZO_ALAS_MAGICAS);
             if (player->HasAura(HECHIZO_ANTI_INVISIBLES)) player->RemoveAurasDueToSpell(HECHIZO_ANTI_INVISIBLES);
             if (player->HasAura(HECHIZO_ANTI_SANADORES)) player->RemoveAurasDueToSpell(HECHIZO_ANTI_SANADORES);
+            if (player->HasAura(HECHIZO_RASTRILLO_LENTO)) player->RemoveAurasDueToSpell(HECHIZO_RASTRILLO_LENTO);
+            if (player->HasAura(HECHIZO_DESGARRO_ASESINO)) player->RemoveAurasDueToSpell(HECHIZO_DESGARRO_ASESINO);
+            if (player->HasAura(HECHIZO_ACIDO_ZONA)) player->RemoveAurasDueToSpell(HECHIZO_ACIDO_ZONA);
         }
         if(!logout)
         {
