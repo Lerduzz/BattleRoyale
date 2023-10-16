@@ -16,8 +16,9 @@ public:
     float GetZ();
     float GetO();
     int dmg_tick;
-    int kills;
+    uint32 kills;
     uint32 spect;
+    uint32 reward;
 
 private:
     int start_map;

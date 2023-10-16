@@ -1,28 +1,82 @@
 [worldserver]
 
-####################################################
-# Module control
-# Default: 1 (Enabled)
-#          0 (Disabled)
-BattleRoyale.Enabled = 1
+#############################################################################
+# Control del modo
+# Defecto: 1 (Activado)
+#          0 (Desactivado)
+BattleRoyale.Activado = 1
 
-####################################################
-# Announce module when player login 
-# Default: 1 (Enabled)
-#          0 (Disabled)
-BattleRoyale.Announce = 1
+#############################################################################
+# Anunciar al jugador cuando se conecta
+# Defecto: 1 (Si)
+#          0 (No)
+BattleRoyale.Anunciar = 1
 
-####################################################
-# Minimun players needed to start
-# Default: 25 (Must be >= 10)
-BattleRoyale.MinPlayers = 25
+#############################################################################
+# Mínimo de jugadores para iniciar ronda automáticamente
+# Defecto: 25 (Consejo: Se recomienda 10 o más)
+BattleRoyale.MinJugadores = 25
 
-####################################################
-# Max players
-# Default: 50 (Must be >= 10)
-BattleRoyale.MaxPlayers = 50
+#############################################################################
+# Máximo de jugadores que pueden participar en una ronda
+# Defecto: 50 (Consejo: Se recomienda 10 o más y mayor que el mínimo)
+BattleRoyale.MaxJugadores = 50
 
-####################################################
-# Secure zone reduce interval (ms)
-# Default: 60000 (Must be >= 10000 and <= 300000)
-BattleRoyale.SecureZoneInterval = 60000
+#############################################################################
+# Intervalos configurables para cada cosa (segundos)
+#
+# * SinJugadores: Tiempo para inicio forzado sin suficientes jugadores
+#       Defecto: 1800 (30 minutos) (Se avisará cuando falten 5 minutos)
+#
+# * NaveEnEspera: Tiempo antes que la nove comience a moverse
+#       Defecto: 30 segundos (Consejo: Se recomienda 20 o más)
+#       Nota: Al faltar 10 segundos se deja de invocar jugadores
+#
+# * ZonaSegura: Tiempo entre reducciones de zona (Son 10 zonas en total)
+#
+# * FinalDeRonda: Tiempo para espectar al ganador antes de salir
+#       Defecto: 10 segundos
+BattleRoyale.Intervalo.SinJugadores = 1800
+BattleRoyale.Intervalo.NaveEnEspera = 30 # TODO: Utilizar este valor.
+BattleRoyale.Intervalo.ZonaSegura = 60
+BattleRoyale.Intervalo.FinalDeRonda = 10
+
+#############################################################################
+# Requisitos para premio mayor
+#
+# * AsesinatosTotales: Minimo de jugadores eliminados por cualquier jugador
+#       Defecto: 5 (0 = Desactivado)
+#
+# * AsesinatosPropios: Minimo de jugadores eliminados por el ganador
+#       Defecto: 1 (0 = Desactivado)
+BattleRoyale.Requisito.AsesinatosTotales = 5
+BattleRoyale.Requisito.AsesinatosPropios = 1
+
+#############################################################################
+# Recompensa acumulada
+#
+# * Base: Recompensa de participación
+#       Defecto: 400
+#
+# * Victoria: Cuando quedas en primer lugar
+#       Defecto: 600
+#
+# * AlAsesinar: Cuando eliminas a otro jugador
+#       Defecto: 350
+#
+# * AlSerEAsesinado: Cuando otro jugador te elimina
+#       Defecto: 200
+#
+# * AlMorir: Cuando mueres por tu cuenta
+#       Defecto: 100
+#
+# * ZonaReducida: En cada reducción de zona
+#       Defecto: 150
+#
+# Nota: Se dará honor igual a esta cantidad (Y emblemas como 0.5%).
+BattleRoyale.Recompensa.Base = 400
+BattleRoyale.Recompensa.Victoria = 600
+BattleRoyale.Recompensa.AlAsesinar = 350
+BattleRoyale.Recompensa.AlSerEAsesinado = 200
+BattleRoyale.Recompensa.AlMorir = 100
+BattleRoyale.Recompensa.ZonaReducida = 150

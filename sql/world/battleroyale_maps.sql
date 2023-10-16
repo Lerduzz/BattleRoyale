@@ -29,15 +29,17 @@ PRIMARY KEY (`id`));
 -- Lista de mapas medidos para el evento --
 INSERT INTO `battleroyale_maps`(`id`,`map_id`,`map_name`,`center_x`,`center_y`,`center_z`,`center_o`,`ship_x`,`ship_y`,`ship_z`,`ship_o`) VALUES
 (1,1,'Kalimdor: Hyjal',5261.58,-2164.18,1259.48,0,2967.58,-2164.18,1556.48,-1.5708),
-(2,0,'Reinos del Este: Isla Jaguero',-14614.6,-313.26,0,0,-12320.6,-313.26,297,1.5708),
-(3,1,'Kalimdor: Las Charcas del Olvido',157.99,-1948.09,87.38,0,-2137.99,-1948.09,394.38,-1.5708),
-(4,1,'Kalimdor: Ruinas de Solarsal',-4695.31,3411.21,7.05,0,-2401.31,3411.21,304.05,1.5708),
-(5,0,'Reinos del Este: Campos de Trabalomas',-535.41,-46.31,30.01,0,-2829.41,-46.31,320.01,-1.5708),
-(6,530,'Terrallende: Puesto Primasol',-1695.52,8498.84,-23.07,0,-1695.52,6204.84,274.07,0),
-(7,530,'Terrallende: Telredor',273.93,5925.29,18.28,0,273.93,8219.29,315.28,3.14159),
-(8,571,'Rasganorte: Santuario de Dragones Rubí',3879.86,961.35,55.38,0,3879.86,-1333.35,352.38,0),
-(9,571,'Rasganorte: Puerto del Embate',7691.04,4857.42,0,0,5397.04,4857.42,297,-1.5708),
-(10,571,'Rasganorte: Pista del Lago',5472.51,4757.34,-199.05,0,5472.51,7051.34,98.05,3.14159);
+(2,0,'Vega de Tuercespina: Isla Jaguero',-14614.6,-313.26,0,0,-12320.6,-313.26,297,1.5708),
+(3,1,'Los Baldíos: Las Charcas del Olvido',157.99,-1948.09,87.38,0,-2137.99,-1948.09,394.38,-1.5708),
+(4,1,'Feralas: Ruinas de Solarsal',-4695.31,3411.21,7.05,0,-2401.31,3411.21,304.05,1.5708),
+(5,0,'Laderas de Trabalomas: Campos',-535.41,-46.31,30.01,0,-2829.41,-46.31,320.01,-1.5708),
+(6,530,'Nagrand: Puesto Primasol',-1695.52,8498.84,-23.07,0,-1695.52,6204.84,274.07,0),
+(7,530,'Marisma de Zangar: Telredor',273.93,5925.29,18.28,0,273.93,8219.29,315.28,3.14159),
+(8,571,'Cementerio de Dragones: Santuario Rubí',3879.86,961.35,55.38,0,3879.86,-1333.35,352.38,0),
+(9,571,'Corona de Hielo: Puerto del Embate',7691.04,4857.42,0,0,5397.04,4857.42,297,-1.5708),
+(10,571,'Cuenca de Sholazar: Pista del Lago',5472.51,4757.34,-199.05,0,5472.51,7051.34,98.05,3.14159),
+(11,571,'Tundra Boreal: Estación de Bombeo',4008.74,4851.63,-13.01,0,1714.74,4851.63,284.01,-1.5708),
+(12,530,'Valle Sombraluna: La Forja Muerta',-3376.17,1971.08,18.01,0,-1082.17,1971.08,315.01,1.5708);
 
 -- Lista de puntos de aparicion de cofres para los mapas --
 INSERT INTO `battleroyale_maps_spawns`(`zone`,`map`,`pos_x`,`pos_y`,`pos_z`,`pos_o`) VALUES

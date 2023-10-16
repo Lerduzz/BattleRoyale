@@ -2,10 +2,13 @@
 #define SC_BR_MGR_H
 
 #include "BRConstantes.h"
+#include "BREquipamientoMgr.h"
 #include "BRChatMgr.h"
 #include "BRListaNegraMgr.h"
+#include "BRMapasMgr.h"
 #include "BRMisionesMgr.h"
 #include "BRObjetosMgr.h"
+#include "BRRecompensaMgr.h"
 #include "BRSonidosMgr.h"
 #include "BRTitulosMgr.h"
 #include "BattleRoyaleData.h"
@@ -29,7 +32,7 @@ public:
         static BattleRoyaleMgr *instance = new BattleRoyaleMgr();
         return instance;
     }
-    
+
     void GestionarJugadorEntrando(Player* player);
     void GestionarJugadorDesconectar(Player* player);
     void GestionarMuerteJcJ(Player* killer, Player* killed);
@@ -39,18 +42,21 @@ public:
     bool DebeRestringirFunciones(Player* player) { return estadoActual > ESTADO_NO_HAY_SUFICIENTES_JUGADORES && HayJugadores() && EstaEnEvento(player); };
     bool EstaEnCola(Player* player) { return EstaEnCola(player->GetGUID().GetCounter()); };
     bool EstaEnEvento(Player* player) { return EstaEnEvento(player->GetGUID().GetCounter()); };
-    bool DebeForzarJcJTcT(Player* player) 
+    bool DebeForzarJcJTcT(Player* player)
     {
         if (!player) return false;
         if (estadoActual != ESTADO_BATALLA_EN_CURSO || !HayJugadores() || !EstaEnEvento(player)) return false;
         return !sBRObjetosMgr->EstaEnLaNave(player);
     };
-    void QuitarAlas(Player* player) { player->DestroyItemCount(INVENTARIO_CAMISA_ALAS, 9999, true); };
-    BR_ContenedorMapas ObtenerMapas() { return list_Mapas; };
-    void EstablecerMapa(uint32 id)
+    BR_EstadosEvento EstadoActual() { return estadoActual; };
+    bool ForzarIniciarNuevaRonda()
     {
-        BR_ContenedorMapas::iterator tmp = list_Mapas.find(id);
-        if (tmp != list_Mapas.end()) mapaActual = tmp;
+        if (HayCola())
+        {
+            IniciarNuevaRonda();
+            return true;
+        }
+        return false;
     };
 
 private:
@@ -70,35 +76,20 @@ private:
     bool EstaEnCola(uint32 guid) { return list_Cola.find(guid) != list_Cola.end(); };
     bool EstaEnEvento(uint32 guid) { return list_Jugadores.find(guid) != list_Jugadores.end(); };
     bool EstaEnListaDeAlas(Player* player) { return EstaEnListaDeAlas(player->GetGUID().GetCounter()); };
-    bool EstaEnListaDeAlas(uint32 guid) { return EstaEnListaDarAlas(guid) || EstaEnListaQuitarAlas(guid); };
-    bool EstaEnListaDarAlas(uint32 guid) { return list_DarAlas.find(guid) != list_DarAlas.end(); };
-    bool EstaEnListaQuitarAlas(uint32 guid) { return list_QuitarAlas.find(guid) != list_QuitarAlas.end(); };
+    bool EstaEnListaDeAlas(uint32 guid) { return EstaEnListaDarObjetosIniciales(guid) || EstaEnListaQuitarTodosLosObjetos(guid); };
+    bool EstaEnListaDarObjetosIniciales(uint32 guid) { return list_DarObjetosIniciales.find(guid) != list_DarObjetosIniciales.end(); };
+    bool EstaEnListaQuitarTodosLosObjetos(uint32 guid) { return list_QuitarTodosLosObjetos.find(guid) != list_QuitarTodosLosObjetos.end(); };
     bool EstaLlenoElEvento() { return list_Jugadores.size() >= conf_JugadoresMaximo; };
     bool EstaEspectando(Player* player)
-    { 
+    {
         return HayJugadores() && EstaEnEvento(player) && list_Datos[player->GetGUID().GetCounter()].spect 
             && EstaEnEvento(list_Datos[player->GetGUID().GetCounter()].spect) && list_Jugadores[list_Datos[player->GetGUID().GetCounter()].spect]->IsAlive();
     };
     bool HaySuficientesEnCola() { return list_Cola.size() >= conf_JugadoresMinimo; };
     void SiguientePosicion() { if (++indiceDeVariacion >= CANTIDAD_DE_VARIACIONES) indiceDeVariacion = 0; };
-    void SiguienteMapa()
-    {
-        int num = list_Mapas.size();
-        if (num <= 1)
-        {
-            mapaActual = list_Mapas.begin();
-        }
-        else
-        {
-            int rnd = rand() % num;
-            mapaActual = list_Mapas.begin();
-            int temp = 0;
-            while (++temp <= rnd) mapaActual++;
-        }
-    };
     void DejarGrupo(Player* player)
-    { 
-        player->RemoveFromGroup(); 
+    {
+        player->RemoveFromGroup();
         player->UninviteFromGroup();
     };
     void Desmontar(Player* player)
@@ -117,17 +108,20 @@ private:
     void AlReducirseLaZona()
     {
         int chestCount = 0;
-        if (indiceDeZona < CANTIDAD_DE_ZONAS && mapaActual->second->ubicacionesMapa.find(indiceDeZona) != mapaActual->second->ubicacionesMapa.end())
+        if (indiceDeZona < CANTIDAD_DE_ZONAS && sBRMapasMgr->TieneZonasParaCofres(indiceDeZona))
         {
-            BR_UbicacionZona temp = mapaActual->second->ubicacionesMapa[indiceDeZona];
-            for (BR_UbicacionZona::iterator it = temp.begin(); it != temp.end(); ++it)
+            BR_UbicacionZona temp = sBRMapasMgr->ObtenerZonasParaCofres(indiceDeZona);
+            if (temp.size())
             {
-                int rnd = rand() % 100 + 1;
-                if (rnd <= 35)
+                for (BR_UbicacionZona::iterator it = temp.begin(); it != temp.end(); ++it)
                 {
-                    if (sBRObjetosMgr->InvocarCofre(it->second))
+                    int rnd = rand() % 100 + 1;
+                    if (rnd <= 35)
                     {
-                        chestCount++;
+                        if (sBRObjetosMgr->InvocarCofre(it->second))
+                        {
+                            chestCount++;
+                        }
                     }
                 }
             }
@@ -137,13 +131,60 @@ private:
             if (estadoActual == ESTADO_BATALLA_EN_CURSO)
             {
                 int vivos = 0;
+                int rndEfecto = rand() % 10 + 1;
                 for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
                 {
                     if (it->second && it->second->IsAlive())
                     {
-                        it->second->AddAura(HECHIZO_ANTI_INVISIBLES, it->second);
-                        it->second->AddAura(HECHIZO_ANTI_SANADORES, it->second);
-                        // TODO: Analizar si esto es factible: it->second->AddAura(HECHIZO_LENGUAJE_BINARIO, it->second);
+                        switch (rndEfecto)
+                        {
+                            case 1:
+                            case 2:
+                            {
+                                if (it->second->CastSpell(it->second, HECHIZO_ANTI_INVISIBLES, true) != SPELL_CAST_OK)
+                                {
+                                    it->second->AddAura(HECHIZO_ANTI_INVISIBLES, it->second);
+                                }
+                                break;
+                            }
+                            case 3:
+                            case 4:
+                            {
+                                it->second->AddAura(HECHIZO_ANTI_SANADORES, it->second);
+                                break;
+                            }
+                            case 5:
+                            case 6:
+                            {
+                                it->second->AddAura(HECHIZO_RASTRILLO_LENTO, it->second);
+                                break;
+                            }
+                            case 7:
+                            {
+                                if (!sBRObjetosMgr->HechizoGuardian(HECHIZO_RAYO_DRAGON, it->second))
+                                {
+                                    it->second->AddAura(HECHIZO_DESGARRO_ASESINO, it->second);
+                                }
+                                break;
+                            }
+                            case 8:
+                            case 9:
+                            {
+                                if (!sBRObjetosMgr->HechizoGuardian(HECHIZO_RAYO_DRAGON_FUERTE, it->second))
+                                {
+                                    it->second->AddAura(HECHIZO_RASTRILLO_LENTO, it->second);                                    
+                                }
+                                break;
+                            }
+                            default:
+                            {
+                                if (it->second->CastSpell(it->second, HECHIZO_BENEFICIO_LIEBRE, true) != SPELL_CAST_OK)
+                                {
+                                    it->second->AddAura(HECHIZO_BENEFICIO_LIEBRE, it->second);
+                                }
+                                break;
+                            }
+                        }
                         vivos++;
                     }
                 }
@@ -156,12 +197,25 @@ private:
     {
         if (HayJugadores())
         {
+            Player* vivo = nullptr;
             for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
             {
                 if (it->second && it->second->IsAlive())
                 {
-                    TodosLosMuertosEspectarme(it->second);
+                    if (!vivo)
+                    {
+                        vivo = it->second;
+                    }
+                    if (EstaEspectando(it->second))
+                    {
+                        it->second->StopCastingBindSight();
+                        list_Datos[it->second->GetGUID().GetCounter()].spect = 0;
+                    }
                 }
+            }
+            if (vivo && vivo->IsAlive())
+            {
+                TodosLosMuertosEspectarme(vivo);
             }
         }
     };
@@ -204,34 +258,12 @@ private:
             player->CastSpell(target, 6277, true);
         }
     };
-    void DarAlas(Player* player)
+    void DarObjetosInicialesProgramado()
     {
-        QuitarAlas(player);
-        ItemPosCountVec dest;
-        InventoryResult msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, INVENTARIO_CAMISA_ALAS, 1);
-        if (msg == EQUIP_ERR_OK)
+        if (list_DarObjetosIniciales.size())
         {
-            if (Item* item = player->StoreNewItem(dest, INVENTARIO_CAMISA_ALAS, true))
-            {
-                player->SendNewItem(item, 1, true, false);
-                sBRChatMgr->AnunciarMensajeBienvenida(player);
-            }
-            else
-            {
-                sBRChatMgr->AnunciarErrorAlas(player);
-            }
-        }
-        else
-        {
-            sBRChatMgr->AnunciarErrorAlas(player, true);
-        }
-    };
-    void DarAlasProgramado()
-    {
-        if (list_DarAlas.size())
-        {
-            BR_ListaDePersonajes::iterator it = list_DarAlas.begin();
-            while (it != list_DarAlas.end())
+            BR_ListaDePersonajes::iterator it = list_DarObjetosIniciales.begin();
+            while (it != list_DarObjetosIniciales.end())
             {
                 if (it->second && it->second->IsAlive())
                 {
@@ -240,9 +272,17 @@ private:
                         uint32 guid = it->first;
                         Player* player = it->second;
                         ++it;
-                        DarAlas(player);
+                        sBREquipamientoMgr->Desnudar(player);
+                        if (sBREquipamientoMgr->DarObjetosIniciales(player))
+                        {
+                            sBRChatMgr->AnunciarMensajeBienvenida(player);
+                        }
+                        else
+                        {
+                            sBRChatMgr->AnunciarErrorAlas(player);
+                        }
                         player->GetMotionMaster()->MoveFall();
-                        list_DarAlas.erase(guid);
+                        list_DarObjetosIniciales.erase(guid);
                     }
                     else
                     {
@@ -255,13 +295,13 @@ private:
                 }
             }
         }
-    }
-    void QuitarAlasProgramado()
+    };
+    void QuitarTodosLosObjetosProgramado()
     {
-        if (list_QuitarAlas.size())
+        if (list_QuitarTodosLosObjetos.size())
         {
-            BR_ListaDePersonajes::iterator it = list_QuitarAlas.begin();
-            while (it != list_QuitarAlas.end())
+            BR_ListaDePersonajes::iterator it = list_QuitarTodosLosObjetos.begin();
+            while (it != list_QuitarTodosLosObjetos.end())
             {
                 if (it->second && it->second->IsAlive())
                 {
@@ -270,8 +310,8 @@ private:
                         uint32 guid = it->first;
                         Player* player = it->second;
                         ++it;
-                        QuitarAlas(player);
-                        list_QuitarAlas.erase(guid);
+                        sBREquipamientoMgr->QuitarTodosLosObjetos(player);
+                        list_QuitarTodosLosObjetos.erase(guid);
                     }
                     else
                     {
@@ -284,34 +324,51 @@ private:
                 }
             }
         }
-    }
+    };
+    void TODO_MejorarAnuncioEnNave()
+    {
+        if (tiempoRestanteInicio % 5 == 0) {
+            if (tiempoRestanteInicio == 45)
+            {
+                sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_NAVE_EN_MOVIMIENTO, list_Jugadores);
+            }
+            sBRChatMgr->NotificarTiempoInicial(tiempoRestanteInicio, list_Jugadores);
+        }
+    };
 
     BR_ListaDePersonajes list_Cola;
 
     BR_ListaDePersonajes list_Jugadores;
     BR_DatosDePersonajes list_Datos;
 
-    BR_ListaDePersonajes list_DarAlas;
-    BR_ListaDePersonajes list_QuitarAlas;
+    BR_ListaDePersonajes list_DarObjetosIniciales;
+    BR_ListaDePersonajes list_QuitarTodosLosObjetos;
 
-    BR_ContenedorMapas list_Mapas;
-    BR_ContenedorMapas::iterator mapaActual;
+    BR_EstadosEvento estadoActual;
 
-    int estadoActual;
+    int tiempoRestanteSinJugadores;
     int tiempoRestanteInicio;
     int tiempoRestanteZona;
     int tiempoRestanteNave;
     int tiempoRestanteFinal;
-    int indiceDeVariacion;
 
+    int indiceDeVariacion;
     int indiceDeZona;
+    uint32 totalAsesinatosJcJ;
+
     int indicadorDeSegundos;
+    bool seHaAnunciadoInicioForzado;
     bool estaZonaAnunciada5s;
     bool estaZonaAnunciada10s;
 
     uint32 conf_JugadoresMinimo;
     uint32 conf_JugadoresMaximo;
-    uint32 conf_IntervaloDeZona;
+    uint32 conf_IntervaloSinJugadores;
+    uint32 conf_IntervaloZonaSegura;
+    uint32 conf_IntervaloFinalDeRonda;
+    uint32 conf_RequisitoAsesinatosTotales;
+    uint32 conf_RequisitoAsesinatosPropios;
+    BRConf_Recompensa conf_Recompensa;
 
 };
 

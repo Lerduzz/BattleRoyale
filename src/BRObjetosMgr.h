@@ -1,9 +1,9 @@
 #ifndef SC_BR_OBJ_MGR_H
 #define SC_BR_OBJ_MGR_H
 
+#include "BRConstantes.h"
 #include "GameObject.h"
 #include "MapMgr.h"
-#include "Player.h"
 #include "Transport.h"
 
 enum BR_Dimensiones
@@ -20,8 +20,11 @@ enum BR_ObjetosMundo
     OBJETO_ZONA_SEGURA_INICIAL              = 500001,
 };
 
-const int CANTIDAD_DE_ZONAS                 = 10;
-const float BR_EscalasDeZonaSegura[CANTIDAD_DE_ZONAS] = { 5.0f, 4.5f, 4.0f, 3.5f, 3.0f, 2.5f, 2.0f, 1.5f, 1.0f, 0.5f };
+enum BR_Criaturas
+{
+    CRIATURA_VENDEDOR_ARMAS                 = 200001,
+    CRIATURA_DRAGON_GUARDIAN                = 199999,
+};
 
 class BRObjetosMgr
 {
@@ -30,6 +33,8 @@ class BRObjetosMgr
         obj_Zona = nullptr;
         obj_Centro = nullptr;
         obj_Nave = nullptr;
+        npc_Vendedor = nullptr;
+        npc_Guardian = nullptr;
         zonaActiva = false;    
     };
     ~BRObjetosMgr(){};
@@ -46,7 +51,8 @@ public:
         DesaparecerZona();
         DesaparecerCentro();
         DesaparecerNave();
-    };
+    }
+
     bool DesaparecerZona()
     {
         if (HayZona()) {
@@ -56,9 +62,16 @@ public:
             return true;
         }
         return false;
-    };
+    }
+
     bool DesaparecerCentro()
     {
+        if (HayGuardian())
+        {
+            npc_Guardian->CleanupsBeforeDelete();
+            delete npc_Guardian;
+            npc_Guardian = nullptr;
+        }
         if (HayCentro()) {
             obj_Centro->CleanupsBeforeDelete();
             delete obj_Centro;
@@ -66,9 +79,16 @@ public:
             return true;
         }
         return false;
-    };
+    }
+
     bool DesaparecerNave()
     {
+        if (npc_Vendedor)
+        {
+            npc_Vendedor->CleanupsBeforeDelete();
+            delete npc_Vendedor;
+            npc_Vendedor = nullptr;
+        }
         if (HayNave()) {
             if(Transport* tp = obj_Nave->ToTransport())
             {
@@ -83,8 +103,8 @@ public:
             return true;
         }
         return false;
-    };
-    
+    }
+
     bool InvocarNave(uint32 mapID, Position pos)
     {
         Map* map = sMapMgr->FindBaseNonInstanceMap(mapID);
@@ -103,6 +123,23 @@ public:
             {
                 obj_Nave->SetVisibilityDistanceOverride(VisibilityDistanceType::Infinite);
                 map->AddToMap(obj_Nave);
+                if (Transport* transport = obj_Nave->ToTransport())
+                {
+                    float vX = 0.0f;
+                    float vY = 23.5f;
+                    float vZ = 0.0f;
+                    float vO = - M_PI_2;
+                    transport->CalculatePassengerPosition(*(&vX), *(&vY), *(&vZ), &vO);
+                    if ((npc_Vendedor = transport->SummonCreature(CRIATURA_VENDEDOR_ARMAS, vX, vY, vZ, vO, TEMPSUMMON_MANUAL_DESPAWN)))
+                    {
+                        transport->AddPassenger(npc_Vendedor, true);
+                    }
+                    else
+                    {
+                        delete npc_Vendedor;
+                        npc_Vendedor = nullptr;
+                    }
+                }
                 return true;
             }
             else
@@ -112,7 +149,8 @@ public:
             }
         }
         return false;
-    };
+    }
+
     bool EncenderNave()
     {
         if (HayNave())
@@ -123,7 +161,8 @@ public:
             return true;
         }
         return false;
-    };
+    }
+
     bool EstaEnLaNave(Player* player)
     {
         if (player && HayNave())
@@ -137,7 +176,8 @@ public:
             }
         }
         return false;
-    };
+    }
+
     bool InvocarCentroDelMapa(uint32 mapID, Position pos)
     {
         Map* map = sMapMgr->FindBaseNonInstanceMap(mapID);
@@ -154,6 +194,11 @@ public:
             {
                 obj_Centro->SetVisibilityDistanceOverride(VisibilityDistanceType::Infinite);
                 map->AddToMap(obj_Centro);
+                if (!(npc_Guardian = obj_Centro->SummonCreature(CRIATURA_DRAGON_GUARDIAN, x, y, z + 330.0f, o, TEMPSUMMON_MANUAL_DESPAWN)))
+                {
+                    delete npc_Guardian;
+                    npc_Guardian = nullptr;
+                }
                 return true;
             }
             else
@@ -163,7 +208,8 @@ public:
             }
         }
         return false;
-    };
+    }
+
     bool InvocarCofre(Position pos)
     {
         if (HayCentro())
@@ -174,7 +220,8 @@ public:
             }
         }
         return false;
-    };
+    }
+
     bool InvocarZonaSegura(uint32 mapID, Position pos, int& index)
     {
         Map* map = sMapMgr->FindBaseNonInstanceMap(mapID);
@@ -210,7 +257,7 @@ public:
             }
         }
         return false;
-    };    
+    }
 
     float DistanciaDelCentro(Player* player) { return obj_Centro ? player->GetExactDist(obj_Centro): 0.0f; };
     bool EstaLaZonaActiva() { return zonaActiva; };
@@ -218,11 +265,24 @@ public:
     bool HayZona() { return obj_Zona ? true : false; };
     bool HayCentro() { return obj_Centro ? true : false; };
     bool HayNave() { return obj_Nave ? true : false; };
+    bool HayGuardian() { return npc_Guardian ? true : false; };
+
+    bool HechizoGuardian(uint32 spell, Player* player)
+    {
+        if (HayGuardian() && player && spell > 0)
+        {
+            return npc_Guardian->CastSpell(player, spell, true) == SPELL_CAST_OK;
+        }
+        return false;
+    }
 
 private:
     GameObject* obj_Zona;
     GameObject* obj_Centro;
     GameObject* obj_Nave;
+
+    Creature* npc_Vendedor;
+    Creature* npc_Guardian;
 
     bool zonaActiva;
 
