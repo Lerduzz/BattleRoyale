@@ -18,7 +18,7 @@
 #include "Chat.h"
 
 class BattleRoyaleData;
-typedef std::map<uint32, Player*> BR_ListaDePersonajes;
+typedef std::map<uint32, Player *> BR_ListaDePersonajes;
 typedef std::map<uint32, BattleRoyaleData> BR_DatosDePersonajes;
 
 class BattleRoyaleMgr
@@ -33,22 +33,41 @@ public:
         return instance;
     }
 
-    void GestionarJugadorEntrando(Player* player);
-    void GestionarJugadorDesconectar(Player* player);
-    void GestionarMuerteJcJ(Player* killer, Player* killed);
-    void GestionarActualizacionMundo(uint32 diff);
-    void PrevenirJcJEnLaNave(Player* player, bool state);
-    bool PuedeReaparecerEnCementerio(Player* player);
-    bool DebeRestringirFunciones(Player* player) { return estadoActual > ESTADO_NO_HAY_SUFICIENTES_JUGADORES && HayJugadores() && EstaEnEvento(player); };
-    bool EstaEnCola(Player* player) { return EstaEnCola(player->GetGUID().GetCounter()); };
-    bool EstaEnEvento(Player* player) { return EstaEnEvento(player->GetGUID().GetCounter()); };
-    bool DebeForzarJcJTcT(Player* player)
+    inline bool EstaActivado() { return conf_EstaActivado; };
+    inline void ActivarSistema() { conf_EstaActivado = true; };
+
+    void DesactivarSistema()
     {
-        if (!player) return false;
-        if (estadoActual != ESTADO_BATALLA_EN_CURSO || !HayJugadores() || !EstaEnEvento(player)) return false;
+        conf_EstaActivado = false;
+        while (HayJugadores())
+            SalirDelEvento(list_Jugadores.begin()->first);
+        while (HayCola())
+            SalirDelEvento(list_Cola.begin()->first);
+        RestablecerTodoElEvento();
+    }
+
+    void GestionarJugadorEntrando(Player *player);
+    void GestionarJugadorDesconectar(Player *player);
+    void GestionarMuerteJcJ(Player *killer, Player *killed);
+    void GestionarActualizacionMundo(uint32 diff);
+    void PrevenirJcJEnLaNave(Player *player, bool state);
+    bool PuedeReaparecerEnCementerio(Player *player);
+
+    inline bool DebeRestringirFunciones(Player *player) { return estadoActual > ESTADO_NO_HAY_SUFICIENTES_JUGADORES && HayJugadores() && EstaEnEvento(player); };
+    inline bool EstaEnCola(Player *player) { return EstaEnCola(player->GetGUID().GetCounter()); };
+    inline bool EstaEnEvento(Player *player) { return EstaEnEvento(player->GetGUID().GetCounter()); };
+
+    bool DebeForzarJcJTcT(Player *player)
+    {
+        if (!player)
+            return false;
+        if (estadoActual != ESTADO_BATALLA_EN_CURSO || !HayJugadores() || !EstaEnEvento(player))
+            return false;
         return !sBRObjetosMgr->EstaEnLaNave(player);
-    };
-    BR_EstadosEvento EstadoActual() { return estadoActual; };
+    }
+
+    inline BR_EstadosEvento EstadoActual() { return estadoActual; };
+
     bool ForzarIniciarNuevaRonda()
     {
         if (HayCola())
@@ -57,7 +76,7 @@ public:
             return true;
         }
         return false;
-    };
+    }
 
 private:
     void RestablecerTodoElEvento();
@@ -70,29 +89,40 @@ private:
     void ActivarJcJTcT();
     void ControlDeReglas();
     bool CondicionDeVictoria();
-    void FinalizarRonda(bool announce, Player* winner = nullptr);
-    bool HayJugadores() { return !list_Jugadores.empty(); };
-    bool HayCola() { return !list_Cola.empty(); };
-    bool EstaEnCola(uint32 guid) { return list_Cola.find(guid) != list_Cola.end(); };
-    bool EstaEnEvento(uint32 guid) { return list_Jugadores.find(guid) != list_Jugadores.end(); };
-    bool EstaEnListaDeAlas(Player* player) { return EstaEnListaDeAlas(player->GetGUID().GetCounter()); };
-    bool EstaEnListaDeAlas(uint32 guid) { return EstaEnListaDarObjetosIniciales(guid) || EstaEnListaQuitarTodosLosObjetos(guid); };
-    bool EstaEnListaDarObjetosIniciales(uint32 guid) { return list_DarObjetosIniciales.find(guid) != list_DarObjetosIniciales.end(); };
-    bool EstaEnListaQuitarTodosLosObjetos(uint32 guid) { return list_QuitarTodosLosObjetos.find(guid) != list_QuitarTodosLosObjetos.end(); };
-    bool EstaLlenoElEvento() { return list_Jugadores.size() >= conf_JugadoresMaximo; };
-    bool EstaEspectando(Player* player)
+    void FinalizarRonda(bool announce, Player *winner = nullptr);
+
+    inline bool HayJugadores() { return !list_Jugadores.empty(); };
+    inline bool HayCola() { return !list_Cola.empty(); };
+    inline bool EstaEnCola(uint32 guid) { return list_Cola.find(guid) != list_Cola.end(); };
+    inline bool EstaEnEvento(uint32 guid) { return list_Jugadores.find(guid) != list_Jugadores.end(); };
+    inline bool EstaEnListaDeAlas(Player *player) { return EstaEnListaDeAlas(player->GetGUID().GetCounter()); };
+    inline bool EstaEnListaDeAlas(uint32 guid) { return EstaEnListaDarObjetosIniciales(guid) || EstaEnListaQuitarTodosLosObjetos(guid); };
+    inline bool EstaEnListaDarObjetosIniciales(uint32 guid) { return list_DarObjetosIniciales.find(guid) != list_DarObjetosIniciales.end(); };
+    inline bool EstaEnListaQuitarTodosLosObjetos(uint32 guid) { return list_QuitarTodosLosObjetos.find(guid) != list_QuitarTodosLosObjetos.end(); };
+    inline bool EstaLlenoElEvento() { return list_Jugadores.size() >= conf_JugadoresMaximo; };
+
+    bool EstaEspectando(Player *player)
     {
-        return HayJugadores() && EstaEnEvento(player) && list_Datos[player->GetGUID().GetCounter()].spect 
-            && EstaEnEvento(list_Datos[player->GetGUID().GetCounter()].spect) && list_Jugadores[list_Datos[player->GetGUID().GetCounter()].spect]->IsAlive();
-    };
-    bool HaySuficientesEnCola() { return list_Cola.size() >= conf_JugadoresMinimo; };
-    void SiguientePosicion() { if (++indiceDeVariacion >= CANTIDAD_DE_VARIACIONES) indiceDeVariacion = 0; };
-    void DejarGrupo(Player* player)
+        return HayJugadores() && EstaEnEvento(player) && list_Datos[player->GetGUID().GetCounter()].spect && EstaEnEvento(list_Datos[player->GetGUID().GetCounter()].spect) && list_Jugadores[list_Datos[player->GetGUID().GetCounter()].spect]->IsAlive();
+    }
+
+    inline bool HaySuficientesEnCola() { return list_Cola.size() >= conf_JugadoresMinimo; };
+
+    void SiguientePosicion()
+    {
+        if (++indiceDeVariacion >= CANTIDAD_DE_VARIACIONES)
+        {
+            indiceDeVariacion = 0;
+        }
+    }
+
+    void DejarGrupo(Player *player)
     {
         player->RemoveFromGroup();
         player->UninviteFromGroup();
-    };
-    void Desmontar(Player* player)
+    }
+
+    void Desmontar(Player *player)
     {
         if (player && player->IsAlive() && player->IsMounted())
         {
@@ -104,7 +134,8 @@ private:
                 player->SetSpeed(MOVE_FLIGHT, 1, true);
             }
         }
-    };
+    }
+
     void AlReducirseLaZona()
     {
         int chestCount = 0;
@@ -138,66 +169,68 @@ private:
                     {
                         switch (rndEfecto)
                         {
-                            case 1:
-                            case 2:
+                        case 1:
+                        case 2:
+                        {
+                            if (it->second->CastSpell(it->second, HECHIZO_ANTI_INVISIBLES, true) != SPELL_CAST_OK)
                             {
-                                if (it->second->CastSpell(it->second, HECHIZO_ANTI_INVISIBLES, true) != SPELL_CAST_OK)
-                                {
-                                    it->second->AddAura(HECHIZO_ANTI_INVISIBLES, it->second);
-                                }
-                                break;
+                                it->second->AddAura(HECHIZO_ANTI_INVISIBLES, it->second);
                             }
-                            case 3:
-                            case 4:
+                            break;
+                        }
+                        case 3:
+                        case 4:
+                        {
+                            it->second->AddAura(HECHIZO_ANTI_SANADORES, it->second);
+                            break;
+                        }
+                        case 5:
+                        case 6:
+                        {
+                            it->second->AddAura(HECHIZO_RASTRILLO_LENTO, it->second);
+                            break;
+                        }
+                        case 7:
+                        {
+                            if (!sBRObjetosMgr->HechizoGuardian(HECHIZO_RAYO_DRAGON, it->second))
                             {
-                                it->second->AddAura(HECHIZO_ANTI_SANADORES, it->second);
-                                break;
+                                it->second->AddAura(HECHIZO_DESGARRO_ASESINO, it->second);
                             }
-                            case 5:
-                            case 6:
+                            break;
+                        }
+                        case 8:
+                        case 9:
+                        {
+                            if (!sBRObjetosMgr->HechizoGuardian(HECHIZO_RAYO_DRAGON_FUERTE, it->second))
                             {
                                 it->second->AddAura(HECHIZO_RASTRILLO_LENTO, it->second);
-                                break;
                             }
-                            case 7:
+                            break;
+                        }
+                        default:
+                        {
+                            if (it->second->CastSpell(it->second, HECHIZO_BENEFICIO_LIEBRE, true) != SPELL_CAST_OK)
                             {
-                                if (!sBRObjetosMgr->HechizoGuardian(HECHIZO_RAYO_DRAGON, it->second))
-                                {
-                                    it->second->AddAura(HECHIZO_DESGARRO_ASESINO, it->second);
-                                }
-                                break;
+                                it->second->AddAura(HECHIZO_BENEFICIO_LIEBRE, it->second);
                             }
-                            case 8:
-                            case 9:
-                            {
-                                if (!sBRObjetosMgr->HechizoGuardian(HECHIZO_RAYO_DRAGON_FUERTE, it->second))
-                                {
-                                    it->second->AddAura(HECHIZO_RASTRILLO_LENTO, it->second);                                    
-                                }
-                                break;
-                            }
-                            default:
-                            {
-                                if (it->second->CastSpell(it->second, HECHIZO_BENEFICIO_LIEBRE, true) != SPELL_CAST_OK)
-                                {
-                                    it->second->AddAura(HECHIZO_BENEFICIO_LIEBRE, it->second);
-                                }
-                                break;
-                            }
+                            break;
+                        }
                         }
                         vivos++;
                     }
                 }
                 sBRChatMgr->AnunciarEfectoZona(list_Jugadores, vivos);
             }
-            if (chestCount) sBRChatMgr->AnunciarConteoCofres(chestCount, list_Jugadores);
+            if (chestCount)
+                sBRChatMgr->AnunciarConteoCofres(chestCount, list_Jugadores);
         }
-    };
+    }
+
     void VerificarEspectadores()
     {
         if (HayJugadores())
         {
-            Player* vivo = nullptr;
+            Player *vivo = nullptr;
             for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
             {
                 if (it->second && it->second->IsAlive())
@@ -218,7 +251,8 @@ private:
                 TodosLosMuertosEspectarme(vivo);
             }
         }
-    };
+    }
+
     void VerificarJugadoresEnNave()
     {
         if (HayJugadores())
@@ -238,26 +272,31 @@ private:
                 }
             }
         }
-        if (!HayJugadores()) FinalizarRonda(false);
-    };
-    void TodosLosMuertosEspectarme(Player* player)
+        if (!HayJugadores())
+            FinalizarRonda(false);
+    }
+
+    void TodosLosMuertosEspectarme(Player *player)
     {
         if (HayJugadores() && player && player->IsAlive() && !EstaEspectando(player))
         {
             for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
             {
-                if (it->second && it->second != player && !it->second->IsAlive() && !EstaEspectando(it->second)) EspectarJugador(it->second , player);
+                if (it->second && it->second != player && !it->second->IsAlive() && !EstaEspectando(it->second))
+                    EspectarJugador(it->second, player);
             }
         }
-    };
-    void EspectarJugador(Player* player, Player* target)
+    }
+
+    void EspectarJugador(Player *player, Player *target)
     {
         if (HayJugadores() && player && target && player != target && EstaEnEvento(player) && EstaEnEvento(target) && !player->IsAlive() && target->IsAlive() && !EstaEspectando(player) && player->GetExactDist(target) <= 666.0f)
         {
             list_Datos[player->GetGUID().GetCounter()].spect = target->GetGUID().GetCounter();
             player->CastSpell(target, 6277, true);
         }
-    };
+    }
+
     void DarObjetosInicialesProgramado()
     {
         if (list_DarObjetosIniciales.size())
@@ -270,7 +309,7 @@ private:
                     if (it->second->IsInWorld() && !it->second->IsBeingTeleported() && sBRObjetosMgr->EstaEnLaNave(it->second))
                     {
                         uint32 guid = it->first;
-                        Player* player = it->second;
+                        Player *player = it->second;
                         ++it;
                         sBREquipamientoMgr->Desnudar(player);
                         if (sBREquipamientoMgr->DarObjetosIniciales(player))
@@ -295,7 +334,8 @@ private:
                 }
             }
         }
-    };
+    }
+
     void QuitarTodosLosObjetosProgramado()
     {
         if (list_QuitarTodosLosObjetos.size())
@@ -308,7 +348,7 @@ private:
                     if (it->second->IsInWorld() && !it->second->IsBeingTeleported())
                     {
                         uint32 guid = it->first;
-                        Player* player = it->second;
+                        Player *player = it->second;
                         ++it;
                         sBREquipamientoMgr->QuitarTodosLosObjetos(player);
                         list_QuitarTodosLosObjetos.erase(guid);
@@ -324,17 +364,19 @@ private:
                 }
             }
         }
-    };
+    }
+
     void TODO_MejorarAnuncioEnNave()
     {
-        if (tiempoRestanteInicio % 5 == 0) {
+        if (tiempoRestanteInicio % 5 == 0)
+        {
             if (tiempoRestanteInicio == 45)
             {
                 sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_NAVE_EN_MOVIMIENTO, list_Jugadores);
             }
             sBRChatMgr->NotificarTiempoInicial(tiempoRestanteInicio, list_Jugadores);
         }
-    };
+    }
 
     BR_ListaDePersonajes list_Cola;
 
@@ -361,6 +403,7 @@ private:
     bool estaZonaAnunciada5s;
     bool estaZonaAnunciada10s;
 
+    bool conf_EstaActivado;
     uint32 conf_JugadoresMinimo;
     uint32 conf_JugadoresMaximo;
     uint32 conf_IntervaloSinJugadores;
@@ -369,7 +412,6 @@ private:
     uint32 conf_RequisitoAsesinatosTotales;
     uint32 conf_RequisitoAsesinatosPropios;
     BRConf_Recompensa conf_Recompensa;
-
 };
 
 #define sBattleRoyaleMgr BattleRoyaleMgr::instance()
