@@ -117,7 +117,7 @@ public:
             float o = pos.GetOrientation();
             float rot2 = std::sin(o / 2);
             float rot3 = cos(o / 2);
-            map->LoadGrid(x, y);
+            // map->LoadGrid(x, y);
             obj_Nave = new StaticTransport();
             if (obj_Nave->Create(map->GenerateLowGuid<HighGuid::GameObject>(), OBJETO_NAVE, map, DIMENSION_EVENTO, x, y, z, o, G3D::Quat(0, 0, rot2, rot3), 100, GO_STATE_READY))
             {
@@ -188,7 +188,7 @@ public:
             float y = pos.GetPositionY();
             float z = pos.GetPositionZ();
             float o = pos.GetOrientation();
-            map->LoadGrid(x, y);
+            // map->LoadGrid(x, y);
             obj_Centro = new GameObject();
             if (obj_Centro->Create(map->GenerateLowGuid<HighGuid::GameObject>(), OBJETO_CENTRO_DEL_MAPA, map, DIMENSION_EVENTO, x, y, z, o, G3D::Quat(), 100, GO_STATE_READY))
             {
@@ -234,7 +234,7 @@ public:
                 float y = pos.GetPositionY();
                 float z = pos.GetPositionZ() + BR_EscalasDeZonaSegura[index] * 66.0f;
                 float o = pos.GetOrientation();
-                map->LoadGrid(x, y);
+                // map->LoadGrid(x, y);
                 obj_Zona = new GameObject();
                 if (obj_Zona->Create(map->GenerateLowGuid<HighGuid::GameObject>(), OBJETO_ZONA_SEGURA_INICIAL + index, map, DIMENSION_EVENTO, x, y, z, o, G3D::Quat(), 100, GO_STATE_READY))
                 {
