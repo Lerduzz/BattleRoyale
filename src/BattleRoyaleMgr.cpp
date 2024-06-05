@@ -1,5 +1,53 @@
 #include "BattleRoyaleMgr.h"
+#include "Battlefield.h"
 #include "Config.h"
+
+class BattlefieldBR : public Battlefield
+{
+public:
+    BattlefieldBR() {}
+    ~BattlefieldBR() override {}
+    void OnBattleStart() override {}
+    void OnBattleEnd(bool endByTimer) override {}
+    void OnStartGrouping() override {}
+    void OnPlayerJoinWar(Player* player) override {}
+    void OnPlayerLeaveWar(Player* player) override {}
+    void OnPlayerLeaveZone(Player* player) override {}
+    void OnPlayerEnterZone(Player* player) override {}
+    bool Update(uint32 diff) override {
+        return Battlefield::Update(diff);
+    }
+    void OnCreatureCreate(Creature* creature) override {}
+    void OnCreatureRemove(Creature* creature) override {}
+    void OnGameObjectCreate(GameObject* go) override {}
+
+    bool SetupBattlefield() override
+    {
+        m_TypeId = 2;
+        m_BattleId = 2;
+        m_ZoneId = 297;
+        m_MapId = 0;
+        m_Map = sMapMgr->FindMap(m_MapId, 0);
+        m_TimeForAcceptInvite = 30;
+        RegisterZone(m_ZoneId);
+        return true;
+    }
+
+    void SendInitWorldStatesToAll() override {}
+    void FillInitialWorldStates(WorldPacket& data) override {}
+    void HandleKill(Player* killer, Unit* victim) override {}
+    void OnUnitDeath(Unit* unit) override {}
+
+    void ProcessEvent(WorldObject* obj, uint32 eventId) override {}
+
+    uint32 GetData(uint32 data) const override {
+        return Battlefield::GetData(data);
+    }
+
+    void InvitePlayer(Player* player) {
+        player->GetSession()->SendBfInvitePlayerToWar(m_BattleId, m_ZoneId, m_TimeForAcceptInvite);
+    }
+};
 
 BattleRoyaleMgr::BattleRoyaleMgr()
 {
@@ -31,80 +79,85 @@ BattleRoyaleMgr::~BattleRoyaleMgr()
 
 void BattleRoyaleMgr::GestionarJugadorEntrando(Player *player)
 {
-    if (!player)
-        return;
-    uint32 guid = player->GetGUID().GetCounter();
-    BR_Bloqueado *blr = sBRListaNegraMgr->EstaBloqueado(guid);
-    if (blr->estaBloqueado)
-    {
-        sBRChatMgr->AnunciarMensajeEntrada(player, MENSAJE_ERROR_BLOQUEADO, blr->motivo);
-        return;
-    }
-    if (player->isUsingLfg())
-    {
-        sBRChatMgr->AnunciarMensajeEntrada(player, MENSAJE_ERROR_MAZMORRA);
-        return;
-    }
-    if (player->InBattlegroundQueue())
-    {
-        sBRChatMgr->AnunciarMensajeEntrada(player, MENSAJE_ERROR_BG);
-        return;
-    }
-    if (EstaEnCola(player))
-    {
-        sBRChatMgr->AnunciarMensajeEntrada(player, MENSAJE_ERROR_EN_COLA);
-        return;
-    }
-    if (EstaEnEvento(player))
-    {
-        sBRChatMgr->AnunciarMensajeEntrada(player, MENSAJE_ERROR_EN_EVENTO);
-        return;
-    }
-    switch (estadoActual)
-    {
-    case ESTADO_NO_HAY_SUFICIENTES_JUGADORES:
-    {
-        list_Cola[guid] = player;
-        if (HaySuficientesEnCola())
-        {
-            IniciarNuevaRonda();
-        }
-        else
-        {
-            sBRChatMgr->AnunciarJugadoresEnCola(player, conf_JugadoresMinimo, list_Cola);
-        }
-        break;
-    }
-    case ESTADO_INVOCANDO_JUGADORES:
-    {
-        if (EstaLlenoElEvento())
-        {
-            list_Cola[guid] = player;
-            sBRChatMgr->AnunciarJugadoresEnCola(player, conf_JugadoresMinimo, list_Cola, MENSAJE_ESTADO_EVENTO_LLENO);
-        }
-        else
-        {
-            if (tiempoRestanteInicio >= 60)
-            {
-                list_Jugadores[guid] = player;
-                AlmacenarPosicionInicial(guid);
-                LlamarDentroDeNave(guid);
-            }
-            else
-            {
-                list_Cola[guid] = player;
-                sBRChatMgr->AnunciarJugadoresEnCola(player, conf_JugadoresMinimo, list_Cola, MENSAJE_ESTADO_EVENTO_EN_CURSO);
-            }
-        }
-        break;
-    }
-    default:
-    {
-        list_Cola[guid] = player;
-        sBRChatMgr->AnunciarJugadoresEnCola(player, conf_JugadoresMinimo, list_Cola, MENSAJE_ESTADO_EVENTO_EN_CURSO);
-        break;
-    }
-    }
+    // AREA 297: Isla Jaguero. ZONA 33: Vega de Tuercespina.
+    BattlefieldBR* br = new BattlefieldBR();
+    br->SetupBattlefield();
+    br->InvitePlayer(player);
+    return;
+    // if (!player)
+    //     return;
+    // uint32 guid = player->GetGUID().GetCounter();
+    // BR_Bloqueado *blr = sBRListaNegraMgr->EstaBloqueado(guid);
+    // if (blr->estaBloqueado)
+    // {
+    //     sBRChatMgr->AnunciarMensajeEntrada(player, MENSAJE_ERROR_BLOQUEADO, blr->motivo);
+    //     return;
+    // }
+    // if (player->isUsingLfg())
+    // {
+    //     sBRChatMgr->AnunciarMensajeEntrada(player, MENSAJE_ERROR_MAZMORRA);
+    //     return;
+    // }
+    // if (player->InBattlegroundQueue())
+    // {
+    //     sBRChatMgr->AnunciarMensajeEntrada(player, MENSAJE_ERROR_BG);
+    //     return;
+    // }
+    // if (EstaEnCola(player))
+    // {
+    //     sBRChatMgr->AnunciarMensajeEntrada(player, MENSAJE_ERROR_EN_COLA);
+    //     return;
+    // }
+    // if (EstaEnEvento(player))
+    // {
+    //     sBRChatMgr->AnunciarMensajeEntrada(player, MENSAJE_ERROR_EN_EVENTO);
+    //     return;
+    // }
+    // switch (estadoActual)
+    // {
+    // case ESTADO_NO_HAY_SUFICIENTES_JUGADORES:
+    // {
+    //     list_Cola[guid] = player;
+    //     if (HaySuficientesEnCola())
+    //     {
+    //         IniciarNuevaRonda();
+    //     }
+    //     else
+    //     {
+    //         sBRChatMgr->AnunciarJugadoresEnCola(player, conf_JugadoresMinimo, list_Cola);
+    //     }
+    //     break;
+    // }
+    // case ESTADO_INVOCANDO_JUGADORES:
+    // {
+    //     if (EstaLlenoElEvento())
+    //     {
+    //         list_Cola[guid] = player;
+    //         sBRChatMgr->AnunciarJugadoresEnCola(player, conf_JugadoresMinimo, list_Cola, MENSAJE_ESTADO_EVENTO_LLENO);
+    //     }
+    //     else
+    //     {
+    //         if (tiempoRestanteInicio >= 60)
+    //         {
+    //             list_Jugadores[guid] = player;
+    //             AlmacenarPosicionInicial(guid);
+    //             LlamarDentroDeNave(guid);
+    //         }
+    //         else
+    //         {
+    //             list_Cola[guid] = player;
+    //             sBRChatMgr->AnunciarJugadoresEnCola(player, conf_JugadoresMinimo, list_Cola, MENSAJE_ESTADO_EVENTO_EN_CURSO);
+    //         }
+    //     }
+    //     break;
+    // }
+    // default:
+    // {
+    //     list_Cola[guid] = player;
+    //     sBRChatMgr->AnunciarJugadoresEnCola(player, conf_JugadoresMinimo, list_Cola, MENSAJE_ESTADO_EVENTO_EN_CURSO);
+    //     break;
+    // }
+    // }
 }
 
 void BattleRoyaleMgr::GestionarJugadorDesconectar(Player *player)
