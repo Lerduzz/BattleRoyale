@@ -82,16 +82,31 @@ BattleRoyaleMgr::~BattleRoyaleMgr()
 
 void BattleRoyaleMgr::GestionarJugadorEntrando(Player *player)
 {
+    // --------------- MEDIANTE MODO BATTLEFIELD ------------------------------------------------
     // AREA 297: Isla Jaguero. ZONA 33: Vega de Tuercespina.
     // BattlefieldBR* br = new BattlefieldBR();
     // sBattlefieldMgr->TestAddBf(br);
     // br->InvitePlayer(player);
-    WorldPacket data(SMSG_GROUP_INVITE, 10);                // guess size
-    data << uint8(1);                                       // invited/already in group flag
-    data << "BattleRoyale";                              // max len 48
-    data << uint32(0);                                      // unk
-    data << uint8(0);                                       // count
-    data << uint32(0);                                      // unk
+    
+    
+    
+    // --------------- MEDIANTE INVITACION A GRUPO ----------------------------------------------
+    // WorldPacket data(SMSG_GROUP_INVITE, 10);                // guess size
+    // data << uint8(1);                                       // invited/already in group flag
+    // data << "BattleRoyale";                                 // max len 48
+    // data << uint32(0);                                      // unk
+    // data << uint8(0);                                       // count
+    // data << uint32(0);                                      // unk
+    // player->GetSession()->SendPacket(&data);
+
+
+    float x, y, z;
+    player->GetPosition(x, y, z);
+    player->SetSummonPoint(player->GetMapId(), x, y, z);
+    WorldPacket data(SMSG_SUMMON_REQUEST, 8 + 4 + 4);
+    data << player->GetGUID();
+    data << uint32(player->GetZoneId());
+    data << uint32(30000); // auto decline after msecs
     player->GetSession()->SendPacket(&data);
     return;
     // if (!player)
