@@ -405,11 +405,21 @@ void BattleRoyaleMgr::LlamarDentroDeNave(uint32 guid)
     BR_Mapa *brM = sBRMapasMgr->MapaActual();
     Position iN = brM->inicioNave;
     player->SetPhaseMask(DIMENSION_EVENTO, true);
-    player->TeleportTo(brM->idMapa, iN.GetPositionX() + ox, iN.GetPositionY() + oy, iN.GetPositionZ() + 2.5f, iN.GetOrientation() + M_PI / 2.0f);
+    // player->TeleportTo(brM->idMapa, iN.GetPositionX() + ox, iN.GetPositionY() + oy, iN.GetPositionZ() + 2.5f, iN.GetOrientation() + M_PI / 2.0f);
     player->SetPvP(false);
     player->SaveToDB(false, false);
     list_DarObjetosIniciales[guid] = player;
     SiguientePosicion();
+
+    // float x, y, z;
+    // player->GetPosition(x, y, z);
+    player->SetSummonPoint(brM->idMapa, iN.GetPositionX() + ox, iN.GetPositionY() + oy, iN.GetPositionZ() + 2.5f);
+    WorldPacket data(SMSG_SUMMON_REQUEST, 8 + 4 + 4);
+    data << sBRObjetosMgr->ObtenerInvocador()->GetGUID();
+    data << uint32(brM->idZona);
+    data << uint32(30000);
+    player->GetSession()->SendPacket(&data);
+    return;
 }
 
 void BattleRoyaleMgr::SalirDelEvento(uint32 guid, bool logout /* = false*/)

@@ -276,6 +276,11 @@ public:
         return false;
     }
 
+    Creature* ObtenerInvocador()
+    {
+        return npc_Vendedor;
+    }
+
 private:
     GameObject* obj_Zona;
     GameObject* obj_Centro;
