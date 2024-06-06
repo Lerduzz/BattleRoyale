@@ -276,7 +276,7 @@ public:
         return false;
     }
 
-    GameObject* ObtenerInvocador()
+    Creature* ObtenerInvocador()
     {
         return npc_Vendedor;
     }
