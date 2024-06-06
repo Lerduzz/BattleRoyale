@@ -412,9 +412,25 @@ void BattleRoyaleMgr::LlamarDentroDeNave(uint32 guid)
     
     // float x, y, z;
     // player->GetPosition(x, y, z);
+
+    // ObjectGuid guid = ObjectGuid::Create<HighGuid::Player>(lowguid);
+    /*
+        player = ObjectAccessor::FindPlayerByName(name, false);
+        if (offline)
+        {
+            guid = sCharacterCache->GetCharacterGuidByName(name);
+        }
+    */
+
+    Player* summoner = ObjectAccessor::FindPlayerByName("Usuario", false);
+    if (!summoner)
+    {
+        summoner = player;
+    }
+
     player->SetSummonPoint(brM->idMapa, iN.GetPositionX() + ox, iN.GetPositionY() + oy, iN.GetPositionZ() + 2.5f);
     WorldPacket data(SMSG_SUMMON_REQUEST, 8 + 4 + 4);
-    data << sBRObjetosMgr->ObtenerInvocador(brM->idMapa, iN.GetPositionX() + ox, iN.GetPositionY() + oy, iN.GetPositionZ() + 2.5f, iN.GetOrientation() + M_PI / 2.0f)->GetGUID();
+    data << summoner->GetGUID();
     data << uint32(brM->idZona);
     data << uint32(30000);
     player->GetSession()->SendPacket(&data);
