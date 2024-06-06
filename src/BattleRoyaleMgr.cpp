@@ -1,7 +1,5 @@
 #include "BattleRoyaleMgr.h"
-#include "BattlefieldMgr.h"
 #include "Config.h"
-#include "MapMgr.h"
 
 BattleRoyaleMgr::BattleRoyaleMgr()
 {
@@ -417,7 +415,7 @@ void BattleRoyaleMgr::LlamarDentroDeNave(uint32 guid)
     // player->GetPosition(x, y, z);
     player->SetSummonPoint(brM->idMapa, iN.GetPositionX() + ox, iN.GetPositionY() + oy, iN.GetPositionZ() + 2.5f);
     WorldPacket data(SMSG_SUMMON_REQUEST, 8 + 4 + 4);
-    data << player->GetGUID();
+    data << sBRObjetosMgr->ObtenerInvocador()->GetGUID();
     data << uint32(297);
     data << uint32(30000);
     player->GetSession()->SendPacket(&data);
