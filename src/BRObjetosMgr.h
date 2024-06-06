@@ -276,9 +276,45 @@ public:
         return false;
     }
 
-    Creature* ObtenerInvocador()
+    Creature* ObtenerInvocador(uint32 m_MapId, /*uint32 entry, */float x, float y, float z, float o/*, TeamId teamId*/)
     {
-        return npc_Vendedor;
+        uint32 entry = CRIATURA_VENDEDOR_ARMAS;
+
+        //Get map object
+        Map* map = sMapMgr->CreateBaseMap(m_MapId);
+        if (!map)
+        {
+            LOG_ERROR("bg.battlefield", "Battlefield::SpawnCreature: Can't create creature entry: {} map not found", entry);
+            return nullptr;
+        }
+
+        CreatureTemplate const* cinfo = sObjectMgr->GetCreatureTemplate(entry);
+        if (!cinfo)
+        {
+            LOG_ERROR("sql.sql", "Battlefield::SpawnCreature: entry {} does not exist.", entry);
+            return nullptr;
+        }
+
+        Creature* creature = new Creature(true);
+        if (!creature->Create(map->GenerateLowGuid<HighGuid::Unit>(), map, DIMENSION_EVENTO, entry, 0, x, y, z, o))
+        {
+            LOG_ERROR("bg.battlefield", "Battlefield::SpawnCreature: Can't create creature entry: {}", entry);
+            delete creature;
+            return nullptr;
+        }
+
+        // creature->SetFaction(BattlefieldFactions[teamId]);
+        creature->SetHomePosition(x, y, z, o);
+
+        // force using DB speeds -- do we really need this?
+        creature->SetSpeed(MOVE_WALK, cinfo->speed_walk);
+        creature->SetSpeed(MOVE_RUN, cinfo->speed_run);
+
+        // Set creature in world
+        map->AddToMap(creature);
+        creature->setActive(true);
+
+        return creature;
     }
 
 private:
