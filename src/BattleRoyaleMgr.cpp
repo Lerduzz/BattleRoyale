@@ -1,6 +1,7 @@
 #include "BattleRoyaleMgr.h"
-#include "Battlefield.h"
+#include "BattlefieldMgr.h"
 #include "Config.h"
+#include "MapMgr.h"
 
 class BattlefieldBR : public Battlefield
 {
@@ -23,13 +24,14 @@ public:
 
     bool SetupBattlefield() override
     {
-        m_TypeId = 2;
+        m_TypeId = BATTLEFIELD_TB;
         m_BattleId = 2;
         m_ZoneId = 297;
         m_MapId = 0;
         m_Map = sMapMgr->FindMap(m_MapId, 0);
         m_TimeForAcceptInvite = 30;
         RegisterZone(m_ZoneId);
+        m_IsEnabled = true;
         return true;
     }
 
@@ -46,6 +48,7 @@ public:
 
     void InvitePlayer(Player* player) {
         player->GetSession()->SendBfInvitePlayerToWar(m_BattleId, m_ZoneId, m_TimeForAcceptInvite);
+        // player->GetSession()->SendBfInvitePlayerToQueue(m_BattleId);
     }
 };
 
@@ -80,9 +83,16 @@ BattleRoyaleMgr::~BattleRoyaleMgr()
 void BattleRoyaleMgr::GestionarJugadorEntrando(Player *player)
 {
     // AREA 297: Isla Jaguero. ZONA 33: Vega de Tuercespina.
-    BattlefieldBR* br = new BattlefieldBR();
-    br->SetupBattlefield();
-    br->InvitePlayer(player);
+    // BattlefieldBR* br = new BattlefieldBR();
+    // sBattlefieldMgr->TestAddBf(br);
+    // br->InvitePlayer(player);
+    WorldPacket data(SMSG_GROUP_INVITE, 10);                // guess size
+    data << uint8(1);                                       // invited/already in group flag
+    data << "BattleRoyale";                              // max len 48
+    data << uint32(0);                                      // unk
+    data << uint8(0);                                       // count
+    data << uint32(0);                                      // unk
+    player->GetSession()->SendPacket(&data);
     return;
     // if (!player)
     //     return;

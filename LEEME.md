@@ -50,3 +50,4 @@ Si necesitas personalizarlo ve a la carpeta de configuracion de los modulos (don
 - Que se muestre en el NPC o en algun sitio el tiempo que falta para el inicio automatico de la ronda.
 - Que se muestre en algun sitio la cantidad de jugadores en cola y la cantidad requerida.
 - IMPORTANTE: Revisar el problema del CRASH, tal vez si se adapta el sistema para que funcione como conquista ya esto no suceda.
+- Hacer que en el mensaje no salga CONQUISTA DEL INVIERNO.
