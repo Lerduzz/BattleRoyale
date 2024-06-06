@@ -416,7 +416,7 @@ void BattleRoyaleMgr::LlamarDentroDeNave(uint32 guid)
     player->SetSummonPoint(brM->idMapa, iN.GetPositionX() + ox, iN.GetPositionY() + oy, iN.GetPositionZ() + 2.5f);
     WorldPacket data(SMSG_SUMMON_REQUEST, 8 + 4 + 4);
     data << sBRObjetosMgr->ObtenerInvocador()->GetGUID();
-    data << uint32(297);
+    data << uint32(brM->idZona);
     data << uint32(30000);
     player->GetSession()->SendPacket(&data);
     return;

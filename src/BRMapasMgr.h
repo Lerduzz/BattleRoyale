@@ -10,6 +10,7 @@ typedef std::map<uint32, BR_UbicacionZona> BR_Ubicacion;
 struct BR_Mapa
 {
     uint32 idMapa;
+    uint32 idZona;
     std::string nombreMapa;
     Position centroMapa;
     Position inicioNave;
@@ -102,7 +103,7 @@ public:
     {
         list_Votos.clear();
         list_Mapas.clear();
-        QueryResult result = WorldDatabase.Query("SELECT `id`, `map_id`, `map_name`, `center_x`, `center_y`, `center_z`, `center_o`, `ship_x`, `ship_y`, `ship_z`, `ship_o` FROM `battleroyale_maps` ORDER BY `id` ASC;");
+        QueryResult result = WorldDatabase.Query("SELECT `id`, `map_id`, `zone_id`, `map_name`, `center_x`, `center_y`, `center_z`, `center_o`, `ship_x`, `ship_y`, `ship_z`, `ship_o` FROM `battleroyale_maps` ORDER BY `id` ASC;");
         if (result)
         {
             do
@@ -111,18 +112,19 @@ public:
                 BR_Mapa* mapa    = new BR_Mapa();
                 uint32 id        = fields[0].Get<uint32>();
                 mapa->idMapa     = fields[1].Get<uint32>();
-                mapa->nombreMapa = fields[2].Get<std::string>();
+                mapa->idZona     = fields[2].Get<uint32>();
+                mapa->nombreMapa = fields[3].Get<std::string>();
                 mapa->centroMapa = { 
-                    fields[3].Get<float>(),
                     fields[4].Get<float>(),
                     fields[5].Get<float>(),
-                    fields[6].Get<float>()
+                    fields[6].Get<float>(),
+                    fields[7].Get<float>()
                 };
                 mapa->inicioNave = { 
-                    fields[7].Get<float>(),
                     fields[8].Get<float>(),
                     fields[9].Get<float>(),
-                    fields[10].Get<float>()
+                    fields[10].Get<float>(),
+                    fields[11].Get<float>()
                 };
                 for (uint32 i = 0; i < CANTIDAD_DE_ZONAS; ++i)
                 {
