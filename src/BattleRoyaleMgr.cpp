@@ -180,6 +180,17 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
                 if (sBRObjetosMgr->EncenderNave())
                 {
                     estadoActual = ESTADO_NAVE_EN_MOVIMIENTO;
+                    if (!list_Invitados.empty())
+                    {
+                        LOG_ERROR("event.br", "> Sacando a los jugadores invitados que no respondieron, cantidad: {}.", list_Invitados.size());
+                        while (!list_Invitados.empty())
+                        {
+                            uint32 guid = list_Invitados.begin()->first;
+                            list_Invitados.erase(guid);
+                            sBRMapasMgr->RemoverVoto(guid);
+                            sBRMapasMgr->LimpiarVoto(guid);
+                        }
+                    }
                 }
                 else
                 {
@@ -434,8 +445,6 @@ void BattleRoyaleMgr::OnSummonResponse(Player *player, bool agree, ObjectGuid su
         sBRMapasMgr->LimpiarVoto(guid);
         // TODO: Mensaje de que se ha quitado de la cola del evento.
         LOG_ERROR("event.br", "> El jugador GUID {} ha cancelado el llamado al Battle Royale.", guid);
-
-        // TODO: Dar la oportunidad a otros jugadores de la cola para que entren (si hay tiempo suficiente).
         if (estadoActual == ESTADO_INVOCANDO_JUGADORES && tiempoRestanteInicio >= 60)
         {
             while (HayCola() && !EstaLlenoElEvento() && tiempoRestanteInicio >= 60)
@@ -452,18 +461,10 @@ void BattleRoyaleMgr::OnSummonResponse(Player *player, bool agree, ObjectGuid su
     list_Jugadores[guid] = list_Invitados[guid];
     list_Invitados.erase(guid);
     AlmacenarPosicionInicial(guid);
-    // TODO: En este momento no se si sea necesaria estas comprobaciones.
-    // if (player->IsAlive())
-    // {
     if (player->HasAura(HECHIZO_PARACAIDAS))
         player->RemoveAurasDueToSpell(HECHIZO_PARACAIDAS);
     if (player->HasAura(HECHIZO_PARACAIDAS_EFECTO))
         player->RemoveAurasDueToSpell(HECHIZO_PARACAIDAS_EFECTO);
-    // }
-    // else
-    // {
-    //     RevivirJugador(player);
-    // }
     DejarGrupo(player);
     Desmontar(player);
 
