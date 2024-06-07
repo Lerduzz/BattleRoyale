@@ -1,4 +1,5 @@
 #include "BattleRoyaleMgr.h"
+#include "CharacterCache.h"
 #include "Config.h"
 
 BattleRoyaleMgr::BattleRoyaleMgr()
@@ -410,7 +411,13 @@ void BattleRoyaleMgr::LlamarDentroDeNave(uint32 guid)
     // player->SaveToDB(false, false);
     list_DarObjetosIniciales[guid] = player;
 
-    // ObjectGuid guid = ObjectGuid::Create<HighGuid::Player>(lowguid);
+    // TODO: ObjectGuid guid = ObjectGuid::Create<HighGuid::Player>(lowguid);
+
+    /*
+        TODO:
+        Player* p = new Player(player->GetSession());
+        p->SetName("Battle Royale");
+    */
 
     player->SetSummonPoint(brM->idMapa, iN.GetPositionX() + ox, iN.GetPositionY() + oy, iN.GetPositionZ() + 2.5f);
     WorldPacket data(SMSG_SUMMON_REQUEST, 8 + 4 + 4);
