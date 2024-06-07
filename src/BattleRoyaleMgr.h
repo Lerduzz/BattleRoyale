@@ -85,7 +85,7 @@ private:
     void RestablecerTodoElEvento();
     void IniciarNuevaRonda();
     void AlmacenarPosicionInicial(uint32 guid);
-    void LlamarDentroDeNave(uint32 guid);
+    void LlamarDentroDeNave(uint32 guid, uint32 tiempo = 20000);
     void SalirDelEvento(uint32 guid, bool logout = false);
     void RevivirJugador(Player *player);
     void EfectoFueraDeZona();

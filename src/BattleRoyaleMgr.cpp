@@ -89,9 +89,12 @@ void BattleRoyaleMgr::GestionarJugadorEntrando(Player *player)
             // TODO: Este tiempo hay que analizarlo porque hay que dar chance a que acepten el cartel de llamada al evento.
             if (tiempoRestanteInicio >= 60)
             {
-                list_Jugadores[guid] = player;
-                AlmacenarPosicionInicial(guid);
-                LlamarDentroDeNave(guid);
+                uint32 tiempo = (tiempoRestanteInicio - 55) * IN_MILLISECONDS;
+                // list_Jugadores[guid] = player;
+                // AlmacenarPosicionInicial(guid);
+                // LlamarDentroDeNave(guid);
+                list_Invitados[guid] = player;
+                LlamarDentroDeNave(guid, tiempo);
             }
             else
             {
@@ -396,9 +399,11 @@ void BattleRoyaleMgr::AlmacenarPosicionInicial(uint32 guid)
     }
 }
 
-void BattleRoyaleMgr::LlamarDentroDeNave(uint32 guid)
+void BattleRoyaleMgr::LlamarDentroDeNave(uint32 guid, uint32 tiempo /* = 20000*/)
 {
-    Player *player = list_Invitados[guid];
+    LOG_ERROR("event.br", "> El jugador GUID {} ha sido invitado al Battle Royale con un tiempo de {}.", guid, tiempo);
+
+    Player *player = list_Invitados[guid]; // TODO: Tal ves sea buena idea verificar si el jugador esta en la lista de invitados.
     float ox = BR_VariacionesDePosicion[indiceDeVariacion][0];
     float oy = BR_VariacionesDePosicion[indiceDeVariacion][1];
     BR_Mapa *brM = sBRMapasMgr->MapaActual();
@@ -408,7 +413,7 @@ void BattleRoyaleMgr::LlamarDentroDeNave(uint32 guid)
     WorldPacket data(SMSG_SUMMON_REQUEST, 8 + 4 + 4);
     data << sCharacterCache->GetCharacterGuidByName("BattleRoyale");
     data << uint32(brM->idZona);
-    data << uint32(20000);
+    data << uint32(tiempo);
     player->GetSession()->SendPacket(&data);
 
     SiguientePosicion();
