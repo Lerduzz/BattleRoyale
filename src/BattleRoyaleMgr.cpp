@@ -86,13 +86,9 @@ void BattleRoyaleMgr::GestionarJugadorEntrando(Player *player)
         }
         else
         {
-            // TODO: Este tiempo hay que analizarlo porque hay que dar chance a que acepten el cartel de llamada al evento.
             if (tiempoRestanteInicio >= 60)
             {
                 uint32 tiempo = (tiempoRestanteInicio - 55) * IN_MILLISECONDS;
-                // list_Jugadores[guid] = player;
-                // AlmacenarPosicionInicial(guid);
-                // LlamarDentroDeNave(guid);
                 list_Invitados[guid] = player;
                 LlamarDentroDeNave(guid, tiempo);
             }
@@ -182,7 +178,6 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
                     estadoActual = ESTADO_NAVE_EN_MOVIMIENTO;
                     if (!list_Invitados.empty())
                     {
-                        LOG_ERROR("event.br", "> Sacando a los jugadores invitados que no respondieron, cantidad: {}.", list_Invitados.size());
                         while (!list_Invitados.empty())
                         {
                             uint32 guid = list_Invitados.begin()->first;
@@ -400,9 +395,7 @@ void BattleRoyaleMgr::AlmacenarPosicionInicial(uint32 guid)
 
 void BattleRoyaleMgr::LlamarDentroDeNave(uint32 guid, uint32 tiempo /* = 20000*/)
 {
-    LOG_ERROR("event.br", "> El jugador GUID {} ha sido invitado al Battle Royale con un tiempo de {}.", guid, tiempo);
-
-    Player *player = list_Invitados[guid]; // TODO: Tal ves sea buena idea verificar si el jugador esta en la lista de invitados.
+    Player *player = list_Invitados[guid];
     float ox = BR_VariacionesDePosicion[indiceDeVariacion][0];
     float oy = BR_VariacionesDePosicion[indiceDeVariacion][1];
     BR_Mapa *brM = sBRMapasMgr->MapaActual();
@@ -420,8 +413,6 @@ void BattleRoyaleMgr::LlamarDentroDeNave(uint32 guid, uint32 tiempo /* = 20000*/
 
 void BattleRoyaleMgr::OnSummonResponse(Player *player, bool agree, ObjectGuid summoner_guid)
 {
-    // TODO: Se puede poner un mayor tiempo de espera en la nave y bajarlo si se queda vacia la cola.
-    // TODO: * El NPC de la nave puede hacerse desaparecer antes de arrancar para evitar el error de que se queda en el aire.
     if (!player || !EstaInvitado(player))
         return;
     uint32 guid = player->GetGUID().GetCounter();
@@ -430,8 +421,6 @@ void BattleRoyaleMgr::OnSummonResponse(Player *player, bool agree, ObjectGuid su
         list_Invitados.erase(guid);
         sBRMapasMgr->RemoverVoto(guid);
         sBRMapasMgr->LimpiarVoto(guid);
-        // TODO: Mensaje de que se ha quitado de la cola del evento.
-        LOG_ERROR("event.br", "> El jugador GUID {} ha cancelado el llamado al Battle Royale.", guid);
         if (estadoActual == ESTADO_INVOCANDO_JUGADORES && tiempoRestanteInicio >= 60)
         {
             while (HayCola() && !EstaLlenoElEvento() && tiempoRestanteInicio >= 60)
@@ -454,14 +443,11 @@ void BattleRoyaleMgr::OnSummonResponse(Player *player, bool agree, ObjectGuid su
         player->RemoveAurasDueToSpell(HECHIZO_PARACAIDAS_EFECTO);
     DejarGrupo(player);
     Desmontar(player);
-
     player->SetPhaseMask(DIMENSION_EVENTO, true);
-
     player->SetOrientation(sBRMapasMgr->MapaActual()->inicioNave.GetOrientation() + M_PI / 2.0f);
     player->SetPvP(false);
     player->SaveToDB(false, false);
     list_DarObjetosIniciales[guid] = player;
-    LOG_ERROR("event.br", "> El jugador GUID {} ha aceptado el llamado al Battle Royale. Invocando ...", guid);
 }
 
 void BattleRoyaleMgr::SalirDelEvento(uint32 guid, bool logout /* = false*/)
