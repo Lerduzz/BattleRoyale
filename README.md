@@ -2,7 +2,7 @@
 
 ## Descripción
 
-El mejor evento JcJ para WotLK, creado por [![Lerduzz](https://i.imgur.com/Jhrdgv6.png)](https://youtube.com/@lerduzz).
+El mejor evento JcJ para WotLK, creado por [Lerduzz](https://youtube.com/@lerduzz).
 
 
 ## Como utilizar
