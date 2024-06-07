@@ -354,21 +354,19 @@ void BattleRoyaleMgr::IniciarNuevaRonda()
         while (HayCola() && !EstaLlenoElEvento() && tiempoRestanteInicio >= 60)
         {
             uint32 guid = list_Cola.begin()->first;
-            if (list_Cola[guid]->IsInFlight())
-            {
-                sBRChatMgr->AnunciarMensajeEntrada(list_Cola[guid], MENSAJE_ERROR_EN_VUELO);
-            }
-            else if (list_Cola[guid]->IsInCombat())
-            {
-                sBRChatMgr->AnunciarMensajeEntrada(list_Cola[guid], MENSAJE_ERROR_EN_COMBATE);
-            }
-            else
-            {
-                list_Jugadores[guid] = list_Cola[guid];
-                AlmacenarPosicionInicial(guid);
-                LlamarDentroDeNave(guid);
-            }
-            list_Cola.erase(guid);
+            // TODO: En este momento no se si sea necesaria estas comprobaciones.
+            // if (list_Cola[guid]->IsInFlight())
+            // {
+            //     sBRChatMgr->AnunciarMensajeEntrada(list_Cola[guid], MENSAJE_ERROR_EN_VUELO);
+            // }
+            // else if (list_Cola[guid]->IsInCombat())
+            // {
+            //     sBRChatMgr->AnunciarMensajeEntrada(list_Cola[guid], MENSAJE_ERROR_EN_COMBATE);
+            // }
+            // else
+            // {
+            LlamarDentroDeNave(guid);
+            // }
         }
     }
 }
@@ -387,47 +385,61 @@ void BattleRoyaleMgr::AlmacenarPosicionInicial(uint32 guid)
 
 void BattleRoyaleMgr::LlamarDentroDeNave(uint32 guid)
 {
-    Player *player = list_Jugadores[guid];
-    if (player->IsAlive())
-    {
-        if (player->HasAura(HECHIZO_PARACAIDAS))
-            player->RemoveAurasDueToSpell(HECHIZO_PARACAIDAS);
-        if (player->HasAura(HECHIZO_PARACAIDAS_EFECTO))
-            player->RemoveAurasDueToSpell(HECHIZO_PARACAIDAS_EFECTO);
-    }
-    else
-    {
-        RevivirJugador(player);
-    }
-    DejarGrupo(player);
-    Desmontar(player);
+    Player *player = list_Cola[guid];
     float ox = BR_VariacionesDePosicion[indiceDeVariacion][0];
     float oy = BR_VariacionesDePosicion[indiceDeVariacion][1];
     BR_Mapa *brM = sBRMapasMgr->MapaActual();
     Position iN = brM->inicioNave;
-    player->SetPhaseMask(DIMENSION_EVENTO, true);
-    // player->TeleportTo(brM->idMapa, iN.GetPositionX() + ox, iN.GetPositionY() + oy, iN.GetPositionZ() + 2.5f, iN.GetOrientation() + M_PI / 2.0f);
-    // player->SetPvP(false);
-    // player->SaveToDB(false, false);
-    list_DarObjetosIniciales[guid] = player;
-
-    // TODO: ObjectGuid guid = ObjectGuid::Create<HighGuid::Player>(lowguid);
-
-    /*
-        TODO:
-        Player* p = new Player(player->GetSession());
-        p->SetName("Battle Royale");
-    */
 
     player->SetSummonPoint(brM->idMapa, iN.GetPositionX() + ox, iN.GetPositionY() + oy, iN.GetPositionZ() + 2.5f);
     WorldPacket data(SMSG_SUMMON_REQUEST, 8 + 4 + 4);
-    data << sCharacterCache->GetCharacterGuidByName("Usuario");
+    data << sCharacterCache->GetCharacterGuidByName("BattleRoyale");
     data << uint32(brM->idZona);
     data << uint32(30000);
     player->GetSession()->SendPacket(&data);
 
     SiguientePosicion();
-    return;
+}
+
+void OnSummonResponse(Player *player, bool agree, ObjectGuid summoner_guid)
+{
+    if (!player || !EstaEnCola(player))
+        return;
+    uint32 guid = player->GetGUID().GetCounter();
+    if (!agree)
+    {
+        list_Cola.erase(guid);
+        sBRMapasMgr->RemoverVoto(guid);
+        sBRMapasMgr->LimpiarVoto(guid);
+        if (EstaEnListaDarObjetosIniciales(guid))
+            list_DarObjetosIniciales.erase(guid);
+        // TODO: Mensaje de que se ha quitado de la cola del evento.
+        return;
+    }
+    list_Jugadores[guid] = list_Cola[guid];
+    list_Cola.erase(guid);
+    AlmacenarPosicionInicial(guid);
+    // TODO: En este momento no se si sea necesaria estas comprobaciones.
+    // if (player->IsAlive())
+    // {
+    if (player->HasAura(HECHIZO_PARACAIDAS))
+        player->RemoveAurasDueToSpell(HECHIZO_PARACAIDAS);
+    if (player->HasAura(HECHIZO_PARACAIDAS_EFECTO))
+        player->RemoveAurasDueToSpell(HECHIZO_PARACAIDAS_EFECTO);
+    // }
+    // else
+    // {
+    //     RevivirJugador(player);
+    // }
+    DejarGrupo(player);
+    Desmontar(player);
+
+    player->SetPhaseMask(DIMENSION_EVENTO, true);
+
+    player->SetOrientation(brM->inicioNave.GetOrientation() + M_PI / 2.0f);
+    player->SetPvP(false);
+    player->SaveToDB(false, false);
+    list_DarObjetosIniciales[guid] = player;
 }
 
 void BattleRoyaleMgr::SalirDelEvento(uint32 guid, bool logout /* = false*/)

@@ -168,6 +168,14 @@ public:
         }
         return false;
     }
+
+    void BattleRoyaleOnSummonResponse(Player* player, bool agree, ObjectGuid summoner_guid) override
+    {
+        if (sBattleRoyaleMgr->EstaActivado())
+        {
+            sBattleRoyaleMgr->OnSummonResponse(player, agree, summoner_guid);
+        }
+    }
 };
 
 class BattleRoyaleCreature : public CreatureScript
