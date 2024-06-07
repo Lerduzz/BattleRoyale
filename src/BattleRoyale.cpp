@@ -486,7 +486,7 @@ public:
     }
 };
 
-void AddBattleRoyaleScripts()
+void AddSC_BattleRoyale()
 {
     new BattleRoyalePlayer();
     new BattleRoyaleCreature();
