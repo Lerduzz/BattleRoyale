@@ -1,6 +1,7 @@
 #include "BattleRoyaleMgr.h"
 #include "CharacterCache.h"
 #include "Config.h"
+#include "Log.h"
 
 BattleRoyaleMgr::BattleRoyaleMgr()
 {
@@ -427,6 +428,7 @@ void BattleRoyaleMgr::OnSummonResponse(Player *player, bool agree, ObjectGuid su
         sBRMapasMgr->LimpiarVoto(guid);
         // TODO: Mensaje de que se ha quitado de la cola del evento.
         // TODO: Dar la oportunidad a otros jugadores de la cola para que entren (si hay tiempo suficiente).
+        LOG_ERROR("event.br", "> El jugador GUID {} ha cancelado el llamado al Battle Royale.", guid);
         return;
     }
     list_Jugadores[guid] = list_Invitados[guid];
@@ -453,6 +455,7 @@ void BattleRoyaleMgr::OnSummonResponse(Player *player, bool agree, ObjectGuid su
     player->SetPvP(false);
     player->SaveToDB(false, false);
     list_DarObjetosIniciales[guid] = player;
+    LOG_ERROR("event.br", "> El jugador GUID {} ha aceptado el llamado al Battle Royale. Invocando ...", guid);
 }
 
 void BattleRoyaleMgr::SalirDelEvento(uint32 guid, bool logout /* = false*/)
