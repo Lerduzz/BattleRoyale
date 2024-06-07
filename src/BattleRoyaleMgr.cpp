@@ -361,11 +361,11 @@ void BattleRoyaleMgr::IniciarNuevaRonda()
         // while (HayCola() && !EstaLlenoElEvento() && tiempoRestanteInicio >= 60)
         // {
         //     uint32 guid = list_Cola.begin()->first;
-        //     if (list_Cola[guid]->IsInFlight())
+        //     TODO: if (list_Cola[guid]->IsInFlight())
         //     {
         //         sBRChatMgr->AnunciarMensajeEntrada(list_Cola[guid], MENSAJE_ERROR_EN_VUELO);
         //     }
-        //     else if (list_Cola[guid]->IsInCombat())
+        //     TODO: else if (list_Cola[guid]->IsInCombat())
         //     {
         //         sBRChatMgr->AnunciarMensajeEntrada(list_Cola[guid], MENSAJE_ERROR_EN_COMBATE);
         //     }
@@ -380,8 +380,9 @@ void BattleRoyaleMgr::IniciarNuevaRonda()
         while (HayCola() && !EstaLlenoElEvento() && tiempoRestanteInicio >= 60)
         {
             uint32 guid = list_Cola.begin()->first;
-            list_Invitados[guid] = list_Cola[guid]; // TODO: Al arrancar la nave limpiar la lista de los invitados que no hayan respondido ?? Hacer algo con el cartel.
-            LlamarDentroDeNave(guid);
+            uint32 tiempo = (tiempoRestanteInicio - 55) * IN_MILLISECONDS;
+            list_Invitados[guid] = list_Cola[guid];
+            LlamarDentroDeNave(guid, tiempo);
             list_Cola.erase(guid);
         }
     }
@@ -432,8 +433,20 @@ void BattleRoyaleMgr::OnSummonResponse(Player *player, bool agree, ObjectGuid su
         sBRMapasMgr->RemoverVoto(guid);
         sBRMapasMgr->LimpiarVoto(guid);
         // TODO: Mensaje de que se ha quitado de la cola del evento.
-        // TODO: Dar la oportunidad a otros jugadores de la cola para que entren (si hay tiempo suficiente).
         LOG_ERROR("event.br", "> El jugador GUID {} ha cancelado el llamado al Battle Royale.", guid);
+
+        // TODO: Dar la oportunidad a otros jugadores de la cola para que entren (si hay tiempo suficiente).
+        if (estadoActual == ESTADO_INVOCANDO_JUGADORES && tiempoRestanteInicio >= 60)
+        {
+            while (HayCola() && !EstaLlenoElEvento() && tiempoRestanteInicio >= 60)
+            {
+                uint32 guid = list_Cola.begin()->first;
+                uint32 tiempo = (tiempoRestanteInicio - 55) * IN_MILLISECONDS;
+                list_Invitados[guid] = list_Cola[guid];
+                LlamarDentroDeNave(guid, tiempo);
+                list_Cola.erase(guid);
+            }
+        }
         return;
     }
     list_Jugadores[guid] = list_Invitados[guid];
