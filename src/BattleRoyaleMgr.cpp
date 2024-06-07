@@ -115,7 +115,7 @@ void BattleRoyaleMgr::GestionarJugadorEntrando(Player *player)
 
 void BattleRoyaleMgr::GestionarJugadorDesconectar(Player *player)
 {
-    if (EstaEnEvento(player) || EstaEnCola(player) || EstaEnListaDeAlas(player))
+    if (EstaEnEvento(player) || EstaEnCola(player) || EstaInvitado(player) || EstaEnListaDeAlas(player))
         SalirDelEvento(player->GetGUID().GetCounter(), true);
 }
 
