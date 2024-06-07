@@ -368,32 +368,19 @@ void BattleRoyaleMgr::IniciarNuevaRonda()
         }
         estadoActual = ESTADO_INVOCANDO_JUGADORES;
         totalAsesinatosJcJ = 0;
-
-        // while (HayCola() && !EstaLlenoElEvento() && tiempoRestanteInicio >= 60)
-        // {
-        //     uint32 guid = list_Cola.begin()->first;
-        //     TODO: if (list_Cola[guid]->IsInFlight())
-        //     {
-        //         sBRChatMgr->AnunciarMensajeEntrada(list_Cola[guid], MENSAJE_ERROR_EN_VUELO);
-        //     }
-        //     TODO: else if (list_Cola[guid]->IsInCombat())
-        //     {
-        //         sBRChatMgr->AnunciarMensajeEntrada(list_Cola[guid], MENSAJE_ERROR_EN_COMBATE);
-        //     }
-        //     else
-        //     {
-        //         list_Jugadores[guid] = list_Cola[guid];
-        //         AlmacenarPosicionInicial(guid);
-        //         LlamarDentroDeNave(guid);
-        //     }
-        //     list_Cola.erase(guid);
-        // }
         while (HayCola() && !EstaLlenoElEvento() && tiempoRestanteInicio >= 60)
         {
             uint32 guid = list_Cola.begin()->first;
-            uint32 tiempo = (tiempoRestanteInicio - 55) * IN_MILLISECONDS;
-            list_Invitados[guid] = list_Cola[guid];
-            LlamarDentroDeNave(guid, tiempo);
+            if (list_Cola[guid]->IsInFlight())
+            {
+                sBRChatMgr->AnunciarMensajeEntrada(list_Cola[guid], MENSAJE_ERROR_EN_VUELO);
+            }
+            else
+            {
+                uint32 tiempo = (tiempoRestanteInicio - 55) * IN_MILLISECONDS;
+                list_Invitados[guid] = list_Cola[guid];
+                LlamarDentroDeNave(guid, tiempo);
+            }
             list_Cola.erase(guid);
         }
     }
