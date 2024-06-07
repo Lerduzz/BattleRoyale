@@ -11,7 +11,6 @@ enum BR_TipoMensaje
     MENSAJE_ERROR_EN_COLA,
     MENSAJE_ERROR_EN_EVENTO,
     MENSAJE_ERROR_EN_VUELO,
-    MENSAJE_ERROR_EN_COMBATE,
     MENSAJE_ERROR_BLOQUEADO,
 };
 
@@ -250,11 +249,6 @@ public:
             case MENSAJE_ERROR_EN_VUELO:
             {
                 Chat(player).PSendSysMessage("%s ¡No has podido entrar al evento porque vas en ruta de vuelo! ¡Se te ha quitado de la cola!", TEXTO_NOMBRE.c_str());
-                break;
-            }
-            case MENSAJE_ERROR_EN_COMBATE:
-            {
-                Chat(player).PSendSysMessage("%s ¡No has podido entrar al evento porque estás en combate! ¡Se te ha quitado de la cola!", TEXTO_NOMBRE.c_str());
                 break;
             }
             case MENSAJE_ERROR_BLOQUEADO:

@@ -1,5 +1,7 @@
 #include "BattleRoyaleMgr.h"
+#include "CharacterCache.h"
 #include "Config.h"
+#include "Log.h"
 
 BattleRoyaleMgr::BattleRoyaleMgr()
 {
@@ -86,9 +88,9 @@ void BattleRoyaleMgr::GestionarJugadorEntrando(Player *player)
         {
             if (tiempoRestanteInicio >= 60)
             {
-                list_Jugadores[guid] = player;
-                AlmacenarPosicionInicial(guid);
-                LlamarDentroDeNave(guid);
+                uint32 tiempo = (tiempoRestanteInicio - 55) * IN_MILLISECONDS;
+                list_Invitados[guid] = player;
+                LlamarDentroDeNave(guid, tiempo);
             }
             else
             {
@@ -109,7 +111,7 @@ void BattleRoyaleMgr::GestionarJugadorEntrando(Player *player)
 
 void BattleRoyaleMgr::GestionarJugadorDesconectar(Player *player)
 {
-    if (EstaEnEvento(player) || EstaEnCola(player) || EstaEnListaDeAlas(player))
+    if (EstaEnEvento(player) || EstaEnCola(player) || EstaInvitado(player) || EstaEnListaDeAlas(player))
         SalirDelEvento(player->GetGUID().GetCounter(), true);
 }
 
@@ -174,6 +176,16 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
                 if (sBRObjetosMgr->EncenderNave())
                 {
                     estadoActual = ESTADO_NAVE_EN_MOVIMIENTO;
+                    if (!list_Invitados.empty())
+                    {
+                        while (!list_Invitados.empty())
+                        {
+                            uint32 guid = list_Invitados.begin()->first;
+                            list_Invitados.erase(guid);
+                            sBRMapasMgr->RemoverVoto(guid);
+                            sBRMapasMgr->LimpiarVoto(guid);
+                        }
+                    }
                 }
                 else
                 {
@@ -323,6 +335,7 @@ bool BattleRoyaleMgr::PuedeReaparecerEnCementerio(Player *player)
 void BattleRoyaleMgr::RestablecerTodoElEvento()
 {
     list_Cola.clear();
+    list_Invitados.clear();
     list_Jugadores.clear();
     list_Datos.clear();
     list_DarObjetosIniciales.clear();
@@ -357,15 +370,11 @@ void BattleRoyaleMgr::IniciarNuevaRonda()
             {
                 sBRChatMgr->AnunciarMensajeEntrada(list_Cola[guid], MENSAJE_ERROR_EN_VUELO);
             }
-            else if (list_Cola[guid]->IsInCombat())
-            {
-                sBRChatMgr->AnunciarMensajeEntrada(list_Cola[guid], MENSAJE_ERROR_EN_COMBATE);
-            }
             else
             {
-                list_Jugadores[guid] = list_Cola[guid];
-                AlmacenarPosicionInicial(guid);
-                LlamarDentroDeNave(guid);
+                uint32 tiempo = (tiempoRestanteInicio - 55) * IN_MILLISECONDS;
+                list_Invitados[guid] = list_Cola[guid];
+                LlamarDentroDeNave(guid, tiempo);
             }
             list_Cola.erase(guid);
         }
@@ -384,42 +393,61 @@ void BattleRoyaleMgr::AlmacenarPosicionInicial(uint32 guid)
     }
 }
 
-void BattleRoyaleMgr::LlamarDentroDeNave(uint32 guid)
+void BattleRoyaleMgr::LlamarDentroDeNave(uint32 guid, uint32 tiempo /* = 20000*/)
 {
-    Player *player = list_Jugadores[guid];
-    if (player->IsAlive())
-    {
-        if (player->HasAura(HECHIZO_PARACAIDAS))
-            player->RemoveAurasDueToSpell(HECHIZO_PARACAIDAS);
-        if (player->HasAura(HECHIZO_PARACAIDAS_EFECTO))
-            player->RemoveAurasDueToSpell(HECHIZO_PARACAIDAS_EFECTO);
-    }
-    else
-    {
-        RevivirJugador(player);
-    }
-    DejarGrupo(player);
-    Desmontar(player);
+    Player *player = list_Invitados[guid];
     float ox = BR_VariacionesDePosicion[indiceDeVariacion][0];
     float oy = BR_VariacionesDePosicion[indiceDeVariacion][1];
     BR_Mapa *brM = sBRMapasMgr->MapaActual();
     Position iN = brM->inicioNave;
+
+    player->SetSummonPoint(brM->idMapa, iN.GetPositionX() + ox, iN.GetPositionY() + oy, iN.GetPositionZ() + 2.5f);
+    WorldPacket data(SMSG_SUMMON_REQUEST, 8 + 4 + 4);
+    data << sCharacterCache->GetCharacterGuidByName("BattleRoyale");
+    data << uint32(brM->idZona);
+    data << uint32(tiempo);
+    player->GetSession()->SendPacket(&data);
+
+    SiguientePosicion();
+}
+
+void BattleRoyaleMgr::OnSummonResponse(Player *player, bool agree, ObjectGuid summoner_guid)
+{
+    if (!player || !EstaInvitado(player))
+        return;
+    uint32 guid = player->GetGUID().GetCounter();
+    if (!agree)
+    {
+        list_Invitados.erase(guid);
+        sBRMapasMgr->RemoverVoto(guid);
+        sBRMapasMgr->LimpiarVoto(guid);
+        if (estadoActual == ESTADO_INVOCANDO_JUGADORES && tiempoRestanteInicio >= 60)
+        {
+            while (HayCola() && !EstaLlenoElEvento() && tiempoRestanteInicio >= 60)
+            {
+                uint32 guid = list_Cola.begin()->first;
+                uint32 tiempo = (tiempoRestanteInicio - 55) * IN_MILLISECONDS;
+                list_Invitados[guid] = list_Cola[guid];
+                LlamarDentroDeNave(guid, tiempo);
+                list_Cola.erase(guid);
+            }
+        }
+        return;
+    }
+    list_Jugadores[guid] = list_Invitados[guid];
+    list_Invitados.erase(guid);
+    AlmacenarPosicionInicial(guid);
+    if (player->HasAura(HECHIZO_PARACAIDAS))
+        player->RemoveAurasDueToSpell(HECHIZO_PARACAIDAS);
+    if (player->HasAura(HECHIZO_PARACAIDAS_EFECTO))
+        player->RemoveAurasDueToSpell(HECHIZO_PARACAIDAS_EFECTO);
+    DejarGrupo(player);
+    Desmontar(player);
     player->SetPhaseMask(DIMENSION_EVENTO, true);
-    // player->TeleportTo(brM->idMapa, iN.GetPositionX() + ox, iN.GetPositionY() + oy, iN.GetPositionZ() + 2.5f, iN.GetOrientation() + M_PI / 2.0f);
+    player->SetOrientation(sBRMapasMgr->MapaActual()->inicioNave.GetOrientation() + M_PI / 2.0f);
     player->SetPvP(false);
     player->SaveToDB(false, false);
     list_DarObjetosIniciales[guid] = player;
-    SiguientePosicion();
-
-    // float x, y, z;
-    // player->GetPosition(x, y, z);
-    player->SetSummonPoint(brM->idMapa, iN.GetPositionX() + ox, iN.GetPositionY() + oy, iN.GetPositionZ() + 2.5f);
-    WorldPacket data(SMSG_SUMMON_REQUEST, 8 + 4 + 4);
-    data << sBRObjetosMgr->ObtenerInvocador()->GetGUID();
-    data << uint32(brM->idZona);
-    data << uint32(30000);
-    player->GetSession()->SendPacket(&data);
-    return;
 }
 
 void BattleRoyaleMgr::SalirDelEvento(uint32 guid, bool logout /* = false*/)
@@ -429,6 +457,11 @@ void BattleRoyaleMgr::SalirDelEvento(uint32 guid, bool logout /* = false*/)
     if (EstaEnCola(guid))
     {
         list_Cola.erase(guid);
+        sBRMapasMgr->RemoverVoto(guid);
+    }
+    if (EstaInvitado(guid))
+    {
+        list_Invitados.erase(guid);
         sBRMapasMgr->RemoverVoto(guid);
     }
     sBRMapasMgr->LimpiarVoto(guid);

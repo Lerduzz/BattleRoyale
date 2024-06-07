@@ -117,7 +117,7 @@ public:
             float o = pos.GetOrientation();
             float rot2 = std::sin(o / 2);
             float rot3 = cos(o / 2);
-            // map->LoadGrid(x, y);
+            map->LoadGrid(x, y);
             obj_Nave = new StaticTransport();
             if (obj_Nave->Create(map->GenerateLowGuid<HighGuid::GameObject>(), OBJETO_NAVE, map, DIMENSION_EVENTO, x, y, z, o, G3D::Quat(0, 0, rot2, rot3), 100, GO_STATE_READY))
             {
@@ -188,7 +188,7 @@ public:
             float y = pos.GetPositionY();
             float z = pos.GetPositionZ();
             float o = pos.GetOrientation();
-            // map->LoadGrid(x, y);
+            map->LoadGrid(x, y);
             obj_Centro = new GameObject();
             if (obj_Centro->Create(map->GenerateLowGuid<HighGuid::GameObject>(), OBJETO_CENTRO_DEL_MAPA, map, DIMENSION_EVENTO, x, y, z, o, G3D::Quat(), 100, GO_STATE_READY))
             {
@@ -234,7 +234,7 @@ public:
                 float y = pos.GetPositionY();
                 float z = pos.GetPositionZ() + BR_EscalasDeZonaSegura[index] * 66.0f;
                 float o = pos.GetOrientation();
-                // map->LoadGrid(x, y);
+                map->LoadGrid(x, y);
                 obj_Zona = new GameObject();
                 if (obj_Zona->Create(map->GenerateLowGuid<HighGuid::GameObject>(), OBJETO_ZONA_SEGURA_INICIAL + index, map, DIMENSION_EVENTO, x, y, z, o, G3D::Quat(), 100, GO_STATE_READY))
                 {
@@ -276,10 +276,39 @@ public:
         return false;
     }
 
-    Creature* ObtenerInvocador()
-    {
-        return npc_Vendedor;
-    }
+    // Creature* ObtenerInvocador(uint32 m_MapId, /*uint32 entry, */float x, float y, float z, float o/*, TeamId teamId*/)
+    // {
+    //     uint32 entry = CRIATURA_VENDEDOR_ARMAS;
+    //     //Get map object
+    //     Map* map = sMapMgr->CreateBaseMap(m_MapId);
+    //     if (!map)
+    //     {
+    //         LOG_ERROR("bg.battlefield", "Battlefield::SpawnCreature: Can't create creature entry: {} map not found", entry);
+    //         return nullptr;
+    //     }
+    //     CreatureTemplate const* cinfo = sObjectMgr->GetCreatureTemplate(entry);
+    //     if (!cinfo)
+    //     {
+    //         LOG_ERROR("sql.sql", "Battlefield::SpawnCreature: entry {} does not exist.", entry);
+    //         return nullptr;
+    //     }
+    //     Creature* creature = new Creature(true);
+    //     if (!creature->Create(map->GenerateLowGuid<HighGuid::Unit>(), map, DIMENSION_EVENTO, entry, 0, x, y, z, o))
+    //     {
+    //         LOG_ERROR("bg.battlefield", "Battlefield::SpawnCreature: Can't create creature entry: {}", entry);
+    //         delete creature;
+    //         return nullptr;
+    //     }
+    //     // creature->SetFaction(BattlefieldFactions[teamId]);
+    //     creature->SetHomePosition(x, y, z, o);
+    //     // force using DB speeds -- do we really need this?
+    //     creature->SetSpeed(MOVE_WALK, cinfo->speed_walk);
+    //     creature->SetSpeed(MOVE_RUN, cinfo->speed_run);
+    //     // Set creature in world
+    //     map->AddToMap(creature);
+    //     creature->setActive(true);
+    //     return creature;
+    // }
 
 private:
     GameObject* obj_Zona;
