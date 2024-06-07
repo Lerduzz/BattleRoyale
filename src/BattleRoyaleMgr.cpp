@@ -85,6 +85,7 @@ void BattleRoyaleMgr::GestionarJugadorEntrando(Player *player)
         }
         else
         {
+            // TODO: Este tiempo hay que analizarlo porque hay que dar chance a que acepten el cartel de llamada al evento.
             if (tiempoRestanteInicio >= 60)
             {
                 list_Jugadores[guid] = player;
@@ -351,7 +352,9 @@ void BattleRoyaleMgr::IniciarNuevaRonda()
         }
         estadoActual = ESTADO_INVOCANDO_JUGADORES;
         totalAsesinatosJcJ = 0;
-        while (HayCola() && !EstaLlenoElEvento() && tiempoRestanteInicio >= 60)
+
+        // TODO: Comprobar si esta lleno el evento ya no debe funcionar bien para esto.
+        while (HayCola() /*&& !EstaLlenoElEvento() */&& tiempoRestanteInicio >= 60)
         {
             uint32 guid = list_Cola.begin()->first;
             // TODO: En este momento no se si sea necesaria estas comprobaciones.
@@ -395,14 +398,16 @@ void BattleRoyaleMgr::LlamarDentroDeNave(uint32 guid)
     WorldPacket data(SMSG_SUMMON_REQUEST, 8 + 4 + 4);
     data << sCharacterCache->GetCharacterGuidByName("BattleRoyale");
     data << uint32(brM->idZona);
-    data << uint32(30000);
+    data << uint32(20000);
     player->GetSession()->SendPacket(&data);
 
     SiguientePosicion();
 }
 
-void OnSummonResponse(Player *player, bool agree, ObjectGuid summoner_guid)
+void BattleRoyaleMgr::OnSummonResponse(Player *player, bool agree, ObjectGuid summoner_guid)
 {
+    // TODO: Se puede poner un mayor tiempo de espera en la nave y bajarlo si se queda vacia la cola.
+    // TODO: * El NPC de la nave puede hacerse desaparecer antes de arrancar para evitar el error de que se queda en el aire.
     if (!player || !EstaEnCola(player))
         return;
     uint32 guid = player->GetGUID().GetCounter();
@@ -414,6 +419,7 @@ void OnSummonResponse(Player *player, bool agree, ObjectGuid summoner_guid)
         if (EstaEnListaDarObjetosIniciales(guid))
             list_DarObjetosIniciales.erase(guid);
         // TODO: Mensaje de que se ha quitado de la cola del evento.
+        // TODO: Dar la oportunidad a otros jugadores de la cola para que entren (si hay tiempo suficiente).
         return;
     }
     list_Jugadores[guid] = list_Cola[guid];
@@ -436,7 +442,7 @@ void OnSummonResponse(Player *player, bool agree, ObjectGuid summoner_guid)
 
     player->SetPhaseMask(DIMENSION_EVENTO, true);
 
-    player->SetOrientation(brM->inicioNave.GetOrientation() + M_PI / 2.0f);
+    player->SetOrientation(sBRMapasMgr->MapaActual()->inicioNave.GetOrientation() + M_PI / 2.0f);
     player->SetPvP(false);
     player->SaveToDB(false, false);
     list_DarObjetosIniciales[guid] = player;

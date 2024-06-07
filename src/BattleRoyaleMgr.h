@@ -78,6 +78,8 @@ public:
         return false;
     }
 
+    void OnSummonResponse(Player *player, bool agree, ObjectGuid summoner_guid);
+
 private:
     void RestablecerTodoElEvento();
     void IniciarNuevaRonda();
