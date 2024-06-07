@@ -325,6 +325,7 @@ bool BattleRoyaleMgr::PuedeReaparecerEnCementerio(Player *player)
 void BattleRoyaleMgr::RestablecerTodoElEvento()
 {
     list_Cola.clear();
+    list_Invitados.clear();
     list_Jugadores.clear();
     list_Datos.clear();
     list_DarObjetosIniciales.clear();
@@ -353,23 +354,31 @@ void BattleRoyaleMgr::IniciarNuevaRonda()
         estadoActual = ESTADO_INVOCANDO_JUGADORES;
         totalAsesinatosJcJ = 0;
 
-        // TODO: Comprobar si esta lleno el evento ya no debe funcionar bien para esto.
-        while (HayCola() /*&& !EstaLlenoElEvento() */&& tiempoRestanteInicio >= 60)
+        // while (HayCola() && !EstaLlenoElEvento() && tiempoRestanteInicio >= 60)
+        // {
+        //     uint32 guid = list_Cola.begin()->first;
+        //     if (list_Cola[guid]->IsInFlight())
+        //     {
+        //         sBRChatMgr->AnunciarMensajeEntrada(list_Cola[guid], MENSAJE_ERROR_EN_VUELO);
+        //     }
+        //     else if (list_Cola[guid]->IsInCombat())
+        //     {
+        //         sBRChatMgr->AnunciarMensajeEntrada(list_Cola[guid], MENSAJE_ERROR_EN_COMBATE);
+        //     }
+        //     else
+        //     {
+        //         list_Jugadores[guid] = list_Cola[guid];
+        //         AlmacenarPosicionInicial(guid);
+        //         LlamarDentroDeNave(guid);
+        //     }
+        //     list_Cola.erase(guid);
+        // }
+        while (HayCola() && !EstaLlenoElEvento() && tiempoRestanteInicio >= 60)
         {
             uint32 guid = list_Cola.begin()->first;
-            // TODO: En este momento no se si sea necesaria estas comprobaciones.
-            // if (list_Cola[guid]->IsInFlight())
-            // {
-            //     sBRChatMgr->AnunciarMensajeEntrada(list_Cola[guid], MENSAJE_ERROR_EN_VUELO);
-            // }
-            // else if (list_Cola[guid]->IsInCombat())
-            // {
-            //     sBRChatMgr->AnunciarMensajeEntrada(list_Cola[guid], MENSAJE_ERROR_EN_COMBATE);
-            // }
-            // else
-            // {
+            list_Invitados[guid] = list_Cola[guid]; // TODO: Al arrancar la nave limpiar la lista de los invitados que no hayan respondido ?? Hacer algo con el cartel.
             LlamarDentroDeNave(guid);
-            // }
+            list_Cola.erase(guid);
         }
     }
 }
@@ -388,7 +397,7 @@ void BattleRoyaleMgr::AlmacenarPosicionInicial(uint32 guid)
 
 void BattleRoyaleMgr::LlamarDentroDeNave(uint32 guid)
 {
-    Player *player = list_Cola[guid];
+    Player *player = list_Invitados[guid];
     float ox = BR_VariacionesDePosicion[indiceDeVariacion][0];
     float oy = BR_VariacionesDePosicion[indiceDeVariacion][1];
     BR_Mapa *brM = sBRMapasMgr->MapaActual();
@@ -408,22 +417,20 @@ void BattleRoyaleMgr::OnSummonResponse(Player *player, bool agree, ObjectGuid su
 {
     // TODO: Se puede poner un mayor tiempo de espera en la nave y bajarlo si se queda vacia la cola.
     // TODO: * El NPC de la nave puede hacerse desaparecer antes de arrancar para evitar el error de que se queda en el aire.
-    if (!player || !EstaEnCola(player))
+    if (!player || !EstaInvitado(player))
         return;
     uint32 guid = player->GetGUID().GetCounter();
     if (!agree)
     {
-        list_Cola.erase(guid);
+        list_Invitados.erase(guid);
         sBRMapasMgr->RemoverVoto(guid);
         sBRMapasMgr->LimpiarVoto(guid);
-        if (EstaEnListaDarObjetosIniciales(guid))
-            list_DarObjetosIniciales.erase(guid);
         // TODO: Mensaje de que se ha quitado de la cola del evento.
         // TODO: Dar la oportunidad a otros jugadores de la cola para que entren (si hay tiempo suficiente).
         return;
     }
-    list_Jugadores[guid] = list_Cola[guid];
-    list_Cola.erase(guid);
+    list_Jugadores[guid] = list_Invitados[guid];
+    list_Invitados.erase(guid);
     AlmacenarPosicionInicial(guid);
     // TODO: En este momento no se si sea necesaria estas comprobaciones.
     // if (player->IsAlive())
@@ -455,6 +462,11 @@ void BattleRoyaleMgr::SalirDelEvento(uint32 guid, bool logout /* = false*/)
     if (EstaEnCola(guid))
     {
         list_Cola.erase(guid);
+        sBRMapasMgr->RemoverVoto(guid);
+    }
+    if (EstaInvitado(guid))
+    {
+        list_Invitados.erase(guid);
         sBRMapasMgr->RemoverVoto(guid);
     }
     sBRMapasMgr->LimpiarVoto(guid);

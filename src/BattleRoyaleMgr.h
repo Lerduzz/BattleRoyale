@@ -55,6 +55,7 @@ public:
 
     inline bool DebeRestringirFunciones(Player *player) { return estadoActual > ESTADO_NO_HAY_SUFICIENTES_JUGADORES && HayJugadores() && EstaEnEvento(player); };
     inline bool EstaEnCola(Player *player) { return EstaEnCola(player->GetGUID().GetCounter()); };
+    inline bool EstaInvitado(Player *player) { return EstaInvitado(player->GetGUID().GetCounter()); };
     inline bool EstaEnEvento(Player *player) { return EstaEnEvento(player->GetGUID().GetCounter()); };
 
     bool DebeForzarJcJTcT(Player *player)
@@ -96,12 +97,13 @@ private:
     inline bool HayJugadores() { return !list_Jugadores.empty(); };
     inline bool HayCola() { return !list_Cola.empty(); };
     inline bool EstaEnCola(uint32 guid) { return list_Cola.find(guid) != list_Cola.end(); };
+    inline bool EstaInvitado(uint32 guid) { return list_Invitados.find(guid) != list_Invitados.end(); };
     inline bool EstaEnEvento(uint32 guid) { return list_Jugadores.find(guid) != list_Jugadores.end(); };
     inline bool EstaEnListaDeAlas(Player *player) { return EstaEnListaDeAlas(player->GetGUID().GetCounter()); };
     inline bool EstaEnListaDeAlas(uint32 guid) { return EstaEnListaDarObjetosIniciales(guid) || EstaEnListaQuitarTodosLosObjetos(guid); };
     inline bool EstaEnListaDarObjetosIniciales(uint32 guid) { return list_DarObjetosIniciales.find(guid) != list_DarObjetosIniciales.end(); };
     inline bool EstaEnListaQuitarTodosLosObjetos(uint32 guid) { return list_QuitarTodosLosObjetos.find(guid) != list_QuitarTodosLosObjetos.end(); };
-    inline bool EstaLlenoElEvento() { return list_Jugadores.size() >= conf_JugadoresMaximo; };
+    inline bool EstaLlenoElEvento() { return list_Jugadores.size() + list_Invitados.size() >= conf_JugadoresMaximo; };
 
     bool EstaEspectando(Player *player)
     {
@@ -381,6 +383,7 @@ private:
     }
 
     BR_ListaDePersonajes list_Cola;
+    BR_ListaDePersonajes list_Invitados;
 
     BR_ListaDePersonajes list_Jugadores;
     BR_DatosDePersonajes list_Datos;
