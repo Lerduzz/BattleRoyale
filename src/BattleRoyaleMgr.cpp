@@ -210,11 +210,6 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
                     RestablecerTodoElEvento();
                     return;
                 }
-                if (!HayJugadores() || !sBRObjetosMgr->InvocarZonaSegura(sBRMapasMgr->MapaActual()->idMapa, sBRMapasMgr->MapaActual()->centroMapa, indiceDeZona))
-                {
-                    RestablecerTodoElEvento();
-                    return;
-                }
                 else
                 {
                     AlReducirseLaZona();
@@ -260,11 +255,11 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
             }
             if (tiempoRestanteZona <= 0)
             {
-                if (!HayJugadores() || !sBRObjetosMgr->InvocarZonaSegura(sBRMapasMgr->MapaActual()->idMapa, sBRMapasMgr->MapaActual()->centroMapa, indiceDeZona))
-                {
-                    RestablecerTodoElEvento();
-                    return;
-                }
+                // if (!HayJugadores() || !sBRObjetosMgr->InvocarZonaSegura(sBRMapasMgr->MapaActual()->idMapa, sBRMapasMgr->MapaActual()->centroMapa, indiceDeZona))
+                // {
+                //     RestablecerTodoElEvento();
+                //     return;
+                // }
                 AlReducirseLaZona();
                 sBRRecompensaMgr->AcumularRecompensaVivos(conf_Recompensa.zona, list_Jugadores, &list_Datos);
                 sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_ZONA_REDUCIDA, list_Jugadores);
