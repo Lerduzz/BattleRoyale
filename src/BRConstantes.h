@@ -15,7 +15,7 @@ enum BREstado
     ESTADO_BR_ZONA_EN_REDUCCION,             // BATALLA EN CURSO: Esperando para reducir la zona (30s) x5.
     ESTADO_BR_ZONA_DESAPARECIDA,             // BATALLA EN CURSO: Todos reciben daño de zona hasta que quede solo 1 con vida (~20seg).
     ESTADO_BR_BATALLA_TERMINADA,             // Batalla terminada, esperando para cerrar el evento (10seg).
-}
+};
 
 enum BR_EstadosEvento
 {
