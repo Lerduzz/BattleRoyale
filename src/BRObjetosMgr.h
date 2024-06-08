@@ -48,7 +48,6 @@ public:
 
     void DesaparecerTodosLosObjetos()
     {
-        DesaparecerZona();
         DesaparecerCentro();
         DesaparecerNave();
     }
@@ -189,7 +188,7 @@ public:
             }
             npc_Centro->SetVisibilityDistanceOverride(VisibilityDistanceType::Infinite);
             map->AddToMap(npc_Centro);
-            Aura::TryRefreshStackOrCreate(63894, MAX_EFFECT_MASK, npc_Centro, npc_Centro);
+            npc_Centro->AddAura(63894, npc_Centro);
             npc_Centro->SetObjectScale(15.0f);
             if (!(npc_Guardian = npc_Centro->SummonCreature(CRIATURA_DRAGON_GUARDIAN, x, y, z + 330.0f, o, TEMPSUMMON_MANUAL_DESPAWN)))
             {
