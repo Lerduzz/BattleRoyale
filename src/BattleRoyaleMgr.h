@@ -58,7 +58,7 @@ public:
     inline bool EstaInvitado(Player *player) { return EstaInvitado(player->GetGUID().GetCounter()); };
     inline bool EstaEnEvento(Player *player) { return EstaEnEvento(player->GetGUID().GetCounter()); };
 
-    bool DebeForzarJcJTcT(Player *player)
+    bool TodosContraTodos(Player *player)
     {
         if (!player)
             return false;
@@ -79,7 +79,7 @@ public:
         return false;
     }
 
-    void OnSummonResponse(Player *player, bool agree, ObjectGuid summoner_guid);
+    void RespondeInvitacion(Player *player, bool agree, ObjectGuid summoner_guid);
 
 private:
     void RestablecerTodoElEvento();

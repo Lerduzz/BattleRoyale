@@ -342,7 +342,7 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
 
 void BattleRoyaleMgr::PrevenirJcJEnLaNave(Player *player, bool state)
 {
-    if (state && HayJugadores() && EstaEnEvento(player) && !DebeForzarJcJTcT(player))
+    if (state && HayJugadores() && EstaEnEvento(player) && !TodosContraTodos(player))
         player->SetPvP(false);
 }
 
@@ -437,7 +437,7 @@ void BattleRoyaleMgr::LlamarDentroDeNave(uint32 guid, uint32 tiempo /* = 20000*/
     SiguientePosicion();
 }
 
-void BattleRoyaleMgr::OnSummonResponse(Player *player, bool agree, ObjectGuid summoner_guid)
+void BattleRoyaleMgr::RespondeInvitacion(Player *player, bool agree, ObjectGuid summoner_guid)
 {
     if (!player || !EstaInvitado(player))
         return;
@@ -581,7 +581,7 @@ void BattleRoyaleMgr::ActivarJcJTcT()
     {
         for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
         {
-            if (it->second && it->second->IsAlive() && DebeForzarJcJTcT(it->second) && !(it->second->HasByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP)))
+            if (it->second && it->second->IsAlive() && TodosContraTodos(it->second) && !(it->second->HasByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP)))
             {
                 it->second->SetByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
             }
