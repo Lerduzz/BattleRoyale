@@ -31,8 +31,7 @@ class BRObjetosMgr
 {
     BRObjetosMgr()
     {
-        obj_Zona = nullptr;
-        obj_Centro = nullptr;
+        npc_Centro = nullptr;
         obj_Nave = nullptr;
         npc_Vendedor = nullptr;
         npc_Guardian = nullptr;
@@ -52,17 +51,6 @@ public:
         DesaparecerZona();
         DesaparecerCentro();
         DesaparecerNave();
-    }
-
-    bool DesaparecerZona()
-    {
-        if (HayZona()) {
-            obj_Zona->CleanupsBeforeDelete();
-            delete obj_Zona;
-            obj_Zona = nullptr;
-            return true;
-        }
-        return false;
     }
 
     bool DesaparecerCentro()
@@ -217,7 +205,7 @@ public:
     {
         if (HayCentro())
         {
-            if (obj_Centro->SummonGameObject(OBJETO_COFRE, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation(), 0, 0, 0, 0, 60))
+            if (npc_Centro->SummonGameObject(OBJETO_COFRE, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation(), 0, 0, 0, 0, 60))
             {
                 return true;
             }
@@ -244,7 +232,7 @@ public:
         return true;
     }
 
-    float DistanciaDelCentro(Player* player) { return HayCentro() ? player->GetExactDist(obj_Centro): 0.0f; }; // TODO: GetDist
+    float DistanciaDelCentro(Player* player) { return HayCentro() ? player->GetExactDist(npc_Centro): 0.0f; }; // TODO: GetDist
     bool EstaLaZonaActiva() { return HayCentro(); }; // TODO: Esto esta repetido.
 
     bool HayCentro() { return npc_Centro ? true : false; };
