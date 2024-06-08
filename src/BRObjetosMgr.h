@@ -46,11 +46,11 @@ public:
 
     void DesaparecerTodosLosObjetos()
     {
-        DesaparecerCentro();
+        DesaparecerZona();
         DesaparecerNave();
     }
 
-    bool DesaparecerCentro()
+    bool DesaparecerZona()
     {
         if (HayGuardian())
         {
@@ -58,7 +58,7 @@ public:
             delete npc_Guardian;
             npc_Guardian = nullptr;
         }
-        if (HayCentro()) {
+        if (EstaLaZonaActiva()) {
             npc_Centro->CleanupsBeforeDelete();
             delete npc_Centro;
             npc_Centro = nullptr;
@@ -164,12 +164,12 @@ public:
         return false;
     }
 
-    bool InvocarCentroDelMapa(uint32 mapID, Position pos)
+    bool InvocarZona(uint32 mapID, Position pos)
     {
         Map* map = sMapMgr->CreateBaseMap(mapID);
         if (map)
         {
-            DesaparecerCentro();
+            DesaparecerZona();
             float x = pos.GetPositionX();
             float y = pos.GetPositionY();
             float z = pos.GetPositionZ();
@@ -200,7 +200,7 @@ public:
 
     bool InvocarCofre(Position pos)
     {
-        if (HayCentro())
+        if (EstaLaZonaActiva())
         {
             if (npc_Centro->SummonGameObject(OBJETO_COFRE, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation(), 0, 0, 0, 0, 60))
             {
@@ -210,7 +210,7 @@ public:
         return false;
     }
 
-    bool ActualizarZonaSegura(float& scale)
+    bool ActualizarZona(float& scale)
     {
         if (scale < 0.2f)
         {
@@ -229,10 +229,9 @@ public:
         return true;
     }
 
-    float DistanciaDelCentro(Player* player) { return HayCentro() ? player->GetExactDist(npc_Centro): 0.0f; }; // TODO: GetDist
-    bool EstaLaZonaActiva() { return HayCentro(); }; // TODO: Esto esta repetido.
+    float DistanciaDelCentro(Player* player) { return EstaLaZonaActiva() ? player->GetExactDist(npc_Centro): 0.0f; }; // TODO: GetDist
+    bool EstaLaZonaActiva() { return npc_Centro ? true : false; };
 
-    bool HayCentro() { return npc_Centro ? true : false; };
     bool HayNave() { return obj_Nave ? true : false; };
     bool HayGuardian() { return npc_Guardian ? true : false; };
 

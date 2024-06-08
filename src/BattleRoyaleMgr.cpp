@@ -204,7 +204,7 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
                 tiempoRestanteZona = 0;
                 estaZonaAnunciada5s = false;
                 estaZonaAnunciada10s = false;
-                if (!HayJugadores() || !sBRObjetosMgr->InvocarCentroDelMapa(sBRMapasMgr->MapaActual()->idMapa, sBRMapasMgr->MapaActual()->centroMapa))
+                if (!HayJugadores() || !sBRObjetosMgr->InvocarZona(sBRMapasMgr->MapaActual()->idMapa, sBRMapasMgr->MapaActual()->centroMapa))
                 {
                     RestablecerTodoElEvento();
                     return;
@@ -252,7 +252,7 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
                     sBRChatMgr->NotificarNaveRetirada(list_Jugadores);
                 }
             }
-            sBRObjetosMgr->ActualizarZonaSegura(escalaDeZona);
+            sBRObjetosMgr->ActualizarZona(escalaDeZona);
             if (tiempoRestanteZona <= 0)
             {
                 AlReducirseLaZona();
@@ -504,7 +504,7 @@ void BattleRoyaleMgr::EfectoFueraDeZona()
     {
         for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
         {
-            if (it->second && it->second->IsAlive() && sBRObjetosMgr->HayCentro())
+            if (it->second && it->second->IsAlive() && sBRObjetosMgr->EstaLaZonaActiva())
             {
                 float distance = sBRObjetosMgr->DistanciaDelCentro(it->second);
                 if (!sBRObjetosMgr->EstaLaZonaActiva() /* || (escalaDeZona > 0 && distance > BR_EscalasDeZonaSegura[escalaDeZona - 1] * 66.0f)*/)
