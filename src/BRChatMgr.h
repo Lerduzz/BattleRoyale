@@ -46,7 +46,7 @@ public:
             {
                 case 0:
                 {
-                    notificacion << "|cff00ff00¡Que comience la batalla de |cffDA70D6" << mapa.c_str() << "|cff00ff00!";
+                    notificacion << "¡Que comience la batalla de " << mapa.c_str() << "!";
                     AnunciarRondaIniciada(mapa, lista.size());
                     break;
                 }
@@ -54,12 +54,12 @@ public:
                 case 10:
                 case 15:
                 {
-                    notificacion << "|cff00ff00En |cffDA70D6" << tiempo << "|cff00ff00 segundos... |cffff0000¡INICIAN LAS HOSTILIDADES!";
+                    notificacion << "En " << tiempo << " segundos... ¡INICIAN LAS HOSTILIDADES!";
                     break;
                 }
                 case 20:
                 {
-                    notificacion << "|cff00ff00¡YA PUEDES SALTAR CUANDO QUIERAS! |cffff0000¡REVISA TUS ALAS!";
+                    notificacion << "¡YA PUEDES SALTAR CUANDO QUIERAS!";
                     break;
                 }
                 case 25:
@@ -67,30 +67,26 @@ public:
                 case 35:
                 case 40:
                 {
-                    notificacion << "|cff00ff00Faltan |cffDA70D6" << (tiempo - 20) << "|cff00ff00 segundos para llegar. |cffff0000¡EQUIPA TUS ALAS!";
+                    notificacion << "Faltan " << (tiempo - 20) << " segundos para llegar.";
                     break;
                 }
                 case 45:
                 {
-                    notificacion << "|cff00ff00La nave se mueve. |cffff0000¡QUÉDATE EN ELLA HASTA LLEGAR!";
+                    notificacion << "La nave se mueve. ¡PERMANECE EN ELLA HASTA LLEGAR!";
                     break;
                 }
                 default:
                 {
                     if (tiempo > 45 && tiempo <= 75)
                     {
-                        notificacion << "|cff00ff00Faltan |cffDA70D6" << (tiempo - 45) << "|cff00ff00 segundos para encender motores. |cffff0000¡NO TE TIRES!";
-                    }
-                    else
-                    {
-                        notificacion << "|cffff0000ERROR: Mensaje desconocido.|r";
+                        notificacion << "Faltan " << (tiempo - 45) << " segundos para encender motores.";
                     }
                     break;
                 }
             }
             for (BR_ListaChat::iterator it = lista.begin(); it != lista.end(); ++it)
             {
-                it->second->GetSession()->SendNotification("%s", notificacion.str().c_str());
+                it->second->GetSession()->SendAreaTriggerMessage("%s", notificacion.str().c_str());
             }
         }
     };

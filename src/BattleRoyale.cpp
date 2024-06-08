@@ -268,6 +268,7 @@ public:
         {
             if (sBattleRoyaleMgr->EstaActivado())
             {
+                // TODO: Primero votar por el mapa antes de llamarlo a la cola, se debe comprobar requisitos.
                 sBattleRoyaleMgr->GestionarJugadorEntrando(player);
                 if (sBattleRoyaleMgr->EstaEnCola(player))
                 {

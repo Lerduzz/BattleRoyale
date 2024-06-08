@@ -143,24 +143,24 @@ private:
     void AlReducirseLaZona()
     {
         int chestCount = 0;
-        if (indiceDeZona < CANTIDAD_DE_ZONAS && sBRMapasMgr->TieneZonasParaCofres(indiceDeZona))
-        {
-            BR_UbicacionZona temp = sBRMapasMgr->ObtenerZonasParaCofres(indiceDeZona);
-            if (temp.size())
-            {
-                for (BR_UbicacionZona::iterator it = temp.begin(); it != temp.end(); ++it)
-                {
-                    int rnd = rand() % 100 + 1;
-                    if (rnd <= 35)
-                    {
-                        if (sBRObjetosMgr->InvocarCofre(it->second))
-                        {
-                            chestCount++;
-                        }
-                    }
-                }
-            }
-        }
+        // if (escalaDeZona < CANTIDAD_DE_ZONAS && sBRMapasMgr->TieneZonasParaCofres(escalaDeZona))
+        // {
+        //     BR_UbicacionZona temp = sBRMapasMgr->ObtenerZonasParaCofres(escalaDeZona);
+        //     if (temp.size())
+        //     {
+        //         for (BR_UbicacionZona::iterator it = temp.begin(); it != temp.end(); ++it)
+        //         {
+        //             int rnd = rand() % 100 + 1;
+        //             if (rnd <= 35)
+        //             {
+        //                 if (sBRObjetosMgr->InvocarCofre(it->second))
+        //                 {
+        //                     chestCount++;
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
         if (HayJugadores())
         {
             if (estadoActual == ESTADO_BATALLA_EN_CURSO)
@@ -392,6 +392,7 @@ private:
     BR_ListaDePersonajes list_QuitarTodosLosObjetos;
 
     BR_EstadosEvento estadoActual;
+    BR_EstadosZona estadoZona;
 
     int tiempoRestanteSinJugadores;
     int tiempoRestanteInicio;
@@ -400,10 +401,12 @@ private:
     int tiempoRestanteFinal;
 
     int indiceDeVariacion;
-    int indiceDeZona;
+    float escalaDeZona;
+    float reducirZonaHasta;
     uint32 totalAsesinatosJcJ;
 
     int indicadorDeSegundos;
+    int indicadorDe100msZona;
     bool seHaAnunciadoInicioForzado;
     bool estaZonaAnunciada5s;
     bool estaZonaAnunciada10s;

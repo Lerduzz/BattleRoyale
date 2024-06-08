@@ -126,24 +126,24 @@ public:
                     fields[10].Get<float>(),
                     fields[11].Get<float>()
                 };
-                for (uint32 i = 0; i < CANTIDAD_DE_ZONAS; ++i)
-                {
-                    QueryResult result_spawn = WorldDatabase.Query("SELECT `id`, `pos_x`, `pos_y`, `pos_z`, `pos_o` FROM `battleroyale_maps_spawns` WHERE `zone` = {} AND `map` = {} ORDER BY `zone` ASC;", i, id);
-                    if (result_spawn)
-                    {
-                        do
-                        {
-                            Field* fields_spawn    = result_spawn->Fetch();
-                            uint32 id_spawn    = fields_spawn[0].Get<uint32>();
-                            mapa->ubicacionesMapa[i][id_spawn] = {
-                                fields_spawn[1].Get<float>(),
-                                fields_spawn[2].Get<float>(),
-                                fields_spawn[3].Get<float>(),
-                                fields_spawn[4].Get<float>()
-                            };
-                        } while (result_spawn->NextRow());
-                    }
-                }
+                // for (uint32 i = 0; i < CANTIDAD_DE_ZONAS; ++i)
+                // {
+                //     QueryResult result_spawn = WorldDatabase.Query("SELECT `id`, `pos_x`, `pos_y`, `pos_z`, `pos_o` FROM `battleroyale_maps_spawns` WHERE `zone` = {} AND `map` = {} ORDER BY `zone` ASC;", i, id);
+                //     if (result_spawn)
+                //     {
+                //         do
+                //         {
+                //             Field* fields_spawn    = result_spawn->Fetch();
+                //             uint32 id_spawn    = fields_spawn[0].Get<uint32>();
+                //             mapa->ubicacionesMapa[i][id_spawn] = {
+                //                 fields_spawn[1].Get<float>(),
+                //                 fields_spawn[2].Get<float>(),
+                //                 fields_spawn[3].Get<float>(),
+                //                 fields_spawn[4].Get<float>()
+                //             };
+                //         } while (result_spawn->NextRow());
+                //     }
+                // }
                 mapa->votos = 0;
                 list_Mapas[id] = mapa;
             } while (result->NextRow());

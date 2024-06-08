@@ -28,11 +28,11 @@ BattleRoyale.MaxJugadores = 50
 # * SinJugadores: Tiempo para inicio forzado sin suficientes jugadores
 #       Defecto: 1800 (30 minutos) (Se avisará cuando falten 5 minutos)
 #
-# * NaveEnEspera: Tiempo antes que la nove comience a moverse
+# * NaveEnEspera: Tiempo antes que la nave comience a moverse
 #       Defecto: 30 segundos (Consejo: Se recomienda 20 o más)
 #       Nota: Al faltar 10 segundos se deja de invocar jugadores
 #
-# * ZonaSegura: Tiempo entre reducciones de zona (Son 10 zonas en total)
+# * ZonaSegura: Tiempo entre reducciones de zona
 #
 # * FinalDeRonda: Tiempo para espectar al ganador antes de salir
 #       Defecto: 10 segundos
