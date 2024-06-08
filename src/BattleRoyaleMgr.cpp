@@ -200,7 +200,7 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
             if (--tiempoRestanteInicio <= 20)
             {
                 estadoActual = ESTADO_NAVE_CERCA_DEL_CENTRO;
-                escalaDeZona = 15.0f;
+                escalaDeZona = 15.2f;
                 tiempoRestanteZona = 0;
                 estaZonaAnunciada5s = false;
                 estaZonaAnunciada10s = false;
@@ -255,9 +255,11 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
             }
             if (tiempoRestanteZona <= 0)
             {
-                if (estadoZona == ESTADO_ZONA_EN_ESPERA && escalaDeZona > 3.0f)
+                if (estadoZona == ESTADO_ZONA_EN_ESPERA && sBRObjetosMgr->EstaLaZonaActiva())
                 {
                     reducirZonaHasta = escalaDeZona - 3.0f;
+                    if (reducirZonaHasta < 0.2f)
+                        reducirZonaHasta = 0.2f;
                     estadoZona = ESTADO_ZONA_EN_REDUCCION;
                 }
                 AlReducirseLaZona();
@@ -270,19 +272,22 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
             }
             else
             {
-                if (!estaZonaAnunciada5s && tiempoRestanteZona <= 5)
+                if (estadoZona == ESTADO_ZONA_EN_ESPERA)
                 {
-                    sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_ZONA_TIEMPO, list_Jugadores);
-                    sBRChatMgr->NotificarAdvertenciaDeZona(5, list_Jugadores);
-                    estaZonaAnunciada5s = true;
+                    if (!estaZonaAnunciada5s && tiempoRestanteZona <= 5)
+                    {
+                        sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_ZONA_TIEMPO, list_Jugadores);
+                        sBRChatMgr->NotificarAdvertenciaDeZona(5, list_Jugadores);
+                        estaZonaAnunciada5s = true;
+                    }
+                    if (!estaZonaAnunciada10s && tiempoRestanteZona <= 10)
+                    {
+                        sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_ZONA_TIEMPO, list_Jugadores);
+                        sBRChatMgr->NotificarAdvertenciaDeZona(10, list_Jugadores);
+                        estaZonaAnunciada10s = true;
+                    }
+                    tiempoRestanteZona--;
                 }
-                if (!estaZonaAnunciada10s && tiempoRestanteZona <= 10)
-                {
-                    sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_ZONA_TIEMPO, list_Jugadores);
-                    sBRChatMgr->NotificarAdvertenciaDeZona(10, list_Jugadores);
-                    estaZonaAnunciada10s = true;
-                }
-                tiempoRestanteZona--;
             }
             break;
         }
@@ -318,13 +323,13 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
             }
             else
             {
-                if (reducirZonaHasta < 1.0f)
+                if (sBRObjetosMgr->EstaLaZonaActiva())
                 {
-                    estadoZona = ESTADO_ZONA_DESAPARECIDA;
+                    estadoZona = ESTADO_ZONA_EN_ESPERA;
                 }
                 else
                 {
-                    estadoZona = ESTADO_ZONA_EN_ESPERA;
+                    estadoZona = ESTADO_ZONA_DESAPARECIDA;                    
                 }
             }
         }
@@ -504,6 +509,8 @@ void BattleRoyaleMgr::SalirDelEvento(uint32 guid, bool logout /* = false*/)
                 player->RemoveAurasDueToSpell(HECHIZO_DESGARRO_ASESINO);
             if (player->HasAura(HECHIZO_ACIDO_ZONA))
                 player->RemoveAurasDueToSpell(HECHIZO_ACIDO_ZONA);
+            if (player->HasAura(HECHIZO_BENEFICIO_LIEBRE))
+                player->RemoveAurasDueToSpell(HECHIZO_BENEFICIO_LIEBRE);
         }
         if (!logout)
         {
@@ -540,7 +547,7 @@ void BattleRoyaleMgr::EfectoFueraDeZona()
             if (it->second && it->second->IsAlive() && sBRObjetosMgr->EstaLaZonaActiva())
             {
                 float distance = sBRObjetosMgr->DistanciaDelCentro(it->second);
-                if (estadoZona == ESTADO_ZONA_DESAPARECIDA || escalaDeZona * 10 < distance)
+                if (estadoZona == ESTADO_ZONA_DESAPARECIDA || escalaDeZona * 20.0f < distance)
                 {
                     list_Datos[it->first].dmg_tick++;
                     if (list_Datos[it->first].dmg_tick <= 15)
