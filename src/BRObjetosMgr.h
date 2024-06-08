@@ -9,20 +9,20 @@
 
 enum BR_Dimensiones
 {
-    DIMENSION_NORMAL                        = 0x00000001,
-    DIMENSION_EVENTO                        = 0x00000002,
+    DIMENSION_NORMAL = 0x00000001,
+    DIMENSION_EVENTO = 0x00000002,
 };
 
 enum BR_ObjetosMundo
 {
-    OBJETO_NAVE                             = 194675,
-    OBJETO_COFRE                            = 499999,
+    OBJETO_NAVE = 194675,
+    OBJETO_COFRE = 499999,
 };
 
 enum BR_Criaturas
 {
-    CRIATURA_VENDEDOR_ARMAS                 = 200001,
-    CRIATURA_DRAGON_GUARDIAN                = 199999,
+    CRIATURA_VENDEDOR_ARMAS = 200001,
+    CRIATURA_DRAGON_GUARDIAN = 199999,
 };
 
 class BRObjetosMgr
@@ -33,7 +33,7 @@ class BRObjetosMgr
         obj_Nave = nullptr;
         npc_Vendedor = nullptr;
         npc_Guardian = nullptr;
-        zonaActiva = false;    
+        zonaActiva = false;
     };
     ~BRObjetosMgr(){};
 
@@ -58,7 +58,8 @@ public:
             delete npc_Guardian;
             npc_Guardian = nullptr;
         }
-        if (EstaLaZonaActiva()) {
+        if (EstaLaZonaActiva())
+        {
             npc_Centro->CleanupsBeforeDelete();
             delete npc_Centro;
             npc_Centro = nullptr;
@@ -75,8 +76,9 @@ public:
             delete npc_Vendedor;
             npc_Vendedor = nullptr;
         }
-        if (HayNave()) {
-            if(Transport* tp = obj_Nave->ToTransport())
+        if (HayNave())
+        {
+            if (Transport *tp = obj_Nave->ToTransport())
             {
                 tp->CleanupsBeforeDelete();
             }
@@ -93,7 +95,7 @@ public:
 
     bool InvocarNave(uint32 mapID, Position pos)
     {
-        Map* map = sMapMgr->CreateBaseMap(mapID);
+        Map *map = sMapMgr->CreateBaseMap(mapID);
         if (map)
         {
             DesaparecerNave();
@@ -109,12 +111,12 @@ public:
             {
                 obj_Nave->SetVisibilityDistanceOverride(VisibilityDistanceType::Infinite);
                 map->AddToMap(obj_Nave);
-                if (Transport* transport = obj_Nave->ToTransport())
+                if (Transport *transport = obj_Nave->ToTransport())
                 {
                     float vX = 0.0f;
                     float vY = 23.5f;
                     float vZ = 0.0f;
-                    float vO = - M_PI_2;
+                    float vO = -M_PI_2;
                     transport->CalculatePassengerPosition(*(&vX), *(&vY), *(&vZ), &vO);
                     if ((npc_Vendedor = transport->SummonCreature(CRIATURA_VENDEDOR_ARMAS, vX, vY, vZ, vO, TEMPSUMMON_MANUAL_DESPAWN)))
                     {
@@ -149,15 +151,16 @@ public:
         return false;
     }
 
-    bool EstaEnLaNave(Player* player)
+    bool EstaEnLaNave(Player *player)
     {
         if (player && HayNave())
         {
-            if (Transport* tp = obj_Nave->ToTransport())
+            if (Transport *tp = obj_Nave->ToTransport())
             {
-                if (Transport* playertp = player->GetTransport())
+                if (Transport *playertp = player->GetTransport())
                 {
-                    if (tp == playertp) return true;
+                    if (tp == playertp)
+                        return true;
                 }
             }
         }
@@ -166,7 +169,7 @@ public:
 
     bool InvocarZona(uint32 mapID, Position pos)
     {
-        Map* map = sMapMgr->CreateBaseMap(mapID);
+        Map *map = sMapMgr->CreateBaseMap(mapID);
         if (map)
         {
             DesaparecerZona();
@@ -174,7 +177,7 @@ public:
             float y = pos.GetPositionY();
             float z = pos.GetPositionZ();
             float o = pos.GetOrientation();
-            CreatureTemplate const* cinfo = sObjectMgr->GetCreatureTemplate(12999);
+            CreatureTemplate const *cinfo = sObjectMgr->GetCreatureTemplate(12999);
             if (!cinfo)
                 return false;
             npc_Centro = new Creature(true);
@@ -210,7 +213,7 @@ public:
         return false;
     }
 
-    bool ActualizarZona(float& scale)
+    bool ActualizarZona(float &scale)
     {
         if (scale < 0.2f)
         {
@@ -229,13 +232,13 @@ public:
         return true;
     }
 
-    float DistanciaDelCentro(Player* player) { return EstaLaZonaActiva() ? player->GetExactDist(npc_Centro): 0.0f; }; // TODO: GetDist
+    float DistanciaDelCentro(Player *player) { return EstaLaZonaActiva() ? player->GetExactDist(npc_Centro) : 0.0f; }; // TODO: GetDist
     bool EstaLaZonaActiva() { return npc_Centro ? true : false; };
 
     bool HayNave() { return obj_Nave ? true : false; };
     bool HayGuardian() { return npc_Guardian ? true : false; };
 
-    bool HechizoGuardian(uint32 spell, Player* player)
+    bool HechizoGuardian(uint32 spell, Player *player)
     {
         if (HayGuardian() && player && spell > 0)
         {
@@ -244,16 +247,14 @@ public:
         return false;
     }
 
-
 private:
-    GameObject* obj_Nave;
+    GameObject *obj_Nave;
 
-    Creature* npc_Vendedor;
-    Creature* npc_Centro;
-    Creature* npc_Guardian;
+    Creature *npc_Vendedor;
+    Creature *npc_Centro;
+    Creature *npc_Guardian;
 
     bool zonaActiva;
-
 };
 
 #define sBRObjetosMgr BRObjetosMgr::instance()
