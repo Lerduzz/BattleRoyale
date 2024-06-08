@@ -215,19 +215,19 @@ public:
 
     bool ActualizarZona(float &scale)
     {
-        if (scale < 0.2f)
+        if (EstaLaZonaActiva())
         {
-            if (npc_Centro)
+            if (scale < 0.2f)
             {
                 npc_Centro->CleanupsBeforeDelete();
                 delete npc_Centro;
                 npc_Centro = nullptr;
             }
-        }
-        else
-        {
-            npc_Centro->SetObjectScale(scale);
-            scale -= 0.01f;
+            else
+            {
+                npc_Centro->SetObjectScale(scale);
+                scale -= 0.01f;
+            }
         }
         return true;
     }
