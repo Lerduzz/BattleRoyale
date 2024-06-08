@@ -1,7 +1,6 @@
 #include "BattleRoyaleMgr.h"
 #include "CharacterCache.h"
 #include "Config.h"
-#include "Log.h"
 
 BattleRoyaleMgr::BattleRoyaleMgr()
 {
