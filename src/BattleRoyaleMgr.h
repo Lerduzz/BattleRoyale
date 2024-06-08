@@ -402,9 +402,11 @@ private:
 
     int indiceDeVariacion;
     float escalaDeZona;
+    float reducirZonaHasta;
     uint32 totalAsesinatosJcJ;
 
     int indicadorDeSegundos;
+    int indicadorDe100msZona;
     bool seHaAnunciadoInicioForzado;
     bool estaZonaAnunciada5s;
     bool estaZonaAnunciada10s;

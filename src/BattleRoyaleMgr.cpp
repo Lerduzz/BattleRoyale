@@ -222,6 +222,7 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
             if (--tiempoRestanteInicio <= 0)
             {
                 estadoActual = ESTADO_BATALLA_EN_CURSO;
+                estadoZona = ESTADO_ZONA_EN_ESPERA;
                 sBRRecompensaMgr->AcumularRecompensaVivos(conf_Recompensa.base, list_Jugadores, &list_Datos);
                 sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_RONDA_INICIADA, list_Jugadores);
                 sBRChatMgr->NotificarTiempoInicial(0, list_Jugadores, sBRMapasMgr->MapaActual()->nombreMapa);
@@ -252,9 +253,13 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
                     sBRChatMgr->NotificarNaveRetirada(list_Jugadores);
                 }
             }
-            sBRObjetosMgr->ActualizarZona(escalaDeZona);
             if (tiempoRestanteZona <= 0)
             {
+                if (estadoZona == ESTADO_ZONA_EN_ESPERA && escalaDeZona > 3.0f)
+                {
+                    reducirZonaHasta = escalaDeZona - 3.0f;
+                    estadoZona = ESTADO_ZONA_EN_REDUCCION;
+                }
                 AlReducirseLaZona();
                 sBRRecompensaMgr->AcumularRecompensaVivos(conf_Recompensa.zona, list_Jugadores, &list_Datos);
                 sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_ZONA_REDUCIDA, list_Jugadores);
@@ -290,6 +295,7 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
                 tiempoRestanteSinJugadores = conf_IntervaloSinJugadores;
                 seHaAnunciadoInicioForzado = false;
                 estadoActual = ESTADO_NO_HAY_SUFICIENTES_JUGADORES;
+                estadoZona = ESTADO_ZONA_SIN_EVENTO;
                 if (HaySuficientesEnCola())
                     IniciarNuevaRonda();
             }
@@ -300,6 +306,32 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
     else
     {
         indicadorDeSegundos -= diff;
+    }
+    if (estadoActual == ESTADO_BATALLA_EN_CURSO && estadoZona == ESTADO_ZONA_EN_REDUCCION)
+    {
+        if (indicadorDe100msZona <= 0)
+        {
+            indicadorDe100msZona = 100;
+            if (reducirZonaHasta < escalaDeZona)
+            {
+                sBRObjetosMgr->ActualizarZona(escalaDeZona);
+            }
+            else
+            {
+                if (reducirZonaHasta < 1.0f)
+                {
+                    estadoZona = ESTADO_ZONA_DESAPARECIDA;
+                }
+                else
+                {
+                    estadoZona = ESTADO_ZONA_EN_ESPERA;
+                }
+            }
+        }
+        else
+        {
+            indicadorDe100msZona -= diff;
+        }
     }
 }
 
@@ -329,6 +361,7 @@ void BattleRoyaleMgr::RestablecerTodoElEvento()
     list_QuitarTodosLosObjetos.clear();
     sBRMapasMgr->SiguienteMapa();
     indicadorDeSegundos = 1000;
+    indicadorDe100msZona = 100;
     indiceDeVariacion = 0;
     totalAsesinatosJcJ = 0;
     sBRObjetosMgr->DesaparecerTodosLosObjetos();
@@ -507,7 +540,7 @@ void BattleRoyaleMgr::EfectoFueraDeZona()
             if (it->second && it->second->IsAlive() && sBRObjetosMgr->EstaLaZonaActiva())
             {
                 float distance = sBRObjetosMgr->DistanciaDelCentro(it->second);
-                if (!sBRObjetosMgr->EstaLaZonaActiva() /* || (escalaDeZona > 0 && distance > BR_EscalasDeZonaSegura[escalaDeZona - 1] * 66.0f)*/)
+                if (estadoZona == ESTADO_ZONA_DESAPARECIDA || escalaDeZona * 10 < distance)
                 {
                     list_Datos[it->first].dmg_tick++;
                     if (list_Datos[it->first].dmg_tick <= 15)
