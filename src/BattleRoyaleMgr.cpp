@@ -201,7 +201,7 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
             if (--tiempoRestanteInicio <= 20)
             {
                 estadoActual = ESTADO_NAVE_CERCA_DEL_CENTRO;
-                indiceDeZona = 0;
+                escalaDeZona = 15.0f;
                 tiempoRestanteZona = 0;
                 estaZonaAnunciada5s = false;
                 estaZonaAnunciada10s = false;
@@ -253,13 +253,9 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
                     sBRChatMgr->NotificarNaveRetirada(list_Jugadores);
                 }
             }
+            sBRObjetosMgr->ActualizarZonaSegura(escalaDeZona);
             if (tiempoRestanteZona <= 0)
             {
-                // if (!HayJugadores() || !sBRObjetosMgr->InvocarZonaSegura(sBRMapasMgr->MapaActual()->idMapa, sBRMapasMgr->MapaActual()->centroMapa, indiceDeZona))
-                // {
-                //     RestablecerTodoElEvento();
-                //     return;
-                // }
                 AlReducirseLaZona();
                 sBRRecompensaMgr->AcumularRecompensaVivos(conf_Recompensa.zona, list_Jugadores, &list_Datos);
                 sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_ZONA_REDUCIDA, list_Jugadores);
@@ -282,10 +278,7 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
                     sBRChatMgr->NotificarAdvertenciaDeZona(10, list_Jugadores);
                     estaZonaAnunciada10s = true;
                 }
-                if (indiceDeZona <= CANTIDAD_DE_ZONAS)
-                {
-                    tiempoRestanteZona--;
-                }
+                tiempoRestanteZona--;
             }
             break;
         }
@@ -514,7 +507,7 @@ void BattleRoyaleMgr::EfectoFueraDeZona()
             if (it->second && it->second->IsAlive() && sBRObjetosMgr->HayCentro())
             {
                 float distance = sBRObjetosMgr->DistanciaDelCentro(it->second);
-                if (!sBRObjetosMgr->EstaLaZonaActiva() || (indiceDeZona > 0 && distance > BR_EscalasDeZonaSegura[indiceDeZona - 1] * 66.0f))
+                if (!sBRObjetosMgr->EstaLaZonaActiva() /* || (escalaDeZona > 0 && distance > BR_EscalasDeZonaSegura[escalaDeZona - 1] * 66.0f)*/)
                 {
                     list_Datos[it->first].dmg_tick++;
                     if (list_Datos[it->first].dmg_tick <= 15)
