@@ -17,8 +17,6 @@ enum BR_ObjetosMundo
 {
     OBJETO_NAVE                             = 194675,
     OBJETO_COFRE                            = 499999,
-    OBJETO_CENTRO_DEL_MAPA                  = 500000,
-    OBJETO_ZONA_SEGURA_INICIAL              = 500001,
 };
 
 enum BR_Criaturas
@@ -189,7 +187,7 @@ public:
             npc_Centro->SetVisibilityDistanceOverride(VisibilityDistanceType::Infinite);
             map->AddToMap(npc_Centro);
             npc_Centro->AddAura(63894, npc_Centro);
-            npc_Centro->SetObjectScale(15.0f);
+            npc_Centro->SetObjectScale(15.2f);
             if (!(npc_Guardian = npc_Centro->SummonCreature(CRIATURA_DRAGON_GUARDIAN, x, y, z + 330.0f, o, TEMPSUMMON_MANUAL_DESPAWN)))
             {
                 delete npc_Guardian;
