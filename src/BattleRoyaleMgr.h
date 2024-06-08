@@ -392,6 +392,7 @@ private:
     BR_ListaDePersonajes list_QuitarTodosLosObjetos;
 
     BR_EstadosEvento estadoActual;
+    BR_EstadosZona estadoZona;
 
     int tiempoRestanteSinJugadores;
     int tiempoRestanteInicio;

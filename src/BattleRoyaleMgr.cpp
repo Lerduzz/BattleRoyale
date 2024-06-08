@@ -335,6 +335,7 @@ void BattleRoyaleMgr::RestablecerTodoElEvento()
     tiempoRestanteSinJugadores = conf_IntervaloSinJugadores;
     seHaAnunciadoInicioForzado = false;
     estadoActual = ESTADO_NO_HAY_SUFICIENTES_JUGADORES;
+    estadoZona = ESTADO_ZONA_SIN_EVENTO;
 }
 
 void BattleRoyaleMgr::IniciarNuevaRonda()

@@ -13,6 +13,14 @@ enum BR_EstadosEvento
     ESTADO_BATALLA_TERMINADA,
 };
 
+enum BR_EstadosZona
+{
+    ESTADO_ZONA_SIN_EVENTO = 0,
+    ESTADO_ZONA_EN_ESPERA,
+    ESTADO_ZONA_EN_REDUCCION,
+    ESTADO_ZONA_DESAPARECIDA,
+};
+
 enum BR_Hechizos
 {
     HECHIZO_PARACAIDAS                      = 45472,
