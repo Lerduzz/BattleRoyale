@@ -4,6 +4,7 @@
 #include "BRConstantes.h"
 #include "GameObject.h"
 #include "MapMgr.h"
+#include "SpellAuras.h"
 #include "Transport.h"
 
 enum BR_Dimensiones
@@ -73,9 +74,9 @@ public:
             npc_Guardian = nullptr;
         }
         if (HayCentro()) {
-            obj_Centro->CleanupsBeforeDelete();
-            delete obj_Centro;
-            obj_Centro = nullptr;
+            npc_Centro->CleanupsBeforeDelete();
+            delete npc_Centro;
+            npc_Centro = nullptr;
             return true;
         }
         return false;
@@ -107,7 +108,7 @@ public:
 
     bool InvocarNave(uint32 mapID, Position pos)
     {
-        Map* map = sMapMgr->FindBaseNonInstanceMap(mapID);
+        Map* map = sMapMgr->CreateBaseMap(mapID);
         if (map)
         {
             DesaparecerNave();
@@ -180,7 +181,7 @@ public:
 
     bool InvocarCentroDelMapa(uint32 mapID, Position pos)
     {
-        Map* map = sMapMgr->FindBaseNonInstanceMap(mapID);
+        Map* map = sMapMgr->CreateBaseMap(mapID);
         if (map)
         {
             DesaparecerCentro();
@@ -188,24 +189,26 @@ public:
             float y = pos.GetPositionY();
             float z = pos.GetPositionZ();
             float o = pos.GetOrientation();
-            map->LoadGrid(x, y);
-            obj_Centro = new GameObject();
-            if (obj_Centro->Create(map->GenerateLowGuid<HighGuid::GameObject>(), OBJETO_CENTRO_DEL_MAPA, map, DIMENSION_EVENTO, x, y, z, o, G3D::Quat(), 100, GO_STATE_READY))
+            CreatureTemplate const* cinfo = sObjectMgr->GetCreatureTemplate(12999);
+            if (!cinfo)
+                return false;
+            npc_Centro = new Creature(true);
+            if (!npc_Centro->Create(map->GenerateLowGuid<HighGuid::Unit>(), map, DIMENSION_EVENTO, 12999, 0, x, y, z, o))
             {
-                obj_Centro->SetVisibilityDistanceOverride(VisibilityDistanceType::Infinite);
-                map->AddToMap(obj_Centro);
-                if (!(npc_Guardian = obj_Centro->SummonCreature(CRIATURA_DRAGON_GUARDIAN, x, y, z + 330.0f, o, TEMPSUMMON_MANUAL_DESPAWN)))
-                {
-                    delete npc_Guardian;
-                    npc_Guardian = nullptr;
-                }
-                return true;
+                delete npc_Centro;
+                npc_Centro = nullptr;
+                return false;
             }
-            else
+            npc_Centro->SetVisibilityDistanceOverride(VisibilityDistanceType::Infinite);
+            map->AddToMap(npc_Centro);
+            Aura::TryRefreshStackOrCreate(63894, MAX_EFFECT_MASK, npc_Centro, npc_Centro);
+            npc_Centro->SetObjectScale(15.0f);
+            if (!(npc_Guardian = npc_Centro->SummonCreature(CRIATURA_DRAGON_GUARDIAN, x, y, z + 330.0f, o, TEMPSUMMON_MANUAL_DESPAWN)))
             {
-                delete obj_Centro;
-                obj_Centro = nullptr;
+                delete npc_Guardian;
+                npc_Guardian = nullptr;
             }
+            return true;
         }
         return false;
     }
@@ -222,48 +225,29 @@ public:
         return false;
     }
 
-    bool InvocarZonaSegura(uint32 mapID, Position pos, int& index)
+    bool ActualizarZonaSegura(float& scale)
     {
-        Map* map = sMapMgr->FindBaseNonInstanceMap(mapID);
-        if (map)
+        if (scale < 0.2f)
         {
-            DesaparecerZona();
-            if (index < CANTIDAD_DE_ZONAS)
+            if (npc_Centro)
             {
-                float x = pos.GetPositionX();
-                float y = pos.GetPositionY();
-                float z = pos.GetPositionZ() + BR_EscalasDeZonaSegura[index] * 66.0f;
-                float o = pos.GetOrientation();
-                map->LoadGrid(x, y);
-                obj_Zona = new GameObject();
-                if (obj_Zona->Create(map->GenerateLowGuid<HighGuid::GameObject>(), OBJETO_ZONA_SEGURA_INICIAL + index, map, DIMENSION_EVENTO, x, y, z, o, G3D::Quat(), 100, GO_STATE_READY))
-                {
-                    obj_Zona->SetVisibilityDistanceOverride(VisibilityDistanceType::Infinite);
-                    map->AddToMap(obj_Zona);
-                    index++;
-                    zonaActiva = true;
-                    return true;
-                }
-                else
-                {
-                    delete obj_Zona;
-                    obj_Zona = nullptr;
-                }
-            }
-            else
-            {
-                zonaActiva = false;
-                return true;
+                npc_Centro->CleanupsBeforeDelete();
+                delete npc_Centro;
+                npc_Centro = nullptr;
             }
         }
-        return false;
+        else
+        {
+            npc_Centro->SetObjectScale(scale);
+            scale -= 0.01f;
+        }
+        return true;
     }
 
-    float DistanciaDelCentro(Player* player) { return obj_Centro ? player->GetExactDist(obj_Centro): 0.0f; };
-    bool EstaLaZonaActiva() { return zonaActiva; };
+    float DistanciaDelCentro(Player* player) { return HayCentro() ? player->GetExactDist(obj_Centro): 0.0f; }; // TODO: GetDist
+    bool EstaLaZonaActiva() { return HayCentro(); }; // TODO: Esto esta repetido.
 
-    bool HayZona() { return obj_Zona ? true : false; };
-    bool HayCentro() { return obj_Centro ? true : false; };
+    bool HayCentro() { return npc_Centro ? true : false; };
     bool HayNave() { return obj_Nave ? true : false; };
     bool HayGuardian() { return npc_Guardian ? true : false; };
 
@@ -276,46 +260,12 @@ public:
         return false;
     }
 
-    // Creature* ObtenerInvocador(uint32 m_MapId, /*uint32 entry, */float x, float y, float z, float o/*, TeamId teamId*/)
-    // {
-    //     uint32 entry = CRIATURA_VENDEDOR_ARMAS;
-    //     //Get map object
-    //     Map* map = sMapMgr->CreateBaseMap(m_MapId);
-    //     if (!map)
-    //     {
-    //         LOG_ERROR("bg.battlefield", "Battlefield::SpawnCreature: Can't create creature entry: {} map not found", entry);
-    //         return nullptr;
-    //     }
-    //     CreatureTemplate const* cinfo = sObjectMgr->GetCreatureTemplate(entry);
-    //     if (!cinfo)
-    //     {
-    //         LOG_ERROR("sql.sql", "Battlefield::SpawnCreature: entry {} does not exist.", entry);
-    //         return nullptr;
-    //     }
-    //     Creature* creature = new Creature(true);
-    //     if (!creature->Create(map->GenerateLowGuid<HighGuid::Unit>(), map, DIMENSION_EVENTO, entry, 0, x, y, z, o))
-    //     {
-    //         LOG_ERROR("bg.battlefield", "Battlefield::SpawnCreature: Can't create creature entry: {}", entry);
-    //         delete creature;
-    //         return nullptr;
-    //     }
-    //     // creature->SetFaction(BattlefieldFactions[teamId]);
-    //     creature->SetHomePosition(x, y, z, o);
-    //     // force using DB speeds -- do we really need this?
-    //     creature->SetSpeed(MOVE_WALK, cinfo->speed_walk);
-    //     creature->SetSpeed(MOVE_RUN, cinfo->speed_run);
-    //     // Set creature in world
-    //     map->AddToMap(creature);
-    //     creature->setActive(true);
-    //     return creature;
-    // }
 
 private:
-    GameObject* obj_Zona;
-    GameObject* obj_Centro;
     GameObject* obj_Nave;
 
     Creature* npc_Vendedor;
+    Creature* npc_Centro;
     Creature* npc_Guardian;
 
     bool zonaActiva;
