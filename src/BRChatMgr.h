@@ -77,10 +77,7 @@ public:
                 }
                 default:
                 {
-                    if (tiempo > 45 && tiempo <= 75)
-                    {
-                        notificacion << "Faltan " << (tiempo - 45) << " segundos para encender motores.";
-                    }
+                    notificacion << "Faltan " << (tiempo - 45) << " segundos para encender motores.";
                     break;
                 }
             }
