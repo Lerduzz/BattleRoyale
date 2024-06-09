@@ -547,7 +547,7 @@ void BattleRoyaleMgr::EfectoFueraDeZona()
             if (it->second && it->second->IsAlive() && sBRObjetosMgr->EstaLaZonaActiva())
             {
                 float distance = sBRObjetosMgr->DistanciaDelCentro(it->second);
-                if (estadoZona == ESTADO_ZONA_DESAPARECIDA || escalaDeZona * 17.5f < distance)
+                if (estadoZona == ESTADO_ZONA_DESAPARECIDA || escalaDeZona * 19.0f < distance)
                 {
                     list_Datos[it->first].dmg_tick++;
                     if (list_Datos[it->first].dmg_tick <= 15)
