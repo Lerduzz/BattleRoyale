@@ -67,7 +67,7 @@ public:
         return !sBRObjetosMgr->EstaEnLaNave(player);
     }
 
-    inline BR_EstadosEvento EstadoActual() { return estadoActual; };
+    inline BREstado EstadoActual() { return estadoActual; };
 
     bool ForzarIniciarNuevaRonda()
     {
@@ -391,8 +391,7 @@ private:
     BR_ListaDePersonajes list_DarObjetosIniciales;
     BR_ListaDePersonajes list_QuitarTodosLosObjetos;
 
-    BR_EstadosEvento estadoActual;
-    BR_EstadosZona estadoZona;
+    BREstado estadoActual;
 
     int tiempoRestanteSinJugadores;
     int tiempoRestanteInicio;

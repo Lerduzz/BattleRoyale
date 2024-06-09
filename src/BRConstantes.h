@@ -17,24 +17,6 @@ enum BREstado
     ESTADO_BR_BATALLA_TERMINADA,             // Batalla terminada, esperando para cerrar el evento (10seg).
 };
 
-enum BR_EstadosEvento
-{
-    ESTADO_NO_HAY_SUFICIENTES_JUGADORES = 0,
-    ESTADO_INVOCANDO_JUGADORES,
-    ESTADO_NAVE_EN_MOVIMIENTO,
-    ESTADO_NAVE_CERCA_DEL_CENTRO,
-    ESTADO_BATALLA_EN_CURSO,
-    ESTADO_BATALLA_TERMINADA,
-};
-
-enum BR_EstadosZona
-{
-    ESTADO_ZONA_SIN_EVENTO = 0,
-    ESTADO_ZONA_EN_ESPERA,
-    ESTADO_ZONA_EN_REDUCCION,
-    ESTADO_ZONA_DESAPARECIDA,
-};
-
 enum BR_Hechizos
 {
     HECHIZO_PARACAIDAS = 45472,
