@@ -268,7 +268,7 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
                 AlReducirseLaZona();
                 sBRRecompensaMgr->AcumularRecompensaVivos(conf_Recompensa.zona, list_Jugadores, &list_Datos);
                 sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_ZONA_REDUCIDA, list_Jugadores);
-                sBRChatMgr->NotificarZonaReducida(list_Jugadores);
+                sBRChatMgr->NotificarZonaEnReduccion(list_Jugadores);
                 tiempoRestanteZona = conf_IntervaloZonaSegura;
                 estaZonaAnunciada5s = false;
                 estaZonaAnunciada10s = false;

@@ -100,13 +100,13 @@ public:
             }
         }
     };
-    void NotificarZonaReducida(BR_ListaChat lista)
+    void NotificarZonaEnReduccion(BR_ListaChat lista)
     {
         if (lista.size())
         {
             for (BR_ListaChat::iterator it = lista.begin(); it != lista.end(); ++it)
             {
-                it->second->GetSession()->SendNotification("|cffff0000¡La zona segura se ha actualizado!");
+                it->second->GetSession()->SendNotification("|cffff0000¡La zona segura se está reduciendo!");
             }
         }
     };
