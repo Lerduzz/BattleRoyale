@@ -620,7 +620,7 @@ void BattleRoyaleMgr::ControlDeReglas()
 
 bool BattleRoyaleMgr::CondicionDeVictoria()
 {
-    if (estadoActual == ESTADO_BATALLA_EN_CURSO)
+    if (estadoActual >= ESTADO_BR_ZONA_EN_ESPERA && estadoActual < ESTADO_BR_BATALLA_TERMINADA)
     {
         if (HayJugadores())
         {
@@ -679,5 +679,5 @@ void BattleRoyaleMgr::FinalizarRonda(bool announce, Player *winner /* = nullptr*
     sBRObjetosMgr->DesaparecerTodosLosObjetos();
     tiempoRestanteFinal = conf_IntervaloFinalDeRonda;
     sBRMapasMgr->SiguienteMapa();
-    estadoActual = ESTADO_BATALLA_TERMINADA;
+    estadoActual = ESTADO_BR_BATALLA_TERMINADA;
 }

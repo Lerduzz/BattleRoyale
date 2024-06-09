@@ -59,7 +59,7 @@ public:
     {
         if (player && pItem)
         {
-            if (sBattleRoyaleMgr->EstadoActual() > ESTADO_NO_HAY_SUFICIENTES_JUGADORES && sBattleRoyaleMgr->EstaEnEvento(player))
+            if (sBattleRoyaleMgr->EstadoActual() > ESTADO_BR_SIN_SUFICIENTES_JUGADORES && sBattleRoyaleMgr->EstaEnEvento(player))
             {
                 return sBREquipamientoMgr->EsEquipamientoDeBR(pItem->GetEntry());
             }
@@ -452,10 +452,10 @@ public:
 
     static bool HandleStartCommand(ChatHandler *handler)
     {
-        if (sBattleRoyaleMgr->EstadoActual() == ESTADO_NO_HAY_SUFICIENTES_JUGADORES)
+        if (sBattleRoyaleMgr->EstadoActual() == ESTADO_BR_SIN_SUFICIENTES_JUGADORES)
         {
             sBattleRoyaleMgr->ForzarIniciarNuevaRonda();
-            if (sBattleRoyaleMgr->EstadoActual() != ESTADO_NO_HAY_SUFICIENTES_JUGADORES)
+            if (sBattleRoyaleMgr->EstadoActual() != ESTADO_BR_SIN_SUFICIENTES_JUGADORES)
             {
                 handler->SendSysMessage("Se ha forzado el inicio de la ronda de Battle Royale sin haber suficientes jugadores.");
             }
