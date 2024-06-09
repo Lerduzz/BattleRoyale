@@ -29,8 +29,8 @@ INSERT INTO `npc_text` (`ID`, `text0_0`) VALUES (@Entry, 'Saludos $N, como cread
 -- NPC vendedor de armas --
 SET
 @Model2     := 23334,
-@Name2      := "Battle Royale",
-@Title2     := "Vendedora de armas y complementos",
+@Name2      := "Alythess la Bruja Suprema",
+@Title2     := "Vendedora de armas de Battle Royale",
 @NPCFlag2   := 4224,
 @Scale2     := 0.7;
 INSERT INTO `creature_template` (`entry`, `modelid1`, `name`, `subname`, `IconName`, `gossip_menu_id`, `minlevel`, `maxlevel`, `faction`, `npcflag`, `speed_walk`, `speed_run`, `scale`, `rank`, `unit_class`, `unit_flags`, `type`, `type_flags`, `RegenHealth`, `flags_extra`, `AiName`, `ScriptName`) VALUES

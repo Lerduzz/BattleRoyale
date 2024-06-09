@@ -1,6 +1,6 @@
 void AddSC_BattleRoyale();
 
-void Addmod_event_battleroyaleScripts()
+void AddBattleRoyaleScripts()
 {
     AddSC_BattleRoyale();
 }

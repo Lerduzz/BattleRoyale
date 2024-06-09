@@ -77,10 +77,7 @@ public:
                 }
                 default:
                 {
-                    if (tiempo > 45 && tiempo <= 75)
-                    {
-                        notificacion << "Faltan " << (tiempo - 45) << " segundos para encender motores.";
-                    }
+                    notificacion << "Faltan " << (tiempo - 45) << " segundos para encender motores.";
                     break;
                 }
             }
@@ -100,13 +97,13 @@ public:
             }
         }
     };
-    void NotificarZonaReducida(BR_ListaChat lista)
+    void NotificarZonaEnReduccion(BR_ListaChat lista)
     {
         if (lista.size())
         {
             for (BR_ListaChat::iterator it = lista.begin(); it != lista.end(); ++it)
             {
-                it->second->GetSession()->SendNotification("|cffff0000¡La zona segura se ha actualizado!");
+                it->second->GetSession()->SendNotification("|cffff0000¡La zona segura se está reduciendo!");
             }
         }
     };

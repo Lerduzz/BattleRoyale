@@ -53,21 +53,21 @@ public:
     void PrevenirJcJEnLaNave(Player *player, bool state);
     bool PuedeReaparecerEnCementerio(Player *player);
 
-    inline bool DebeRestringirFunciones(Player *player) { return estadoActual > ESTADO_NO_HAY_SUFICIENTES_JUGADORES && HayJugadores() && EstaEnEvento(player); };
+    inline bool DebeRestringirFunciones(Player *player) { return estadoActual > ESTADO_BR_SIN_SUFICIENTES_JUGADORES && HayJugadores() && EstaEnEvento(player); };
     inline bool EstaEnCola(Player *player) { return EstaEnCola(player->GetGUID().GetCounter()); };
     inline bool EstaInvitado(Player *player) { return EstaInvitado(player->GetGUID().GetCounter()); };
     inline bool EstaEnEvento(Player *player) { return EstaEnEvento(player->GetGUID().GetCounter()); };
 
-    bool DebeForzarJcJTcT(Player *player)
+    bool TodosContraTodos(Player *player)
     {
         if (!player)
             return false;
-        if (estadoActual != ESTADO_BATALLA_EN_CURSO || !HayJugadores() || !EstaEnEvento(player))
+        if ((estadoActual < ESTADO_BR_ZONA_EN_ESPERA || estadoActual == ESTADO_BR_BATALLA_TERMINADA) || !HayJugadores() || !EstaEnEvento(player))
             return false;
         return !sBRObjetosMgr->EstaEnLaNave(player);
     }
 
-    inline BR_EstadosEvento EstadoActual() { return estadoActual; };
+    inline BREstado EstadoActual() { return estadoActual; };
 
     bool ForzarIniciarNuevaRonda()
     {
@@ -79,7 +79,7 @@ public:
         return false;
     }
 
-    void OnSummonResponse(Player *player, bool agree, ObjectGuid summoner_guid);
+    void RespondeInvitacion(Player *player, bool agree, ObjectGuid summoner_guid);
 
 private:
     void RestablecerTodoElEvento();
@@ -89,7 +89,7 @@ private:
     void SalirDelEvento(uint32 guid, bool logout = false);
     void RevivirJugador(Player *player);
     void EfectoFueraDeZona();
-    void ActivarJcJTcT();
+    void ActivarTodosContraTodos();
     void ControlDeReglas();
     bool CondicionDeVictoria();
     void FinalizarRonda(bool announce, Player *winner = nullptr);
@@ -163,7 +163,7 @@ private:
         // }
         if (HayJugadores())
         {
-            if (estadoActual == ESTADO_BATALLA_EN_CURSO)
+            if (estadoActual >= ESTADO_BR_ZONA_EN_ESPERA && estadoActual < ESTADO_BR_BATALLA_TERMINADA)
             {
                 int vivos = 0;
                 int rndEfecto = rand() % 10 + 1;
@@ -391,8 +391,7 @@ private:
     BR_ListaDePersonajes list_DarObjetosIniciales;
     BR_ListaDePersonajes list_QuitarTodosLosObjetos;
 
-    BR_EstadosEvento estadoActual;
-    BR_EstadosZona estadoZona;
+    BREstado estadoActual;
 
     int tiempoRestanteSinJugadores;
     int tiempoRestanteInicio;
