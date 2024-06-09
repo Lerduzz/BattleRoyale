@@ -85,17 +85,9 @@ void BattleRoyaleMgr::GestionarJugadorEntrando(Player *player)
         }
         else
         {
-            if (tiempoRestanteInicio >= 60)
-            {
-                uint32 tiempo = (tiempoRestanteInicio - 55) * IN_MILLISECONDS;
-                list_Invitados[guid] = player;
-                LlamarDentroDeNave(guid, tiempo);
-            }
-            else
-            {
-                list_Cola[guid] = player;
-                sBRChatMgr->AnunciarJugadoresEnCola(player, conf_JugadoresMinimo, list_Cola, MENSAJE_ESTADO_EVENTO_EN_CURSO);
-            }
+            uint32 tiempo = (tiempoRestanteInicio - 75) * IN_MILLISECONDS;
+            list_Invitados[guid] = player;
+            LlamarDentroDeNave(guid, tiempo);
         }
         break;
     }
@@ -160,7 +152,7 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
                     sBRChatMgr->AnunciarErrorInicioForzado();
                 }
             }
-            else if (!seHaAnunciadoInicioForzado && tiempoRestanteSinJugadores <= 300)
+            else if (!seHaAnunciadoInicioForzado && tiempoRestanteSinJugadores <= 300 /* TODO: Configurable. */)
             {
                 seHaAnunciadoInicioForzado = true;
                 sBRChatMgr->AnunciarAvisoInicioForzado();
@@ -171,8 +163,9 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
         case ESTADO_BR_ESPERANDO_JUGADORES:
         case ESTADO_BR_NAVE_EN_ESPERA:
         {
+            tiempoRestanteInicio--;
             DarObjetosInicialesProgramado();
-            if (--tiempoRestanteInicio <= 45)
+            if (tiempoRestanteInicio <= 45)
             {
                 if (sBRObjetosMgr->EncenderNave())
                 {
@@ -191,6 +184,20 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
                 else
                 {
                     RestablecerTodoElEvento();
+                }
+            }
+            else if (tiempoRestanteInicio <= 75)
+            {
+                if (estadoActual == ESTADO_BR_ESPERANDO_JUGADORES)
+                {
+                    estadoActual = ESTADO_BR_NAVE_EN_ESPERA;
+                }
+            }
+            else if (tiempoRestanteInicio <= 90)
+            {
+                if (estadoActual == ESTADO_BR_INVITANDO_JUGADORES)
+                {
+                    estadoActual = ESTADO_BR_ESPERANDO_JUGADORES;
                 }
             }
             TODO_MejorarAnuncioEnNave();
@@ -331,7 +338,7 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
                 }
                 else
                 {
-                    estadoActual = ESTADO_BR_ZONA_DESAPARECIDA;                    
+                    estadoActual = ESTADO_BR_ZONA_DESAPARECIDA;
                 }
             }
         }
@@ -382,7 +389,7 @@ void BattleRoyaleMgr::IniciarNuevaRonda()
     if (estadoActual == ESTADO_BR_SIN_SUFICIENTES_JUGADORES)
     {
         sBRMapasMgr->EstablecerMasVotado();
-        tiempoRestanteInicio = 75;
+        tiempoRestanteInicio = 120; // TODO: Configurale: Es la suma rara de los tiempos iniciales.
         if (!HayCola() || !sBRObjetosMgr->InvocarNave(sBRMapasMgr->MapaActual()->idMapa, sBRMapasMgr->MapaActual()->inicioNave))
         {
             RestablecerTodoElEvento();
@@ -390,7 +397,7 @@ void BattleRoyaleMgr::IniciarNuevaRonda()
         }
         estadoActual = ESTADO_BR_INVITANDO_JUGADORES;
         totalAsesinatosJcJ = 0;
-        while (HayCola() && !EstaLlenoElEvento() && tiempoRestanteInicio >= 60)
+        while (HayCola() && !EstaLlenoElEvento() && tiempoRestanteInicio >= 90 /* TODO: Tiempo total - Tiempo ESTADO_BR_INVITANDO_JUGADORES. */)
         {
             uint32 guid = list_Cola.begin()->first;
             if (list_Cola[guid]->IsInFlight())
@@ -399,7 +406,7 @@ void BattleRoyaleMgr::IniciarNuevaRonda()
             }
             else
             {
-                uint32 tiempo = (tiempoRestanteInicio - 55) * IN_MILLISECONDS;
+                uint32 tiempo = (tiempoRestanteInicio - 75 /* TODO: Espera + Movimiento + Desaparecer. */) * IN_MILLISECONDS;
                 list_Invitados[guid] = list_Cola[guid];
                 LlamarDentroDeNave(guid, tiempo);
             }
