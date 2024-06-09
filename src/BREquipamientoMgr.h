@@ -5,12 +5,10 @@
 
 enum BR_Equipamiento
 {
-    EQUIPAMIENTO_CAMISA_ALAS                  = 17,
-    EQUIPAMIENTO_PIERNAS_BASE                 = 20902,
+    EQUIPAMIENTO_CAMISA_ALAS = 500000,
+    EQUIPAMIENTO_PIERNAS_BASE = 500001,
+    EQUIPAMIENTO_BR_MAXIMO = 500210,
 };
-
-const uint32 CANTIDAD_ARMAS = 30;
-const uint32 BR_Armas[CANTIDAD_ARMAS] = { 34985, 34987, 34988, 34989, 34995, 34996, 34997, 35014, 35015, 35017, 35018, 35037, 35038, 35047, 35058, 35064, 35065, 35071, 35072, 35075, 35076, 35082, 35093, 35095, 35101, 35102, 35103, 35107, 35108, 35109 };
 
 class BREquipamientoMgr
 {
@@ -24,38 +22,31 @@ public:
         return instance;
     }
 
-    bool DarObjetosIniciales(Player* player)
+    bool DarObjetosIniciales(Player *player)
     {
         DarEquipamiento(player, EQUIPAMIENTO_PIERNAS_BASE);
         return DarEquipamiento(player, EQUIPAMIENTO_CAMISA_ALAS);
     };
 
-    void QuitarTodosLosObjetos(Player* player)
+    void QuitarTodosLosObjetos(Player *player)
     {
-        QuitarEquipamiento(player, EQUIPAMIENTO_PIERNAS_BASE);
-        QuitarEquipamiento(player, EQUIPAMIENTO_CAMISA_ALAS);
-        for (uint32 i = 0; i < CANTIDAD_ARMAS; ++i)
+        for (uint32 i = EQUIPAMIENTO_CAMISA_ALAS; i <= EQUIPAMIENTO_BR_MAXIMO; ++i)
         {
-            QuitarEquipamiento(player, BR_Armas[i]);
+            QuitarEquipamiento(player, i);
         }
         player->UpdateTitansGrip();
     };
 
     bool EsEquipamientoDeBR(uint32 item)
     {
-        if (item == EQUIPAMIENTO_CAMISA_ALAS || item == EQUIPAMIENTO_PIERNAS_BASE) return true;
-        for (uint32 i = 0; i < CANTIDAD_ARMAS; ++i)
-        {
-            if (item == BR_Armas[i]) return true;
-        }
-        return false;
+        return item >= EQUIPAMIENTO_CAMISA_ALAS && item <= EQUIPAMIENTO_BR_MAXIMO;
     };
 
-    void Desnudar(Player* player)
+    void Desnudar(Player *player)
     {
         for (uint8 i = EQUIPMENT_SLOT_START; i < EQUIPMENT_SLOT_END; ++i)
         {
-            if (Item* pItem = player->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+            if (Item *pItem = player->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
             {
                 ItemPosCountVec dest;
                 uint8 msg = player->CanStoreItem(NULL_BAG, NULL_SLOT, dest, pItem, false);
@@ -81,7 +72,7 @@ public:
     };
 
 private:
-    bool QuitarEquipamiento(Player* player, uint32 item)
+    bool QuitarEquipamiento(Player *player, uint32 item)
     {
         uint32 count = player->GetItemCount(item, true);
         if (count > 0)
@@ -92,12 +83,11 @@ private:
         return false;
     };
 
-    bool DarEquipamiento(Player* player, uint32 item)
+    bool DarEquipamiento(Player *player, uint32 item)
     {
         QuitarEquipamiento(player, item);
         return player->StoreNewItemInBestSlots(item, 1);
     };
-
 };
 
 #define sBREquipamientoMgr BREquipamientoMgr::instance()
