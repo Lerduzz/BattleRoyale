@@ -24,6 +24,7 @@ public:
 
     bool DarObjetosIniciales(Player *player)
     {
+        QuitarTodosLosObjetos(player);
         DarEquipamiento(player, EQUIPAMIENTO_PIERNAS_BASE);
         return DarEquipamiento(player, EQUIPAMIENTO_CAMISA_ALAS);
     };
