@@ -245,7 +245,7 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
             if (!CondicionDeVictoria())
             {
                 EfectoFueraDeZona();
-                ActivarJcJTcT();
+                ActivarTodosContraTodos();
                 VerificarEspectadores();
             }
             if (--tiempoRestanteNave <= 0)
@@ -576,7 +576,7 @@ void BattleRoyaleMgr::EfectoFueraDeZona()
     }
 }
 
-void BattleRoyaleMgr::ActivarJcJTcT()
+void BattleRoyaleMgr::ActivarTodosContraTodos()
 {
     if (HayJugadores())
     {

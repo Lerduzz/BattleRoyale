@@ -89,7 +89,7 @@ private:
     void SalirDelEvento(uint32 guid, bool logout = false);
     void RevivirJugador(Player *player);
     void EfectoFueraDeZona();
-    void ActivarJcJTcT();
+    void ActivarTodosContraTodos();
     void ControlDeReglas();
     bool CondicionDeVictoria();
     void FinalizarRonda(bool announce, Player *winner = nullptr);
