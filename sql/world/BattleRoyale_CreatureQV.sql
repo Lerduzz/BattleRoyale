@@ -36,6 +36,7 @@ SET
 INSERT INTO `creature_template` (`entry`, `modelid1`, `name`, `subname`, `IconName`, `gossip_menu_id`, `minlevel`, `maxlevel`, `faction`, `npcflag`, `speed_walk`, `speed_run`, `scale`, `rank`, `unit_class`, `unit_flags`, `type`, `type_flags`, `RegenHealth`, `flags_extra`, `AiName`, `ScriptName`) VALUES
 (@Entry + 1, @Model2, @Name2, @Title2, '', @GossipMenu, @MinLevel, @MaxLevel, @Faction, @NPCFlag2, 1, 1.14286, @Scale2, @Rank, 1, 2, 7, @TypeFlags, 1, @FlagsExtra, '', '');
 
+/*
 DELETE FROM `npc_vendor` WHERE `entry` = @Entry + 1;
 INSERT INTO `npc_vendor` (`entry`, `item`) VALUES
 (@Entry + 1,'500052'),
@@ -127,6 +128,7 @@ INSERT INTO `npc_vendor` (`entry`, `item`) VALUES
 (@Entry + 1,'500030'),
 (@Entry + 1,'500032'),
 (@Entry + 1,'500033');
+*/
 
 
 -- NPC de las misiones --
