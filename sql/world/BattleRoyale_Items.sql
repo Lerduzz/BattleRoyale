@@ -253,6 +253,7 @@ WHERE
     OR (
       `class` = 4
       AND `subclass` IN (0, 6, 7, 8, 9, 10)
+      AND `InventoryType` != 4
     )
   )
 ;
