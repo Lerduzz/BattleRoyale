@@ -3,7 +3,7 @@
 
 #include "Player.h"
 
-enum BR_Equipamiento
+enum BREquipo
 {
     EQUIPAMIENTO_INICIAL_CAMISA = 17,
     EQUIPAMIENTO_INICIAL_PANTALONES = 20902,
