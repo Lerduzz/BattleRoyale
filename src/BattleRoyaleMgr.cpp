@@ -534,7 +534,6 @@ void BattleRoyaleMgr::SalirDelEvento(uint32 guid, bool logout /* = false*/)
         else
         {
             sBREquipamientoMgr->QuitarTodosLosObjetos(player);
-            player->SaveToDB(false, false);
         }
         sBRRecompensaMgr->DarRecompensas(player, list_Datos[guid].reward);
         list_Jugadores.erase(guid);
@@ -543,7 +542,6 @@ void BattleRoyaleMgr::SalirDelEvento(uint32 guid, bool logout /* = false*/)
     if (logout && EstaEnListaQuitarTodosLosObjetos(guid))
     {
         sBREquipamientoMgr->QuitarTodosLosObjetos(list_QuitarTodosLosObjetos[guid]);
-        list_QuitarTodosLosObjetos[guid]->SaveToDB(false, false);
         list_QuitarTodosLosObjetos.erase(guid);
     }
 }
