@@ -541,8 +541,8 @@ void BattleRoyaleMgr::SalirDelEvento(uint32 guid, bool logout /* = false*/)
     }
     if (logout && EstaEnListaQuitarTodosLosObjetos(guid))
     {
+        sBREquipamientoMgr->QuitarTodosLosObjetos(list_QuitarTodosLosObjetos[guid]);
         list_QuitarTodosLosObjetos.erase(guid);
-        sBREquipamientoMgr->QuitarTodosLosObjetos(player);
     }
 }
 
