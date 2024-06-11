@@ -576,24 +576,32 @@ void BattleRoyaleMgr::EfectoFueraDeZona()
             if (it->second && it->second->IsAlive() && sBRObjetosMgr->EstaLaZonaActiva())
             {
                 float distance = sBRObjetosMgr->DistanciaDelCentro(it->second);
-                if (estadoActual == ESTADO_BR_ZONA_DESAPARECIDA || escalaDeZona * 19.0f < distance)
+                float f_RadioZona = escalaDeZona * 19.0f;
+                if (estadoActual == ESTADO_BR_ZONA_DESAPARECIDA || f_RadioZona < distance)
                 {
+                    int tick = list_Datos[it->first].dmg_tick;
+                    if ((tick <= 57 && tick % 3 == 0) || (tick > 57 && tick % 6 == 0))
+                    {
+                        it->second->AddAura(56710, it->second); // Aura de esperanza perdida: x20 -3% salud max.
+                        it->second->AddAura(50196, it->second); // Toque de putrfaccion: x20 dmg 88-112.
+                        it->second->AddAura(60084, it->second); // EL velo de las sombras: -50% sanaciones.
+                    }
+                    if (tick >= 57)
+                    {
+                        if ((tick <= 102 && tick % 3 == 0) || (tick > 102 && tick % 6 == 0))
+                        {
+                            it->second->AddAura(61460, it->second); // Aura de esperanza perdida: x15 -5% salud max.
+                        }
+                        if (tick >= 102)
+                        {
+                            if ((tick <= 132 && tick % 3 == 0) || (tick > 132 && tick % 24 == 0))
+                            {
+                                it->second->AddAura(19771, it->second); // Mordedura cerrada: x10 dmg 1500 en 30seg.
+                            }
+                        }
+                    }
+                    it->second->GetSession()->SendNotification("|cffff0000¡Entra en la zona segura!");
                     list_Datos[it->first].dmg_tick++;
-                    if (list_Datos[it->first].dmg_tick <= 15)
-                    {
-                        if (!sBRObjetosMgr->HechizoGuardian(HECHIZO_RAYO_DRAGON, it->second))
-                        {
-                            it->second->AddAura(HECHIZO_ACIDO_ZONA, it->second);
-                        }
-                    }
-                    else
-                    {
-                        if (!sBRObjetosMgr->HechizoGuardian(HECHIZO_RAYO_DRAGON_FUERTE, it->second))
-                        {
-                            it->second->AddAura(HECHIZO_ACIDO_ZONA, it->second);
-                        }
-                    }
-                    it->second->GetSession()->SendNotification("|cffff0000¡Estás fuera de la zona segura, el guardián te ataca!");
                 }
                 else
                 {
