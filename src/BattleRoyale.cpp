@@ -36,6 +36,7 @@ public:
                 ChatHandler(player->GetSession()).SendSysMessage("El modo |cff4CFF00BattleRoyale|r ha sido activado.");
             }
         }
+        sBREquipamientoMgr->QuitarTodosLosObjetos(player);
     }
 
     void OnLogout(Player *player) override
@@ -54,9 +55,9 @@ public:
         }
     }
 
-    bool CanEquipItem(Player *player, uint8 /*slot*/, uint16 & /*dest*/, Item *pItem, bool /*swap*/, bool /*not_loading*/) override
+    bool CanEquipItem(Player *player, uint8 /*slot*/, uint16 & /*dest*/, Item *pItem, bool /*swap*/, bool not_loading) override
     {
-        if (player && pItem)
+        if (player && pItem && not_loading)
         {
             if (sBattleRoyaleMgr->EstadoActual() > ESTADO_BR_SIN_SUFICIENTES_JUGADORES && sBattleRoyaleMgr->EstaEnEvento(player))
             {
