@@ -579,28 +579,28 @@ void BattleRoyaleMgr::EfectoFueraDeZona()
                 float f_RadioZona = escalaDeZona * 19.0f;
                 if (estadoActual == ESTADO_BR_ZONA_DESAPARECIDA || f_RadioZona < distance)
                 {
-                    list_Datos[it->first].dmg_tick++;
-                    float f_TimeModifier = 15.2f - escalaDeZona;
-                    if (f_TimeModifier < 0.0f)
-                        f_TimeModifier = 0.0f;
-                    if (f_TimeModifier > 15.0f)
-                        f_TimeModifier = 15.0f;
-                    float f_DistModifier = 25.0f;
-                    if (estadoActual != ESTADO_BR_ZONA_DESAPARECIDA)
-                        f_DistModifier = ((distance - f_RadioZona) * 100.0f / f_RadioZona) / 3;
-                    if (f_DistModifier < 0.0f)
-                        f_DistModifier = 0.0f;
-                    if (f_DistModifier > 50.0f)
-                        f_DistModifier = 50.0f;
-                    float f_Percent = 2 * sqrt(list_Datos[it->first].dmg_tick) + f_TimeModifier;
-                    if (f_Percent < 2.0f)
-                        f_Percent = 2.0f;
-                    if (f_Percent > 100.0f)
-                        f_Percent = 100.0f;
-                    float f_MaxHealth = (float)it->second->GetMaxHealth();
-                    float f_Damage = f_MaxHealth * f_Percent / 100.0f;
-                    uint32 damage = (uint32)f_Damage;
-                    Unit::DealDamage(nullptr, it->second, damage, nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false, false);
+                    int tick = list_Datos[it->first].dmg_tick + 1;                    
+                    if (tick < 20 || (tick >= 20 && tick % 5 == 0))
+                    {
+                        it->second->AddAura(56710, it->second); // Aura de esperanza perdida: x20 -3% salud max.
+                        it->second->AddAura(50196, it->second); // Toque de putrfaccion: x20 dmg 88-112.
+                        it->second->AddAura(60084, it->second); // EL velo de las sombras: -50% sanaciones.
+                    }                    
+                    if (tick >= 20)
+                    {
+                        if (tick < 35 || (tick >= 35 && tick % 5 == 0))
+                        {
+                            it->second->AddAura(61460, it->second); // Aura de esperanza perdida: x15 -5% salud max.
+                        }
+                        if (tick >= 35)
+                        {
+                            if (tick < 45 || (tick >= 45 && tick % 5 == 0))
+                            {
+                                it->second->AddAura(19771, it->second); // Mordedura cerrada: x10 dmg 1500 en 30seg.
+                            }
+                        }
+                    }                            
+                    list_Datos[it->first].dmg_tick = tick;
                 }
                 else
                 {
