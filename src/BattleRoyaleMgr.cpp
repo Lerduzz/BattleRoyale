@@ -579,21 +579,36 @@ void BattleRoyaleMgr::EfectoFueraDeZona()
                 if (estadoActual == ESTADO_BR_ZONA_DESAPARECIDA || escalaDeZona * 19.0f < distance)
                 {
                     list_Datos[it->first].dmg_tick++;
-                    if (list_Datos[it->first].dmg_tick <= 15)
-                    {
-                        if (!sBRObjetosMgr->HechizoGuardian(HECHIZO_RAYO_DRAGON, it->second))
-                        {
-                            it->second->AddAura(HECHIZO_ACIDO_ZONA, it->second);
-                        }
-                    }
-                    else
-                    {
-                        if (!sBRObjetosMgr->HechizoGuardian(HECHIZO_RAYO_DRAGON_FUERTE, it->second))
-                        {
-                            it->second->AddAura(HECHIZO_ACIDO_ZONA, it->second);
-                        }
-                    }
-                    it->second->GetSession()->SendNotification("|cffff0000¡Estás fuera de la zona segura, el guardián te ataca!");
+                    float f_Modifier = 15.2f - escalaDeZona;
+                    if (f_Modifier < 0.0f)
+                        f_Modifier = 0.0f;
+                    if (f_Modifier > 15.0f)
+                        f_Modifier = 15.0f;
+                    float f_Percent = 2 * sqrt(list_Datos[it->first].dmg_tick) + f_Modifier;
+                    if (f_Percent < 2.0f)
+                        f_Percent = 2.0f;
+                    if (f_Percent > 100.0f)
+                        f_Percent = 100.0f;
+                    float f_MaxHealth = (float)it->second->GetMaxHealth();
+                    float f_Damage = f_MaxHealth * f_Percent / 100.0f;
+                    uint32 damage = (uint32)f_Damage;
+                    // it->second->GetSession()->SendNotification("|cffff0000¡Has recibido |cffDA70D6%u|cffff0000 de daño, adéntrate en la zona segura!", damage);
+                    Unit::DealDamage(it->second, it->second, damage /*, nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false, false*/);
+                    // if (list_Datos[it->first].dmg_tick <= 15)
+                    // {
+                    //     if (!sBRObjetosMgr->HechizoGuardian(HECHIZO_RAYO_DRAGON, it->second))
+                    //     {
+                    //         it->second->AddAura(HECHIZO_ACIDO_ZONA, it->second);
+                    //     }
+                    // }
+                    // else
+                    // {
+                    //     if (!sBRObjetosMgr->HechizoGuardian(HECHIZO_RAYO_DRAGON_FUERTE, it->second))
+                    //     {
+                    //         it->second->AddAura(HECHIZO_ACIDO_ZONA, it->second);
+                    //     }
+                    // }
+                    // it->second->GetSession()->SendNotification("|cffff0000¡Estás fuera de la zona segura, el guardián te ataca!");
                 }
                 else
                 {
