@@ -131,10 +131,20 @@ void BattleRoyaleMgr::GestionarMuerteJcJ(Player *killer, Player *killed)
 
 void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
 {
+    if (indicadorQuitarObjetosProgramado <= 0)
+    {
+        indicadorQuitarObjetosProgramado = 500;
+        QuitarTodosLosObjetosProgramado();
+    }
+    else
+    {
+        indicadorQuitarObjetosProgramado -= diff;
+    }
+    if (!EstaActivado())
+        return;
     if (indicadorDeSegundos <= 0)
     {
         indicadorDeSegundos = 1000;
-        QuitarTodosLosObjetosProgramado();
         switch (estadoActual)
         {
         case ESTADO_BR_SIN_SUFICIENTES_JUGADORES:
@@ -376,6 +386,7 @@ void BattleRoyaleMgr::RestablecerTodoElEvento()
     sBRMapasMgr->SiguienteMapa();
     indicadorDeSegundos = 1000;
     indicadorDe100msZona = 100;
+    indicadorQuitarObjetosProgramado = 500;
     indiceDeVariacion = 0;
     totalAsesinatosJcJ = 0;
     sBRObjetosMgr->DesaparecerTodosLosObjetos();

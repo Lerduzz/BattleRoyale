@@ -36,7 +36,7 @@ public:
                 ChatHandler(player->GetSession()).SendSysMessage("El modo |cff4CFF00BattleRoyale|r ha sido activado.");
             }
         }
-        sBREquipamientoMgr->QuitarTodosLosObjetos(player);
+        sBattleRoyaleMgr->ProgramarQuitarObjetos(player);
     }
 
     void OnLogout(Player *player) override
@@ -296,10 +296,7 @@ public:
     }
     void OnUpdate(uint32 diff) override
     {
-        if (sBattleRoyaleMgr->EstaActivado())
-        {
-            sBattleRoyaleMgr->GestionarActualizacionMundo(diff);
-        }
+        sBattleRoyaleMgr->GestionarActualizacionMundo(diff);
     }
 };
 
