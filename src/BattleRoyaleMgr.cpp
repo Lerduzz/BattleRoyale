@@ -600,7 +600,7 @@ void BattleRoyaleMgr::EfectoFueraDeZona()
                     float f_MaxHealth = (float)it->second->GetMaxHealth();
                     float f_Damage = f_MaxHealth * f_Percent / 100.0f;
                     uint32 damage = (uint32)f_Damage;
-                    Unit::DealDamage(it->second, it->second, damage /*, nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false, false*/);
+                    Unit::DealDamage(nullptr, it->second, damage, nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false, false);
                 }
                 else
                 {
