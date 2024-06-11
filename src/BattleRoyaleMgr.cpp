@@ -36,6 +36,11 @@ void BattleRoyaleMgr::GestionarJugadorEntrando(Player *player)
         return;
     uint32 guid = player->GetGUID().GetCounter();
     BR_Bloqueado *blr = sBRListaNegraMgr->EstaBloqueado(guid);
+    if (player->getLevel() != 80)
+    {
+        sBRChatMgr->AnunciarMensajeEntrada(player, MENSAJE_ERROR_NIVEL);
+        return;
+    }
     if (player->getClass() == CLASS_DEATH_KNIGHT && player->GetMapId() == 609)
     {
         sBRChatMgr->AnunciarMensajeEntrada(player, MENSAJE_ERROR_DK_INICIO);
