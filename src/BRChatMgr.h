@@ -12,6 +12,7 @@ enum BR_TipoMensaje
     MENSAJE_ERROR_EN_EVENTO,
     MENSAJE_ERROR_EN_VUELO,
     MENSAJE_ERROR_BLOQUEADO,
+    MENSAJE_ERROR_DK_INICIO,
 };
 
 enum BR_TipoMensajeEstado
@@ -247,6 +248,11 @@ public:
             case MENSAJE_ERROR_BLOQUEADO:
             {
                 Chat(player).PSendSysMessage("%s No puedes utilizar este modo de juego. Motivo: |cffff0000%s|r.", TEXTO_NOMBRE.c_str(), extra);
+                break;
+            }
+            case MENSAJE_ERROR_DK_INICIO:
+            {
+                Chat(player).PSendSysMessage("%s No puedes utilizar este modo de juego hasta terminar la cadena de misiones inicial de tu clase.", TEXTO_NOMBRE.c_str());
                 break;
             }
             default:
