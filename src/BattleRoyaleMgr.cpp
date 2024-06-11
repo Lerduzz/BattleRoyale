@@ -576,15 +576,23 @@ void BattleRoyaleMgr::EfectoFueraDeZona()
             if (it->second && it->second->IsAlive() && sBRObjetosMgr->EstaLaZonaActiva())
             {
                 float distance = sBRObjetosMgr->DistanciaDelCentro(it->second);
-                if (estadoActual == ESTADO_BR_ZONA_DESAPARECIDA || escalaDeZona * 19.0f < distance)
+                float f_RadioZona = escalaDeZona * 19.0f;
+                if (estadoActual == ESTADO_BR_ZONA_DESAPARECIDA || f_RadioZona < distance)
                 {
                     list_Datos[it->first].dmg_tick++;
-                    float f_Modifier = 15.2f - escalaDeZona;
-                    if (f_Modifier < 0.0f)
-                        f_Modifier = 0.0f;
-                    if (f_Modifier > 15.0f)
-                        f_Modifier = 15.0f;
-                    float f_Percent = 2 * sqrt(list_Datos[it->first].dmg_tick) + f_Modifier;
+                    float f_TimeModifier = 15.2f - escalaDeZona;
+                    if (f_TimeModifier < 0.0f)
+                        f_TimeModifier = 0.0f;
+                    if (f_TimeModifier > 15.0f)
+                        f_TimeModifier = 15.0f;
+                    float f_DistModifier = 25.0f;
+                    if (estadoActual != ESTADO_BR_ZONA_DESAPARECIDA)
+                        f_DistModifier = ((distance - f_RadioZona) * 100.0f / f_RadioZona) / 3;
+                    if (f_DistModifier < 0.0f)
+                        f_DistModifier = 0.0f;
+                    if (f_DistModifier > 50.0f)
+                        f_DistModifier = 50.0f;
+                    float f_Percent = 2 * sqrt(list_Datos[it->first].dmg_tick) + f_TimeModifier;
                     if (f_Percent < 2.0f)
                         f_Percent = 2.0f;
                     if (f_Percent > 100.0f)
