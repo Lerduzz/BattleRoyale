@@ -253,7 +253,7 @@ public:
             }
             case MENSAJE_ERROR_DK_INICIO:
             {
-                Chat(player).PSendSysMessage("%s No puedes utilizar este modo de juego hasta terminar la cadena de misiones inicial de tu clase.", TEXTO_NOMBRE.c_str());
+                Chat(player).PSendSysMessage("%s Primero debes terminar la cadena de misiones inicial.", TEXTO_NOMBRE.c_str());
                 break;
             }
             case MENSAJE_ERROR_NIVEL:
