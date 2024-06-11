@@ -579,11 +579,8 @@ void BattleRoyaleMgr::EfectoFueraDeZona()
                 float f_RadioZona = escalaDeZona * 19.0f;
                 if (estadoActual == ESTADO_BR_ZONA_DESAPARECIDA || f_RadioZona < distance)
                 {
-                    list_Datos[it->first].dmg_tick++;
                     int tick = list_Datos[it->first].dmg_tick;
-                    if (tick % 3 != 1)
-                        return; // Aplicar cargas cada 3 segundos.
-                    if (tick < 60 || (tick >= 60 && tick % 6 == 0))
+                    if ((tick < 60 && tick % 3 == 0) || (tick >= 60 && tick % 6 == 0))
                     {
                         it->second->AddAura(56710, it->second); // Aura de esperanza perdida: x20 -3% salud max.
                         it->second->AddAura(50196, it->second); // Toque de putrfaccion: x20 dmg 88-112.
@@ -591,19 +588,20 @@ void BattleRoyaleMgr::EfectoFueraDeZona()
                     }
                     if (tick >= 60)
                     {
-                        if (tick < 105 || (tick >= 105 && tick % 6 == 0))
+                        if ((tick < 105 && tick % 3 == 0) || (tick >= 105 && tick % 6 == 0))
                         {
                             it->second->AddAura(61460, it->second); // Aura de esperanza perdida: x15 -5% salud max.
                         }
                         if (tick >= 105)
                         {
-                            if (tick < 135 || (tick >= 135 && tick % 24 == 0))
+                            if ((tick < 135 && tick % 3 == 0) || (tick >= 135 && tick % 24 == 0))
                             {
                                 it->second->AddAura(19771, it->second); // Mordedura cerrada: x10 dmg 1500 en 30seg.
                             }
                         }
                     }
                     it->second->GetSession()->SendNotification("|cffff0000¡Entra en la zona segura!");
+                    list_Datos[it->first].dmg_tick++;
                 }
                 else
                 {
