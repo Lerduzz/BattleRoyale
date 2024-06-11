@@ -450,6 +450,8 @@ void BattleRoyaleMgr::AlmacenarPosicionInicial(uint32 guid)
 
 void BattleRoyaleMgr::LlamarDentroDeNave(uint32 guid, uint32 tiempo /* = 20000*/)
 {
+    if (list_Invitados.find(guid) == list_Invitados.end())
+        return;
     Player *player = list_Invitados[guid];
     float ox = BR_VariacionesDePosicion[indiceDeVariacion][0];
     float oy = BR_VariacionesDePosicion[indiceDeVariacion][1];
