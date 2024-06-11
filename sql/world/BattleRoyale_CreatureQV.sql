@@ -3,7 +3,7 @@ SET
 @Entry 		:= 200000,
 @Model1 	:= 23240,
 @Name1 		:= "Lerduzz el Comandante",
-@Title1 	:= "Administrador del Battle Royale",
+@Title1 	:= "Administrador de Cola de Battle Royale",
 @Icon 		:= "Speak",
 @GossipMenu := 0,
 @MinLevel 	:= 80,
@@ -30,7 +30,7 @@ INSERT INTO `npc_text` (`ID`, `text0_0`) VALUES (@Entry, 'Saludos $N, como cread
 SET
 @Model2     := 23334,
 @Name2      := "Alythess la Bruja Suprema",
-@Title2     := "Vendedora de armas de Battle Royale",
+@Title2     := "Vendedora de Equipamiento de Battle Royale",
 @NPCFlag2   := 4224,
 @Scale2     := 0.7;
 INSERT INTO `creature_template` (`entry`, `modelid1`, `name`, `subname`, `IconName`, `gossip_menu_id`, `minlevel`, `maxlevel`, `faction`, `npcflag`, `speed_walk`, `speed_run`, `scale`, `rank`, `unit_class`, `unit_flags`, `type`, `type_flags`, `RegenHealth`, `flags_extra`, `AiName`, `ScriptName`) VALUES
@@ -41,7 +41,7 @@ INSERT INTO `creature_template` (`entry`, `modelid1`, `name`, `subname`, `IconNa
 SET
 @Model3     := 19301,
 @Name3      := "Skxawng el Instructor",
-@Title3     := "Misiones del Battle Royale",
+@Title3     := "Asignador de Misiones del Battle Royale",
 @NPCFlag3   := 2,
 @Scale3     := 0.8;
 INSERT INTO `creature_template` (`entry`, `modelid1`, `name`, `subname`, `IconName`, `gossip_menu_id`, `minlevel`, `maxlevel`, `faction`, `npcflag`, `speed_walk`, `speed_run`, `scale`, `rank`, `unit_class`, `unit_flags`, `type`, `type_flags`, `RegenHealth`, `flags_extra`, `AiName`, `ScriptName`) VALUES
