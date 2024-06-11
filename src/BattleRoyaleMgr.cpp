@@ -36,6 +36,16 @@ void BattleRoyaleMgr::GestionarJugadorEntrando(Player *player)
         return;
     uint32 guid = player->GetGUID().GetCounter();
     BR_Bloqueado *blr = sBRListaNegraMgr->EstaBloqueado(guid);
+    if (player->getLevel() != 80)
+    {
+        sBRChatMgr->AnunciarMensajeEntrada(player, MENSAJE_ERROR_NIVEL);
+        return;
+    }
+    if (player->getClass() == CLASS_DEATH_KNIGHT && player->GetMapId() == 609)
+    {
+        sBRChatMgr->AnunciarMensajeEntrada(player, MENSAJE_ERROR_DK_INICIO);
+        return;
+    }
     if (blr->estaBloqueado)
     {
         sBRChatMgr->AnunciarMensajeEntrada(player, MENSAJE_ERROR_BLOQUEADO, blr->motivo);
@@ -428,7 +438,7 @@ void BattleRoyaleMgr::IniciarNuevaRonda()
 
 void BattleRoyaleMgr::AlmacenarPosicionInicial(uint32 guid)
 {
-    if (list_Jugadores[guid]->GetMap()->Instanceable())
+    if (!list_Jugadores[guid]->GetMap() || list_Jugadores[guid]->GetMap()->Instanceable() || list_Jugadores[guid]->GetTransport())
     {
         list_Datos[guid].SetPosition(list_Jugadores[guid]->m_homebindMapId, list_Jugadores[guid]->m_homebindX, list_Jugadores[guid]->m_homebindY, list_Jugadores[guid]->m_homebindZ, list_Jugadores[guid]->GetOrientation());
     }

@@ -12,6 +12,8 @@ enum BR_TipoMensaje
     MENSAJE_ERROR_EN_EVENTO,
     MENSAJE_ERROR_EN_VUELO,
     MENSAJE_ERROR_BLOQUEADO,
+    MENSAJE_ERROR_DK_INICIO,
+    MENSAJE_ERROR_NIVEL,
 };
 
 enum BR_TipoMensajeEstado
@@ -247,6 +249,16 @@ public:
             case MENSAJE_ERROR_BLOQUEADO:
             {
                 Chat(player).PSendSysMessage("%s No puedes utilizar este modo de juego. Motivo: |cffff0000%s|r.", TEXTO_NOMBRE.c_str(), extra);
+                break;
+            }
+            case MENSAJE_ERROR_DK_INICIO:
+            {
+                Chat(player).PSendSysMessage("%s Primero debes terminar la cadena de misiones inicial.", TEXTO_NOMBRE.c_str());
+                break;
+            }
+            case MENSAJE_ERROR_NIVEL:
+            {
+                Chat(player).PSendSysMessage("%s ¡Este modo de juego es solo para personajes de nivel 80!", TEXTO_NOMBRE.c_str());
                 break;
             }
             default:
