@@ -579,28 +579,31 @@ void BattleRoyaleMgr::EfectoFueraDeZona()
                 float f_RadioZona = escalaDeZona * 19.0f;
                 if (estadoActual == ESTADO_BR_ZONA_DESAPARECIDA || f_RadioZona < distance)
                 {
-                    int tick = list_Datos[it->first].dmg_tick + 1;                    
-                    if (tick < 20 || (tick >= 20 && tick % 5 == 0))
+                    list_Datos[it->first].dmg_tick++;
+                    int tick = list_Datos[it->first].dmg_tick;
+                    if (tick % 3 != 1)
+                        return; // Aplicar cargas cada 3 segundos.
+                    if (tick < 60 || (tick >= 60 && tick % 6 == 0))
                     {
                         it->second->AddAura(56710, it->second); // Aura de esperanza perdida: x20 -3% salud max.
                         it->second->AddAura(50196, it->second); // Toque de putrfaccion: x20 dmg 88-112.
                         it->second->AddAura(60084, it->second); // EL velo de las sombras: -50% sanaciones.
-                    }                    
-                    if (tick >= 20)
+                    }
+                    if (tick >= 60)
                     {
-                        if (tick < 35 || (tick >= 35 && tick % 5 == 0))
+                        if (tick < 105 || (tick >= 105 && tick % 6 == 0))
                         {
                             it->second->AddAura(61460, it->second); // Aura de esperanza perdida: x15 -5% salud max.
                         }
-                        if (tick >= 35)
+                        if (tick >= 105)
                         {
-                            if (tick < 45 || (tick >= 45 && tick % 5 == 0))
+                            if (tick < 135 || (tick >= 135 && tick % 6 == 0))
                             {
                                 it->second->AddAura(19771, it->second); // Mordedura cerrada: x10 dmg 1500 en 30seg.
                             }
                         }
-                    }                            
-                    list_Datos[it->first].dmg_tick = tick;
+                    }
+                    it->second->GetSession()->SendNotification("|cffff0000¡Entra en la zona segura!");
                 }
                 else
                 {
