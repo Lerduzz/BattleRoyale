@@ -531,19 +531,12 @@ void BattleRoyaleMgr::SalirDelEvento(uint32 guid, bool logout /* = false*/)
             player->TeleportTo(list_Datos[guid].GetMap(), list_Datos[guid].GetX(), list_Datos[guid].GetY(), list_Datos[guid].GetZ(), list_Datos[guid].GetO());
             player->SaveToDB(false, false);
         }
-        else
-        {
-            sBREquipamientoMgr->QuitarTodosLosObjetos(player);
-        }
         sBRRecompensaMgr->DarRecompensas(player, list_Datos[guid].reward);
         list_Jugadores.erase(guid);
         list_Datos.erase(guid);
     }
     if (logout && EstaEnListaQuitarTodosLosObjetos(guid))
-    {
-        sBREquipamientoMgr->QuitarTodosLosObjetos(list_QuitarTodosLosObjetos[guid]);
         list_QuitarTodosLosObjetos.erase(guid);
-    }
 }
 
 void BattleRoyaleMgr::RevivirJugador(Player *player)
