@@ -597,7 +597,7 @@ void BattleRoyaleMgr::EfectoFueraDeZona()
                         }
                         if (tick >= 105)
                         {
-                            if (tick < 135 || (tick >= 135 && tick % 6 == 0))
+                            if (tick < 135 || (tick >= 135 && tick % 24 == 0))
                             {
                                 it->second->AddAura(19771, it->second); // Mordedura cerrada: x10 dmg 1500 en 30seg.
                             }
