@@ -80,6 +80,12 @@ public:
     }
 
     void RespondeInvitacion(Player *player, bool agree, ObjectGuid summoner_guid);
+    
+    void ProgramarQuitarObjetos(Player *player)
+    {
+        uint32 guid = player->GetGUID().GetCounter();
+        list_QuitarTodosLosObjetos[guid] = player;
+    }
 
 private:
     void RestablecerTodoElEvento();
@@ -406,6 +412,7 @@ private:
 
     int indicadorDeSegundos;
     int indicadorDe100msZona;
+    int indicadorQuitarObjetosProgramado;
     bool seHaAnunciadoInicioForzado;
     bool estaZonaAnunciada5s;
     bool estaZonaAnunciada10s;
