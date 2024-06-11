@@ -40,7 +40,6 @@ public:
             QuitarEquipamiento(player, EQUIPAMIENTO_BR[i]);
         }
         player->UpdateTitansGrip();
-        player->SaveToDB(false, false);
     };
 
     bool EsEquipamientoDeBR(uint32 item)
