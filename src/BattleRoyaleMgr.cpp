@@ -600,23 +600,7 @@ void BattleRoyaleMgr::EfectoFueraDeZona()
                     float f_MaxHealth = (float)it->second->GetMaxHealth();
                     float f_Damage = f_MaxHealth * f_Percent / 100.0f;
                     uint32 damage = (uint32)f_Damage;
-                    // it->second->GetSession()->SendNotification("|cffff0000¡Has recibido |cffDA70D6%u|cffff0000 de daño, adéntrate en la zona segura!", damage);
                     Unit::DealDamage(it->second, it->second, damage /*, nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false, false*/);
-                    // if (list_Datos[it->first].dmg_tick <= 15)
-                    // {
-                    //     if (!sBRObjetosMgr->HechizoGuardian(HECHIZO_RAYO_DRAGON, it->second))
-                    //     {
-                    //         it->second->AddAura(HECHIZO_ACIDO_ZONA, it->second);
-                    //     }
-                    // }
-                    // else
-                    // {
-                    //     if (!sBRObjetosMgr->HechizoGuardian(HECHIZO_RAYO_DRAGON_FUERTE, it->second))
-                    //     {
-                    //         it->second->AddAura(HECHIZO_ACIDO_ZONA, it->second);
-                    //     }
-                    // }
-                    // it->second->GetSession()->SendNotification("|cffff0000¡Estás fuera de la zona segura, el guardián te ataca!");
                 }
                 else
                 {
