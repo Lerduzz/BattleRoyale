@@ -468,9 +468,11 @@ void BattleRoyaleMgr::LlamarDentroDeNave(uint32 guid, uint32 tiempo /* = 20000*/
     SiguientePosicion();
 }
 
-void BattleRoyaleMgr::RespondeInvitacion(Player *player, bool agree, ObjectGuid /*summoner_guid*/)
+void BattleRoyaleMgr::RespondeInvitacion(Player *player, bool agree, ObjectGuid summoner_guid)
 {
     if (!player || !EstaInvitado(player))
+        return;
+    if (sCharacterCache->GetCharacterGuidByName("BattleRoyale") != summoner_guid)
         return;
     uint32 guid = player->GetGUID().GetCounter();
     if (!agree)
