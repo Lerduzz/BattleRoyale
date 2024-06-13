@@ -4,15 +4,15 @@
 #include "Constantes.h"
 #include "Chat.h"
 
-class BRChatMgr
+class MensajeMgr
 {
-    BRChatMgr(){};
-    ~BRChatMgr(){};
+    MensajeMgr(){};
+    ~MensajeMgr(){};
 
 public:
-    static BRChatMgr *instance()
+    static MensajeMgr *instance()
     {
-        static BRChatMgr *instance = new BRChatMgr();
+        static MensajeMgr *instance = new MensajeMgr();
         return instance;
     }
 
@@ -241,6 +241,6 @@ private:
     };
 };
 
-#define sBRChatMgr BRChatMgr::instance()
+#define sMensajeMgr MensajeMgr::instance()
 
 #endif

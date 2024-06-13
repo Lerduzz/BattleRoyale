@@ -37,22 +37,22 @@ void EventoMgr::GestionarJugadorEntrando(Player *player)
     uint32 guid = player->GetGUID().GetCounter();
     if (player->getLevel() != 80)
     {
-        sBRChatMgr->AnunciarMensajeEntrada(player, BR_MENSAJE_ERROR_NIVEL);
+        sMensajeMgr->AnunciarMensajeEntrada(player, BR_MENSAJE_ERROR_NIVEL);
         return;
     }
     if (player->getClass() == CLASS_DEATH_KNIGHT && player->GetMapId() == 609)
     {
-        sBRChatMgr->AnunciarMensajeEntrada(player, BR_MENSAJE_ERROR_DK_INICIO);
+        sMensajeMgr->AnunciarMensajeEntrada(player, BR_MENSAJE_ERROR_DK_INICIO);
         return;
     }
     if (EstaEnCola(player))
     {
-        sBRChatMgr->AnunciarMensajeEntrada(player, BR_MENSAJE_ERROR_EN_COLA);
+        sMensajeMgr->AnunciarMensajeEntrada(player, BR_MENSAJE_ERROR_EN_COLA);
         return;
     }
     if (EstaEnEvento(player))
     {
-        sBRChatMgr->AnunciarMensajeEntrada(player, BR_MENSAJE_ERROR_EN_EVENTO);
+        sMensajeMgr->AnunciarMensajeEntrada(player, BR_MENSAJE_ERROR_EN_EVENTO);
         return;
     }
     switch (estadoActual)
@@ -66,7 +66,7 @@ void EventoMgr::GestionarJugadorEntrando(Player *player)
         }
         else
         {
-            sBRChatMgr->AnunciarJugadoresEnCola(player, conf_JugadoresMinimo, list_Cola);
+            sMensajeMgr->AnunciarJugadoresEnCola(player, conf_JugadoresMinimo, list_Cola);
         }
         break;
     }
@@ -75,7 +75,7 @@ void EventoMgr::GestionarJugadorEntrando(Player *player)
         if (EstaLlenoElEvento())
         {
             list_Cola[guid] = player;
-            sBRChatMgr->AnunciarJugadoresEnCola(player, conf_JugadoresMinimo, list_Cola, BR_MENSAJE_ESTADO_EVENTO_LLENO);
+            sMensajeMgr->AnunciarJugadoresEnCola(player, conf_JugadoresMinimo, list_Cola, BR_MENSAJE_ESTADO_EVENTO_LLENO);
         }
         else
         {
@@ -88,7 +88,7 @@ void EventoMgr::GestionarJugadorEntrando(Player *player)
     default:
     {
         list_Cola[guid] = player;
-        sBRChatMgr->AnunciarJugadoresEnCola(player, conf_JugadoresMinimo, list_Cola, BR_MENSAJE_ESTADO_EVENTO_EN_CURSO);
+        sMensajeMgr->AnunciarJugadoresEnCola(player, conf_JugadoresMinimo, list_Cola, BR_MENSAJE_ESTADO_EVENTO_EN_CURSO);
         break;
     }
     }
@@ -110,7 +110,7 @@ void EventoMgr::GestionarMuerteJcJ(Player *killer, Player *killed)
         if (killer == killed)
         {
             sBRRecompensaMgr->AcumularRecompensa(conf_Recompensa.morir, &(list_Datos[killed->GetGUID().GetCounter()]));
-            sBRChatMgr->AnunciarMuerteJcJ(killer, killed, 0, list_Jugadores);
+            sMensajeMgr->AnunciarMuerteJcJ(killer, killed, 0, list_Jugadores);
             return;
         }
         killer->AddAura(BR_HECHIZO_DESGARRO_ASESINO, killer);
@@ -118,7 +118,7 @@ void EventoMgr::GestionarMuerteJcJ(Player *killer, Player *killed)
         totalAsesinatosJcJ++;
         sBRRecompensaMgr->AcumularRecompensa(conf_Recompensa.asesinar, &(list_Datos[killer->GetGUID().GetCounter()]));
         sBRRecompensaMgr->AcumularRecompensa(conf_Recompensa.serAsesinado, &(list_Datos[killed->GetGUID().GetCounter()]));
-        sBRChatMgr->AnunciarMuerteJcJ(killer, killed, list_Datos[killer->GetGUID().GetCounter()].kills, list_Jugadores);
+        sMensajeMgr->AnunciarMuerteJcJ(killer, killed, list_Datos[killer->GetGUID().GetCounter()].kills, list_Jugadores);
         TodosLosMuertosEspectarme(killer);
     }
 }
@@ -149,17 +149,17 @@ void EventoMgr::GestionarActualizacionMundo(uint32 diff)
                 seHaAnunciadoInicioForzado = false;
                 if (sEventoMgr->ForzarIniciarNuevaRonda())
                 {
-                    sBRChatMgr->AnunciarInicioForzado(list_Jugadores.size());
+                    sMensajeMgr->AnunciarInicioForzado(list_Jugadores.size());
                 }
                 else
                 {
-                    sBRChatMgr->AnunciarErrorInicioForzado();
+                    sMensajeMgr->AnunciarErrorInicioForzado();
                 }
             }
             else if (!seHaAnunciadoInicioForzado && tiempoRestanteSinJugadores <= 300 /* TODO: Configurable. */)
             {
                 seHaAnunciadoInicioForzado = true;
-                sBRChatMgr->AnunciarAvisoInicioForzado();
+                sMensajeMgr->AnunciarAvisoInicioForzado();
             }
             break;
         }
@@ -237,7 +237,7 @@ void EventoMgr::GestionarActualizacionMundo(uint32 diff)
                 estadoActual = BR_ESTADO_ZONA_EN_ESPERA;
                 sBRRecompensaMgr->AcumularRecompensaVivos(conf_Recompensa.base, list_Jugadores, &list_Datos);
                 sSonidoMgr->ReproducirSonidoParaTodos(BR_SONIDO_RONDA_INICIADA, list_Jugadores);
-                sBRChatMgr->NotificarTiempoInicial(0, list_Jugadores, sBRMapasMgr->MapaActual()->nombreMapa);
+                sMensajeMgr->NotificarTiempoInicial(0, list_Jugadores, sBRMapasMgr->MapaActual()->nombreMapa);
                 sBRMisionesMgr->CompletarRequerimiento(MISION_DIARIA_1, MISION_DIARIA_1_REQ_1, list_Jugadores);
                 tiempoRestanteZona = conf_IntervaloZonaSegura;
                 tiempoRestanteNave = 15;
@@ -264,7 +264,7 @@ void EventoMgr::GestionarActualizacionMundo(uint32 diff)
                 if (sEntidadMgr->DesaparecerNave())
                 {
                     sSonidoMgr->ReproducirSonidoParaTodos(BR_SONIDO_NAVE_RETIRADA, list_Jugadores);
-                    sBRChatMgr->NotificarNaveRetirada(list_Jugadores);
+                    sMensajeMgr->NotificarNaveRetirada(list_Jugadores);
                 }
             }
             if (tiempoRestanteZona <= 0)
@@ -279,7 +279,7 @@ void EventoMgr::GestionarActualizacionMundo(uint32 diff)
                 AlReducirseLaZona();
                 sBRRecompensaMgr->AcumularRecompensaVivos(conf_Recompensa.zona, list_Jugadores, &list_Datos);
                 sSonidoMgr->ReproducirSonidoParaTodos(BR_SONIDO_ZONA_REDUCIDA, list_Jugadores);
-                sBRChatMgr->NotificarZonaEnReduccion(list_Jugadores);
+                sMensajeMgr->NotificarZonaEnReduccion(list_Jugadores);
                 tiempoRestanteZona = conf_IntervaloZonaSegura;
                 estaZonaAnunciada5s = false;
                 estaZonaAnunciada10s = false;
@@ -291,13 +291,13 @@ void EventoMgr::GestionarActualizacionMundo(uint32 diff)
                     if (!estaZonaAnunciada5s && tiempoRestanteZona <= 5)
                     {
                         sSonidoMgr->ReproducirSonidoParaTodos(BR_SONIDO_ZONA_TIEMPO, list_Jugadores);
-                        sBRChatMgr->NotificarAdvertenciaDeZona(5, list_Jugadores);
+                        sMensajeMgr->NotificarAdvertenciaDeZona(5, list_Jugadores);
                         estaZonaAnunciada5s = true;
                     }
                     if (!estaZonaAnunciada10s && tiempoRestanteZona <= 10)
                     {
                         sSonidoMgr->ReproducirSonidoParaTodos(BR_SONIDO_ZONA_TIEMPO, list_Jugadores);
-                        sBRChatMgr->NotificarAdvertenciaDeZona(10, list_Jugadores);
+                        sMensajeMgr->NotificarAdvertenciaDeZona(10, list_Jugadores);
                         estaZonaAnunciada10s = true;
                     }
                     tiempoRestanteZona--;
@@ -675,7 +675,7 @@ void EventoMgr::FinalizarRonda(bool announce, Player *winner /* = nullptr*/)
         {
             sBRRecompensaMgr->AcumularRecompensa(conf_Recompensa.victoria, &(list_Datos[winner->GetGUID().GetCounter()]));
         }
-        sBRChatMgr->AnunciarGanador(winner, list_Datos[winner->GetGUID().GetCounter()].kills);
+        sMensajeMgr->AnunciarGanador(winner, list_Datos[winner->GetGUID().GetCounter()].kills);
         TodosLosMuertosEspectarme(winner);
         if (conf_RequisitoAsesinatosTotales <= totalAsesinatosJcJ && conf_RequisitoAsesinatosPropios <= list_Datos[winner->GetGUID().GetCounter()].kills)
         {
@@ -684,7 +684,7 @@ void EventoMgr::FinalizarRonda(bool announce, Player *winner /* = nullptr*/)
     }
     else
     {
-        sBRChatMgr->AnunciarEmpate();
+        sMensajeMgr->AnunciarEmpate();
     }
     sEntidadMgr->DesaparecerTodosLosObjetos();
     tiempoRestanteFinal = conf_IntervaloFinalDeRonda;

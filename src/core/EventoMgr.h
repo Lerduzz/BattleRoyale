@@ -3,7 +3,7 @@
 
 #include "Constantes.h"
 #include "BREquipamientoMgr.h"
-#include "BRChatMgr.h"
+#include "MensajeMgr.h"
 #include "BRMapasMgr.h"
 #include "BRMisionesMgr.h"
 #include "EntidadMgr.h"
@@ -226,10 +226,10 @@ private:
                         vivos++;
                     }
                 }
-                sBRChatMgr->AnunciarEfectoZona(list_Jugadores, vivos);
+                sMensajeMgr->AnunciarEfectoZona(list_Jugadores, vivos);
             }
             if (chestCount)
-                sBRChatMgr->AnunciarConteoCofres(chestCount, list_Jugadores);
+                sMensajeMgr->AnunciarConteoCofres(chestCount, list_Jugadores);
         }
     }
 
@@ -321,11 +321,11 @@ private:
                         sBREquipamientoMgr->Desnudar(player);
                         if (sBREquipamientoMgr->DarObjetosIniciales(player))
                         {
-                            sBRChatMgr->AnunciarMensajeBienvenida(player);
+                            sMensajeMgr->AnunciarMensajeBienvenida(player);
                         }
                         else
                         {
-                            sBRChatMgr->AnunciarErrorAlas(player);
+                            sMensajeMgr->AnunciarErrorAlas(player);
                         }
                         player->GetMotionMaster()->MoveFall();
                         list_DarObjetosIniciales.erase(guid);
@@ -381,7 +381,7 @@ private:
             {
                 sSonidoMgr->ReproducirSonidoParaTodos(BR_SONIDO_NAVE_EN_MOVIMIENTO, list_Jugadores);
             }
-            sBRChatMgr->NotificarTiempoInicial(tiempoRestanteInicio, list_Jugadores);
+            sMensajeMgr->NotificarTiempoInicial(tiempoRestanteInicio, list_Jugadores);
         }
     }
 
