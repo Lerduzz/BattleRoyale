@@ -38,12 +38,12 @@ void BattleRoyaleMgr::GestionarJugadorEntrando(Player *player)
     BR_Bloqueado *blr = sBRListaNegraMgr->EstaBloqueado(guid);
     if (player->getLevel() != 80)
     {
-        sBRChatMgr->AnunciarMensajeEntrada(player, MENSAJE_ERROR_NIVEL);
+        sBRChatMgr->AnunciarMensajeEntrada(player, BR_MENSAJE_ERROR_NIVEL);
         return;
     }
     if (player->getClass() == CLASS_DEATH_KNIGHT && player->GetMapId() == 609)
     {
-        sBRChatMgr->AnunciarMensajeEntrada(player, MENSAJE_ERROR_DK_INICIO);
+        sBRChatMgr->AnunciarMensajeEntrada(player, BR_MENSAJE_ERROR_DK_INICIO);
         return;
     }
     if (blr->estaBloqueado)
@@ -63,12 +63,12 @@ void BattleRoyaleMgr::GestionarJugadorEntrando(Player *player)
     }
     if (EstaEnCola(player))
     {
-        sBRChatMgr->AnunciarMensajeEntrada(player, MENSAJE_ERROR_EN_COLA);
+        sBRChatMgr->AnunciarMensajeEntrada(player, BR_MENSAJE_ERROR_EN_COLA);
         return;
     }
     if (EstaEnEvento(player))
     {
-        sBRChatMgr->AnunciarMensajeEntrada(player, MENSAJE_ERROR_EN_EVENTO);
+        sBRChatMgr->AnunciarMensajeEntrada(player, BR_MENSAJE_ERROR_EN_EVENTO);
         return;
     }
     switch (estadoActual)
@@ -91,7 +91,7 @@ void BattleRoyaleMgr::GestionarJugadorEntrando(Player *player)
         if (EstaLlenoElEvento())
         {
             list_Cola[guid] = player;
-            sBRChatMgr->AnunciarJugadoresEnCola(player, conf_JugadoresMinimo, list_Cola, MENSAJE_ESTADO_EVENTO_LLENO);
+            sBRChatMgr->AnunciarJugadoresEnCola(player, conf_JugadoresMinimo, list_Cola, BR_MENSAJE_ESTADO_EVENTO_LLENO);
         }
         else
         {
