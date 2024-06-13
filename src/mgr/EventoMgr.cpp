@@ -47,7 +47,7 @@ bool EventoMgr::PuedeEntrarCola(Player *player)
 
 bool EventoMgr::EstaEnCola(Player *player)
 {
-    return cola.find(player->GetGUID().GetCounter()) != cola.end();
+    return std::find(cola.begin(), cola.end(), player) != cola.end();
 }
 
 bool EventoMgr::EstaInvitado(Player *player)
@@ -64,7 +64,7 @@ void EventoMgr::JugadorEntrando(Player *player)
 {
     if (!PuedeEntrarCola(player))
         return;
-    cola[player->GetGUID().GetCounter()] = player;
+    cola.push_back(player);
     switch (estado)
     {
     case BR_ESTADO_SIN_SUFICIENTES_JUGADORES:

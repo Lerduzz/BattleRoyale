@@ -1,7 +1,7 @@
 #ifndef SC_BR_CHAT_MGR_H
 #define SC_BR_CHAT_MGR_H
 
-#include "Player.h"
+#include "Chat.h"
 #include "Constantes.h"
 
 class ChatMgr
