@@ -77,6 +77,18 @@ private:
      *
      */
     BRCola cola;
+
+    /**
+     * @brief Almacena la lista de personajes que han sido invitados al evento.
+     *
+     */
+    BRListaPersonajes invitados;
+
+    /**
+     * @brief Almacena la lista de personajes dentro del evento.
+     *
+     */
+    BRListaPersonajes jugadores;
 };
 
 /**

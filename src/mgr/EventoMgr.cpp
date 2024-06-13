@@ -52,12 +52,12 @@ bool EventoMgr::EstaEnCola(Player *player)
 
 bool EventoMgr::EstaInvitado(Player *player)
 {
-    return false;
+    return invitados.find(player->GetGUID().GetCounter()) != invitados.end();
 }
 
 bool EventoMgr::EstaEnEvento(Player *player)
 {
-    return false;
+    return jugadores.find(player->GetGUID().GetCounter()) != jugadores.end();
 }
 
 void EventoMgr::JugadorEntrando(Player *player)
@@ -84,4 +84,6 @@ void EventoMgr::LimpiarEvento()
 {
     estado = BR_ESTADO_SIN_SUFICIENTES_JUGADORES;
     cola.clear();
+    invitados.clear();
+    jugadores.clear();
 }
