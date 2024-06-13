@@ -181,7 +181,6 @@ void EventoMgr::GestionarActualizacionMundo(uint32 diff)
                             uint32 guid = list_Invitados.begin()->first;
                             list_Invitados.erase(guid);
                             sMapaMgr->RemoverVoto(guid);
-                            sMapaMgr->LimpiarVoto(guid);
                         }
                     }
                 }
@@ -456,7 +455,6 @@ void EventoMgr::RespondeInvitacion(Player *player, bool agree, ObjectGuid summon
     {
         list_Invitados.erase(guid);
         sMapaMgr->RemoverVoto(guid);
-        sMapaMgr->LimpiarVoto(guid);
         if ((estadoActual == BR_ESTADO_INVITANDO_JUGADORES || estadoActual == BR_ESTADO_ESPERANDO_JUGADORES) && tiempoRestanteInicio >= 60)
         {
             while (HayCola() && !EstaLlenoElEvento() && tiempoRestanteInicio >= 60)
@@ -500,7 +498,6 @@ void EventoMgr::SalirDelEvento(uint32 guid, bool logout /* = false*/)
         list_Invitados.erase(guid);
         sMapaMgr->RemoverVoto(guid);
     }
-    sMapaMgr->LimpiarVoto(guid);
     if (EstaEnEvento(guid))
     {
         Player *player = list_Jugadores[guid];
