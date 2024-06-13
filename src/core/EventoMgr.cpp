@@ -21,7 +21,7 @@ EventoMgr::EventoMgr()
     conf_Recompensa.morir = sConfigMgr->GetOption<uint32>("BattleRoyale.Recompensa.AlMorir", 100);
     conf_Recompensa.zona = sConfigMgr->GetOption<uint32>("BattleRoyale.Recompensa.ZonaReducida", 150);
 
-    sBRMapasMgr->CargarMapasDesdeBD();
+    sMapaMgr->CargarMapasDesdeBD();
     RestablecerTodoElEvento();
 }
 
@@ -180,8 +180,8 @@ void EventoMgr::GestionarActualizacionMundo(uint32 diff)
                         {
                             uint32 guid = list_Invitados.begin()->first;
                             list_Invitados.erase(guid);
-                            sBRMapasMgr->RemoverVoto(guid);
-                            sBRMapasMgr->LimpiarVoto(guid);
+                            sMapaMgr->RemoverVoto(guid);
+                            sMapaMgr->LimpiarVoto(guid);
                         }
                     }
                 }
@@ -217,7 +217,7 @@ void EventoMgr::GestionarActualizacionMundo(uint32 diff)
                 tiempoRestanteZona = 0;
                 estaZonaAnunciada5s = false;
                 estaZonaAnunciada10s = false;
-                if (!HayJugadores() || !sEntidadMgr->InvocarZona(sBRMapasMgr->MapaActual()->idMapa, sBRMapasMgr->MapaActual()->centroMapa))
+                if (!HayJugadores() || !sEntidadMgr->InvocarZona(sMapaMgr->MapaActual()->idMapa, sMapaMgr->MapaActual()->centroMapa))
                 {
                     RestablecerTodoElEvento();
                     return;
@@ -237,7 +237,7 @@ void EventoMgr::GestionarActualizacionMundo(uint32 diff)
                 estadoActual = BR_ESTADO_ZONA_EN_ESPERA;
                 sBRRecompensaMgr->AcumularRecompensaVivos(conf_Recompensa.base, list_Jugadores, &list_Datos);
                 sSonidoMgr->ReproducirSonidoParaTodos(BR_SONIDO_RONDA_INICIADA, list_Jugadores);
-                sMensajeMgr->NotificarTiempoInicial(0, list_Jugadores, sBRMapasMgr->MapaActual()->nombreMapa);
+                sMensajeMgr->NotificarTiempoInicial(0, list_Jugadores, sMapaMgr->MapaActual()->nombreMapa);
                 sBRMisionesMgr->CompletarRequerimiento(MISION_DIARIA_1, MISION_DIARIA_1_REQ_1, list_Jugadores);
                 tiempoRestanteZona = conf_IntervaloZonaSegura;
                 tiempoRestanteNave = 15;
@@ -377,7 +377,7 @@ void EventoMgr::RestablecerTodoElEvento()
     list_Datos.clear();
     list_DarObjetosIniciales.clear();
     list_QuitarTodosLosObjetos.clear();
-    sBRMapasMgr->SiguienteMapa();
+    sMapaMgr->SiguienteMapa();
     indicadorDeSegundos = 1000;
     indicadorDe100msZona = 100;
     indicadorQuitarObjetosProgramado = 500;
@@ -393,9 +393,9 @@ void EventoMgr::IniciarNuevaRonda()
 {
     if (estadoActual == BR_ESTADO_SIN_SUFICIENTES_JUGADORES)
     {
-        sBRMapasMgr->EstablecerMasVotado();
+        sMapaMgr->EstablecerMasVotado();
         tiempoRestanteInicio = 120; // TODO: Configurale: Es la suma rara de los tiempos iniciales.
-        if (!HayCola() || !sEntidadMgr->InvocarNave(sBRMapasMgr->MapaActual()->idMapa, sBRMapasMgr->MapaActual()->inicioNave))
+        if (!HayCola() || !sEntidadMgr->InvocarNave(sMapaMgr->MapaActual()->idMapa, sMapaMgr->MapaActual()->inicioNave))
         {
             RestablecerTodoElEvento();
             return;
@@ -432,7 +432,7 @@ void EventoMgr::LlamarDentroDeNave(uint32 guid, uint32 tiempo /* = 20000*/)
     Player *player = list_Invitados[guid];
     float ox = BR_VARIACIONES_POSICION[indiceDeVariacion][0];
     float oy = BR_VARIACIONES_POSICION[indiceDeVariacion][1];
-    BRMapa *brM = sBRMapasMgr->MapaActual();
+    BRMapa *brM = sMapaMgr->MapaActual();
     Position iN = brM->inicioNave;
 
     player->SetSummonPoint(brM->idMapa, iN.GetPositionX() + ox, iN.GetPositionY() + oy, iN.GetPositionZ() + 2.5f);
@@ -455,8 +455,8 @@ void EventoMgr::RespondeInvitacion(Player *player, bool agree, ObjectGuid summon
     if (!agree)
     {
         list_Invitados.erase(guid);
-        sBRMapasMgr->RemoverVoto(guid);
-        sBRMapasMgr->LimpiarVoto(guid);
+        sMapaMgr->RemoverVoto(guid);
+        sMapaMgr->LimpiarVoto(guid);
         if ((estadoActual == BR_ESTADO_INVITANDO_JUGADORES || estadoActual == BR_ESTADO_ESPERANDO_JUGADORES) && tiempoRestanteInicio >= 60)
         {
             while (HayCola() && !EstaLlenoElEvento() && tiempoRestanteInicio >= 60)
@@ -480,7 +480,7 @@ void EventoMgr::RespondeInvitacion(Player *player, bool agree, ObjectGuid summon
     DejarGrupo(player);
     Desmontar(player);
     player->SetPhaseMask(BR_VISIBILIDAD_EVENTO, true);
-    player->SetOrientation(sBRMapasMgr->MapaActual()->inicioNave.GetOrientation() + M_PI / 2.0f);
+    player->SetOrientation(sMapaMgr->MapaActual()->inicioNave.GetOrientation() + M_PI / 2.0f);
     player->SetPvP(false);
     player->SaveToDB(false, false);
     list_DarObjetosIniciales[guid] = player;
@@ -493,14 +493,14 @@ void EventoMgr::SalirDelEvento(uint32 guid, bool logout /* = false*/)
     if (EstaEnCola(guid))
     {
         list_Cola.erase(guid);
-        sBRMapasMgr->RemoverVoto(guid);
+        sMapaMgr->RemoverVoto(guid);
     }
     if (EstaInvitado(guid))
     {
         list_Invitados.erase(guid);
-        sBRMapasMgr->RemoverVoto(guid);
+        sMapaMgr->RemoverVoto(guid);
     }
-    sBRMapasMgr->LimpiarVoto(guid);
+    sMapaMgr->LimpiarVoto(guid);
     if (EstaEnEvento(guid))
     {
         Player *player = list_Jugadores[guid];
@@ -688,6 +688,6 @@ void EventoMgr::FinalizarRonda(bool announce, Player *winner /* = nullptr*/)
     }
     sEntidadMgr->DesaparecerTodosLosObjetos();
     tiempoRestanteFinal = conf_IntervaloFinalDeRonda;
-    sBRMapasMgr->SiguienteMapa();
+    sMapaMgr->SiguienteMapa();
     estadoActual = BR_ESTADO_BATALLA_TERMINADA;
 }

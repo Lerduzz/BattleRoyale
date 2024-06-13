@@ -229,7 +229,7 @@ public:
             if (sEventoMgr->EstaActivado())
             {
                 uint32 start = 5;
-                BRListaMapas mapas = sBRMapasMgr->ObtenerMapas();
+                BRListaMapas mapas = sMapaMgr->ObtenerMapas();
                 for (BRListaMapas::iterator it = mapas.begin(); it != mapas.end(); ++it)
                 {
                     AddGossipItemFor(player, GOSSIP_ICON_BATTLE, it->second->nombreMapa, it->first, start++);
@@ -272,7 +272,7 @@ public:
                 sEventoMgr->GestionarJugadorEntrando(player);
                 if (sEventoMgr->EstaEnCola(player))
                 {
-                    sBRMapasMgr->VotarPorMapa(player->GetGUID().GetCounter(), sender);
+                    sMapaMgr->VotarPorMapa(player->GetGUID().GetCounter(), sender);
                 }
             }
             else

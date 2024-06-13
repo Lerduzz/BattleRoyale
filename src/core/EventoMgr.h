@@ -4,7 +4,7 @@
 #include "Constantes.h"
 #include "BREquipamientoMgr.h"
 #include "MensajeMgr.h"
-#include "BRMapasMgr.h"
+#include "MapaMgr.h"
 #include "BRMisionesMgr.h"
 #include "EntidadMgr.h"
 #include "BRRecompensaMgr.h"
@@ -146,9 +146,9 @@ private:
     void AlReducirseLaZona()
     {
         int chestCount = 0;
-        // if (escalaDeZona < CANTIDAD_DE_ZONAS && sBRMapasMgr->TieneZonasParaCofres(escalaDeZona))
+        // if (escalaDeZona < CANTIDAD_DE_ZONAS && sMapaMgr->TieneZonasParaCofres(escalaDeZona))
         // {
-        //     std::map<uint32, Position> temp = sBRMapasMgr->ObtenerZonasParaCofres(escalaDeZona);
+        //     std::map<uint32, Position> temp = sMapaMgr->ObtenerZonasParaCofres(escalaDeZona);
         //     if (temp.size())
         //     {
         //         for (std::map<uint32, Position>::iterator it = temp.begin(); it != temp.end(); ++it)

@@ -3,23 +3,23 @@
 
 #include "Constantes.h"
 
-class BRMapasMgr
+class MapaMgr
 {
-    BRMapasMgr()
+    MapaMgr()
     {
         CargarMapasDesdeBD();
         usarVotos = false;
     };
-    ~BRMapasMgr()
+    ~MapaMgr()
     {
         list_Votos.clear();
         list_Mapas.clear();
     };
 
 public:
-    static BRMapasMgr *instance()
+    static MapaMgr *instance()
     {
-        static BRMapasMgr *instance = new BRMapasMgr();
+        static MapaMgr *instance = new MapaMgr();
         return instance;
     }
 
@@ -158,6 +158,6 @@ private:
 
 };
 
-#define sBRMapasMgr BRMapasMgr::instance()
+#define sMapaMgr MapaMgr::instance()
 
 #endif
