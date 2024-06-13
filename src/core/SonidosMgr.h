@@ -5,15 +5,15 @@
 #include "MiscPackets.h"
 #include "Player.h"
 
-class BRSonidosMgr
+class SonidosMgr
 {
-    BRSonidosMgr(){};
-    ~BRSonidosMgr(){};
+    SonidosMgr(){};
+    ~SonidosMgr(){};
 
 public:
-    static BRSonidosMgr *instance()
+    static SonidosMgr *instance()
     {
-        static BRSonidosMgr *instance = new BRSonidosMgr();
+        static SonidosMgr *instance = new SonidosMgr();
         return instance;
     }
 
@@ -33,6 +33,6 @@ public:
 
 };
 
-#define sBRSonidosMgr BRSonidosMgr::instance()
+#define sSonidosMgr SonidosMgr::instance()
 
 #endif

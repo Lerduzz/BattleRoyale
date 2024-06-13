@@ -8,7 +8,7 @@
 #include "BRMisionesMgr.h"
 #include "BRObjetosMgr.h"
 #include "BRRecompensaMgr.h"
-#include "BRSonidosMgr.h"
+#include "SonidosMgr.h"
 #include "TitulosMgr.h"
 #include "PlayerData.h"
 #include "Common.h"
@@ -379,7 +379,7 @@ private:
         {
             if (tiempoRestanteInicio == 45)
             {
-                sBRSonidosMgr->ReproducirSonidoParaTodos(BR_SONIDO_NAVE_EN_MOVIMIENTO, list_Jugadores);
+                sSonidosMgr->ReproducirSonidoParaTodos(BR_SONIDO_NAVE_EN_MOVIMIENTO, list_Jugadores);
             }
             sBRChatMgr->NotificarTiempoInicial(tiempoRestanteInicio, list_Jugadores);
         }
