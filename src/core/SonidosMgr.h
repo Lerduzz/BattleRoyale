@@ -1,9 +1,8 @@
 #ifndef SC_BR_SOUNDS_MGR_H
 #define SC_BR_SOUNDS_MGR_H
 
-#include "Common.h"
+#include "Constantes.h"
 #include "MiscPackets.h"
-#include "Player.h"
 
 class SonidosMgr
 {
