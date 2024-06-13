@@ -113,6 +113,15 @@ struct BRConfigRecompensa
     uint32 zona;
 };
 
+struct BRConfigIntervalos
+{
+    uint32 sinJugadores;
+    uint32 invitandoJugadores;
+    uint32 esperandoJugadores;
+    uint32 naveEnEspera;
+    uint32 zonaEnEspera;
+};
+
 struct BRListaNegra
 {
     bool estaBloqueado;

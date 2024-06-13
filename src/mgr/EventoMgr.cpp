@@ -69,6 +69,8 @@ void EventoMgr::JugadorEntrando(Player *player)
     {
     case BR_ESTADO_SIN_SUFICIENTES_JUGADORES:
         // TODO: Si se lleno la cola iniciar nueva ronda.
+        if (cola.size() >= minJugadores)
+            IniciarRonda();
         break;
     case BR_ESTADO_INVITANDO_JUGADORES:
         // TODO: Invitar directamente a unirse al evento.
@@ -86,4 +88,69 @@ void EventoMgr::LimpiarEvento()
     cola.clear();
     invitados.clear();
     jugadores.clear();
+    intervalo = BRConfigIntervalos(); // TODO: Conf (seg).
+    intervalo.sinJugadores = 1800;
+    intervalo.invitandoJugadores = 30;
+    intervalo.esperandoJugadores = 15;
+    intervalo.naveEnEspera = 30;
+    intervalo.zonaEnEspera = 60;
+    minJugadores = 1; // TODO: Conf.
+    maxJugadores = 5; // TODO: Conf.
+    tiempoRestanteInicio = 45 + intervalo.naveEnEspera + intervalo.esperandoJugadores + intervalo.invitandoJugadores;
+    indiceDePosicionNave = 0;
+}
+
+void EventoMgr::IniciarRonda()
+{
+    if (estado != BR_ESTADO_SIN_SUFICIENTES_JUGADORES)
+    {
+        LOG_ERROR("event.br", "[BattleRoyale] EventoMgr::IniciarRonda(): El evento no se encuentra en el estado correcto.");
+        return;
+    }
+    if (cola.empty())
+    {
+        LOG_ERROR("event.br", "[BattleRoyale] EventoMgr::IniciarRonda(): No hay jugadores en cola.");
+        return;
+    }
+    // TODO: Establecer mapa mas votado.
+    // TODO: Invocar nave.
+    estado = BR_ESTADO_INVITANDO_JUGADORES;
+    tiempoRestanteInicio = 45 + intervalo.naveEnEspera + intervalo.esperandoJugadores + intervalo.invitandoJugadores;
+    InvitarJugadores();
+}
+
+void EventoMgr::InvitarJugadores()
+{
+    while (!cola.empty() && invitados.size() + jugadores.size() < maxJugadores && tiempoRestanteInicio < 45 + intervalo.naveEnEspera + intervalo.esperandoJugadores)
+    {
+        Player *player = cola.front();
+        cola.pop_front();
+        if (!player)
+            continue;
+        invitados[player->GetGUID().GetCounter()] = player;
+        if (!player->IsInWorld() || !player->IsAlive() || player->IsBeingTeleported())
+            continue;
+        InvitarJugador(player);
+    }
+}
+
+void EventoMgr::InvitarJugador(Player *player)
+{
+    if (!EstaInvitado(player))
+        return;
+    float ox = BR_VARIACIONES_POSICION[indiceDePosicionNave][0];
+    float oy = BR_VARIACIONES_POSICION[indiceDePosicionNave][1];
+    BRMapa *brM = sBRMapasMgr->MapaActual();
+    Position iN = brM->inicioNave;
+    uint32 tiempo = (tiempoRestanteInicio - (45 + intervalo.naveEnEspera)) * IN_MILLISECONDS;
+    player->SetSummonPoint(brM->idMapa, iN.GetPositionX() + ox, iN.GetPositionY() + oy, iN.GetPositionZ() + 2.5f);
+    WorldPacket data(SMSG_SUMMON_REQUEST, 8 + 4 + 4);
+    data << sCharacterCache->GetCharacterGuidByName("BattleRoyale");
+    data << uint32(brM->idZona);
+    data << uint32(tiempo);
+    Player->GetSession()->SendPacket(&data);
+    if (++indiceDePosicionNave >= BR_CANTIDAD_VARIACIONES)
+    {
+        indiceDePosicionNave = 0;
+    }
 }

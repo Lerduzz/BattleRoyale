@@ -2,6 +2,7 @@
 #define SC_BR_ENTIDAD_MGR_H
 
 #include "Constantes.h"
+#include "CharacterCache.h"
 #include "ChatMgr.h"
 
 class EventoMgr
@@ -67,6 +68,25 @@ private:
     void LimpiarEvento();
 
     /**
+     * @brief Prepara una nueva ronda y comienza a invitar jugadores.
+     *
+     */
+    void IniciarRonda();
+
+    /**
+     * @brief Invita a los jugadores al evento mientras se cumplan los requisitos.
+     *
+     */
+    void InvitarJugadores();
+
+    /**
+     * @brief Invita al jugador a la batalla, ya debe estar en la lista.
+     *
+     * @param player El jugador a invitar.
+     */
+    void InvitarJugador(Player *player);
+
+    /**
      * @brief Almacena el estado actual en el que se encuentra el evento.
      *
      */
@@ -89,6 +109,23 @@ private:
      *
      */
     BRListaPersonajes jugadores;
+
+    /**
+     * @brief Tiempo restante para que inicie el combate desde el momento en que se comienza a invitar jugadores.
+     *
+     */
+    uint32 tiempoRestanteInicio;
+
+    /**
+     * @brief Determina la variacion de posicion del jugador invitado para que se invoquen en formacion.
+     *
+     */
+    uint32 indiceDePosicionNave;
+
+    BRConfigIntervalos intervalo;
+
+    uint32 minJugadores;
+    uint32 maxJugadores;
 };
 
 /**
