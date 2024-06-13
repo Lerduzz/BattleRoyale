@@ -18,6 +18,7 @@ enum BRObjeto
 
 enum BRCriatura
 {
+    BR_CRIATURA_GESTOR_COLA = 200000,
     BR_CRIATURA_VENDEDOR_ARMAS = 200001,
     BR_CRIATURA_DRAGON_GUARDIAN = 199999,
 };
@@ -134,7 +135,7 @@ typedef std::map<uint32, BRMapa *> BRListaMapas;
 
 // ----------------------------------- TYPEDEFS ----------------------------------- //
 typedef std::map<uint32, Player *> BRListaPersonajes;
-typedef std::map<uint32, BattleRoyaleData> BRListaDatos;
+// typedef std::map<uint32, BattleRoyaleData> BRListaDatos;
 typedef std::map<uint32, uint32> BRListaVotos;
 typedef std::list<Player *> BRCola;
 

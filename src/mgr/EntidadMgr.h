@@ -29,7 +29,7 @@ public:
     bool ZonaActualizar();
     bool ZonaEliminar();
     bool HayZona();
-    bool EstaEnNave(Player *player);
+    bool EstaEnZona(Player *player);
 
 private:
     GameObject *obj_Nave;
