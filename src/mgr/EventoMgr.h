@@ -6,24 +6,10 @@
 
 class EventoMgr
 {
-    /**
-     * @brief Construye un nuevo objeto EventoMgr.
-     *
-     */
     EventoMgr();
-
-    /**
-     * @brief Destruye el objeto EventoMgr.
-     *
-     */
     ~EventoMgr();
 
 public:
-    /**
-     * @brief Obtiene la referencia a la instancia de la clase.
-     *
-     * @return EventoMgr*
-     */
     static EventoMgr *instance()
     {
         static EventoMgr *instance = new EventoMgr();
@@ -94,7 +80,7 @@ private:
 };
 
 /**
- * @brief Define acceso directo a la instancia global de la clase.
+ * @brief Se encarga de gestionar globalmente todo el evento.
  *
  */
 #define sEventoMgr EventoMgr::instance()

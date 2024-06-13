@@ -1,6 +1,6 @@
 #include "ChatMgr.h"
 
-void ChatMgr::MensajeEntrada(Player *player, BRMensaje tipo, std::string extra)
+void ChatMgr::MensajeEntrada(Player *player, BRMensaje tipo)
 {
     switch (tipo)
     {

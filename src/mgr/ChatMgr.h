@@ -16,12 +16,22 @@ public:
         return instance;
     }
 
-    void MensajeEntrada(Player *player, BRMensaje tipo, std::string extra = "");
+    /**
+     * @brief Muestra los mensajes de error al intentar unirse a la cola del evento.
+     *
+     * @param player Jugador que intenta unirse a la cola del evento.
+     * @param tipo Tipo de mensaje de error.
+     */
+    void MensajeEntrada(Player *player, BRMensaje tipo);
 
 private:
     inline ChatHandler Chat(Player *player) { return ChatHandler(player->GetSession()); };
 };
 
+/**
+ * @brief Se encarga de gestionar los anuncios de chat del evento.
+ *
+ */
 #define sChatMgr ChatMgr::instance()
 
 #endif
