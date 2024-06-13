@@ -31,14 +31,6 @@ public:
         {
         case 1:
         {
-            // if (sBattleRoyaleMgr->EstaActivado())
-            // {
-            //     sBattleRoyaleMgr->GestionarJugadorEntrando(player);
-            // }
-            // else
-            // {
-            //     ChatHandler(player->GetSession()).PSendSysMessage("|cff4CFF00BattleRoyale::|r ¡Este modo de juego se encuentra actualmente desactivado!");
-            // }
             sEventoMgr->JugadorEntrando(player);
             CloseGossipMenuFor(player);
             break;
