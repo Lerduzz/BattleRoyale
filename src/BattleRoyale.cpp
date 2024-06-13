@@ -317,7 +317,7 @@ public:
             ChatHandler(player->GetSession()).PSendSysMessage("|cff4CFF00BattleRoyale::|r ¡Solo se puede utilizar mientras participas en este modo de juego!");
             return false;
         }
-        if (sBRObjetosMgr->EstaEnLaNave(player))
+        if (sEntidadMgr->EstaEnLaNave(player))
         {
             ChatHandler(player->GetSession()).PSendSysMessage("|cff4CFF00BattleRoyale::|r ¡No se puede utilizar hasta que saltas de la nave!");
             return false;

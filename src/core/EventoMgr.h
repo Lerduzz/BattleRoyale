@@ -6,7 +6,7 @@
 #include "BRChatMgr.h"
 #include "BRMapasMgr.h"
 #include "BRMisionesMgr.h"
-#include "BRObjetosMgr.h"
+#include "EntidadMgr.h"
 #include "BRRecompensaMgr.h"
 #include "SonidosMgr.h"
 #include "TitulosMgr.h"
@@ -61,7 +61,7 @@ public:
             return false;
         if ((estadoActual < BR_ESTADO_ZONA_EN_ESPERA || estadoActual == BR_ESTADO_BATALLA_TERMINADA) || !HayJugadores() || !EstaEnEvento(player))
             return false;
-        return !sBRObjetosMgr->EstaEnLaNave(player);
+        return !sEntidadMgr->EstaEnLaNave(player);
     }
 
     inline BREstado EstadoActual() { return estadoActual; };
@@ -156,7 +156,7 @@ private:
         //             int rnd = rand() % 100 + 1;
         //             if (rnd <= 35)
         //             {
-        //                 if (sBRObjetosMgr->InvocarCofre(it->second))
+        //                 if (sEntidadMgr->InvocarCofre(it->second))
         //                 {
         //                     chestCount++;
         //                 }
@@ -199,7 +199,7 @@ private:
                         }
                         case 7:
                         {
-                            if (!sBRObjetosMgr->HechizoGuardian(BR_HECHIZO_RAYO_DRAGON, it->second))
+                            if (!sEntidadMgr->HechizoGuardian(BR_HECHIZO_RAYO_DRAGON, it->second))
                             {
                                 it->second->AddAura(BR_HECHIZO_DESGARRO_ASESINO, it->second);
                             }
@@ -208,7 +208,7 @@ private:
                         case 8:
                         case 9:
                         {
-                            if (!sBRObjetosMgr->HechizoGuardian(BR_HECHIZO_RAYO_DRAGON_FUERTE, it->second))
+                            if (!sEntidadMgr->HechizoGuardian(BR_HECHIZO_RAYO_DRAGON_FUERTE, it->second))
                             {
                                 it->second->AddAura(BR_HECHIZO_RASTRILLO_LENTO, it->second);
                             }
@@ -267,7 +267,7 @@ private:
             BRListaPersonajes::iterator it = list_Jugadores.begin();
             while (it != list_Jugadores.end())
             {
-                if (!sBRObjetosMgr->EstaEnLaNave(it->second) || !it->second->IsAlive())
+                if (!sEntidadMgr->EstaEnLaNave(it->second) || !it->second->IsAlive())
                 {
                     uint32 guid = it->first;
                     ++it;
@@ -313,7 +313,7 @@ private:
             {
                 if (it->second && it->second->IsAlive())
                 {
-                    if (it->second->IsInWorld() && !it->second->IsBeingTeleported() && sBRObjetosMgr->EstaEnLaNave(it->second))
+                    if (it->second->IsInWorld() && !it->second->IsBeingTeleported() && sEntidadMgr->EstaEnLaNave(it->second))
                     {
                         uint32 guid = it->first;
                         Player *player = it->second;

@@ -171,7 +171,7 @@ void EventoMgr::GestionarActualizacionMundo(uint32 diff)
             DarObjetosInicialesProgramado();
             if (tiempoRestanteInicio <= 45)
             {
-                if (sBRObjetosMgr->EncenderNave())
+                if (sEntidadMgr->EncenderNave())
                 {
                     estadoActual = BR_ESTADO_NAVE_EN_MOVIMIENTO;
                     if (!list_Invitados.empty())
@@ -217,7 +217,7 @@ void EventoMgr::GestionarActualizacionMundo(uint32 diff)
                 tiempoRestanteZona = 0;
                 estaZonaAnunciada5s = false;
                 estaZonaAnunciada10s = false;
-                if (!HayJugadores() || !sBRObjetosMgr->InvocarZona(sBRMapasMgr->MapaActual()->idMapa, sBRMapasMgr->MapaActual()->centroMapa))
+                if (!HayJugadores() || !sEntidadMgr->InvocarZona(sBRMapasMgr->MapaActual()->idMapa, sBRMapasMgr->MapaActual()->centroMapa))
                 {
                     RestablecerTodoElEvento();
                     return;
@@ -261,7 +261,7 @@ void EventoMgr::GestionarActualizacionMundo(uint32 diff)
             }
             if (--tiempoRestanteNave <= 0)
             {
-                if (sBRObjetosMgr->DesaparecerNave())
+                if (sEntidadMgr->DesaparecerNave())
                 {
                     sSonidosMgr->ReproducirSonidoParaTodos(BR_SONIDO_NAVE_RETIRADA, list_Jugadores);
                     sBRChatMgr->NotificarNaveRetirada(list_Jugadores);
@@ -269,7 +269,7 @@ void EventoMgr::GestionarActualizacionMundo(uint32 diff)
             }
             if (tiempoRestanteZona <= 0)
             {
-                if (estadoActual == BR_ESTADO_ZONA_EN_ESPERA && sBRObjetosMgr->EstaLaZonaActiva())
+                if (estadoActual == BR_ESTADO_ZONA_EN_ESPERA && sEntidadMgr->EstaLaZonaActiva())
                 {
                     reducirZonaHasta = escalaDeZona - 3.0f;
                     if (reducirZonaHasta < 0.2f)
@@ -332,11 +332,11 @@ void EventoMgr::GestionarActualizacionMundo(uint32 diff)
             indicadorDe100msZona = 100;
             if (reducirZonaHasta < escalaDeZona)
             {
-                sBRObjetosMgr->ActualizarZona(escalaDeZona);
+                sEntidadMgr->ActualizarZona(escalaDeZona);
             }
             else
             {
-                if (sBRObjetosMgr->EstaLaZonaActiva())
+                if (sEntidadMgr->EstaLaZonaActiva())
                 {
                     estadoActual = BR_ESTADO_ZONA_EN_ESPERA;
                 }
@@ -383,7 +383,7 @@ void EventoMgr::RestablecerTodoElEvento()
     indicadorQuitarObjetosProgramado = 500;
     indiceDeVariacion = 0;
     totalAsesinatosJcJ = 0;
-    sBRObjetosMgr->DesaparecerTodosLosObjetos();
+    sEntidadMgr->DesaparecerTodosLosObjetos();
     tiempoRestanteSinJugadores = conf_IntervaloSinJugadores;
     seHaAnunciadoInicioForzado = false;
     estadoActual = BR_ESTADO_SIN_SUFICIENTES_JUGADORES;
@@ -395,7 +395,7 @@ void EventoMgr::IniciarNuevaRonda()
     {
         sBRMapasMgr->EstablecerMasVotado();
         tiempoRestanteInicio = 120; // TODO: Configurale: Es la suma rara de los tiempos iniciales.
-        if (!HayCola() || !sBRObjetosMgr->InvocarNave(sBRMapasMgr->MapaActual()->idMapa, sBRMapasMgr->MapaActual()->inicioNave))
+        if (!HayCola() || !sEntidadMgr->InvocarNave(sBRMapasMgr->MapaActual()->idMapa, sBRMapasMgr->MapaActual()->inicioNave))
         {
             RestablecerTodoElEvento();
             return;
@@ -547,9 +547,9 @@ void EventoMgr::EfectoFueraDeZona()
     {
         for (BRListaPersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
         {
-            if (it->second && it->second->IsAlive() && sBRObjetosMgr->EstaLaZonaActiva())
+            if (it->second && it->second->IsAlive() && sEntidadMgr->EstaLaZonaActiva())
             {
-                float distance = sBRObjetosMgr->DistanciaDelCentro(it->second);
+                float distance = sEntidadMgr->DistanciaDelCentro(it->second);
                 float f_RadioZona = escalaDeZona * 19.0f;
                 if (estadoActual == BR_ESTADO_ZONA_DESAPARECIDA || f_RadioZona < distance)
                 {
@@ -609,7 +609,7 @@ void EventoMgr::ControlDeReglas()
         {
             if (it->second && it->second->IsAlive())
             {
-                if (sBRObjetosMgr->DistanciaDelCentro(it->second) > 1147.0f)
+                if (sEntidadMgr->DistanciaDelCentro(it->second) > 1147.0f)
                 {
                     uint32 guid = it->first;
                     ++it;
@@ -686,7 +686,7 @@ void EventoMgr::FinalizarRonda(bool announce, Player *winner /* = nullptr*/)
     {
         sBRChatMgr->AnunciarEmpate();
     }
-    sBRObjetosMgr->DesaparecerTodosLosObjetos();
+    sEntidadMgr->DesaparecerTodosLosObjetos();
     tiempoRestanteFinal = conf_IntervaloFinalDeRonda;
     sBRMapasMgr->SiguienteMapa();
     estadoActual = BR_ESTADO_BATALLA_TERMINADA;

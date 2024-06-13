@@ -7,9 +7,9 @@
 #include "SpellAuras.h"
 #include "Transport.h"
 
-class BRObjetosMgr
+class EntidadMgr
 {
-    BRObjetosMgr()
+    EntidadMgr()
     {
         npc_Centro = nullptr;
         obj_Nave = nullptr;
@@ -17,12 +17,12 @@ class BRObjetosMgr
         npc_Guardian = nullptr;
         zonaActiva = false;
     };
-    ~BRObjetosMgr(){};
+    ~EntidadMgr(){};
 
 public:
-    static BRObjetosMgr *instance()
+    static EntidadMgr *instance()
     {
-        static BRObjetosMgr *instance = new BRObjetosMgr();
+        static EntidadMgr *instance = new EntidadMgr();
         return instance;
     }
 
@@ -239,6 +239,6 @@ private:
     bool zonaActiva;
 };
 
-#define sBRObjetosMgr BRObjetosMgr::instance()
+#define sEntidadMgr EntidadMgr::instance()
 
 #endif
