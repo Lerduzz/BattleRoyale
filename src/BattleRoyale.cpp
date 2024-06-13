@@ -414,8 +414,7 @@ public:
 
     static bool HandleReloadCommand(ChatHandler *handler)
     {
-        sBRListaNegraMgr->RecargarLista();
-        handler->SendSysMessage("Se ha recargado la lista negra del modo Battle Royale.");
+        handler->SendSysMessage("UNIMPLEMENTED: Recargar los mapas y spawns de Battle Royale.");
         return true;
     }
 

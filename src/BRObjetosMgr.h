@@ -89,7 +89,7 @@ public:
             float rot3 = cos(o / 2);
             map->LoadGrid(x, y);
             obj_Nave = new StaticTransport();
-            if (obj_Nave->Create(map->GenerateLowGuid<HighGuid::GameObject>(), OBJETO_NAVE, map, BR_VISIBILIDAD_EVENTO, x, y, z, o, G3D::Quat(0, 0, rot2, rot3), 100, GO_STATE_READY))
+            if (obj_Nave->Create(map->GenerateLowGuid<HighGuid::GameObject>(), BR_OBJETO_NAVE, map, BR_VISIBILIDAD_EVENTO, x, y, z, o, G3D::Quat(0, 0, rot2, rot3), 100, GO_STATE_READY))
             {
                 obj_Nave->SetVisibilityDistanceOverride(VisibilityDistanceType::Infinite);
                 map->AddToMap(obj_Nave);
@@ -100,7 +100,7 @@ public:
                     float vZ = 0.0f;
                     float vO = -M_PI_2;
                     transport->CalculatePassengerPosition(*(&vX), *(&vY), *(&vZ), &vO);
-                    if ((npc_Vendedor = transport->SummonCreature(CRIATURA_VENDEDOR_ARMAS, vX, vY, vZ, vO, TEMPSUMMON_MANUAL_DESPAWN)))
+                    if ((npc_Vendedor = transport->SummonCreature(BR_CRIATURA_VENDEDOR_ARMAS, vX, vY, vZ, vO, TEMPSUMMON_MANUAL_DESPAWN)))
                     {
                         transport->AddPassenger(npc_Vendedor, true);
                     }
@@ -173,7 +173,7 @@ public:
             map->AddToMap(npc_Centro);
             npc_Centro->AddAura(63894, npc_Centro);
             npc_Centro->SetObjectScale(15.2f);
-            if (!(npc_Guardian = npc_Centro->SummonCreature(CRIATURA_DRAGON_GUARDIAN, x, y, z + 330.0f, o, TEMPSUMMON_MANUAL_DESPAWN)))
+            if (!(npc_Guardian = npc_Centro->SummonCreature(BR_CRIATURA_DRAGON_GUARDIAN, x, y, z + 330.0f, o, TEMPSUMMON_MANUAL_DESPAWN)))
             {
                 delete npc_Guardian;
                 npc_Guardian = nullptr;
@@ -187,7 +187,7 @@ public:
     {
         if (EstaLaZonaActiva())
         {
-            if (npc_Centro->SummonGameObject(OBJETO_COFRE, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation(), 0, 0, 0, 0, 60))
+            if (npc_Centro->SummonGameObject(BR_OBJETO_COFRE, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation(), 0, 0, 0, 0, 60))
             {
                 return true;
             }
