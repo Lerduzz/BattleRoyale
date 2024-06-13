@@ -64,8 +64,20 @@ void EventoMgr::JugadorEntrando(Player *player)
 {
     if (!PuedeEntrarCola(player))
         return;
-    // TODO: Agregar a la cola, llamar al evento o iniciar ronda nueva segun estado actual.
-    LOG_ERROR("event.br", "[BattleRoyale] TODO: EventoMgr::JugadorEntrando(Player *player): El jugador cumple los requisitos para entrar en cola.");
+    cola[player->GetGUID().GetCounter()] = player;
+    switch (estado)
+    {
+    case BR_ESTADO_SIN_SUFICIENTES_JUGADORES:
+        // TODO: Si se lleno la cola iniciar nueva ronda.
+        break;
+    case BR_ESTADO_INVITANDO_JUGADORES:
+        // TODO: Invitar directamente a unirse al evento.
+        break;
+    default:
+        // TODO: Anunciar que se ha unido a la cola y el estado actual del evento.
+        // TODO: Anunciar a los miembros de la cola que se ha unido otro si procede.
+        break;
+    }
 }
 
 void EventoMgr::LimpiarEvento()
