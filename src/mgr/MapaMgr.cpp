@@ -85,7 +85,7 @@ void MapaMgr::CargarMapasDesdeBD()
         do
         {
             Field *fields = result->Fetch();
-            BR_Mapa *mapa = new BR_Mapa();
+            BRMapa *mapa = new BRMapa();
             uint32 id = fields[0].Get<uint32>();
             mapa->idMapa = fields[1].Get<uint32>();
             mapa->idZona = fields[2].Get<uint32>();
