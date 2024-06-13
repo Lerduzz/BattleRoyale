@@ -1,6 +1,6 @@
-#include "BattleRoyaleData.h"
+#include "PlayerData.h"
 
-BattleRoyaleData::BattleRoyaleData()
+PlayerData::PlayerData()
 {
     start_map = 0;
     start_x = 0.0f;
@@ -13,11 +13,11 @@ BattleRoyaleData::BattleRoyaleData()
     reward = 0;
 }
 
-BattleRoyaleData::~BattleRoyaleData()
+PlayerData::~PlayerData()
 {
 }
 
-void BattleRoyaleData::SetPosition(int m, float x, float y, float z, float o)
+void PlayerData::SetPosition(int m, float x, float y, float z, float o)
 {
     start_map = m;
     start_x = x;
@@ -26,27 +26,27 @@ void BattleRoyaleData::SetPosition(int m, float x, float y, float z, float o)
     start_o = o;
 }
 
-int BattleRoyaleData::GetMap()
+int PlayerData::GetMap()
 {
     return start_map;
 }
 
-float BattleRoyaleData::GetX()
+float PlayerData::GetX()
 {
     return start_x;
 }
 
-float BattleRoyaleData::GetY()
+float PlayerData::GetY()
 {
     return start_y;
 }
 
-float BattleRoyaleData::GetZ()
+float PlayerData::GetZ()
 {
     return start_z;
 }
 
-float BattleRoyaleData::GetO()
+float PlayerData::GetO()
 {
     return start_o;
 }

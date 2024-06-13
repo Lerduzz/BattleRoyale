@@ -1,4 +1,4 @@
-#include "BattleRoyaleMgr.h"
+#include "EventoMgr.h"
 #include "ScriptMgr.h"
 #include "Player.h"
 #include "Config.h"
@@ -29,29 +29,29 @@ public:
 
     void OnLogin(Player *player) override
     {
-        if (sBattleRoyaleMgr->EstaActivado())
+        if (sEventoMgr->EstaActivado())
         {
             if (sConfigMgr->GetOption<bool>("BattleRoyale.Anunciar", true))
             {
                 ChatHandler(player->GetSession()).SendSysMessage("El modo |cff4CFF00BattleRoyale|r ha sido activado.");
             }
         }
-        sBattleRoyaleMgr->ProgramarQuitarObjetos(player);
+        sEventoMgr->ProgramarQuitarObjetos(player);
     }
 
     void OnLogout(Player *player) override
     {
-        if (sBattleRoyaleMgr->EstaActivado())
+        if (sEventoMgr->EstaActivado())
         {
-            sBattleRoyaleMgr->GestionarJugadorDesconectar(player);
+            sEventoMgr->GestionarJugadorDesconectar(player);
         }
     }
 
     void OnPVPKill(Player *killer, Player *killed) override
     {
-        if (sBattleRoyaleMgr->EstaActivado())
+        if (sEventoMgr->EstaActivado())
         {
-            sBattleRoyaleMgr->GestionarMuerteJcJ(killer, killed);
+            sEventoMgr->GestionarMuerteJcJ(killer, killed);
         }
     }
 
@@ -59,13 +59,13 @@ public:
     {
         if (player && pItem && not_loading)
         {
-            if (sBattleRoyaleMgr->EstadoActual() > ESTADO_BR_SIN_SUFICIENTES_JUGADORES && sBattleRoyaleMgr->EstaEnEvento(player))
+            if (sEventoMgr->EstadoActual() > BR_ESTADO_SIN_SUFICIENTES_JUGADORES && sEventoMgr->EstaEnEvento(player))
             {
-                return sBREquipamientoMgr->EsEquipamientoDeBR(pItem->GetEntry());
+                return sInventarioMgr->EsEquipamientoDeBR(pItem->GetEntry());
             }
             else
             {
-                return !sBREquipamientoMgr->EsEquipamientoDeBR(pItem->GetEntry());
+                return !sInventarioMgr->EsEquipamientoDeBR(pItem->GetEntry());
             }
         }
         return true;
@@ -73,26 +73,26 @@ public:
 
     bool CanRepopAtGraveyard(Player *player) override
     {
-        if (sBattleRoyaleMgr->EstaActivado())
+        if (sEventoMgr->EstaActivado())
         {
-            return sBattleRoyaleMgr->PuedeReaparecerEnCementerio(player);
+            return sEventoMgr->PuedeReaparecerEnCementerio(player);
         }
         return true;
     }
 
     void OnPlayerPVPFlagChange(Player *player, bool state) override
     {
-        if (sBattleRoyaleMgr->EstaActivado())
+        if (sEventoMgr->EstaActivado())
         {
-            sBattleRoyaleMgr->PrevenirJcJEnLaNave(player, state);
+            sEventoMgr->PrevenirJcJEnLaNave(player, state);
         }
     }
 
     bool CanJoinLfg(Player *player, uint8 /*roles*/, lfg::LfgDungeonSet & /*dungeons*/, const std::string & /*comment*/) override
     {
-        if (sBattleRoyaleMgr->EstaActivado())
+        if (sEventoMgr->EstaActivado())
         {
-            if (sBattleRoyaleMgr->EstaEnCola(player) || sBattleRoyaleMgr->DebeRestringirFunciones(player))
+            if (sEventoMgr->EstaEnCola(player) || sEventoMgr->DebeRestringirFunciones(player))
             {
                 ChatHandler(player->GetSession()).SendSysMessage("|cff4CFF00BattleRoyale::|r ¡No puedes hacer eso mientras participas en el modo Battle Royale!");
                 return false;
@@ -103,27 +103,27 @@ public:
 
     bool CanGroupInvite(Player *player, std::string & /*membername*/) override
     {
-        if (sBattleRoyaleMgr->EstaActivado())
+        if (sEventoMgr->EstaActivado())
         {
-            return !sBattleRoyaleMgr->DebeRestringirFunciones(player);
+            return !sEventoMgr->DebeRestringirFunciones(player);
         }
         return true;
     }
 
     bool CanGroupAccept(Player *player, Group * /*group*/) override
     {
-        if (sBattleRoyaleMgr->EstaActivado())
+        if (sEventoMgr->EstaActivado())
         {
-            return !sBattleRoyaleMgr->DebeRestringirFunciones(player);
+            return !sEventoMgr->DebeRestringirFunciones(player);
         }
         return true;
     }
 
     bool CanBattleFieldPort(Player *player, uint8 /*arenaType*/, BattlegroundTypeId /*BGTypeID*/, uint8 /*action*/) override
     {
-        if (sBattleRoyaleMgr->EstaActivado())
+        if (sEventoMgr->EstaActivado())
         {
-            if (sBattleRoyaleMgr->EstaEnCola(player) || sBattleRoyaleMgr->DebeRestringirFunciones(player))
+            if (sEventoMgr->EstaEnCola(player) || sEventoMgr->DebeRestringirFunciones(player))
             {
                 ChatHandler(player->GetSession()).SendSysMessage("|cff4CFF00BattleRoyale::|r ¡No puedes hacer eso mientras participas en el modo Battle Royale!");
                 return false;
@@ -134,9 +134,9 @@ public:
 
     bool CanJoinInArenaQueue(Player *player, ObjectGuid /*BattlemasterGuid*/, uint8 /*arenaslot*/, BattlegroundTypeId /*BGTypeID*/, uint8 /*joinAsGroup*/, uint8 /*IsRated*/, GroupJoinBattlegroundResult &err) override
     {
-        if (sBattleRoyaleMgr->EstaActivado())
+        if (sEventoMgr->EstaActivado())
         {
-            if (sBattleRoyaleMgr->EstaEnCola(player) || sBattleRoyaleMgr->DebeRestringirFunciones(player))
+            if (sEventoMgr->EstaEnCola(player) || sEventoMgr->DebeRestringirFunciones(player))
             {
                 err = GroupJoinBattlegroundResult::ERR_BATTLEGROUND_NOT_IN_BATTLEGROUND;
                 ChatHandler(player->GetSession()).SendSysMessage("|cff4CFF00BattleRoyale::|r ¡No puedes hacer eso mientras participas en el modo Battle Royale!");
@@ -148,9 +148,9 @@ public:
 
     bool CanJoinInBattlegroundQueue(Player *player, ObjectGuid /*BattlemasterGuid*/, BattlegroundTypeId /*BGTypeID*/, uint8 /*joinAsGroup*/, GroupJoinBattlegroundResult &err) override
     {
-        if (sBattleRoyaleMgr->EstaActivado())
+        if (sEventoMgr->EstaActivado())
         {
-            if (sBattleRoyaleMgr->EstaEnCola(player) || sBattleRoyaleMgr->DebeRestringirFunciones(player))
+            if (sEventoMgr->EstaEnCola(player) || sEventoMgr->DebeRestringirFunciones(player))
             {
                 err = GroupJoinBattlegroundResult::ERR_BATTLEGROUND_NOT_IN_BATTLEGROUND;
                 ChatHandler(player->GetSession()).SendSysMessage("|cff4CFF00BattleRoyale::|r ¡No puedes hacer eso mientras participas en el modo Battle Royale!");
@@ -162,18 +162,18 @@ public:
 
     bool BRTodosContraTodos(Player *player) override
     {
-        if (sBattleRoyaleMgr->EstaActivado())
+        if (sEventoMgr->EstaActivado())
         {
-            return sBattleRoyaleMgr->TodosContraTodos(player);
+            return sEventoMgr->TodosContraTodos(player);
         }
         return false;
     }
 
     void BRRespondeInvitacion(Player* player, bool agree, ObjectGuid summoner_guid) override
     {
-        if (sBattleRoyaleMgr->EstaActivado())
+        if (sEventoMgr->EstaActivado())
         {
-            sBattleRoyaleMgr->RespondeInvitacion(player, agree, summoner_guid);
+            sEventoMgr->RespondeInvitacion(player, agree, summoner_guid);
         }
     }
 };
@@ -187,7 +187,7 @@ public:
     bool OnGossipHello(Player *player, Creature *creature)
     {
         AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Quiero saber más.", 0, 1);
-        if (!sBattleRoyaleMgr->EstaEnCola(player))
+        if (!sEventoMgr->EstaEnCola(player))
         {
             AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "Quiero unirme a la cola.", 0, 2);
             AddGossipItemFor(player, GOSSIP_ICON_TAXI, "Votar para elegir mapa.", 0, 3);
@@ -213,9 +213,9 @@ public:
         }
         case 2:
         {
-            if (sBattleRoyaleMgr->EstaActivado())
+            if (sEventoMgr->EstaActivado())
             {
-                sBattleRoyaleMgr->GestionarJugadorEntrando(player);
+                sEventoMgr->GestionarJugadorEntrando(player);
             }
             else
             {
@@ -226,11 +226,11 @@ public:
         }
         case 3:
         {
-            if (sBattleRoyaleMgr->EstaActivado())
+            if (sEventoMgr->EstaActivado())
             {
                 uint32 start = 5;
-                BR_ContenedorMapas mapas = sBRMapasMgr->ObtenerMapas();
-                for (BR_ContenedorMapas::iterator it = mapas.begin(); it != mapas.end(); ++it)
+                BRListaMapas mapas = sMapaMgr->ObtenerMapas();
+                for (BRListaMapas::iterator it = mapas.begin(); it != mapas.end(); ++it)
                 {
                     AddGossipItemFor(player, GOSSIP_ICON_BATTLE, it->second->nombreMapa, it->first, start++);
                 }
@@ -245,11 +245,11 @@ public:
         }
         case 4:
         {
-            if (sBattleRoyaleMgr->EstaActivado())
+            if (sEventoMgr->EstaActivado())
             {
-                if (sBattleRoyaleMgr->EstaEnCola(player))
+                if (sEventoMgr->EstaEnCola(player))
                 {
-                    sBattleRoyaleMgr->GestionarJugadorDesconectar(player);
+                    sEventoMgr->GestionarJugadorDesconectar(player);
                     ChatHandler(player->GetSession()).PSendSysMessage("|cff4CFF00BattleRoyale::|r Ya no estas en cola para el evento.");
                 }
                 else
@@ -266,13 +266,13 @@ public:
         }
         default:
         {
-            if (sBattleRoyaleMgr->EstaActivado())
+            if (sEventoMgr->EstaActivado())
             {
                 // TODO: Primero votar por el mapa antes de llamarlo a la cola, se debe comprobar requisitos.
-                sBattleRoyaleMgr->GestionarJugadorEntrando(player);
-                if (sBattleRoyaleMgr->EstaEnCola(player))
+                sEventoMgr->GestionarJugadorEntrando(player);
+                if (sEventoMgr->EstaEnCola(player))
                 {
-                    sBRMapasMgr->VotarPorMapa(player->GetGUID().GetCounter(), sender);
+                    sMapaMgr->VotarPorMapa(player->GetGUID().GetCounter(), sender);
                 }
             }
             else
@@ -296,7 +296,7 @@ public:
     }
     void OnUpdate(uint32 diff) override
     {
-        sBattleRoyaleMgr->GestionarActualizacionMundo(diff);
+        sEventoMgr->GestionarActualizacionMundo(diff);
     }
 };
 
@@ -307,29 +307,29 @@ public:
 
     bool OnUse(Player *player, Item * /*item*/, const SpellCastTargets &) override
     {
-        if (!sBattleRoyaleMgr->EstaActivado())
+        if (!sEventoMgr->EstaActivado())
         {
             ChatHandler(player->GetSession()).PSendSysMessage("|cff4CFF00BattleRoyale::|r ¡Este modo de juego se encuentra actualmente desactivado!");
             return false;
         }
-        if (!sBattleRoyaleMgr->EstaEnEvento(player))
+        if (!sEventoMgr->EstaEnEvento(player))
         {
             ChatHandler(player->GetSession()).PSendSysMessage("|cff4CFF00BattleRoyale::|r ¡Solo se puede utilizar mientras participas en este modo de juego!");
             return false;
         }
-        if (sBRObjetosMgr->EstaEnLaNave(player))
+        if (sEntidadMgr->EstaEnLaNave(player))
         {
             ChatHandler(player->GetSession()).PSendSysMessage("|cff4CFF00BattleRoyale::|r ¡No se puede utilizar hasta que saltas de la nave!");
             return false;
         }
-        if (player->HasAura(HECHIZO_ALAS_MAGICAS))
+        if (player->HasAura(BR_HECHIZO_ALAS_MAGICAS))
         {
-            player->RemoveAurasDueToSpell(HECHIZO_ALAS_MAGICAS);
+            player->RemoveAurasDueToSpell(BR_HECHIZO_ALAS_MAGICAS);
             return true;
         }
         else
         {
-            player->AddAura(HECHIZO_ALAS_MAGICAS, player);
+            player->AddAura(BR_HECHIZO_ALAS_MAGICAS, player);
             return false;
         }
     }
@@ -359,7 +359,7 @@ public:
 
     static bool HandleBRCommand(ChatHandler *handler)
     {
-        if (sBattleRoyaleMgr->EstaActivado())
+        if (sEventoMgr->EstaActivado())
         {
             handler->SendSysMessage("El modo |cff4CFF00BattleRoyale|r se encuentra |cff00ff00activado|r.");
             handler->SendSysMessage("Puedes unirte a la cola mediante el comando '.br unirme'.");
@@ -374,12 +374,12 @@ public:
 
     static bool HandleJoinCommand(ChatHandler *handler)
     {
-        if (sBattleRoyaleMgr->EstaActivado())
+        if (sEventoMgr->EstaActivado())
         {
             Player *me = handler->GetSession()->GetPlayer();
             if (!me)
                 return false;
-            sBattleRoyaleMgr->GestionarJugadorEntrando(me);
+            sEventoMgr->GestionarJugadorEntrando(me);
         }
         else
         {
@@ -390,14 +390,14 @@ public:
 
     static bool HandleLeaveCommand(ChatHandler *handler)
     {
-        if (sBattleRoyaleMgr->EstaActivado())
+        if (sEventoMgr->EstaActivado())
         {
             Player *me = handler->GetSession()->GetPlayer();
             if (!me)
                 return false;
-            if (sBattleRoyaleMgr->EstaEnCola(me))
+            if (sEventoMgr->EstaEnCola(me))
             {
-                sBattleRoyaleMgr->GestionarJugadorDesconectar(me);
+                sEventoMgr->GestionarJugadorDesconectar(me);
                 handler->SendSysMessage("|cff4CFF00BattleRoyale::|r Ya no estas en cola para el evento.");
             }
             else
@@ -414,20 +414,19 @@ public:
 
     static bool HandleReloadCommand(ChatHandler *handler)
     {
-        sBRListaNegraMgr->RecargarLista();
-        handler->SendSysMessage("Se ha recargado la lista negra del modo Battle Royale.");
+        handler->SendSysMessage("UNIMPLEMENTED: Recargar los mapas y spawns de Battle Royale.");
         return true;
     }
 
     static bool HandleTurnOnCommand(ChatHandler *handler)
     {
-        if (sBattleRoyaleMgr->EstaActivado())
+        if (sEventoMgr->EstaActivado())
         {
             handler->SendSysMessage("El modo Battle Royale se encuentra activado.");
         }
         else
         {
-            sBattleRoyaleMgr->ActivarSistema();
+            sEventoMgr->ActivarSistema();
             handler->SendSysMessage("Se ha activado el modo Battle Royale.");
         }
         return true;
@@ -435,9 +434,9 @@ public:
 
     static bool HandleTurnOffCommand(ChatHandler *handler)
     {
-        if (sBattleRoyaleMgr->EstaActivado())
+        if (sEventoMgr->EstaActivado())
         {
-            sBattleRoyaleMgr->DesactivarSistema();
+            sEventoMgr->DesactivarSistema();
             handler->SendSysMessage("Se ha desactivado el modo Battle Royale.");
         }
         else
@@ -449,10 +448,10 @@ public:
 
     static bool HandleStartCommand(ChatHandler *handler)
     {
-        if (sBattleRoyaleMgr->EstadoActual() == ESTADO_BR_SIN_SUFICIENTES_JUGADORES)
+        if (sEventoMgr->EstadoActual() == BR_ESTADO_SIN_SUFICIENTES_JUGADORES)
         {
-            sBattleRoyaleMgr->ForzarIniciarNuevaRonda();
-            if (sBattleRoyaleMgr->EstadoActual() != ESTADO_BR_SIN_SUFICIENTES_JUGADORES)
+            sEventoMgr->ForzarIniciarNuevaRonda();
+            if (sEventoMgr->EstadoActual() != BR_ESTADO_SIN_SUFICIENTES_JUGADORES)
             {
                 handler->SendSysMessage("Se ha forzado el inicio de la ronda de Battle Royale sin haber suficientes jugadores.");
             }
@@ -480,7 +479,7 @@ public:
         {
             Unit *uCaster = spell->GetCaster();
             Player *pCaster = uCaster && uCaster->GetTypeId() == TYPEID_PLAYER ? uCaster->ToPlayer() : nullptr;
-            if (pCaster && sBattleRoyaleMgr->EstaEnEvento(pCaster))
+            if (pCaster && sEventoMgr->EstaEnEvento(pCaster))
             {
                 if (const SpellInfo *spInf = spell->GetSpellInfo())
                 {

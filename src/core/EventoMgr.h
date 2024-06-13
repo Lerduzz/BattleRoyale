@@ -1,35 +1,32 @@
 #ifndef SC_BR_MGR_H
 #define SC_BR_MGR_H
 
-#include "BRConstantes.h"
-#include "BREquipamientoMgr.h"
-#include "BRChatMgr.h"
-#include "BRListaNegraMgr.h"
-#include "BRMapasMgr.h"
-#include "BRMisionesMgr.h"
-#include "BRObjetosMgr.h"
-#include "BRRecompensaMgr.h"
-#include "BRSonidosMgr.h"
-#include "BRTitulosMgr.h"
-#include "BattleRoyaleData.h"
+#include "Constantes.h"
+#include "InventarioMgr.h"
+#include "MensajeMgr.h"
+#include "MapaMgr.h"
+#include "MisionMgr.h"
+#include "EntidadMgr.h"
+#include "PremioMgr.h"
+#include "SonidoMgr.h"
+#include "TituloMgr.h"
+#include "PlayerData.h"
 #include "Common.h"
 #include "SharedDefines.h"
 #include "ScriptMgr.h"
 #include "Chat.h"
 
-class BattleRoyaleData;
-typedef std::map<uint32, Player *> BR_ListaDePersonajes;
-typedef std::map<uint32, BattleRoyaleData> BR_DatosDePersonajes;
+class PlayerData;
 
-class BattleRoyaleMgr
+class EventoMgr
 {
-    BattleRoyaleMgr();
-    ~BattleRoyaleMgr();
+    EventoMgr();
+    ~EventoMgr();
 
 public:
-    static BattleRoyaleMgr *instance()
+    static EventoMgr *instance()
     {
-        static BattleRoyaleMgr *instance = new BattleRoyaleMgr();
+        static EventoMgr *instance = new EventoMgr();
         return instance;
     }
 
@@ -53,7 +50,7 @@ public:
     void PrevenirJcJEnLaNave(Player *player, bool state);
     bool PuedeReaparecerEnCementerio(Player *player);
 
-    inline bool DebeRestringirFunciones(Player *player) { return estadoActual > ESTADO_BR_SIN_SUFICIENTES_JUGADORES && HayJugadores() && EstaEnEvento(player); };
+    inline bool DebeRestringirFunciones(Player *player) { return estadoActual > BR_ESTADO_SIN_SUFICIENTES_JUGADORES && HayJugadores() && EstaEnEvento(player); };
     inline bool EstaEnCola(Player *player) { return EstaEnCola(player->GetGUID().GetCounter()); };
     inline bool EstaInvitado(Player *player) { return EstaInvitado(player->GetGUID().GetCounter()); };
     inline bool EstaEnEvento(Player *player) { return EstaEnEvento(player->GetGUID().GetCounter()); };
@@ -62,9 +59,9 @@ public:
     {
         if (!player)
             return false;
-        if ((estadoActual < ESTADO_BR_ZONA_EN_ESPERA || estadoActual == ESTADO_BR_BATALLA_TERMINADA) || !HayJugadores() || !EstaEnEvento(player))
+        if ((estadoActual < BR_ESTADO_ZONA_EN_ESPERA || estadoActual == BR_ESTADO_BATALLA_TERMINADA) || !HayJugadores() || !EstaEnEvento(player))
             return false;
-        return !sBRObjetosMgr->EstaEnLaNave(player);
+        return !sEntidadMgr->EstaEnLaNave(player);
     }
 
     inline BREstado EstadoActual() { return estadoActual; };
@@ -120,7 +117,7 @@ private:
 
     void SiguientePosicion()
     {
-        if (++indiceDeVariacion >= CANTIDAD_DE_VARIACIONES)
+        if (++indiceDeVariacion >= BR_CANTIDAD_VARIACIONES)
         {
             indiceDeVariacion = 0;
         }
@@ -149,17 +146,17 @@ private:
     void AlReducirseLaZona()
     {
         int chestCount = 0;
-        // if (escalaDeZona < CANTIDAD_DE_ZONAS && sBRMapasMgr->TieneZonasParaCofres(escalaDeZona))
+        // if (escalaDeZona < CANTIDAD_DE_ZONAS && sMapaMgr->TieneZonasParaCofres(escalaDeZona))
         // {
-        //     BR_UbicacionZona temp = sBRMapasMgr->ObtenerZonasParaCofres(escalaDeZona);
+        //     std::map<uint32, Position> temp = sMapaMgr->ObtenerZonasParaCofres(escalaDeZona);
         //     if (temp.size())
         //     {
-        //         for (BR_UbicacionZona::iterator it = temp.begin(); it != temp.end(); ++it)
+        //         for (std::map<uint32, Position>::iterator it = temp.begin(); it != temp.end(); ++it)
         //         {
         //             int rnd = rand() % 100 + 1;
         //             if (rnd <= 35)
         //             {
-        //                 if (sBRObjetosMgr->InvocarCofre(it->second))
+        //                 if (sEntidadMgr->InvocarCofre(it->second))
         //                 {
         //                     chestCount++;
         //                 }
@@ -169,11 +166,11 @@ private:
         // }
         if (HayJugadores())
         {
-            if (estadoActual >= ESTADO_BR_ZONA_EN_ESPERA && estadoActual < ESTADO_BR_BATALLA_TERMINADA)
+            if (estadoActual >= BR_ESTADO_ZONA_EN_ESPERA && estadoActual < BR_ESTADO_BATALLA_TERMINADA)
             {
                 int vivos = 0;
                 int rndEfecto = rand() % 10 + 1;
-                for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
+                for (BRListaPersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
                 {
                     if (it->second && it->second->IsAlive())
                     {
@@ -182,46 +179,46 @@ private:
                         case 1:
                         case 2:
                         {
-                            if (it->second->CastSpell(it->second, HECHIZO_ANTI_INVISIBLES, true) != SPELL_CAST_OK)
+                            if (it->second->CastSpell(it->second, BR_HECHIZO_ANTI_INVISIBLES, true) != SPELL_CAST_OK)
                             {
-                                it->second->AddAura(HECHIZO_ANTI_INVISIBLES, it->second);
+                                it->second->AddAura(BR_HECHIZO_ANTI_INVISIBLES, it->second);
                             }
                             break;
                         }
                         case 3:
                         case 4:
                         {
-                            it->second->AddAura(HECHIZO_ANTI_SANADORES, it->second);
+                            it->second->AddAura(BR_HECHIZO_ANTI_SANADORES, it->second);
                             break;
                         }
                         case 5:
                         case 6:
                         {
-                            it->second->AddAura(HECHIZO_RASTRILLO_LENTO, it->second);
+                            it->second->AddAura(BR_HECHIZO_RASTRILLO_LENTO, it->second);
                             break;
                         }
                         case 7:
                         {
-                            if (!sBRObjetosMgr->HechizoGuardian(HECHIZO_RAYO_DRAGON, it->second))
+                            if (!sEntidadMgr->HechizoGuardian(BR_HECHIZO_RAYO_DRAGON, it->second))
                             {
-                                it->second->AddAura(HECHIZO_DESGARRO_ASESINO, it->second);
+                                it->second->AddAura(BR_HECHIZO_DESGARRO_ASESINO, it->second);
                             }
                             break;
                         }
                         case 8:
                         case 9:
                         {
-                            if (!sBRObjetosMgr->HechizoGuardian(HECHIZO_RAYO_DRAGON_FUERTE, it->second))
+                            if (!sEntidadMgr->HechizoGuardian(BR_HECHIZO_RAYO_DRAGON_FUERTE, it->second))
                             {
-                                it->second->AddAura(HECHIZO_RASTRILLO_LENTO, it->second);
+                                it->second->AddAura(BR_HECHIZO_RASTRILLO_LENTO, it->second);
                             }
                             break;
                         }
                         default:
                         {
-                            if (it->second->CastSpell(it->second, HECHIZO_BENEFICIO_LIEBRE, true) != SPELL_CAST_OK)
+                            if (it->second->CastSpell(it->second, BR_HECHIZO_BENEFICIO_LIEBRE, true) != SPELL_CAST_OK)
                             {
-                                it->second->AddAura(HECHIZO_BENEFICIO_LIEBRE, it->second);
+                                it->second->AddAura(BR_HECHIZO_BENEFICIO_LIEBRE, it->second);
                             }
                             break;
                         }
@@ -229,10 +226,10 @@ private:
                         vivos++;
                     }
                 }
-                sBRChatMgr->AnunciarEfectoZona(list_Jugadores, vivos);
+                sMensajeMgr->AnunciarEfectoZona(list_Jugadores, vivos);
             }
             if (chestCount)
-                sBRChatMgr->AnunciarConteoCofres(chestCount, list_Jugadores);
+                sMensajeMgr->AnunciarConteoCofres(chestCount, list_Jugadores);
         }
     }
 
@@ -241,7 +238,7 @@ private:
         if (HayJugadores())
         {
             Player *vivo = nullptr;
-            for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
+            for (BRListaPersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
             {
                 if (it->second && it->second->IsAlive())
                 {
@@ -267,10 +264,10 @@ private:
     {
         if (HayJugadores())
         {
-            BR_ListaDePersonajes::iterator it = list_Jugadores.begin();
+            BRListaPersonajes::iterator it = list_Jugadores.begin();
             while (it != list_Jugadores.end())
             {
-                if (!sBRObjetosMgr->EstaEnLaNave(it->second) || !it->second->IsAlive())
+                if (!sEntidadMgr->EstaEnLaNave(it->second) || !it->second->IsAlive())
                 {
                     uint32 guid = it->first;
                     ++it;
@@ -290,7 +287,7 @@ private:
     {
         if (HayJugadores() && player && player->IsAlive() && !EstaEspectando(player))
         {
-            for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
+            for (BRListaPersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
             {
                 if (it->second && it->second != player && !it->second->IsAlive() && !EstaEspectando(it->second))
                     EspectarJugador(it->second, player);
@@ -311,24 +308,24 @@ private:
     {
         if (list_DarObjetosIniciales.size())
         {
-            BR_ListaDePersonajes::iterator it = list_DarObjetosIniciales.begin();
+            BRListaPersonajes::iterator it = list_DarObjetosIniciales.begin();
             while (it != list_DarObjetosIniciales.end())
             {
                 if (it->second && it->second->IsAlive())
                 {
-                    if (it->second->IsInWorld() && !it->second->IsBeingTeleported() && sBRObjetosMgr->EstaEnLaNave(it->second))
+                    if (it->second->IsInWorld() && !it->second->IsBeingTeleported() && sEntidadMgr->EstaEnLaNave(it->second))
                     {
                         uint32 guid = it->first;
                         Player *player = it->second;
                         ++it;
-                        sBREquipamientoMgr->Desnudar(player);
-                        if (sBREquipamientoMgr->DarObjetosIniciales(player))
+                        sInventarioMgr->Desnudar(player);
+                        if (sInventarioMgr->DarObjetosIniciales(player))
                         {
-                            sBRChatMgr->AnunciarMensajeBienvenida(player);
+                            sMensajeMgr->AnunciarMensajeBienvenida(player);
                         }
                         else
                         {
-                            sBRChatMgr->AnunciarErrorAlas(player);
+                            sMensajeMgr->AnunciarErrorAlas(player);
                         }
                         player->GetMotionMaster()->MoveFall();
                         list_DarObjetosIniciales.erase(guid);
@@ -350,7 +347,7 @@ private:
     {
         if (list_QuitarTodosLosObjetos.size())
         {
-            BR_ListaDePersonajes::iterator it = list_QuitarTodosLosObjetos.begin();
+            BRListaPersonajes::iterator it = list_QuitarTodosLosObjetos.begin();
             while (it != list_QuitarTodosLosObjetos.end())
             {
                 if (it->second && it->second->IsAlive())
@@ -360,7 +357,7 @@ private:
                         uint32 guid = it->first;
                         Player *player = it->second;
                         ++it;
-                        sBREquipamientoMgr->QuitarTodosLosObjetos(player);
+                        sInventarioMgr->QuitarTodosLosObjetos(player);
                         list_QuitarTodosLosObjetos.erase(guid);
                     }
                     else
@@ -382,20 +379,20 @@ private:
         {
             if (tiempoRestanteInicio == 45)
             {
-                sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_NAVE_EN_MOVIMIENTO, list_Jugadores);
+                sSonidoMgr->ReproducirSonidoParaTodos(BR_SONIDO_NAVE_EN_MOVIMIENTO, list_Jugadores);
             }
-            sBRChatMgr->NotificarTiempoInicial(tiempoRestanteInicio, list_Jugadores);
+            sMensajeMgr->NotificarTiempoInicial(tiempoRestanteInicio, list_Jugadores);
         }
     }
 
-    BR_ListaDePersonajes list_Cola;
-    BR_ListaDePersonajes list_Invitados;
+    BRListaPersonajes list_Cola;
+    BRListaPersonajes list_Invitados;
 
-    BR_ListaDePersonajes list_Jugadores;
-    BR_DatosDePersonajes list_Datos;
+    BRListaPersonajes list_Jugadores;
+    BRListaDatos list_Datos;
 
-    BR_ListaDePersonajes list_DarObjetosIniciales;
-    BR_ListaDePersonajes list_QuitarTodosLosObjetos;
+    BRListaPersonajes list_DarObjetosIniciales;
+    BRListaPersonajes list_QuitarTodosLosObjetos;
 
     BREstado estadoActual;
 
@@ -425,9 +422,9 @@ private:
     uint32 conf_IntervaloFinalDeRonda;
     uint32 conf_RequisitoAsesinatosTotales;
     uint32 conf_RequisitoAsesinatosPropios;
-    BRConf_Recompensa conf_Recompensa;
+    BRConfigRecompensa conf_Recompensa;
 };
 
-#define sBattleRoyaleMgr BattleRoyaleMgr::instance()
+#define sEventoMgr EventoMgr::instance()
 
 #endif
