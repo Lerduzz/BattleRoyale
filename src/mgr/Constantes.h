@@ -136,5 +136,6 @@ typedef std::map<uint32, BRMapa *> BRListaMapas;
 typedef std::map<uint32, Player *> BRListaPersonajes;
 typedef std::map<uint32, BattleRoyaleData> BRListaDatos;
 typedef std::map<uint32, uint32> BRListaVotos;
+typedef std::list<Player *> BRCola;
 
 #endif
