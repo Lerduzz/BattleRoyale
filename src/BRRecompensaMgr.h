@@ -1,12 +1,12 @@
 #ifndef SC_BR_REWARD_MGR_H
 #define SC_BR_REWARD_MGR_H
 
-#include "BattleRoyaleData.h"
+#include "PlayerData.h"
 #include "Player.h"
 #include "Mail.h"
 
 typedef std::map<uint32, Player*> BR_ListaRecompensa;
-typedef std::map<uint32, BattleRoyaleData> BR_ListaDatos;
+typedef std::map<uint32, PlayerData> BR_ListaDatos;
 
 class BRRecompensaMgr
 {
@@ -35,7 +35,7 @@ public:
         }
     }
 
-    void AcumularRecompensa(uint32 rew, BattleRoyaleData* data)
+    void AcumularRecompensa(uint32 rew, PlayerData* data)
     {
         if (data)
         {

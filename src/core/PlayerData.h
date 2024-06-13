@@ -3,11 +3,11 @@
 
 #include "Common.h"
 
-class BattleRoyaleData
+class PlayerData
 {
 public:
-    BattleRoyaleData();
-    ~BattleRoyaleData();
+    PlayerData();
+    ~PlayerData();
 
     void SetPosition(int m, float x, float y, float z, float o);
     int GetMap();

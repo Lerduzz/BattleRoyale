@@ -11,15 +11,15 @@
 #include "BRRecompensaMgr.h"
 #include "BRSonidosMgr.h"
 #include "BRTitulosMgr.h"
-#include "BattleRoyaleData.h"
+#include "PlayerData.h"
 #include "Common.h"
 #include "SharedDefines.h"
 #include "ScriptMgr.h"
 #include "Chat.h"
 
-class BattleRoyaleData;
+class PlayerData;
 typedef std::map<uint32, Player *> BR_ListaDePersonajes;
-typedef std::map<uint32, BattleRoyaleData> BR_DatosDePersonajes;
+typedef std::map<uint32, PlayerData> BR_DatosDePersonajes;
 
 class BattleRoyaleMgr
 {
