@@ -122,8 +122,8 @@ private:
      */
     uint32 indiceDePosicionNave;
 
+    // ---------------------------- Variables que se deben cargar desde configuracion --------------------------------
     BRConfigIntervalos intervalo;
-
     uint32 minJugadores;
     uint32 maxJugadores;
 };

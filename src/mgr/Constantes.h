@@ -122,12 +122,6 @@ struct BRConfigIntervalos
     uint32 zonaEnEspera;
 };
 
-struct BRListaNegra
-{
-    bool estaBloqueado;
-    std::string motivo;
-};
-
 struct BRMapa
 {
     uint32 idMapa;
