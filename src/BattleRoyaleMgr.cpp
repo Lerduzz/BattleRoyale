@@ -106,7 +106,7 @@ void BattleRoyaleMgr::GestionarMuerteJcJ(Player *killer, Player *killed)
     {
         if (!killer || !killed || !EstaEnEvento(killer) || !EstaEnEvento(killed))
             return;
-        sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_ALGUIEN_MUERE, list_Jugadores);
+        sBRSonidosMgr->ReproducirSonidoParaTodos(BR_SONIDO_ALGUIEN_MUERE, list_Jugadores);
         if (killer == killed)
         {
             sBRRecompensaMgr->AcumularRecompensa(conf_Recompensa.morir, &(list_Datos[killed->GetGUID().GetCounter()]));
@@ -236,7 +236,7 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
             {
                 estadoActual = BR_ESTADO_ZONA_EN_ESPERA;
                 sBRRecompensaMgr->AcumularRecompensaVivos(conf_Recompensa.base, list_Jugadores, &list_Datos);
-                sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_RONDA_INICIADA, list_Jugadores);
+                sBRSonidosMgr->ReproducirSonidoParaTodos(BR_SONIDO_RONDA_INICIADA, list_Jugadores);
                 sBRChatMgr->NotificarTiempoInicial(0, list_Jugadores, sBRMapasMgr->MapaActual()->nombreMapa);
                 sBRMisionesMgr->CompletarRequerimiento(MISION_DIARIA_1, MISION_DIARIA_1_REQ_1, list_Jugadores);
                 tiempoRestanteZona = conf_IntervaloZonaSegura;
@@ -263,7 +263,7 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
             {
                 if (sBRObjetosMgr->DesaparecerNave())
                 {
-                    sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_NAVE_RETIRADA, list_Jugadores);
+                    sBRSonidosMgr->ReproducirSonidoParaTodos(BR_SONIDO_NAVE_RETIRADA, list_Jugadores);
                     sBRChatMgr->NotificarNaveRetirada(list_Jugadores);
                 }
             }
@@ -278,7 +278,7 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
                 }
                 AlReducirseLaZona();
                 sBRRecompensaMgr->AcumularRecompensaVivos(conf_Recompensa.zona, list_Jugadores, &list_Datos);
-                sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_ZONA_REDUCIDA, list_Jugadores);
+                sBRSonidosMgr->ReproducirSonidoParaTodos(BR_SONIDO_ZONA_REDUCIDA, list_Jugadores);
                 sBRChatMgr->NotificarZonaEnReduccion(list_Jugadores);
                 tiempoRestanteZona = conf_IntervaloZonaSegura;
                 estaZonaAnunciada5s = false;
@@ -290,13 +290,13 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
                 {
                     if (!estaZonaAnunciada5s && tiempoRestanteZona <= 5)
                     {
-                        sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_ZONA_TIEMPO, list_Jugadores);
+                        sBRSonidosMgr->ReproducirSonidoParaTodos(BR_SONIDO_ZONA_TIEMPO, list_Jugadores);
                         sBRChatMgr->NotificarAdvertenciaDeZona(5, list_Jugadores);
                         estaZonaAnunciada5s = true;
                     }
                     if (!estaZonaAnunciada10s && tiempoRestanteZona <= 10)
                     {
-                        sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_ZONA_TIEMPO, list_Jugadores);
+                        sBRSonidosMgr->ReproducirSonidoParaTodos(BR_SONIDO_ZONA_TIEMPO, list_Jugadores);
                         sBRChatMgr->NotificarAdvertenciaDeZona(10, list_Jugadores);
                         estaZonaAnunciada10s = true;
                     }
@@ -405,16 +405,9 @@ void BattleRoyaleMgr::IniciarNuevaRonda()
         while (HayCola() && !EstaLlenoElEvento() && tiempoRestanteInicio >= 90 /* TODO: Tiempo total - Tiempo BR_ESTADO_INVITANDO_JUGADORES. */)
         {
             uint32 guid = list_Cola.begin()->first;
-            if (list_Cola[guid]->IsInFlight())
-            {
-                sBRChatMgr->AnunciarMensajeEntrada(list_Cola[guid], MENSAJE_ERROR_EN_VUELO);
-            }
-            else
-            {
-                uint32 tiempo = (tiempoRestanteInicio - 75 /* TODO: Espera + Movimiento + Desaparecer. */) * IN_MILLISECONDS;
-                list_Invitados[guid] = list_Cola[guid];
-                LlamarDentroDeNave(guid, tiempo);
-            }
+            uint32 tiempo = (tiempoRestanteInicio - 75 /* TODO: Espera + Movimiento + Desaparecer. */) * IN_MILLISECONDS;
+            list_Invitados[guid] = list_Cola[guid];
+            LlamarDentroDeNave(guid, tiempo);
             list_Cola.erase(guid);
         }
     }
@@ -437,8 +430,8 @@ void BattleRoyaleMgr::LlamarDentroDeNave(uint32 guid, uint32 tiempo /* = 20000*/
     if (list_Invitados.find(guid) == list_Invitados.end())
         return;
     Player *player = list_Invitados[guid];
-    float ox = BR_VariacionesDePosicion[indiceDeVariacion][0];
-    float oy = BR_VariacionesDePosicion[indiceDeVariacion][1];
+    float ox = BR_VARIACIONES_POSICION[indiceDeVariacion][0];
+    float oy = BR_VARIACIONES_POSICION[indiceDeVariacion][1];
     BRMapa *brM = sBRMapasMgr->MapaActual();
     Position iN = brM->inicioNave;
 
@@ -480,13 +473,13 @@ void BattleRoyaleMgr::RespondeInvitacion(Player *player, bool agree, ObjectGuid 
     list_Jugadores[guid] = list_Invitados[guid];
     list_Invitados.erase(guid);
     AlmacenarPosicionInicial(guid);
-    if (player->HasAura(HECHIZO_PARACAIDAS))
-        player->RemoveAurasDueToSpell(HECHIZO_PARACAIDAS);
-    if (player->HasAura(HECHIZO_PARACAIDAS_EFECTO))
-        player->RemoveAurasDueToSpell(HECHIZO_PARACAIDAS_EFECTO);
+    if (player->HasAura(BR_HECHIZO_PARACAIDAS))
+        player->RemoveAurasDueToSpell(BR_HECHIZO_PARACAIDAS);
+    if (player->HasAura(BR_HECHIZO_PARACAIDAS_EFECTO))
+        player->RemoveAurasDueToSpell(BR_HECHIZO_PARACAIDAS_EFECTO);
     DejarGrupo(player);
     Desmontar(player);
-    player->SetPhaseMask(DIMENSION_EVENTO, true);
+    player->SetPhaseMask(BR_VISIBILIDAD_EVENTO, true);
     player->SetOrientation(sBRMapasMgr->MapaActual()->inicioNave.GetOrientation() + M_PI / 2.0f);
     player->SetPvP(false);
     player->SaveToDB(false, false);
@@ -511,23 +504,16 @@ void BattleRoyaleMgr::SalirDelEvento(uint32 guid, bool logout /* = false*/)
     if (EstaEnEvento(guid))
     {
         Player *player = list_Jugadores[guid];
-        player->SetPhaseMask(DIMENSION_NORMAL, true);
+        player->SetPhaseMask(BR_VISIBILIDAD_NORMAL, true);
         if (player->IsAlive())
         {
-            if (player->HasAura(BR_HECHIZO_ALAS_MAGICAS))
-                player->RemoveAurasDueToSpell(BR_HECHIZO_ALAS_MAGICAS);
-            if (player->HasAura(BR_HECHIZO_ANTI_INVISIBLES))
-                player->RemoveAurasDueToSpell(BR_HECHIZO_ANTI_INVISIBLES);
-            if (player->HasAura(BR_HECHIZO_ANTI_SANADORES))
-                player->RemoveAurasDueToSpell(BR_HECHIZO_ANTI_SANADORES);
-            if (player->HasAura(BR_HECHIZO_RASTRILLO_LENTO))
-                player->RemoveAurasDueToSpell(BR_HECHIZO_RASTRILLO_LENTO);
-            if (player->HasAura(BR_HECHIZO_DESGARRO_ASESINO))
-                player->RemoveAurasDueToSpell(BR_HECHIZO_DESGARRO_ASESINO);
-            if (player->HasAura(HECHIZO_ACIDO_ZONA))
-                player->RemoveAurasDueToSpell(HECHIZO_ACIDO_ZONA);
-            if (player->HasAura(BR_HECHIZO_BENEFICIO_LIEBRE))
-                player->RemoveAurasDueToSpell(BR_HECHIZO_BENEFICIO_LIEBRE);
+            player->RemoveAurasDueToSpell(BR_HECHIZO_ALAS_MAGICAS);
+            player->RemoveAurasDueToSpell(BR_HECHIZO_ANTI_INVISIBLES);
+            player->RemoveAurasDueToSpell(BR_HECHIZO_ANTI_SANADORES);
+            player->RemoveAurasDueToSpell(BR_HECHIZO_RASTRILLO_LENTO);
+            player->RemoveAurasDueToSpell(BR_HECHIZO_DESGARRO_ASESINO);
+            player->RemoveAurasDueToSpell(BR_HECHIZO_ACIDO_ZONA);
+            player->RemoveAurasDueToSpell(BR_HECHIZO_BENEFICIO_LIEBRE);
         }
         if (!logout)
         {
@@ -536,7 +522,7 @@ void BattleRoyaleMgr::SalirDelEvento(uint32 guid, bool logout /* = false*/)
             if (!player->isPossessing())
                 player->StopCastingBindSight();
             list_QuitarTodosLosObjetos[guid] = player;
-            player->AddAura(HECHIZO_PARACAIDAS, player);
+            player->AddAura(BR_HECHIZO_PARACAIDAS, player);
             player->TeleportTo(list_Datos[guid].GetMap(), list_Datos[guid].GetX(), list_Datos[guid].GetY(), list_Datos[guid].GetZ(), list_Datos[guid].GetO());
             player->SaveToDB(false, false);
         }
@@ -679,11 +665,11 @@ void BattleRoyaleMgr::FinalizarRonda(bool announce, Player *winner /* = nullptr*
     {
         if (winner->GetTeamId() == TEAM_ALLIANCE)
         {
-            sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_GANADOR_ALIANZA, list_Jugadores);
+            sBRSonidosMgr->ReproducirSonidoParaTodos(BR_SONIDO_GANADOR_ALIANZA, list_Jugadores);
         }
         else
         {
-            sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_GANADOR_HORDA, list_Jugadores);
+            sBRSonidosMgr->ReproducirSonidoParaTodos(BR_SONIDO_GANADOR_HORDA, list_Jugadores);
         }
         if (list_Datos.find(winner->GetGUID().GetCounter()) != list_Datos.end())
         {

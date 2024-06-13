@@ -17,11 +17,11 @@ public:
         return instance;
     }
 
-    void ReproducirSonidoParaTodos(uint32 soundID, BR_ListaSonido playerList)
+    void ReproducirSonidoParaTodos(uint32 soundID, BRListaPersonajes playerList)
     {
         if (playerList.size())
         {
-            for (BR_ListaSonido::iterator it = playerList.begin(); it != playerList.end(); ++it)
+            for (BRListaPersonajes::iterator it = playerList.begin(); it != playerList.end(); ++it)
             {
                 if (it->second)
                 {

@@ -19,7 +19,7 @@ public:
     {
         if (playerList.size())
         {
-            for (BR_ListaMision::iterator it = playerList.begin(); it != playerList.end(); ++it)
+            for (BRListaPersonajes::iterator it = playerList.begin(); it != playerList.end(); ++it)
             {
                 if (it->second && it->second->HasQuest(mision) && it->second->GetQuestStatus(mision) == QUEST_STATUS_INCOMPLETE)
                 {

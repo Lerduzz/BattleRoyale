@@ -17,13 +17,13 @@ public:
         return instance;
     }
 
-    void AcumularRecompensaVivos(uint32 rew, BR_ListaRecompensa list, BR_ListaDatos* data)
+    void AcumularRecompensaVivos(uint32 rew, BRListaPersonajes list, BRListaDatos* data)
     {
         if (list.size())
         {
-            for (BR_ListaRecompensa::iterator it = list.begin(); it != list.end(); ++it)
+            for (BRListaPersonajes::iterator it = list.begin(); it != list.end(); ++it)
             {
-                BR_ListaDatos::iterator dt = data->find(it->first);
+                BRListaDatos::iterator dt = data->find(it->first);
                 if (it->second && it->second->IsAlive() && dt != data->end())
                 {
                     dt->second.reward += rew;

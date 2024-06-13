@@ -89,7 +89,7 @@ public:
             float rot3 = cos(o / 2);
             map->LoadGrid(x, y);
             obj_Nave = new StaticTransport();
-            if (obj_Nave->Create(map->GenerateLowGuid<HighGuid::GameObject>(), OBJETO_NAVE, map, DIMENSION_EVENTO, x, y, z, o, G3D::Quat(0, 0, rot2, rot3), 100, GO_STATE_READY))
+            if (obj_Nave->Create(map->GenerateLowGuid<HighGuid::GameObject>(), OBJETO_NAVE, map, BR_VISIBILIDAD_EVENTO, x, y, z, o, G3D::Quat(0, 0, rot2, rot3), 100, GO_STATE_READY))
             {
                 obj_Nave->SetVisibilityDistanceOverride(VisibilityDistanceType::Infinite);
                 map->AddToMap(obj_Nave);
@@ -163,7 +163,7 @@ public:
             if (!cinfo)
                 return false;
             npc_Centro = new Creature(true);
-            if (!npc_Centro->Create(map->GenerateLowGuid<HighGuid::Unit>(), map, DIMENSION_EVENTO, 12999, 0, x, y, z, o))
+            if (!npc_Centro->Create(map->GenerateLowGuid<HighGuid::Unit>(), map, BR_VISIBILIDAD_EVENTO, 12999, 0, x, y, z, o))
             {
                 delete npc_Centro;
                 npc_Centro = nullptr;
