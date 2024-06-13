@@ -229,8 +229,8 @@ public:
             if (sBattleRoyaleMgr->EstaActivado())
             {
                 uint32 start = 5;
-                BR_ContenedorMapas mapas = sBRMapasMgr->ObtenerMapas();
-                for (BR_ContenedorMapas::iterator it = mapas.begin(); it != mapas.end(); ++it)
+                BRListaMapas mapas = sBRMapasMgr->ObtenerMapas();
+                for (BRListaMapas::iterator it = mapas.begin(); it != mapas.end(); ++it)
                 {
                     AddGossipItemFor(player, GOSSIP_ICON_BATTLE, it->second->nombreMapa, it->first, start++);
                 }

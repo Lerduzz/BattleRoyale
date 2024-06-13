@@ -18,28 +18,28 @@ public:
     bool DarObjetosIniciales(Player *player)
     {
         QuitarTodosLosObjetos(player);
-        DarEquipamiento(player, EQUIPAMIENTO_INICIAL_PANTALONES);
-        return DarEquipamiento(player, EQUIPAMIENTO_INICIAL_CAMISA);
+        DarEquipamiento(player, BR_EQUIPO_INICIAL_PANTALONES);
+        return DarEquipamiento(player, BR_EQUIPO_INICIAL_CAMISA);
     };
 
     void QuitarTodosLosObjetos(Player *player)
     {
-        QuitarEquipamiento(player, EQUIPAMIENTO_INICIAL_CAMISA);
-        QuitarEquipamiento(player, EQUIPAMIENTO_INICIAL_PANTALONES);
-        for (uint32 i = 0; i < EQUIPAMIENTO_BR_MAXIMO; ++i)
+        QuitarEquipamiento(player, BR_EQUIPO_INICIAL_CAMISA);
+        QuitarEquipamiento(player, BR_EQUIPO_INICIAL_PANTALONES);
+        for (uint32 i = 0; i < BR_EQUIPO_MAXIMO; ++i)
         {
-            QuitarEquipamiento(player, EQUIPAMIENTO_BR[i]);
+            QuitarEquipamiento(player, BR_EQUIPO_LISTA[i]);
         }
         player->UpdateTitansGrip();
     };
 
     bool EsEquipamientoDeBR(uint32 item)
     {
-        if (item == EQUIPAMIENTO_INICIAL_CAMISA || item == EQUIPAMIENTO_INICIAL_PANTALONES)
+        if (item == BR_EQUIPO_INICIAL_CAMISA || item == BR_EQUIPO_INICIAL_PANTALONES)
             return true;
-        for (uint32 i = 0; i < EQUIPAMIENTO_BR_MAXIMO; ++i)
+        for (uint32 i = 0; i < BR_EQUIPO_MAXIMO; ++i)
         {
-            if (item == EQUIPAMIENTO_BR[i])
+            if (item == BR_EQUIPO_LISTA[i])
                 return true;
         }
         return false;

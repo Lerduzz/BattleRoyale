@@ -24,11 +24,11 @@ public:
     }
 
     BR_Mapa* MapaActual() { return mapaActual->second; };
-    BR_ContenedorMapas ObtenerMapas() { return list_Mapas; };
+    BRListaMapas ObtenerMapas() { return list_Mapas; };
     void VotarPorMapa(uint32 guid, uint32 id)
     {
         RemoverVoto(guid);
-        BR_ContenedorMapas::iterator tmp = list_Mapas.find(id);
+        BRListaMapas::iterator tmp = list_Mapas.find(id);
         if (tmp != list_Mapas.end())
         {
             tmp->second->votos++;
@@ -41,7 +41,7 @@ public:
         if (usarVotos && list_Votos.find(guid) != list_Votos.end())
         {
             uint32 id = list_Votos[id];
-            BR_ContenedorMapas::iterator tmp = list_Mapas.find(id);
+            BRListaMapas::iterator tmp = list_Mapas.find(id);
             if (tmp != list_Mapas.end())
             {
                 if (tmp->second->votos > 0) tmp->second->votos--;
@@ -54,9 +54,9 @@ public:
     {
         if (usarVotos && list_Mapas.size())
         {
-            BR_ContenedorMapas::iterator tmpMap = list_Mapas.begin();
+            BRListaMapas::iterator tmpMap = list_Mapas.begin();
             int tmpVote = -1;
-            for (BR_ContenedorMapas::iterator it = list_Mapas.begin(); it != list_Mapas.end(); ++it)
+            for (BRListaMapas::iterator it = list_Mapas.begin(); it != list_Mapas.end(); ++it)
             {
                 if (it->second && it->second->votos >= tmpVote) // >= (Cuando hay empate usar el ultimo mapa del empate), > (Cuando hay empate usar el primer mapa del empate).
                 {
@@ -142,7 +142,7 @@ private:
         list_Votos.clear();
         if (list_Mapas.size())
         {
-            for (BR_ContenedorMapas::iterator it = list_Mapas.begin(); it != list_Mapas.end(); ++it)
+            for (BRListaMapas::iterator it = list_Mapas.begin(); it != list_Mapas.end(); ++it)
             {
                 if (it->second) it->second->votos = 0;
             }
@@ -150,9 +150,9 @@ private:
         if (usarVotos) usarVotos = false;
     };
 
-    BR_ListVotos list_Votos;
-    BR_ContenedorMapas list_Mapas;
-    BR_ContenedorMapas::iterator mapaActual;
+    BRListaVotos list_Votos;
+    BRListaMapas list_Mapas;
+    BRListaMapas::iterator mapaActual;
 
     bool usarVotos;
 
