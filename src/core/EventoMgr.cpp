@@ -109,15 +109,15 @@ void EventoMgr::GestionarMuerteJcJ(Player *killer, Player *killed)
         sSonidoMgr->ReproducirSonidoParaTodos(BR_SONIDO_ALGUIEN_MUERE, list_Jugadores);
         if (killer == killed)
         {
-            sBRRecompensaMgr->AcumularRecompensa(conf_Recompensa.morir, &(list_Datos[killed->GetGUID().GetCounter()]));
+            sPremioMgr->AcumularRecompensa(conf_Recompensa.morir, &(list_Datos[killed->GetGUID().GetCounter()]));
             sMensajeMgr->AnunciarMuerteJcJ(killer, killed, 0, list_Jugadores);
             return;
         }
         killer->AddAura(BR_HECHIZO_DESGARRO_ASESINO, killer);
         list_Datos[killer->GetGUID().GetCounter()].kills++;
         totalAsesinatosJcJ++;
-        sBRRecompensaMgr->AcumularRecompensa(conf_Recompensa.asesinar, &(list_Datos[killer->GetGUID().GetCounter()]));
-        sBRRecompensaMgr->AcumularRecompensa(conf_Recompensa.serAsesinado, &(list_Datos[killed->GetGUID().GetCounter()]));
+        sPremioMgr->AcumularRecompensa(conf_Recompensa.asesinar, &(list_Datos[killer->GetGUID().GetCounter()]));
+        sPremioMgr->AcumularRecompensa(conf_Recompensa.serAsesinado, &(list_Datos[killed->GetGUID().GetCounter()]));
         sMensajeMgr->AnunciarMuerteJcJ(killer, killed, list_Datos[killer->GetGUID().GetCounter()].kills, list_Jugadores);
         TodosLosMuertosEspectarme(killer);
     }
@@ -234,10 +234,10 @@ void EventoMgr::GestionarActualizacionMundo(uint32 diff)
             if (--tiempoRestanteInicio <= 0)
             {
                 estadoActual = BR_ESTADO_ZONA_EN_ESPERA;
-                sBRRecompensaMgr->AcumularRecompensaVivos(conf_Recompensa.base, list_Jugadores, &list_Datos);
+                sPremioMgr->AcumularRecompensaVivos(conf_Recompensa.base, list_Jugadores, &list_Datos);
                 sSonidoMgr->ReproducirSonidoParaTodos(BR_SONIDO_RONDA_INICIADA, list_Jugadores);
                 sMensajeMgr->NotificarTiempoInicial(0, list_Jugadores, sMapaMgr->MapaActual()->nombreMapa);
-                sBRMisionesMgr->CompletarRequerimiento(MISION_DIARIA_1, MISION_DIARIA_1_REQ_1, list_Jugadores);
+                sMisionMgr->CompletarRequerimiento(MISION_DIARIA_1, MISION_DIARIA_1_REQ_1, list_Jugadores);
                 tiempoRestanteZona = conf_IntervaloZonaSegura;
                 tiempoRestanteNave = 15;
             }
@@ -276,7 +276,7 @@ void EventoMgr::GestionarActualizacionMundo(uint32 diff)
                     estadoActual = BR_ESTADO_ZONA_EN_REDUCCION;
                 }
                 AlReducirseLaZona();
-                sBRRecompensaMgr->AcumularRecompensaVivos(conf_Recompensa.zona, list_Jugadores, &list_Datos);
+                sPremioMgr->AcumularRecompensaVivos(conf_Recompensa.zona, list_Jugadores, &list_Datos);
                 sSonidoMgr->ReproducirSonidoParaTodos(BR_SONIDO_ZONA_REDUCIDA, list_Jugadores);
                 sMensajeMgr->NotificarZonaEnReduccion(list_Jugadores);
                 tiempoRestanteZona = conf_IntervaloZonaSegura;
@@ -523,7 +523,7 @@ void EventoMgr::SalirDelEvento(uint32 guid, bool logout /* = false*/)
             player->TeleportTo(list_Datos[guid].GetMap(), list_Datos[guid].GetX(), list_Datos[guid].GetY(), list_Datos[guid].GetZ(), list_Datos[guid].GetO());
             player->SaveToDB(false, false);
         }
-        sBRRecompensaMgr->DarRecompensas(player, list_Datos[guid].reward);
+        sPremioMgr->DarRecompensas(player, list_Datos[guid].reward);
         list_Jugadores.erase(guid);
         list_Datos.erase(guid);
     }
@@ -670,7 +670,7 @@ void EventoMgr::FinalizarRonda(bool announce, Player *winner /* = nullptr*/)
         }
         if (list_Datos.find(winner->GetGUID().GetCounter()) != list_Datos.end())
         {
-            sBRRecompensaMgr->AcumularRecompensa(conf_Recompensa.victoria, &(list_Datos[winner->GetGUID().GetCounter()]));
+            sPremioMgr->AcumularRecompensa(conf_Recompensa.victoria, &(list_Datos[winner->GetGUID().GetCounter()]));
         }
         sMensajeMgr->AnunciarGanador(winner, list_Datos[winner->GetGUID().GetCounter()].kills);
         TodosLosMuertosEspectarme(winner);

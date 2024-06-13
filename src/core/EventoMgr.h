@@ -2,12 +2,12 @@
 #define SC_BR_MGR_H
 
 #include "Constantes.h"
-#include "BREquipamientoMgr.h"
+#include "InventarioMgr.h"
 #include "MensajeMgr.h"
 #include "MapaMgr.h"
-#include "BRMisionesMgr.h"
+#include "MisionMgr.h"
 #include "EntidadMgr.h"
-#include "BRRecompensaMgr.h"
+#include "PremioMgr.h"
 #include "SonidoMgr.h"
 #include "TituloMgr.h"
 #include "PlayerData.h"
@@ -318,8 +318,8 @@ private:
                         uint32 guid = it->first;
                         Player *player = it->second;
                         ++it;
-                        sBREquipamientoMgr->Desnudar(player);
-                        if (sBREquipamientoMgr->DarObjetosIniciales(player))
+                        sInventarioMgr->Desnudar(player);
+                        if (sInventarioMgr->DarObjetosIniciales(player))
                         {
                             sMensajeMgr->AnunciarMensajeBienvenida(player);
                         }
@@ -357,7 +357,7 @@ private:
                         uint32 guid = it->first;
                         Player *player = it->second;
                         ++it;
-                        sBREquipamientoMgr->QuitarTodosLosObjetos(player);
+                        sInventarioMgr->QuitarTodosLosObjetos(player);
                         list_QuitarTodosLosObjetos.erase(guid);
                     }
                     else

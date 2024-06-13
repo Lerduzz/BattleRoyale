@@ -61,11 +61,11 @@ public:
         {
             if (sEventoMgr->EstadoActual() > BR_ESTADO_SIN_SUFICIENTES_JUGADORES && sEventoMgr->EstaEnEvento(player))
             {
-                return sBREquipamientoMgr->EsEquipamientoDeBR(pItem->GetEntry());
+                return sInventarioMgr->EsEquipamientoDeBR(pItem->GetEntry());
             }
             else
             {
-                return !sBREquipamientoMgr->EsEquipamientoDeBR(pItem->GetEntry());
+                return !sInventarioMgr->EsEquipamientoDeBR(pItem->GetEntry());
             }
         }
         return true;
