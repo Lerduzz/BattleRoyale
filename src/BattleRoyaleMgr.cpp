@@ -455,7 +455,7 @@ void BattleRoyaleMgr::LlamarDentroDeNave(uint32 guid, uint32 tiempo /* = 20000*/
     Player *player = list_Invitados[guid];
     float ox = BR_VariacionesDePosicion[indiceDeVariacion][0];
     float oy = BR_VariacionesDePosicion[indiceDeVariacion][1];
-    BR_Mapa *brM = sBRMapasMgr->MapaActual();
+    BRMapa *brM = sBRMapasMgr->MapaActual();
     Position iN = brM->inicioNave;
 
     player->SetSummonPoint(brM->idMapa, iN.GetPositionX() + ox, iN.GetPositionY() + oy, iN.GetPositionZ() + 2.5f);
@@ -575,7 +575,7 @@ void BattleRoyaleMgr::EfectoFueraDeZona()
 {
     if (HayJugadores())
     {
-        for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
+        for (BRListaPersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
         {
             if (it->second && it->second->IsAlive() && sBRObjetosMgr->EstaLaZonaActiva())
             {
@@ -620,7 +620,7 @@ void BattleRoyaleMgr::ActivarTodosContraTodos()
 {
     if (HayJugadores())
     {
-        for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
+        for (BRListaPersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
         {
             if (it->second && it->second->IsAlive() && TodosContraTodos(it->second) && !(it->second->HasByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP)))
             {
@@ -634,7 +634,7 @@ void BattleRoyaleMgr::ControlDeReglas()
 {
     if (HayJugadores())
     {
-        BR_ListaDePersonajes::iterator it = list_Jugadores.begin();
+        BRListaPersonajes::iterator it = list_Jugadores.begin();
         while (it != list_Jugadores.end())
         {
             if (it->second && it->second->IsAlive())
@@ -666,7 +666,7 @@ bool BattleRoyaleMgr::CondicionDeVictoria()
         {
             int cantidadVivos = 0;
             Player *vivo = nullptr;
-            for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
+            for (BRListaPersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
             {
                 if (it->second && it->second->IsAlive())
                 {

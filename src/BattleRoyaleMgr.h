@@ -148,10 +148,10 @@ private:
         int chestCount = 0;
         // if (escalaDeZona < CANTIDAD_DE_ZONAS && sBRMapasMgr->TieneZonasParaCofres(escalaDeZona))
         // {
-        //     BR_UbicacionZona temp = sBRMapasMgr->ObtenerZonasParaCofres(escalaDeZona);
+        //     std::map<uint32, Position> temp = sBRMapasMgr->ObtenerZonasParaCofres(escalaDeZona);
         //     if (temp.size())
         //     {
-        //         for (BR_UbicacionZona::iterator it = temp.begin(); it != temp.end(); ++it)
+        //         for (std::map<uint32, Position>::iterator it = temp.begin(); it != temp.end(); ++it)
         //         {
         //             int rnd = rand() % 100 + 1;
         //             if (rnd <= 35)
@@ -170,7 +170,7 @@ private:
             {
                 int vivos = 0;
                 int rndEfecto = rand() % 10 + 1;
-                for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
+                for (BRListaPersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
                 {
                     if (it->second && it->second->IsAlive())
                     {
@@ -238,7 +238,7 @@ private:
         if (HayJugadores())
         {
             Player *vivo = nullptr;
-            for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
+            for (BRListaPersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
             {
                 if (it->second && it->second->IsAlive())
                 {
@@ -264,7 +264,7 @@ private:
     {
         if (HayJugadores())
         {
-            BR_ListaDePersonajes::iterator it = list_Jugadores.begin();
+            BRListaPersonajes::iterator it = list_Jugadores.begin();
             while (it != list_Jugadores.end())
             {
                 if (!sBRObjetosMgr->EstaEnLaNave(it->second) || !it->second->IsAlive())
@@ -287,7 +287,7 @@ private:
     {
         if (HayJugadores() && player && player->IsAlive() && !EstaEspectando(player))
         {
-            for (BR_ListaDePersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
+            for (BRListaPersonajes::iterator it = list_Jugadores.begin(); it != list_Jugadores.end(); ++it)
             {
                 if (it->second && it->second != player && !it->second->IsAlive() && !EstaEspectando(it->second))
                     EspectarJugador(it->second, player);
@@ -308,7 +308,7 @@ private:
     {
         if (list_DarObjetosIniciales.size())
         {
-            BR_ListaDePersonajes::iterator it = list_DarObjetosIniciales.begin();
+            BRListaPersonajes::iterator it = list_DarObjetosIniciales.begin();
             while (it != list_DarObjetosIniciales.end())
             {
                 if (it->second && it->second->IsAlive())
@@ -347,7 +347,7 @@ private:
     {
         if (list_QuitarTodosLosObjetos.size())
         {
-            BR_ListaDePersonajes::iterator it = list_QuitarTodosLosObjetos.begin();
+            BRListaPersonajes::iterator it = list_QuitarTodosLosObjetos.begin();
             while (it != list_QuitarTodosLosObjetos.end())
             {
                 if (it->second && it->second->IsAlive())
@@ -385,14 +385,14 @@ private:
         }
     }
 
-    BR_ListaDePersonajes list_Cola;
-    BR_ListaDePersonajes list_Invitados;
+    BRListaPersonajes list_Cola;
+    BRListaPersonajes list_Invitados;
 
-    BR_ListaDePersonajes list_Jugadores;
-    BR_DatosDePersonajes list_Datos;
+    BRListaPersonajes list_Jugadores;
+    BRListaDatos list_Datos;
 
-    BR_ListaDePersonajes list_DarObjetosIniciales;
-    BR_ListaDePersonajes list_QuitarTodosLosObjetos;
+    BRListaPersonajes list_DarObjetosIniciales;
+    BRListaPersonajes list_QuitarTodosLosObjetos;
 
     BREstado estadoActual;
 

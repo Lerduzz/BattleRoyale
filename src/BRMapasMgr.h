@@ -23,7 +23,7 @@ public:
         return instance;
     }
 
-    BR_Mapa* MapaActual() { return mapaActual->second; };
+    BRMapa* MapaActual() { return mapaActual->second; };
     BRListaMapas ObtenerMapas() { return list_Mapas; };
     void VotarPorMapa(uint32 guid, uint32 id)
     {
@@ -93,7 +93,7 @@ public:
             do
             {
                 Field* fields    = result->Fetch();
-                BR_Mapa* mapa    = new BR_Mapa();
+                BRMapa* mapa    = new BRMapa();
                 uint32 id        = fields[0].Get<uint32>();
                 mapa->idMapa     = fields[1].Get<uint32>();
                 mapa->idZona     = fields[2].Get<uint32>();
@@ -134,7 +134,7 @@ public:
         }
     };
     bool TieneZonasParaCofres(int zona) { return MapaActual()->ubicacionesMapa.find(zona) != MapaActual()->ubicacionesMapa.end(); };
-    BR_UbicacionZona ObtenerZonasParaCofres(int zona) { return TieneZonasParaCofres(zona) ? MapaActual()->ubicacionesMapa[zona] : BR_UbicacionZona(); };
+    std::map<uint32, Position> ObtenerZonasParaCofres(int zona) { return TieneZonasParaCofres(zona) ? MapaActual()->ubicacionesMapa[zona] : std::map<uint32, Position>(); };
 
 private:
     void RestablecerVotos()
