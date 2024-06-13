@@ -37,21 +37,13 @@ public:
         }
         case 2:
         {
-            // if (sBattleRoyaleMgr->EstaActivado())
-            // {
-            //     uint32 start = 5;
-            //     BR_ContenedorMapas mapas = sBRMapasMgr->ObtenerMapas();
-            //     for (BR_ContenedorMapas::iterator it = mapas.begin(); it != mapas.end(); ++it)
-            //     {
-            //         AddGossipItemFor(player, GOSSIP_ICON_BATTLE, it->second->nombreMapa, it->first, start++);
-            //     }
-            //     SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
-            // }
-            // else
-            // {
-            //     ChatHandler(player->GetSession()).PSendSysMessage("|cff4CFF00BattleRoyale::|r ¡Este modo de juego se encuentra actualmente desactivado!");
-            //     CloseGossipMenuFor(player);
-            // }
+            uint32 start = 5;
+            BRListaMapas mapas = sMapaMgr->ObtenerMapas();
+            for (BRListaMapas::iterator it = mapas.begin(); it != mapas.end(); ++it)
+            {
+                AddGossipItemFor(player, GOSSIP_ICON_BATTLE, it->second->nombreMapa, it->first, start++);
+            }
+            SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
             break;
         }
         case 3:

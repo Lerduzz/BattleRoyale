@@ -61,6 +61,14 @@ public:
      */
     void JugadorEntrando(Player *player);
 
+    /**
+     * @brief Gestiona cuando un jugador debe salir del evento.
+     * 
+     * @param player Jugador que esta saliendo.
+     * @param logout Bandera para saber si la salida es por desconexion.
+     */
+    void JugadorSaliendo(Player *player, bool logout = false);
+
 private:
     /**
      * @brief Establece todas las variables del evento a su estado inicial.

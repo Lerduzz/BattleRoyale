@@ -76,18 +76,60 @@ void EventoMgr::JugadorEntrando(Player *player)
     switch (estado)
     {
     case BR_ESTADO_SIN_SUFICIENTES_JUGADORES:
-        // TODO: Si se lleno la cola iniciar nueva ronda.
         if (cola.size() >= minJugadores)
             IniciarRonda();
         break;
     case BR_ESTADO_INVITANDO_JUGADORES:
-        // TODO: Invitar directamente a unirse al evento.
-        break;
-    default:
-        // TODO: Anunciar que se ha unido a la cola y el estado actual del evento.
-        // TODO: Anunciar a los miembros de la cola que se ha unido otro si procede.
+        if (cola.size() > 0)
+            InvitarJugadores();
         break;
     }
+}
+
+void EventoMgr::JugadorSaliendo(Player *player, bool logout)
+{
+    if (!player)
+        return;
+    if (EstaEnCola(player))
+    {
+        cola.erase(player);
+        sMapaMgr->RemoverVoto(player->GetGUID().GetCounter());
+    }
+    if (EstaInvitado(player))
+    {
+        invitados.erase(player->GetGUID().GetCounter());
+        sMapaMgr->RemoverVoto(player->GetGUID().GetCounter());
+    }
+    if (EstaEnEvento(player))
+    {
+        player->SetPhaseMask(BR_VISIBILIDAD_NORMAL, true);
+        if (player->IsAlive())
+        {
+            player->RemoveAurasDueToSpell(BR_HECHIZO_ALAS_MAGICAS);
+            player->RemoveAurasDueToSpell(BR_HECHIZO_ANTI_INVISIBLES);
+            player->RemoveAurasDueToSpell(BR_HECHIZO_ANTI_SANADORES);
+            player->RemoveAurasDueToSpell(BR_HECHIZO_RASTRILLO_LENTO);
+            player->RemoveAurasDueToSpell(BR_HECHIZO_DESGARRO_ASESINO);
+            player->RemoveAurasDueToSpell(BR_HECHIZO_ACIDO_ZONA);
+            player->RemoveAurasDueToSpell(BR_HECHIZO_BENEFICIO_LIEBRE);
+        }
+        if (!logout)
+        {
+            if (!player->IsAlive())
+                RevivirJugador(player);
+            if (!player->isPossessing())
+                player->StopCastingBindSight();
+            // list_QuitarTodosLosObjetos[guid] = player;
+            player->AddAura(BR_HECHIZO_PARACAIDAS, player);
+            // player->TeleportTo(list_Datos[guid].GetMap(), list_Datos[guid].GetX(), list_Datos[guid].GetY(), list_Datos[guid].GetZ(), list_Datos[guid].GetO());
+            // player->SaveToDB(false, false);
+        }
+        // sBRRecompensaMgr->DarRecompensas(player, list_Datos[guid].reward);
+        jugadores.erase(player->GetGUID().GetCounter());
+        // list_Datos.erase(guid);
+    }
+    // if (logout && EstaEnListaQuitarTodosLosObjetos(guid))
+    //     list_QuitarTodosLosObjetos.erase(guid);
 }
 
 void EventoMgr::LimpiarEvento()
