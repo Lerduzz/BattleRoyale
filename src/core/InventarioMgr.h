@@ -1,7 +1,7 @@
 #ifndef SC_BR_ITEM_MGR_H
 #define SC_BR_ITEM_MGR_H
 
-#include "Player.h"
+#include "Constantes.h"
 
 class InventarioMgr
 {

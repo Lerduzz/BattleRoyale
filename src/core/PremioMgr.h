@@ -1,8 +1,7 @@
 #ifndef SC_BR_REWARD_MGR_H
 #define SC_BR_REWARD_MGR_H
 
-#include "PlayerData.h"
-#include "Player.h"
+#include "Constantes.h"
 #include "Mail.h"
 
 class PremioMgr
