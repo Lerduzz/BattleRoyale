@@ -47,7 +47,7 @@ bool EventoMgr::PuedeEntrarCola(Player *player)
 
 bool EventoMgr::EstaEnCola(Player *player)
 {
-    return false;
+    return cola.find(player->GetGUID().GetCounter()) != cola.end();
 }
 
 bool EventoMgr::EstaInvitado(Player *player)
