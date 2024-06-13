@@ -2,6 +2,7 @@
 #define SC_BR_ENTIDAD_MGR_H
 
 #include "Constantes.h"
+#include "ChatMgr.h"
 
 class EventoMgr
 {
@@ -84,6 +85,12 @@ private:
      *
      */
     BREstado estado;
+
+    /**
+     * @brief Almacena la cola para el evento.
+     *
+     */
+    BRCola cola;
 };
 
 /**

@@ -19,27 +19,27 @@ bool EventoMgr::PuedeEntrarCola(Player *player)
     }
     if (player->getLevel() != 80)
     {
-        // TODO: sBRChatMgr->AnunciarMensajeEntrada(player, MENSAJE_ERROR_NIVEL);
+        sChatMgr->MensajeEntrada(player, BR_MENSAJE_ERROR_NIVEL);
         return false;
     }
     if (player->getClass() == CLASS_DEATH_KNIGHT && player->GetMapId() == 609)
     {
-        // TODO: sBRChatMgr->AnunciarMensajeEntrada(player, MENSAJE_ERROR_DK_INICIO);
+        sChatMgr->MensajeEntrada(player, BR_MENSAJE_ERROR_DK_INICIO);
         return false;
     }
     if (EstaEnCola(player))
     {
-        // sBRChatMgr->AnunciarMensajeEntrada(player, MENSAJE_ERROR_EN_COLA);
+        sChatMgr->MensajeEntrada(player, BR_MENSAJE_ERROR_EN_COLA);
         return false;
     }
     if (EstaInvitado(player))
     {
-        // sBRChatMgr->AnunciarMensajeEntrada(player, MENSAJE_ERROR_INVITADO);
+        sChatMgr->MensajeEntrada(player, BR_MENSAJE_ERROR_INVITADO);
         return false;
     }
     if (EstaEnEvento(player))
     {
-        // sBRChatMgr->AnunciarMensajeEntrada(player, MENSAJE_ERROR_EN_EVENTO);
+        sChatMgr->MensajeEntrada(player, BR_MENSAJE_ERROR_EN_EVENTO);
         return false;
     }
     return true;
@@ -71,4 +71,5 @@ void EventoMgr::JugadorEntrando(Player *player)
 void EventoMgr::LimpiarEvento()
 {
     estado = BR_ESTADO_SIN_SUFICIENTES_JUGADORES;
+    cola.clear();
 }
