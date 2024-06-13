@@ -9,7 +9,7 @@
 #include "BRObjetosMgr.h"
 #include "BRRecompensaMgr.h"
 #include "BRSonidosMgr.h"
-#include "BRTitulosMgr.h"
+#include "TitulosMgr.h"
 #include "PlayerData.h"
 #include "Common.h"
 #include "SharedDefines.h"

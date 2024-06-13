@@ -679,7 +679,7 @@ void EventoMgr::FinalizarRonda(bool announce, Player *winner /* = nullptr*/)
         TodosLosMuertosEspectarme(winner);
         if (conf_RequisitoAsesinatosTotales <= totalAsesinatosJcJ && conf_RequisitoAsesinatosPropios <= list_Datos[winner->GetGUID().GetCounter()].kills)
         {
-            sBRTitulosMgr->Ascender(winner);
+            sTitulosMgr->Ascender(winner);
         }
     }
     else

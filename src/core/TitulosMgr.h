@@ -5,15 +5,15 @@
 #include "Player.h"
 #include "SharedDefines.h"
 
-class BRTitulosMgr
+class TitulosMgr
 {
-    BRTitulosMgr(){};
-    ~BRTitulosMgr(){};
+    TitulosMgr(){};
+    ~TitulosMgr(){};
 
 public:
-    static BRTitulosMgr *instance()
+    static TitulosMgr *instance()
     {
-        static BRTitulosMgr *instance = new BRTitulosMgr();
+        static TitulosMgr *instance = new TitulosMgr();
         return instance;
     }
 
@@ -59,6 +59,6 @@ public:
     };
 };
 
-#define sBRTitulosMgr BRTitulosMgr::instance()
+#define sTitulosMgr TitulosMgr::instance()
 
 #endif
