@@ -16,7 +16,7 @@ SET
 @TypeFlags 	:= 0,
 @FlagsExtra := 2,
 @AIName		:= "SmartAI",
-@Script 	:= "BattleRoyaleCreature";
+@Script 	:= "BRScriptCriatura";
 
 DELETE FROM `creature_template` WHERE `entry` >= @Entry - 1 AND `entry` <= @Entry + 3;
 INSERT INTO `creature_template` (`entry`, `modelid1`, `name`, `subname`, `IconName`, `gossip_menu_id`, `minlevel`, `maxlevel`, `faction`, `npcflag`, `speed_walk`, `speed_run`, `scale`, `rank`, `unit_class`, `unit_flags`, `type`, `type_flags`, `RegenHealth`, `flags_extra`, `AiName`, `ScriptName`) VALUES
