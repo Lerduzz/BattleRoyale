@@ -9,6 +9,7 @@ MapaMgr::MapaMgr()
 MapaMgr::~MapaMgr()
 {
     mapas.clear();
+    votantes.clear();
 }
 
 void MapaMgr::VotarPorMapa(uint32 guid, uint32 id)

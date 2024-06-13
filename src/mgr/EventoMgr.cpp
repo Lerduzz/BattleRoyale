@@ -2,6 +2,14 @@
 
 EventoMgr::EventoMgr()
 {
+    intervalo = BRConfigIntervalos(); // TODO: Conf (seg).
+    intervalo.sinJugadores = 1800;
+    intervalo.invitandoJugadores = 30;
+    intervalo.esperandoJugadores = 15;
+    intervalo.naveEnEspera = 30;
+    intervalo.zonaEnEspera = 60;
+    minJugadores = 1; // TODO: Conf.
+    maxJugadores = 5; // TODO: Conf.
     LimpiarEvento();
 }
 
@@ -88,14 +96,7 @@ void EventoMgr::LimpiarEvento()
     cola.clear();
     invitados.clear();
     jugadores.clear();
-    intervalo = BRConfigIntervalos(); // TODO: Conf (seg).
-    intervalo.sinJugadores = 1800;
-    intervalo.invitandoJugadores = 30;
-    intervalo.esperandoJugadores = 15;
-    intervalo.naveEnEspera = 30;
-    intervalo.zonaEnEspera = 60;
-    minJugadores = 1; // TODO: Conf.
-    maxJugadores = 5; // TODO: Conf.
+    sMapaMgr->SiguienteMapa();
     tiempoRestanteInicio = 45 + intervalo.naveEnEspera + intervalo.esperandoJugadores + intervalo.invitandoJugadores;
     indiceDePosicionNave = 0;
 }
