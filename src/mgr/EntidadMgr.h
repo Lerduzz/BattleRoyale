@@ -12,7 +12,7 @@ class EntidadMgr
 public:
     static EntidadMgr *instance()
     {
-        static EntidadMgr *instance = new BRObjetosMgr();
+        static EntidadMgr *instance = new EntidadMgr();
         return instance;
     }
 
