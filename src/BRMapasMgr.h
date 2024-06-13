@@ -3,22 +3,6 @@
 
 #include "Constantes.h"
 
-typedef std::map<uint32, uint32> BR_ListVotos;
-
-typedef std::map<uint32, Position> BR_UbicacionZona;
-typedef std::map<uint32, BR_UbicacionZona> BR_Ubicacion;
-struct BR_Mapa
-{
-    uint32 idMapa;
-    uint32 idZona;
-    std::string nombreMapa;
-    Position centroMapa;
-    Position inicioNave;
-    BR_Ubicacion ubicacionesMapa;
-    int votos;
-};
-typedef std::map<uint32, BR_Mapa*> BR_ContenedorMapas;
-
 class BRMapasMgr
 {
     BRMapasMgr()

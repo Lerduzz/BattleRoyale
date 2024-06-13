@@ -5,9 +5,6 @@
 #include "Player.h"
 #include "Mail.h"
 
-typedef std::map<uint32, Player*> BR_ListaRecompensa;
-typedef std::map<uint32, PlayerData> BR_ListaDatos;
-
 class BRRecompensaMgr
 {
     BRRecompensaMgr(){};

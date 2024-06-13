@@ -4,29 +4,6 @@
 #include "Chat.h"
 #include "Player.h"
 
-enum BR_TipoMensaje
-{
-    MENSAJE_ERROR_MAZMORRA = 0,
-    MENSAJE_ERROR_BG,
-    MENSAJE_ERROR_EN_COLA,
-    MENSAJE_ERROR_EN_EVENTO,
-    MENSAJE_ERROR_EN_VUELO,
-    MENSAJE_ERROR_BLOQUEADO,
-    MENSAJE_ERROR_DK_INICIO,
-    MENSAJE_ERROR_NIVEL,
-};
-
-enum BR_TipoMensajeEstado
-{
-    MENSAJE_ESTADO_EVENTO_OK = 0,
-    MENSAJE_ESTADO_EVENTO_EN_CURSO,
-    MENSAJE_ESTADO_EVENTO_LLENO,
-};
-
-const std::string TEXTO_NOMBRE = "|cffff6633[|cffff0000B|cffff3300attle |cffff0000R|cffff3300oyale|cffff6633]:|r";
-
-typedef std::map<uint32, Player*> BR_ListaChat;
-
 class BRChatMgr
 {
     BRChatMgr(){};

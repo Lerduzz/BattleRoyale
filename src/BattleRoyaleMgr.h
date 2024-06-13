@@ -18,8 +18,6 @@
 #include "Chat.h"
 
 class PlayerData;
-typedef std::map<uint32, Player *> BR_ListaDePersonajes;
-typedef std::map<uint32, PlayerData> BR_DatosDePersonajes;
 
 class BattleRoyaleMgr
 {

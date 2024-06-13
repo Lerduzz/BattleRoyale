@@ -7,24 +7,6 @@
 #include "SpellAuras.h"
 #include "Transport.h"
 
-enum BR_Dimensiones
-{
-    DIMENSION_NORMAL = 0x00000001,
-    DIMENSION_EVENTO = 0x00000002,
-};
-
-enum BR_ObjetosMundo
-{
-    OBJETO_NAVE = 194675,
-    OBJETO_COFRE = 499999,
-};
-
-enum BR_Criaturas
-{
-    CRIATURA_VENDEDOR_ARMAS = 200001,
-    CRIATURA_DRAGON_GUARDIAN = 199999,
-};
-
 class BRObjetosMgr
 {
     BRObjetosMgr()
