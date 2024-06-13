@@ -121,7 +121,7 @@ void EventoMgr::IniciarRonda()
 
 void EventoMgr::InvitarJugadores()
 {
-    while (!cola.empty() && invitados.size() + jugadores.size() < maxJugadores && tiempoRestanteInicio < 45 + intervalo.naveEnEspera + intervalo.esperandoJugadores)
+    while (!cola.empty() && invitados.size() + jugadores.size() < maxJugadores && tiempoRestanteInicio > 45 + intervalo.naveEnEspera + intervalo.esperandoJugadores)
     {
         Player *player = cola.front();
         cola.pop_front();
