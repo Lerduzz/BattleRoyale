@@ -1,8 +1,8 @@
 #ifndef SC_BR_CHAT_MGR_H
 #define SC_BR_CHAT_MGR_H
 
+#include "Constantes.h"
 #include "Chat.h"
-#include "Player.h"
 
 class BRChatMgr
 {
@@ -16,7 +16,7 @@ public:
         return instance;
     }
 
-    void NotificarTiempoInicial(uint32 tiempo, BR_ListaChat lista, std::string mapa = "Lugar: Desconocido")
+    void NotificarTiempoInicial(uint32 tiempo, BRListaPersonajes lista, std::string mapa = "Lugar: Desconocido")
     {
         if (lista.size())
         {
@@ -60,43 +60,43 @@ public:
                     break;
                 }
             }
-            for (BR_ListaChat::iterator it = lista.begin(); it != lista.end(); ++it)
+            for (BRListaPersonajes::iterator it = lista.begin(); it != lista.end(); ++it)
             {
                 it->second->GetSession()->SendAreaTriggerMessage("%s", notificacion.str().c_str());
             }
         }
     };
-    void NotificarAdvertenciaDeZona(uint32 tiempo, BR_ListaChat lista)
+    void NotificarAdvertenciaDeZona(uint32 tiempo, BRListaPersonajes lista)
     {
         if (lista.size())
         {
-            for (BR_ListaChat::iterator it = lista.begin(); it != lista.end(); ++it)
+            for (BRListaPersonajes::iterator it = lista.begin(); it != lista.end(); ++it)
             {
                 it->second->GetSession()->SendNotification("|cff00ff00¡La zona segura se reducirá en |cffDA70D6%u|cff00ff00 segundos!", tiempo);
             }
         }
     };
-    void NotificarZonaEnReduccion(BR_ListaChat lista)
+    void NotificarZonaEnReduccion(BRListaPersonajes lista)
     {
         if (lista.size())
         {
-            for (BR_ListaChat::iterator it = lista.begin(); it != lista.end(); ++it)
+            for (BRListaPersonajes::iterator it = lista.begin(); it != lista.end(); ++it)
             {
                 it->second->GetSession()->SendNotification("|cffff0000¡La zona segura se está reduciendo!");
             }
         }
     };
-    void NotificarNaveRetirada(BR_ListaChat lista)
+    void NotificarNaveRetirada(BRListaPersonajes lista)
     {
         if (lista.size())
         {
-            for (BR_ListaChat::iterator it = lista.begin(); it != lista.end(); ++it)
+            for (BRListaPersonajes::iterator it = lista.begin(); it != lista.end(); ++it)
             {
                 it->second->GetSession()->SendNotification("|cff0000ff¡La nave se ha retirado!");
             }
         }
     };  
-    void AnunciarJugadoresEnCola(Player* player, uint32 minimo, BR_ListaChat lista, BR_TipoMensajeEstado estado = MENSAJE_ESTADO_EVENTO_OK)
+    void AnunciarJugadoresEnCola(Player* player, uint32 minimo, BRListaPersonajes lista, BR_TipoMensajeEstado estado = MENSAJE_ESTADO_EVENTO_OK)
     {
         if (lista.size())
         {
@@ -120,7 +120,7 @@ public:
                 }
             }
             Chat(player).PSendSysMessage("%s Te has unido a la cola del evento. Jugadores en cola: |cff4CFF00%u|r/|cff4CFF00%u|r.%s", TEXTO_NOMBRE.c_str(), lista.size(), minimo, mensajeEstado.c_str());
-            for (BR_ListaChat::iterator it = lista.begin(); it != lista.end(); ++it)
+            for (BRListaPersonajes::iterator it = lista.begin(); it != lista.end(); ++it)
             {
                 if (it->second != player)
                 {
@@ -130,11 +130,11 @@ public:
             }
         }
     };
-    void AnunciarMuerteJcJ(Player* killer, Player* killed, int kills, BR_ListaChat lista)
+    void AnunciarMuerteJcJ(Player* killer, Player* killed, int kills, BRListaPersonajes lista)
     {
         if (lista.size())
         {
-            for (BR_ListaChat::iterator it = lista.begin(); it != lista.end(); ++it)
+            for (BRListaPersonajes::iterator it = lista.begin(); it != lista.end(); ++it)
             {
                 if (killer == killed)
                 {
@@ -159,21 +159,21 @@ public:
         msg << TEXTO_NOMBRE << " Ronda finalizada, no hubo ganador|r.";
         sWorld->SendServerMessage(SERVER_MSG_STRING, msg.str().c_str());
     };
-    void AnunciarEfectoZona(BR_ListaChat lista, int vivos)
+    void AnunciarEfectoZona(BRListaPersonajes lista, int vivos)
     {
         if (lista.size())
         {
-            for (BR_ListaChat::iterator it = lista.begin(); it != lista.end(); ++it)
+            for (BRListaPersonajes::iterator it = lista.begin(); it != lista.end(); ++it)
             {
                 Chat(it->second).PSendSysMessage("%s ¡Efectos de Zona aplicados! Jugadores vivos: |cff4CFF00%u|r, y espectadores: |cff4CFF00%u|r.", TEXTO_NOMBRE.c_str(), vivos, lista.size() - vivos);
             }
         }
     };
-    void AnunciarConteoCofres(int cofres, BR_ListaChat lista)
+    void AnunciarConteoCofres(int cofres, BRListaPersonajes lista)
     {
         if (lista.size())
         {
-            for (BR_ListaChat::iterator it = lista.begin(); it != lista.end(); ++it)
+            for (BRListaPersonajes::iterator it = lista.begin(); it != lista.end(); ++it)
             {
                 Chat(it->second).PSendSysMessage("%s Ha%s aparecido %i cofre%s con recompensas aleatorias.", TEXTO_NOMBRE.c_str(), (cofres > 1 ? "n" : ""), cofres, (cofres > 1 ? "s" : ""));
             }
