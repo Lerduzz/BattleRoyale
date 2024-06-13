@@ -117,7 +117,7 @@ private:
 
     void SiguientePosicion()
     {
-        if (++indiceDeVariacion >= CANTIDAD_DE_VARIACIONES)
+        if (++indiceDeVariacion >= BR_CANTIDAD_VARIACIONES)
         {
             indiceDeVariacion = 0;
         }
@@ -179,46 +179,46 @@ private:
                         case 1:
                         case 2:
                         {
-                            if (it->second->CastSpell(it->second, HECHIZO_ANTI_INVISIBLES, true) != SPELL_CAST_OK)
+                            if (it->second->CastSpell(it->second, BR_HECHIZO_ANTI_INVISIBLES, true) != SPELL_CAST_OK)
                             {
-                                it->second->AddAura(HECHIZO_ANTI_INVISIBLES, it->second);
+                                it->second->AddAura(BR_HECHIZO_ANTI_INVISIBLES, it->second);
                             }
                             break;
                         }
                         case 3:
                         case 4:
                         {
-                            it->second->AddAura(HECHIZO_ANTI_SANADORES, it->second);
+                            it->second->AddAura(BR_HECHIZO_ANTI_SANADORES, it->second);
                             break;
                         }
                         case 5:
                         case 6:
                         {
-                            it->second->AddAura(HECHIZO_RASTRILLO_LENTO, it->second);
+                            it->second->AddAura(BR_HECHIZO_RASTRILLO_LENTO, it->second);
                             break;
                         }
                         case 7:
                         {
-                            if (!sBRObjetosMgr->HechizoGuardian(HECHIZO_RAYO_DRAGON, it->second))
+                            if (!sBRObjetosMgr->HechizoGuardian(BR_HECHIZO_RAYO_DRAGON, it->second))
                             {
-                                it->second->AddAura(HECHIZO_DESGARRO_ASESINO, it->second);
+                                it->second->AddAura(BR_HECHIZO_DESGARRO_ASESINO, it->second);
                             }
                             break;
                         }
                         case 8:
                         case 9:
                         {
-                            if (!sBRObjetosMgr->HechizoGuardian(HECHIZO_RAYO_DRAGON_FUERTE, it->second))
+                            if (!sBRObjetosMgr->HechizoGuardian(BR_HECHIZO_RAYO_DRAGON_FUERTE, it->second))
                             {
-                                it->second->AddAura(HECHIZO_RASTRILLO_LENTO, it->second);
+                                it->second->AddAura(BR_HECHIZO_RASTRILLO_LENTO, it->second);
                             }
                             break;
                         }
                         default:
                         {
-                            if (it->second->CastSpell(it->second, HECHIZO_BENEFICIO_LIEBRE, true) != SPELL_CAST_OK)
+                            if (it->second->CastSpell(it->second, BR_HECHIZO_BENEFICIO_LIEBRE, true) != SPELL_CAST_OK)
                             {
-                                it->second->AddAura(HECHIZO_BENEFICIO_LIEBRE, it->second);
+                                it->second->AddAura(BR_HECHIZO_BENEFICIO_LIEBRE, it->second);
                             }
                             break;
                         }
@@ -379,7 +379,7 @@ private:
         {
             if (tiempoRestanteInicio == 45)
             {
-                sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_NAVE_EN_MOVIMIENTO, list_Jugadores);
+                sBRSonidosMgr->ReproducirSonidoParaTodos(BR_SONIDO_NAVE_EN_MOVIMIENTO, list_Jugadores);
             }
             sBRChatMgr->NotificarTiempoInicial(tiempoRestanteInicio, list_Jugadores);
         }

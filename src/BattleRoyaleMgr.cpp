@@ -35,7 +35,6 @@ void BattleRoyaleMgr::GestionarJugadorEntrando(Player *player)
     if (!player)
         return;
     uint32 guid = player->GetGUID().GetCounter();
-    BR_Bloqueado *blr = sBRListaNegraMgr->EstaBloqueado(guid);
     if (player->getLevel() != 80)
     {
         sBRChatMgr->AnunciarMensajeEntrada(player, BR_MENSAJE_ERROR_NIVEL);
@@ -44,21 +43,6 @@ void BattleRoyaleMgr::GestionarJugadorEntrando(Player *player)
     if (player->getClass() == CLASS_DEATH_KNIGHT && player->GetMapId() == 609)
     {
         sBRChatMgr->AnunciarMensajeEntrada(player, BR_MENSAJE_ERROR_DK_INICIO);
-        return;
-    }
-    if (blr->estaBloqueado)
-    {
-        sBRChatMgr->AnunciarMensajeEntrada(player, MENSAJE_ERROR_BLOQUEADO, blr->motivo);
-        return;
-    }
-    if (player->isUsingLfg())
-    {
-        sBRChatMgr->AnunciarMensajeEntrada(player, MENSAJE_ERROR_MAZMORRA);
-        return;
-    }
-    if (player->InBattlegroundQueue())
-    {
-        sBRChatMgr->AnunciarMensajeEntrada(player, MENSAJE_ERROR_BG);
         return;
     }
     if (EstaEnCola(player))
@@ -104,7 +88,7 @@ void BattleRoyaleMgr::GestionarJugadorEntrando(Player *player)
     default:
     {
         list_Cola[guid] = player;
-        sBRChatMgr->AnunciarJugadoresEnCola(player, conf_JugadoresMinimo, list_Cola, MENSAJE_ESTADO_EVENTO_EN_CURSO);
+        sBRChatMgr->AnunciarJugadoresEnCola(player, conf_JugadoresMinimo, list_Cola, BR_MENSAJE_ESTADO_EVENTO_EN_CURSO);
         break;
     }
     }
@@ -129,7 +113,7 @@ void BattleRoyaleMgr::GestionarMuerteJcJ(Player *killer, Player *killed)
             sBRChatMgr->AnunciarMuerteJcJ(killer, killed, 0, list_Jugadores);
             return;
         }
-        killer->AddAura(HECHIZO_DESGARRO_ASESINO, killer);
+        killer->AddAura(BR_HECHIZO_DESGARRO_ASESINO, killer);
         list_Datos[killer->GetGUID().GetCounter()].kills++;
         totalAsesinatosJcJ++;
         sBRRecompensaMgr->AcumularRecompensa(conf_Recompensa.asesinar, &(list_Datos[killer->GetGUID().GetCounter()]));
@@ -532,18 +516,18 @@ void BattleRoyaleMgr::SalirDelEvento(uint32 guid, bool logout /* = false*/)
         {
             if (player->HasAura(BR_HECHIZO_ALAS_MAGICAS))
                 player->RemoveAurasDueToSpell(BR_HECHIZO_ALAS_MAGICAS);
-            if (player->HasAura(HECHIZO_ANTI_INVISIBLES))
-                player->RemoveAurasDueToSpell(HECHIZO_ANTI_INVISIBLES);
-            if (player->HasAura(HECHIZO_ANTI_SANADORES))
-                player->RemoveAurasDueToSpell(HECHIZO_ANTI_SANADORES);
-            if (player->HasAura(HECHIZO_RASTRILLO_LENTO))
-                player->RemoveAurasDueToSpell(HECHIZO_RASTRILLO_LENTO);
-            if (player->HasAura(HECHIZO_DESGARRO_ASESINO))
-                player->RemoveAurasDueToSpell(HECHIZO_DESGARRO_ASESINO);
+            if (player->HasAura(BR_HECHIZO_ANTI_INVISIBLES))
+                player->RemoveAurasDueToSpell(BR_HECHIZO_ANTI_INVISIBLES);
+            if (player->HasAura(BR_HECHIZO_ANTI_SANADORES))
+                player->RemoveAurasDueToSpell(BR_HECHIZO_ANTI_SANADORES);
+            if (player->HasAura(BR_HECHIZO_RASTRILLO_LENTO))
+                player->RemoveAurasDueToSpell(BR_HECHIZO_RASTRILLO_LENTO);
+            if (player->HasAura(BR_HECHIZO_DESGARRO_ASESINO))
+                player->RemoveAurasDueToSpell(BR_HECHIZO_DESGARRO_ASESINO);
             if (player->HasAura(HECHIZO_ACIDO_ZONA))
                 player->RemoveAurasDueToSpell(HECHIZO_ACIDO_ZONA);
-            if (player->HasAura(HECHIZO_BENEFICIO_LIEBRE))
-                player->RemoveAurasDueToSpell(HECHIZO_BENEFICIO_LIEBRE);
+            if (player->HasAura(BR_HECHIZO_BENEFICIO_LIEBRE))
+                player->RemoveAurasDueToSpell(BR_HECHIZO_BENEFICIO_LIEBRE);
         }
         if (!logout)
         {
