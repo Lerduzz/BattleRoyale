@@ -1,9 +1,10 @@
-#ifndef SC_BR_ENTIDAD_MGR_H
-#define SC_BR_ENTIDAD_MGR_H
+#ifndef SC_BR_EVENTO_MGR_H
+#define SC_BR_EVENTO_MGR_H
 
 #include "Constantes.h"
 #include "CharacterCache.h"
 #include "ChatMgr.h"
+#include "MapaMgr.h"
 
 class EventoMgr
 {

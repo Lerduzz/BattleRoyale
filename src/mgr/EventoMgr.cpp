@@ -140,7 +140,7 @@ void EventoMgr::InvitarJugador(Player *player)
         return;
     float ox = BR_VARIACIONES_POSICION[indiceDePosicionNave][0];
     float oy = BR_VARIACIONES_POSICION[indiceDePosicionNave][1];
-    BRMapa *brM = sBRMapasMgr->MapaActual();
+    BRMapa *brM = sMapaMgr->MapaActual();
     Position iN = brM->inicioNave;
     uint32 tiempo = (tiempoRestanteInicio - (45 + intervalo.naveEnEspera)) * IN_MILLISECONDS;
     player->SetSummonPoint(brM->idMapa, iN.GetPositionX() + ox, iN.GetPositionY() + oy, iN.GetPositionZ() + 2.5f);
@@ -148,7 +148,7 @@ void EventoMgr::InvitarJugador(Player *player)
     data << sCharacterCache->GetCharacterGuidByName("BattleRoyale");
     data << uint32(brM->idZona);
     data << uint32(tiempo);
-    Player->GetSession()->SendPacket(&data);
+    player->GetSession()->SendPacket(&data);
     if (++indiceDePosicionNave >= BR_CANTIDAD_VARIACIONES)
     {
         indiceDePosicionNave = 0;
