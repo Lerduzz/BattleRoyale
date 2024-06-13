@@ -106,7 +106,7 @@ void EventoMgr::GestionarMuerteJcJ(Player *killer, Player *killed)
     {
         if (!killer || !killed || !EstaEnEvento(killer) || !EstaEnEvento(killed))
             return;
-        sSonidosMgr->ReproducirSonidoParaTodos(BR_SONIDO_ALGUIEN_MUERE, list_Jugadores);
+        sSonidoMgr->ReproducirSonidoParaTodos(BR_SONIDO_ALGUIEN_MUERE, list_Jugadores);
         if (killer == killed)
         {
             sBRRecompensaMgr->AcumularRecompensa(conf_Recompensa.morir, &(list_Datos[killed->GetGUID().GetCounter()]));
@@ -236,7 +236,7 @@ void EventoMgr::GestionarActualizacionMundo(uint32 diff)
             {
                 estadoActual = BR_ESTADO_ZONA_EN_ESPERA;
                 sBRRecompensaMgr->AcumularRecompensaVivos(conf_Recompensa.base, list_Jugadores, &list_Datos);
-                sSonidosMgr->ReproducirSonidoParaTodos(BR_SONIDO_RONDA_INICIADA, list_Jugadores);
+                sSonidoMgr->ReproducirSonidoParaTodos(BR_SONIDO_RONDA_INICIADA, list_Jugadores);
                 sBRChatMgr->NotificarTiempoInicial(0, list_Jugadores, sBRMapasMgr->MapaActual()->nombreMapa);
                 sBRMisionesMgr->CompletarRequerimiento(MISION_DIARIA_1, MISION_DIARIA_1_REQ_1, list_Jugadores);
                 tiempoRestanteZona = conf_IntervaloZonaSegura;
@@ -263,7 +263,7 @@ void EventoMgr::GestionarActualizacionMundo(uint32 diff)
             {
                 if (sEntidadMgr->DesaparecerNave())
                 {
-                    sSonidosMgr->ReproducirSonidoParaTodos(BR_SONIDO_NAVE_RETIRADA, list_Jugadores);
+                    sSonidoMgr->ReproducirSonidoParaTodos(BR_SONIDO_NAVE_RETIRADA, list_Jugadores);
                     sBRChatMgr->NotificarNaveRetirada(list_Jugadores);
                 }
             }
@@ -278,7 +278,7 @@ void EventoMgr::GestionarActualizacionMundo(uint32 diff)
                 }
                 AlReducirseLaZona();
                 sBRRecompensaMgr->AcumularRecompensaVivos(conf_Recompensa.zona, list_Jugadores, &list_Datos);
-                sSonidosMgr->ReproducirSonidoParaTodos(BR_SONIDO_ZONA_REDUCIDA, list_Jugadores);
+                sSonidoMgr->ReproducirSonidoParaTodos(BR_SONIDO_ZONA_REDUCIDA, list_Jugadores);
                 sBRChatMgr->NotificarZonaEnReduccion(list_Jugadores);
                 tiempoRestanteZona = conf_IntervaloZonaSegura;
                 estaZonaAnunciada5s = false;
@@ -290,13 +290,13 @@ void EventoMgr::GestionarActualizacionMundo(uint32 diff)
                 {
                     if (!estaZonaAnunciada5s && tiempoRestanteZona <= 5)
                     {
-                        sSonidosMgr->ReproducirSonidoParaTodos(BR_SONIDO_ZONA_TIEMPO, list_Jugadores);
+                        sSonidoMgr->ReproducirSonidoParaTodos(BR_SONIDO_ZONA_TIEMPO, list_Jugadores);
                         sBRChatMgr->NotificarAdvertenciaDeZona(5, list_Jugadores);
                         estaZonaAnunciada5s = true;
                     }
                     if (!estaZonaAnunciada10s && tiempoRestanteZona <= 10)
                     {
-                        sSonidosMgr->ReproducirSonidoParaTodos(BR_SONIDO_ZONA_TIEMPO, list_Jugadores);
+                        sSonidoMgr->ReproducirSonidoParaTodos(BR_SONIDO_ZONA_TIEMPO, list_Jugadores);
                         sBRChatMgr->NotificarAdvertenciaDeZona(10, list_Jugadores);
                         estaZonaAnunciada10s = true;
                     }
@@ -665,11 +665,11 @@ void EventoMgr::FinalizarRonda(bool announce, Player *winner /* = nullptr*/)
     {
         if (winner->GetTeamId() == TEAM_ALLIANCE)
         {
-            sSonidosMgr->ReproducirSonidoParaTodos(BR_SONIDO_GANADOR_ALIANZA, list_Jugadores);
+            sSonidoMgr->ReproducirSonidoParaTodos(BR_SONIDO_GANADOR_ALIANZA, list_Jugadores);
         }
         else
         {
-            sSonidosMgr->ReproducirSonidoParaTodos(BR_SONIDO_GANADOR_HORDA, list_Jugadores);
+            sSonidoMgr->ReproducirSonidoParaTodos(BR_SONIDO_GANADOR_HORDA, list_Jugadores);
         }
         if (list_Datos.find(winner->GetGUID().GetCounter()) != list_Datos.end())
         {

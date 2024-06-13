@@ -1,6 +1,6 @@
-#include "SonidosMgr.h"
+#include "SonidoMgr.h"
 
-void SonidosMgr::ReproducirSonidoParaTodos(uint32 soundID, BRListaPersonajes playerList)
+void SonidoMgr::ReproducirSonidoParaTodos(uint32 soundID, BRListaPersonajes playerList)
 {
     if (playerList.size())
     {

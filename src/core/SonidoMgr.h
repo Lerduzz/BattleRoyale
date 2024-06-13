@@ -4,21 +4,21 @@
 #include "Constantes.h"
 #include "MiscPackets.h"
 
-class SonidosMgr
+class SonidoMgr
 {
-    SonidosMgr(){};
-    ~SonidosMgr(){};
+    SonidoMgr(){};
+    ~SonidoMgr(){};
 
 public:
-    static SonidosMgr *instance()
+    static SonidoMgr *instance()
     {
-        static SonidosMgr *instance = new SonidosMgr();
+        static SonidoMgr *instance = new SonidoMgr();
         return instance;
     }
 
     void ReproducirSonidoParaTodos(uint32 soundID, BRListaPersonajes playerList);
 };
 
-#define sSonidosMgr SonidosMgr::instance()
+#define sSonidoMgr SonidoMgr::instance()
 
 #endif
