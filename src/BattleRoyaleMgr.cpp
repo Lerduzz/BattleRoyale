@@ -13,7 +13,7 @@ BattleRoyaleMgr::BattleRoyaleMgr()
     conf_RequisitoAsesinatosTotales = sConfigMgr->GetOption<uint32>("BattleRoyale.Requisito.AsesinatosTotales", 5);
     conf_RequisitoAsesinatosPropios = sConfigMgr->GetOption<uint32>("BattleRoyale.Requisito.AsesinatosPropios", 1);
 
-    conf_Recompensa = BRConf_Recompensa();
+    conf_Recompensa = BRConfigRecompensa();
     conf_Recompensa.base = sConfigMgr->GetOption<uint32>("BattleRoyale.Recompensa.Base", 400);
     conf_Recompensa.victoria = sConfigMgr->GetOption<uint32>("BattleRoyale.Recompensa.Victoria", 600);
     conf_Recompensa.asesinar = sConfigMgr->GetOption<uint32>("BattleRoyale.Recompensa.AlAsesinar", 350);
@@ -73,7 +73,7 @@ void BattleRoyaleMgr::GestionarJugadorEntrando(Player *player)
     }
     switch (estadoActual)
     {
-    case ESTADO_BR_SIN_SUFICIENTES_JUGADORES:
+    case BR_ESTADO_SIN_SUFICIENTES_JUGADORES:
     {
         list_Cola[guid] = player;
         if (HaySuficientesEnCola())
@@ -86,7 +86,7 @@ void BattleRoyaleMgr::GestionarJugadorEntrando(Player *player)
         }
         break;
     }
-    case ESTADO_BR_INVITANDO_JUGADORES:
+    case BR_ESTADO_INVITANDO_JUGADORES:
     {
         if (EstaLlenoElEvento())
         {
@@ -118,7 +118,7 @@ void BattleRoyaleMgr::GestionarJugadorDesconectar(Player *player)
 
 void BattleRoyaleMgr::GestionarMuerteJcJ(Player *killer, Player *killed)
 {
-    if (HayJugadores() && estadoActual >= ESTADO_BR_ZONA_EN_ESPERA && estadoActual < ESTADO_BR_BATALLA_TERMINADA)
+    if (HayJugadores() && estadoActual >= BR_ESTADO_ZONA_EN_ESPERA && estadoActual < BR_ESTADO_BATALLA_TERMINADA)
     {
         if (!killer || !killed || !EstaEnEvento(killer) || !EstaEnEvento(killed))
             return;
@@ -157,7 +157,7 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
         indicadorDeSegundos = 1000;
         switch (estadoActual)
         {
-        case ESTADO_BR_SIN_SUFICIENTES_JUGADORES:
+        case BR_ESTADO_SIN_SUFICIENTES_JUGADORES:
         {
             if (--tiempoRestanteSinJugadores <= 0)
             {
@@ -179,9 +179,9 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
             }
             break;
         }
-        case ESTADO_BR_INVITANDO_JUGADORES:
-        case ESTADO_BR_ESPERANDO_JUGADORES:
-        case ESTADO_BR_NAVE_EN_ESPERA:
+        case BR_ESTADO_INVITANDO_JUGADORES:
+        case BR_ESTADO_ESPERANDO_JUGADORES:
+        case BR_ESTADO_NAVE_EN_ESPERA:
         {
             tiempoRestanteInicio--;
             DarObjetosInicialesProgramado();
@@ -189,7 +189,7 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
             {
                 if (sBRObjetosMgr->EncenderNave())
                 {
-                    estadoActual = ESTADO_BR_NAVE_EN_MOVIMIENTO;
+                    estadoActual = BR_ESTADO_NAVE_EN_MOVIMIENTO;
                     if (!list_Invitados.empty())
                     {
                         while (!list_Invitados.empty())
@@ -208,27 +208,27 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
             }
             else if (tiempoRestanteInicio <= 75)
             {
-                if (estadoActual == ESTADO_BR_ESPERANDO_JUGADORES)
+                if (estadoActual == BR_ESTADO_ESPERANDO_JUGADORES)
                 {
-                    estadoActual = ESTADO_BR_NAVE_EN_ESPERA;
+                    estadoActual = BR_ESTADO_NAVE_EN_ESPERA;
                 }
             }
             else if (tiempoRestanteInicio <= 90)
             {
-                if (estadoActual == ESTADO_BR_INVITANDO_JUGADORES)
+                if (estadoActual == BR_ESTADO_INVITANDO_JUGADORES)
                 {
-                    estadoActual = ESTADO_BR_ESPERANDO_JUGADORES;
+                    estadoActual = BR_ESTADO_ESPERANDO_JUGADORES;
                 }
             }
             TODO_MejorarAnuncioEnNave();
             break;
         }
-        case ESTADO_BR_NAVE_EN_MOVIMIENTO:
+        case BR_ESTADO_NAVE_EN_MOVIMIENTO:
         {
             VerificarJugadoresEnNave();
             if (--tiempoRestanteInicio <= 20)
             {
-                estadoActual = ESTADO_BR_NAVE_POR_DESAPARECER;
+                estadoActual = BR_ESTADO_NAVE_POR_DESAPARECER;
                 escalaDeZona = 15.2f;
                 tiempoRestanteZona = 0;
                 estaZonaAnunciada5s = false;
@@ -246,11 +246,11 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
             TODO_MejorarAnuncioEnNave();
             break;
         }
-        case ESTADO_BR_NAVE_POR_DESAPARECER:
+        case BR_ESTADO_NAVE_POR_DESAPARECER:
         {
             if (--tiempoRestanteInicio <= 0)
             {
-                estadoActual = ESTADO_BR_ZONA_EN_ESPERA;
+                estadoActual = BR_ESTADO_ZONA_EN_ESPERA;
                 sBRRecompensaMgr->AcumularRecompensaVivos(conf_Recompensa.base, list_Jugadores, &list_Datos);
                 sBRSonidosMgr->ReproducirSonidoParaTodos(SONIDO_RONDA_INICIADA, list_Jugadores);
                 sBRChatMgr->NotificarTiempoInicial(0, list_Jugadores, sBRMapasMgr->MapaActual()->nombreMapa);
@@ -264,9 +264,9 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
             }
             break;
         }
-        case ESTADO_BR_ZONA_EN_ESPERA:
-        case ESTADO_BR_ZONA_EN_REDUCCION:
-        case ESTADO_BR_ZONA_DESAPARECIDA:
+        case BR_ESTADO_ZONA_EN_ESPERA:
+        case BR_ESTADO_ZONA_EN_REDUCCION:
+        case BR_ESTADO_ZONA_DESAPARECIDA:
         {
             ControlDeReglas();
             if (!CondicionDeVictoria())
@@ -285,12 +285,12 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
             }
             if (tiempoRestanteZona <= 0)
             {
-                if (estadoActual == ESTADO_BR_ZONA_EN_ESPERA && sBRObjetosMgr->EstaLaZonaActiva())
+                if (estadoActual == BR_ESTADO_ZONA_EN_ESPERA && sBRObjetosMgr->EstaLaZonaActiva())
                 {
                     reducirZonaHasta = escalaDeZona - 3.0f;
                     if (reducirZonaHasta < 0.2f)
                         reducirZonaHasta = 0.2f;
-                    estadoActual = ESTADO_BR_ZONA_EN_REDUCCION;
+                    estadoActual = BR_ESTADO_ZONA_EN_REDUCCION;
                 }
                 AlReducirseLaZona();
                 sBRRecompensaMgr->AcumularRecompensaVivos(conf_Recompensa.zona, list_Jugadores, &list_Datos);
@@ -302,7 +302,7 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
             }
             else
             {
-                if (estadoActual == ESTADO_BR_ZONA_EN_ESPERA)
+                if (estadoActual == BR_ESTADO_ZONA_EN_ESPERA)
                 {
                     if (!estaZonaAnunciada5s && tiempoRestanteZona <= 5)
                     {
@@ -321,7 +321,7 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
             }
             break;
         }
-        case ESTADO_BR_BATALLA_TERMINADA:
+        case BR_ESTADO_BATALLA_TERMINADA:
         {
             if (--tiempoRestanteFinal <= 0)
             {
@@ -329,7 +329,7 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
                     SalirDelEvento(list_Jugadores.begin()->first);
                 tiempoRestanteSinJugadores = conf_IntervaloSinJugadores;
                 seHaAnunciadoInicioForzado = false;
-                estadoActual = ESTADO_BR_SIN_SUFICIENTES_JUGADORES;
+                estadoActual = BR_ESTADO_SIN_SUFICIENTES_JUGADORES;
                 if (HaySuficientesEnCola())
                     IniciarNuevaRonda();
             }
@@ -341,7 +341,7 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
     {
         indicadorDeSegundos -= diff;
     }
-    if (estadoActual == ESTADO_BR_ZONA_EN_REDUCCION)
+    if (estadoActual == BR_ESTADO_ZONA_EN_REDUCCION)
     {
         if (indicadorDe100msZona <= 0)
         {
@@ -354,11 +354,11 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
             {
                 if (sBRObjetosMgr->EstaLaZonaActiva())
                 {
-                    estadoActual = ESTADO_BR_ZONA_EN_ESPERA;
+                    estadoActual = BR_ESTADO_ZONA_EN_ESPERA;
                 }
                 else
                 {
-                    estadoActual = ESTADO_BR_ZONA_DESAPARECIDA;
+                    estadoActual = BR_ESTADO_ZONA_DESAPARECIDA;
                 }
             }
         }
@@ -402,12 +402,12 @@ void BattleRoyaleMgr::RestablecerTodoElEvento()
     sBRObjetosMgr->DesaparecerTodosLosObjetos();
     tiempoRestanteSinJugadores = conf_IntervaloSinJugadores;
     seHaAnunciadoInicioForzado = false;
-    estadoActual = ESTADO_BR_SIN_SUFICIENTES_JUGADORES;
+    estadoActual = BR_ESTADO_SIN_SUFICIENTES_JUGADORES;
 }
 
 void BattleRoyaleMgr::IniciarNuevaRonda()
 {
-    if (estadoActual == ESTADO_BR_SIN_SUFICIENTES_JUGADORES)
+    if (estadoActual == BR_ESTADO_SIN_SUFICIENTES_JUGADORES)
     {
         sBRMapasMgr->EstablecerMasVotado();
         tiempoRestanteInicio = 120; // TODO: Configurale: Es la suma rara de los tiempos iniciales.
@@ -416,9 +416,9 @@ void BattleRoyaleMgr::IniciarNuevaRonda()
             RestablecerTodoElEvento();
             return;
         }
-        estadoActual = ESTADO_BR_INVITANDO_JUGADORES;
+        estadoActual = BR_ESTADO_INVITANDO_JUGADORES;
         totalAsesinatosJcJ = 0;
-        while (HayCola() && !EstaLlenoElEvento() && tiempoRestanteInicio >= 90 /* TODO: Tiempo total - Tiempo ESTADO_BR_INVITANDO_JUGADORES. */)
+        while (HayCola() && !EstaLlenoElEvento() && tiempoRestanteInicio >= 90 /* TODO: Tiempo total - Tiempo BR_ESTADO_INVITANDO_JUGADORES. */)
         {
             uint32 guid = list_Cola.begin()->first;
             if (list_Cola[guid]->IsInFlight())
@@ -480,7 +480,7 @@ void BattleRoyaleMgr::RespondeInvitacion(Player *player, bool agree, ObjectGuid 
         list_Invitados.erase(guid);
         sBRMapasMgr->RemoverVoto(guid);
         sBRMapasMgr->LimpiarVoto(guid);
-        if ((estadoActual == ESTADO_BR_INVITANDO_JUGADORES || estadoActual == ESTADO_BR_ESPERANDO_JUGADORES) && tiempoRestanteInicio >= 60)
+        if ((estadoActual == BR_ESTADO_INVITANDO_JUGADORES || estadoActual == BR_ESTADO_ESPERANDO_JUGADORES) && tiempoRestanteInicio >= 60)
         {
             while (HayCola() && !EstaLlenoElEvento() && tiempoRestanteInicio >= 60)
             {
@@ -530,8 +530,8 @@ void BattleRoyaleMgr::SalirDelEvento(uint32 guid, bool logout /* = false*/)
         player->SetPhaseMask(DIMENSION_NORMAL, true);
         if (player->IsAlive())
         {
-            if (player->HasAura(HECHIZO_ALAS_MAGICAS))
-                player->RemoveAurasDueToSpell(HECHIZO_ALAS_MAGICAS);
+            if (player->HasAura(BR_HECHIZO_ALAS_MAGICAS))
+                player->RemoveAurasDueToSpell(BR_HECHIZO_ALAS_MAGICAS);
             if (player->HasAura(HECHIZO_ANTI_INVISIBLES))
                 player->RemoveAurasDueToSpell(HECHIZO_ANTI_INVISIBLES);
             if (player->HasAura(HECHIZO_ANTI_SANADORES))
@@ -581,7 +581,7 @@ void BattleRoyaleMgr::EfectoFueraDeZona()
             {
                 float distance = sBRObjetosMgr->DistanciaDelCentro(it->second);
                 float f_RadioZona = escalaDeZona * 19.0f;
-                if (estadoActual == ESTADO_BR_ZONA_DESAPARECIDA || f_RadioZona < distance)
+                if (estadoActual == BR_ESTADO_ZONA_DESAPARECIDA || f_RadioZona < distance)
                 {
                     int tick = list_Datos[it->first].dmg_tick;
                     if ((tick <= 57 && tick % 3 == 0) || (tick > 57 && tick % 6 == 0))
@@ -660,7 +660,7 @@ void BattleRoyaleMgr::ControlDeReglas()
 
 bool BattleRoyaleMgr::CondicionDeVictoria()
 {
-    if (estadoActual >= ESTADO_BR_ZONA_EN_ESPERA && estadoActual < ESTADO_BR_BATALLA_TERMINADA)
+    if (estadoActual >= BR_ESTADO_ZONA_EN_ESPERA && estadoActual < BR_ESTADO_BATALLA_TERMINADA)
     {
         if (HayJugadores())
         {
@@ -719,5 +719,5 @@ void BattleRoyaleMgr::FinalizarRonda(bool announce, Player *winner /* = nullptr*
     sBRObjetosMgr->DesaparecerTodosLosObjetos();
     tiempoRestanteFinal = conf_IntervaloFinalDeRonda;
     sBRMapasMgr->SiguienteMapa();
-    estadoActual = ESTADO_BR_BATALLA_TERMINADA;
+    estadoActual = BR_ESTADO_BATALLA_TERMINADA;
 }

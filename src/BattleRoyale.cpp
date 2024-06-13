@@ -59,7 +59,7 @@ public:
     {
         if (player && pItem && not_loading)
         {
-            if (sBattleRoyaleMgr->EstadoActual() > ESTADO_BR_SIN_SUFICIENTES_JUGADORES && sBattleRoyaleMgr->EstaEnEvento(player))
+            if (sBattleRoyaleMgr->EstadoActual() > BR_ESTADO_SIN_SUFICIENTES_JUGADORES && sBattleRoyaleMgr->EstaEnEvento(player))
             {
                 return sBREquipamientoMgr->EsEquipamientoDeBR(pItem->GetEntry());
             }
@@ -322,14 +322,14 @@ public:
             ChatHandler(player->GetSession()).PSendSysMessage("|cff4CFF00BattleRoyale::|r ¡No se puede utilizar hasta que saltas de la nave!");
             return false;
         }
-        if (player->HasAura(HECHIZO_ALAS_MAGICAS))
+        if (player->HasAura(BR_HECHIZO_ALAS_MAGICAS))
         {
-            player->RemoveAurasDueToSpell(HECHIZO_ALAS_MAGICAS);
+            player->RemoveAurasDueToSpell(BR_HECHIZO_ALAS_MAGICAS);
             return true;
         }
         else
         {
-            player->AddAura(HECHIZO_ALAS_MAGICAS, player);
+            player->AddAura(BR_HECHIZO_ALAS_MAGICAS, player);
             return false;
         }
     }
@@ -449,10 +449,10 @@ public:
 
     static bool HandleStartCommand(ChatHandler *handler)
     {
-        if (sBattleRoyaleMgr->EstadoActual() == ESTADO_BR_SIN_SUFICIENTES_JUGADORES)
+        if (sBattleRoyaleMgr->EstadoActual() == BR_ESTADO_SIN_SUFICIENTES_JUGADORES)
         {
             sBattleRoyaleMgr->ForzarIniciarNuevaRonda();
-            if (sBattleRoyaleMgr->EstadoActual() != ESTADO_BR_SIN_SUFICIENTES_JUGADORES)
+            if (sBattleRoyaleMgr->EstadoActual() != BR_ESTADO_SIN_SUFICIENTES_JUGADORES)
             {
                 handler->SendSysMessage("Se ha forzado el inicio de la ronda de Battle Royale sin haber suficientes jugadores.");
             }
