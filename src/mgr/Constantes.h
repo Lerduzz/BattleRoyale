@@ -95,7 +95,7 @@ enum BRMisionReq
 };
 
 // ----------------------------------- CONSTS ----------------------------------- //
-const std::string BR_NOMBRE_CHAT = "|cffff6633[|cffff0000B|cffff3300attle |cffff0000R|cffff3300oyale|cffff6633]|r";
+const std::string BR_NOMBRE_CHAT = "|cffff6633[|cffff0000B|cffff3300attle|cffff0000R|cffff3300oyale|cffff6633]|r";
 
 const int BR_CANTIDAD_VARIACIONES = 49;
 const float BR_VARIACIONES_POSICION[BR_CANTIDAD_VARIACIONES][2] = {{-4.5f, 4.5f}, {-3.0f, 4.5f}, {-1.5f, 4.5f}, {0.0f, 4.5f}, {1.5f, 4.5f}, {3.0f, 4.5f}, {4.5f, 4.5f}, {-4.5f, 3.0f}, {-3.0f, 3.0f}, {-1.5f, 3.0f}, {0.0f, 3.0f}, {1.5f, 3.0f}, {3.0f, 3.0f}, {4.5f, 3.0f}, {-4.5f, 1.5f}, {-3.0f, 1.5f}, {-1.5f, 1.5f}, {0.0f, 1.5f}, {1.5f, 1.5f}, {3.0f, 1.5f}, {4.5f, 1.5f}, {-4.5f, 0.0f}, {-3.0f, 0.0f}, {-1.5f, 0.0f}, {0.0f, 0.0f}, {1.5f, 0.0f}, {3.0f, 0.0f}, {4.5f, 0.0f}, {-4.5f, -1.5f}, {-3.0f, -1.5f}, {-1.5f, -1.5f}, {0.0f, -1.5f}, {1.5f, -1.5f}, {3.0f, -1.5f}, {4.5f, -1.5f}, {-4.5f, -3.0f}, {-3.0f, -3.0f}, {-1.5f, -3.0f}, {0.0f, -3.0f}, {1.5f, -3.0f}, {3.0f, -3.0f}, {4.5f, -3.0f}, {-4.5f, -4.5f}, {-3.0f, -4.5f}, {-1.5f, -4.5f}, {0.0f, -4.5f}, {1.5f, -4.5f}, {3.0f, -4.5f}, {4.5f, -4.5f}};
