@@ -12,13 +12,14 @@ public:
     {
         if (!sEventoMgr->EstaEnCola(player))
         {
-            AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "Unirme a un mapa aleatorio.", 0, 1);
+            AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "Unirme a un mapa aleatorio", 0, 1);
             // AddGossipItemFor(player, GOSSIP_ICON_TAXI, "Votar por un mapa específico.", 0, 2);
         }
         else
         {
-            AddGossipItemFor(player, GOSSIP_ICON_TALK, "Salir de la cola.", 0, 3);
+            AddGossipItemFor(player, GOSSIP_ICON_TALK, "Salir de la cola", 0, 3);
         }
+        AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Hasta luego", 0, 4);
         SendGossipMenuFor(player, BR_CRIATURA_GESTOR_COLA, creature->GetGUID());
         return true;
     }
@@ -79,6 +80,11 @@ public:
             // {
             //     ChatHandler(player->GetSession()).PSendSysMessage("|cff4CFF00BattleRoyale::|r ¡Este modo de juego se encuentra actualmente desactivado!");
             // }
+            CloseGossipMenuFor(player);
+            break;
+        }
+        case 4:
+        {
             CloseGossipMenuFor(player);
             break;
         }
