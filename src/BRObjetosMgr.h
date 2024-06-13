@@ -1,7 +1,7 @@
 #ifndef SC_BR_OBJ_MGR_H
 #define SC_BR_OBJ_MGR_H
 
-#include "BRConstantes.h"
+#include "Constantes.h"
 #include "GameObject.h"
 #include "MapMgr.h"
 #include "SpellAuras.h"

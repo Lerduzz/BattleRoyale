@@ -1,7 +1,7 @@
 #ifndef SC_BR_MGR_H
 #define SC_BR_MGR_H
 
-#include "BRConstantes.h"
+#include "Constantes.h"
 #include "BREquipamientoMgr.h"
 #include "BRChatMgr.h"
 #include "BRListaNegraMgr.h"

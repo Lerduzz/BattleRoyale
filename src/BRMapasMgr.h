@@ -1,7 +1,7 @@
 #ifndef SC_BR_MAPS_MGR_H
 #define SC_BR_MAPS_MGR_H
 
-#include "BRConstantes.h"
+#include "Constantes.h"
 
 typedef std::map<uint32, uint32> BR_ListVotos;
 
