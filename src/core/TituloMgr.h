@@ -5,21 +5,21 @@
 #include "Player.h"
 #include "SharedDefines.h"
 
-class TitulosMgr
+class TituloMgr
 {
-    TitulosMgr(){};
-    ~TitulosMgr(){};
+    TituloMgr(){};
+    ~TituloMgr(){};
 
 public:
-    static TitulosMgr *instance()
+    static TituloMgr *instance()
     {
-        static TitulosMgr *instance = new TitulosMgr();
+        static TituloMgr *instance = new TituloMgr();
         return instance;
     }
 
     void Ascender(Player* player);
 };
 
-#define sTitulosMgr TitulosMgr::instance()
+#define sTituloMgr TituloMgr::instance()
 
 #endif

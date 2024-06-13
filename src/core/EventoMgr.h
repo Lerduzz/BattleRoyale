@@ -9,7 +9,7 @@
 #include "EntidadMgr.h"
 #include "BRRecompensaMgr.h"
 #include "SonidoMgr.h"
-#include "TitulosMgr.h"
+#include "TituloMgr.h"
 #include "PlayerData.h"
 #include "Common.h"
 #include "SharedDefines.h"

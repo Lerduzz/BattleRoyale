@@ -1,6 +1,6 @@
-#include "TitulosMgr.h"
+#include "TituloMgr.h"
 
-void TitulosMgr::Ascender(Player *player)
+void TituloMgr::Ascender(Player *player)
 {
     if (!player)
         return;
