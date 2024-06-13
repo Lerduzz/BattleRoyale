@@ -18,15 +18,15 @@
 
 class PlayerData;
 
-class BattleRoyaleMgr
+class EventoMgr
 {
-    BattleRoyaleMgr();
-    ~BattleRoyaleMgr();
+    EventoMgr();
+    ~EventoMgr();
 
 public:
-    static BattleRoyaleMgr *instance()
+    static EventoMgr *instance()
     {
-        static BattleRoyaleMgr *instance = new BattleRoyaleMgr();
+        static EventoMgr *instance = new EventoMgr();
         return instance;
     }
 
@@ -425,6 +425,6 @@ private:
     BRConfigRecompensa conf_Recompensa;
 };
 
-#define sBattleRoyaleMgr BattleRoyaleMgr::instance()
+#define sEventoMgr EventoMgr::instance()
 
 #endif

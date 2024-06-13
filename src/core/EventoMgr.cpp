@@ -1,8 +1,8 @@
-#include "BattleRoyaleMgr.h"
+#include "EventoMgr.h"
 #include "CharacterCache.h"
 #include "Config.h"
 
-BattleRoyaleMgr::BattleRoyaleMgr()
+EventoMgr::EventoMgr()
 {
     conf_EstaActivado = sConfigMgr->GetOption<bool>("BattleRoyale.Activado", true);
     conf_JugadoresMinimo = sConfigMgr->GetOption<uint32>("BattleRoyale.MinJugadores", 25);
@@ -25,12 +25,12 @@ BattleRoyaleMgr::BattleRoyaleMgr()
     RestablecerTodoElEvento();
 }
 
-BattleRoyaleMgr::~BattleRoyaleMgr()
+EventoMgr::~EventoMgr()
 {
     RestablecerTodoElEvento();
 }
 
-void BattleRoyaleMgr::GestionarJugadorEntrando(Player *player)
+void EventoMgr::GestionarJugadorEntrando(Player *player)
 {
     if (!player)
         return;
@@ -94,13 +94,13 @@ void BattleRoyaleMgr::GestionarJugadorEntrando(Player *player)
     }
 }
 
-void BattleRoyaleMgr::GestionarJugadorDesconectar(Player *player)
+void EventoMgr::GestionarJugadorDesconectar(Player *player)
 {
     if (EstaEnEvento(player) || EstaEnCola(player) || EstaInvitado(player) || EstaEnListaDeAlas(player))
         SalirDelEvento(player->GetGUID().GetCounter(), true);
 }
 
-void BattleRoyaleMgr::GestionarMuerteJcJ(Player *killer, Player *killed)
+void EventoMgr::GestionarMuerteJcJ(Player *killer, Player *killed)
 {
     if (HayJugadores() && estadoActual >= BR_ESTADO_ZONA_EN_ESPERA && estadoActual < BR_ESTADO_BATALLA_TERMINADA)
     {
@@ -123,7 +123,7 @@ void BattleRoyaleMgr::GestionarMuerteJcJ(Player *killer, Player *killed)
     }
 }
 
-void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
+void EventoMgr::GestionarActualizacionMundo(uint32 diff)
 {
     if (indicadorQuitarObjetosProgramado <= 0)
     {
@@ -147,7 +147,7 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
             {
                 tiempoRestanteSinJugadores = conf_IntervaloSinJugadores;
                 seHaAnunciadoInicioForzado = false;
-                if (sBattleRoyaleMgr->ForzarIniciarNuevaRonda())
+                if (sEventoMgr->ForzarIniciarNuevaRonda())
                 {
                     sBRChatMgr->AnunciarInicioForzado(list_Jugadores.size());
                 }
@@ -353,13 +353,13 @@ void BattleRoyaleMgr::GestionarActualizacionMundo(uint32 diff)
     }
 }
 
-void BattleRoyaleMgr::PrevenirJcJEnLaNave(Player *player, bool state)
+void EventoMgr::PrevenirJcJEnLaNave(Player *player, bool state)
 {
     if (state && HayJugadores() && EstaEnEvento(player) && !TodosContraTodos(player))
         player->SetPvP(false);
 }
 
-bool BattleRoyaleMgr::PuedeReaparecerEnCementerio(Player *player)
+bool EventoMgr::PuedeReaparecerEnCementerio(Player *player)
 {
     if (HayJugadores() && EstaEnEvento(player))
     {
@@ -369,7 +369,7 @@ bool BattleRoyaleMgr::PuedeReaparecerEnCementerio(Player *player)
     return true;
 }
 
-void BattleRoyaleMgr::RestablecerTodoElEvento()
+void EventoMgr::RestablecerTodoElEvento()
 {
     list_Cola.clear();
     list_Invitados.clear();
@@ -389,7 +389,7 @@ void BattleRoyaleMgr::RestablecerTodoElEvento()
     estadoActual = BR_ESTADO_SIN_SUFICIENTES_JUGADORES;
 }
 
-void BattleRoyaleMgr::IniciarNuevaRonda()
+void EventoMgr::IniciarNuevaRonda()
 {
     if (estadoActual == BR_ESTADO_SIN_SUFICIENTES_JUGADORES)
     {
@@ -413,7 +413,7 @@ void BattleRoyaleMgr::IniciarNuevaRonda()
     }
 }
 
-void BattleRoyaleMgr::AlmacenarPosicionInicial(uint32 guid)
+void EventoMgr::AlmacenarPosicionInicial(uint32 guid)
 {
     if (!list_Jugadores[guid]->GetMap() || list_Jugadores[guid]->GetMap()->Instanceable() || list_Jugadores[guid]->GetTransport())
     {
@@ -425,7 +425,7 @@ void BattleRoyaleMgr::AlmacenarPosicionInicial(uint32 guid)
     }
 }
 
-void BattleRoyaleMgr::LlamarDentroDeNave(uint32 guid, uint32 tiempo /* = 20000*/)
+void EventoMgr::LlamarDentroDeNave(uint32 guid, uint32 tiempo /* = 20000*/)
 {
     if (list_Invitados.find(guid) == list_Invitados.end())
         return;
@@ -445,7 +445,7 @@ void BattleRoyaleMgr::LlamarDentroDeNave(uint32 guid, uint32 tiempo /* = 20000*/
     SiguientePosicion();
 }
 
-void BattleRoyaleMgr::RespondeInvitacion(Player *player, bool agree, ObjectGuid summoner_guid)
+void EventoMgr::RespondeInvitacion(Player *player, bool agree, ObjectGuid summoner_guid)
 {
     if (!player || !EstaInvitado(player))
         return;
@@ -486,7 +486,7 @@ void BattleRoyaleMgr::RespondeInvitacion(Player *player, bool agree, ObjectGuid 
     list_DarObjetosIniciales[guid] = player;
 }
 
-void BattleRoyaleMgr::SalirDelEvento(uint32 guid, bool logout /* = false*/)
+void EventoMgr::SalirDelEvento(uint32 guid, bool logout /* = false*/)
 {
     if (EstaEnListaDarObjetosIniciales(guid))
         list_DarObjetosIniciales.erase(guid);
@@ -534,14 +534,14 @@ void BattleRoyaleMgr::SalirDelEvento(uint32 guid, bool logout /* = false*/)
         list_QuitarTodosLosObjetos.erase(guid);
 }
 
-void BattleRoyaleMgr::RevivirJugador(Player *player)
+void EventoMgr::RevivirJugador(Player *player)
 {
     player->ResurrectPlayer(1.0f);
     player->SpawnCorpseBones();
     player->SaveToDB(false, false);
 }
 
-void BattleRoyaleMgr::EfectoFueraDeZona()
+void EventoMgr::EfectoFueraDeZona()
 {
     if (HayJugadores())
     {
@@ -586,7 +586,7 @@ void BattleRoyaleMgr::EfectoFueraDeZona()
     }
 }
 
-void BattleRoyaleMgr::ActivarTodosContraTodos()
+void EventoMgr::ActivarTodosContraTodos()
 {
     if (HayJugadores())
     {
@@ -600,7 +600,7 @@ void BattleRoyaleMgr::ActivarTodosContraTodos()
     }
 }
 
-void BattleRoyaleMgr::ControlDeReglas()
+void EventoMgr::ControlDeReglas()
 {
     if (HayJugadores())
     {
@@ -628,7 +628,7 @@ void BattleRoyaleMgr::ControlDeReglas()
     }
 }
 
-bool BattleRoyaleMgr::CondicionDeVictoria()
+bool EventoMgr::CondicionDeVictoria()
 {
     if (estadoActual >= BR_ESTADO_ZONA_EN_ESPERA && estadoActual < BR_ESTADO_BATALLA_TERMINADA)
     {
@@ -659,7 +659,7 @@ bool BattleRoyaleMgr::CondicionDeVictoria()
     return false;
 }
 
-void BattleRoyaleMgr::FinalizarRonda(bool announce, Player *winner /* = nullptr*/)
+void EventoMgr::FinalizarRonda(bool announce, Player *winner /* = nullptr*/)
 {
     if (announce && winner && EstaEnEvento(winner))
     {
